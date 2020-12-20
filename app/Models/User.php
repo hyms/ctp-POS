@@ -2,42 +2,69 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Model;
 
-class User extends Authenticatable
+class User extends Model
 {
-    use HasFactory, Notifiable;
+    protected $table = 'user';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    public function getOrdenCTPs()
+    {
+        return $this->hasMany(OrdenCTP::class, 'fk_idUserD', 'idUser');
+    }
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    public function getOrdenCTPs0()
+    {
+        return $this->hasMany(OrdenCTP::class, 'fk_idUserV', 'idUser');
+    }
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    public function getOrdenCTPs1()
+    {
+        return $this->hasMany(OrdenCTP::class, 'fk_idUserD2', 'idUser');
+    }
+
+    public function getMovimientoCajas()
+    {
+        return $this->hasMany(MovimientoCaja::class, 'fk_idUser', 'idUser');
+    }
+
+    public function getMovimientoStocks()
+    {
+        return $this->hasMany(MovimientoStock::class, 'fk_idUser', 'idUser');
+    }
+
+    public function getNotas()
+    {
+        return $this->hasMany(Notas::class, 'fk_idUserCreador', 'idUser');
+    }
+
+    public function getNotas0()
+    {
+        return $this->hasMany(Notas::class, 'fk_idUserVisto', 'idUser');
+    }
+
+    public function getRecibos()
+    {
+        return $this->hasMany(Recibo::class, 'fk_idUser', 'idUser');
+    }
+
+    public function getFkIdSucursal()
+    {
+        return $this->hasOne(Sucursal::class, 'idSucursal', 'fk_idSucursal');
+    }
+
+    public function getRole($int = null)
+    {
+        $roles = array(
+            '1' => 'sadmin',
+            '2' => 'admin',
+            '3' => 'venta',
+            '4' => 'operario',
+            '5' => 'diseño',
+            '6' => 'auxVenta'
+        );
+        if (is_null($int))
+            return $roles;
+        return $roles[$int];
+    }
 }
