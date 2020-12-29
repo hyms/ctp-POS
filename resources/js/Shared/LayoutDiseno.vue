@@ -1,33 +1,31 @@
 <template>
-  <div>
-      <div class="all-wrapper solid-bg-all" >
-          <div class="layout-w">
-<!--              <MainMenuMobile v-if="isLogged"/>
-              <MainMenu v-if="isLogged"/>-->
-              <div class="content-w">
-                  <div class="content-box">
-                  <slot />
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
+    <div class="">
+        <div class="all-wrapper solid-bg-all">
+            <div class="layout-w">
+                <MainMenuMobile :nombre="$page.props.auth"/>
+                <MainMenu :nombre="$page.props.auth"/>
+                <div class="content-w">
+                        <slot/>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
+import MainMenuMobile from "./menu/MainMenuMobile";
+import MainMenu from "./menu/MainMenu";
 
 export default {
-  components: {
-  },
-  data() {
-    return {
-    }
-  },
-  methods: {
-    url() {
+    components: {
+        MainMenu,
+        MainMenuMobile
     },
-    hideDropdownMenus() {
+    data() {
+        return {
+        }
     },
-  },
+    methods: {},
+
 }
 </script>

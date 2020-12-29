@@ -1,20 +1,130 @@
 <template>
-  <div>
-    <h1 class="mb-8 font-bold text-3xl">Dashboard</h1>
-    <p class="mb-8 leading-normal">Hey there! Welcome to Ping CRM, a demo app designed to help illustrate how <a class="text-indigo-500 underline hover:text-orange-600" href="https://inertiajs.com">Inertia.js</a> works.</p>
-    <div class="mb-8 flex">
-      <inertia-link class="btn-indigo" href="/500">500 error</inertia-link>
-      <inertia-link class="btn-indigo ml-1" href="/404">404 error</inertia-link>
+    <div class="content-w">
+        <div class="content-box">
+    <div class="hello">
+        <p>
+            For a guide and recipes on how to configure / customize this
+            project,<br />
+            check out the
+            <a href="https://cli.vuejs.org" target="_blank" rel="noopener"
+            >vue-cli documentation</a
+            >.
+        </p>
+        <h3>Installed CLI Plugins</h3>
+        <ul>
+            <li>
+                <a
+                    href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel"
+                    target="_blank"
+                    rel="noopener"
+                >babel</a
+                >
+            </li>
+            <li>
+                <a
+                    href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-router"
+                    target="_blank"
+                    rel="noopener"
+                >router</a
+                >
+            </li>
+            <li>
+                <a
+                    href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-vuex"
+                    target="_blank"
+                    rel="noopener"
+                >vuex</a
+                >
+            </li>
+            <li>
+                <a
+                    href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint"
+                    target="_blank"
+                    rel="noopener"
+                >eslint</a
+                >
+            </li>
+        </ul>
+        <h3>Essential Links</h3>
+        <ul>
+            <li>
+                <a href="https://vuejs.org" target="_blank" rel="noopener"
+                >Core Docs</a
+                >
+            </li>
+            <li>
+                <a href="https://forum.vuejs.org" target="_blank" rel="noopener"
+                >Forum</a
+                >
+            </li>
+            <li>
+                <a href="https://chat.vuejs.org" target="_blank" rel="noopener"
+                >Community Chat</a
+                >
+            </li>
+            <li>
+                <a
+                    href="https://twitter.com/vuejs"
+                    target="_blank"
+                    rel="noopener"
+                >Twitter</a
+                >
+            </li>
+            <li>
+                <a href="https://news.vuejs.org" target="_blank" rel="noopener"
+                >News</a
+                >
+            </li>
+        </ul>
+        <h3>Ecosystem</h3>
+        <ul>
+            <li>
+                <a
+                    href="https://router.vuejs.org"
+                    target="_blank"
+                    rel="noopener"
+                >vue-router</a
+                >
+            </li>
+            <li>
+                <a href="https://vuex.vuejs.org" target="_blank" rel="noopener"
+                >vuex</a
+                >
+            </li>
+            <li>
+                <a
+                    href="https://github.com/vuejs/vue-devtools#vue-devtools"
+                    target="_blank"
+                    rel="noopener"
+                >vue-devtools</a
+                >
+            </li>
+            <li>
+                <a
+                    href="https://vue-loader.vuejs.org"
+                    target="_blank"
+                    rel="noopener"
+                >vue-loader</a
+                >
+            </li>
+            <li>
+                <a
+                    href="https://github.com/vuejs/awesome-vue"
+                    target="_blank"
+                    rel="noopener"
+                >awesome-vue</a
+                >
+            </li>
+        </ul>
     </div>
-    <p class="leading-normal">👆 These links are intended to be broken to illustrate how error handling works with Inertia.js.</p>
-  </div>
+    </div>
+    </div>
 </template>
 
 <script>
 import Layout from '@/Shared/LayoutDiseno'
 
 export default {
-  metaInfo: { title: 'Diseño' },
   layout: Layout,
 }
 </script>
