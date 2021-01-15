@@ -6,21 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class MovimientoCaja extends Model
 {
-    protected $table = 'movimientoCaja';
+    protected $table = 'movimientoCajas';
 
     public function getOrdenCTPs()
     {
-        return $this->hasMany(OrdenCTP::class, 'fk_idMovimientoCaja', 'idMovimientoCaja');
+        return $this->hasMany(OrdenesTrabajo::class, 'fk_idMovimientoCaja', 'idMovimientoCaja');
     }
 
     public function getCajaDestino()
     {
-        return $this->hasOne(Caja::class, 'idCaja', 'fk_idCajaDestino');
+        return $this->hasOne(Cajas::class, 'idCaja', 'fk_idCajaDestino');
     }
 
     public function getCajaOrigen()
     {
-        return $this->hasOne(Caja::class, 'idCaja', 'fk_idCajaOrigen');
+        return $this->hasOne(Cajas::class, 'idCaja', 'fk_idCajaOrigen');
     }
 
     public function getCajaPadre()

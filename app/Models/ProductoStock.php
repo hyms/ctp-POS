@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductoStock extends Model
 {
-    protected $table = 'productoStock';
+    protected $table = 'stock';
 
     public function getMovimientoStocks()
     {
@@ -15,7 +15,7 @@ class ProductoStock extends Model
 
     public function getOrdenDetalles()
     {
-        return $this->hasMany(OrdenDetalle::class, 'fk_idProductoStock', 'idProductoStock');
+        return $this->hasMany(detallesOrden::class, 'fk_idProductoStock', 'idProductoStock');
     }
 
     public function getProducto()

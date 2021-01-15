@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cliente extends Model
 {
-    protected $table = 'cliente';
+    protected $table = 'clientes';
 
     public function getOrdenCTPs()
     {
-        return $this->hasMany(OrdenCTP::class, 'fk_idCliente', 'idCliente');
+        return $this->hasMany(OrdenesTrabajo::class, 'fk_idCliente', 'idCliente');
     }
 
     public function getFkIdSucursal()

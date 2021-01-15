@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class OrdenCTP extends Model
+class OrdenesTrabajo extends Model
 {
-    protected $table = 'OrdenCTP';
+    protected $table = 'ordenesTrabajo';
 
     public function getCliente()
     {
@@ -20,12 +20,12 @@ class OrdenCTP extends Model
 
     public function getOrdenPadre()
     {
-        return $this->hasOne(OrdenCTP::class, 'idOrdenCTP', 'fk_idParent');
+        return $this->hasOne(OrdenesTrabajo::class, 'idOrdenCTP', 'fk_idParent');
     }
 
     public function getOrdenCTPs()
     {
-        return $this->hasMany(OrdenCTP::class, 'fk_idParent', 'idOrdenCTP');
+        return $this->hasMany(OrdenesTrabajo::class, 'fk_idParent', 'idOrdenCTP');
     }
 
     public function getUsuarioDiseño()
@@ -50,7 +50,7 @@ class OrdenCTP extends Model
 
     public function getOrdenDetalle()
     {
-        return $this->hasMany(OrdenDetalle::class, 'fk_idOrden', 'idOrdenCTP');
+        return $this->hasMany(detallesOrden::class, 'fk_idOrden', 'idOrdenCTP');
     }
 
     static public function estadoCTP($id = null)

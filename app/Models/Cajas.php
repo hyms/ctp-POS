@@ -4,18 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Caja extends Model
+class Cajas extends Model
 {
-    protected $table = 'caja';
+    protected $table = 'cajas';
 
     public function getCajaPadre()
     {
-        return $this->hasOne(Caja::class, 'idCaja', 'fk_idCaja');
+        return $this->hasOne(Cajas::class, 'idCaja', 'fk_idCaja');
     }
 
     public function getCajas()
     {
-        return $this->hasMany(Caja::class, 'fk_idCaja', 'idCaja');
+        return $this->hasMany(Cajas::class, 'fk_idCaja', 'idCaja');
     }
 
     public function getSucursal()

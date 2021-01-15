@@ -6,16 +6,17 @@ use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
+use function PHPUnit\Framework\isNull;
 
 class User extends Model implements AuthenticatableContract
 {
     use Authenticatable;
-    protected $table = 'user';
-    protected $primaryKey = 'idUser';
+
+    protected $table = 'users';
 
     public function getNameAttribute()
     {
-        return $this->nombre.' '.$this->apellido;
+        return $this->nombre . ' ' . $this->apellido;
     }
 
     public function setPasswordAttribute($password)
@@ -25,17 +26,17 @@ class User extends Model implements AuthenticatableContract
 
     public function getOrdenCTPs()
     {
-        return $this->hasMany(OrdenCTP::class, 'fk_idUserD', 'idUser');
+        return $this->hasMany(OrdenesTrabajo::class, 'user', 'id');
     }
 
     public function getOrdenCTPs0()
     {
-        return $this->hasMany(OrdenCTP::class, 'fk_idUserV', 'idUser');
+        return $this->hasMany(OrdenesTrabajo::class, 'fk_idUserV', 'idUser');
     }
 
     public function getOrdenCTPs1()
     {
-        return $this->hasMany(OrdenCTP::class, 'fk_idUserD2', 'idUser');
+        return $this->hasMany(OrdenesTrabajo::class, 'fk_idUserD2', 'idUser');
     }
 
     public function getMovimientoCajas()
@@ -53,11 +54,6 @@ class User extends Model implements AuthenticatableContract
         return $this->hasMany(Notas::class, 'fk_idUserCreador', 'idUser');
     }
 
-    public function getNotas0()
-    {
-        return $this->hasMany(Notas::class, 'fk_idUserVisto', 'idUser');
-    }
-
     public function getRecibos()
     {
         return $this->hasMany(Recibo::class, 'fk_idUser', 'idUser');
@@ -71,15 +67,16 @@ class User extends Model implements AuthenticatableContract
     public function getRole($int = null)
     {
         $roles = array(
-            '1' => 'sadmin',
-            '2' => 'admin',
-            '3' => 'venta',
-            '4' => 'operario',
-            '5' => 'diseño',
-            '6' => 'auxVenta'
+            '0' => 'sadmin',
+            '1' => 'admin',
+            '2' => 'venta',
+            '3' => 'operario',
+            '4' => 'diseño',
+            '5' => 'auxVenta'
         );
-        if (is_null($int))
+        if (isNull($int)) {
             return $roles;
+        }
         return $roles[$int];
     }
 }

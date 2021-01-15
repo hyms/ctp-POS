@@ -24,7 +24,7 @@ Route::post('login', [LoginController::class, 'login'])
     ->name('login.attempt')
     ->middleware('guest');
 
-Route::post('logout', [LoginController::class, 'logout'])
+Route::get('logout', [LoginController::class, 'logout'])
     ->name('logout');
 
 

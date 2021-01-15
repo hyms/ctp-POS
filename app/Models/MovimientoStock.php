@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MovimientoStock extends Model
 {
-    protected $table = 'movimientoStock';
+    protected $table = 'movimientosStock';
 
     public function getProducto()
     {
@@ -30,6 +30,6 @@ class MovimientoStock extends Model
 
     public function getOrdenDetalles()
     {
-        return $this->hasMany(OrdenDetalle::class, 'fk_idMovimientoStock', 'idMovimientoStock');
+        return $this->hasMany(detallesOrden::class, 'fk_idMovimientoStock', 'idMovimientoStock');
     }
 }

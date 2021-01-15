@@ -6,16 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sucursal extends Model
 {
-    protected $table = 'sucursal';
+    protected $table = 'sucursales';
 
     public function getOrdenCTPs()
     {
-        return $this->hasMany(OrdenCTP::class, 'fk_idSucursal', 'idSucursal');
+        return $this->hasMany(OrdenesTrabajo::class, 'fk_idSucursal', 'idSucursal');
     }
 
     public function getCajas()
     {
-        return $this->hasMany(Caja::class, 'fk_idSucursal', 'idSucursal');
+        return $this->hasMany(Cajas::class, 'fk_idSucursal', 'idSucursal');
     }
 
     public function getClientes()

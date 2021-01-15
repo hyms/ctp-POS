@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class OrdenDetalle extends Model
+class detallesOrden extends Model
 {
-    protected $table = 'ordenDetalle';
+    protected $table = 'detallesOrden';
 
     public function getMovimientoStock()
     {
@@ -20,6 +20,6 @@ class OrdenDetalle extends Model
 
     public function getOrden()
     {
-        return $this->hasOne(OrdenCTP::class, 'idOrdenCTP', 'fk_idOrden');
+        return $this->hasOne(OrdenesTrabajo::class, 'idOrdenCTP', 'fk_idOrden');
     }
 }
