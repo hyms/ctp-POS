@@ -1,61 +1,73 @@
 <template>
-    <div class="all-wrapper menu-side with-pattern" >
-        <div class="auth-box-w">
-            <div class="logo-w">
-                <a href="#"><img alt="" src=""/></a>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+
+                <div class="wrapper-page">
+                    <div class="m-t-40 card-box">
+                        <div class="text-center">
+                            <h2 class="text-uppercase m-t-0 m-b-30">
+                                Ingresar
+                            </h2>
+                        </div>
+                        <div class="col">
+                            <b-alert :show="Object.values(errors).length>0" variant="danger" dismissible>
+                                <ul>
+                                    <li v-for="(value,key) in errors">
+                                        {{key}}:{{value}}
+                                    </li>
+                                </ul>
+                            </b-alert>
+                        </div>
+                        <div class="account-content">
+                            <form class="form-horizontal" @submit.prevent="submit">
+                                <div class="form-group m-b-20">
+                                    <div class="col-12">
+                                        <label for="username">Username</label>
+                                        <b-form-input
+                                            id="username"
+                                            v-model="form.username"
+                                            placeholder="Usuario"
+                                            trim
+                                            type="text"
+                                        ></b-form-input>
+                                    </div>
+                                </div>
+                                <div class="form-group m-b-20">
+                                    <div class="col-12">
+                                        <label for="password">Contraseña</label>
+                                        <b-form-input
+                                            id="password"
+                                            v-model="form.password"
+                                            placeholder="Contraseña"
+                                            trim
+                                            type="password"
+                                        ></b-form-input>
+                                    </div>
+                                </div>
+                                <div class="form-group m-b-30">
+                                    <div class="col-8">
+                                        <div class="icheck-primary">
+                                            <input id="remember" v-model="form.remember" type="checkbox">
+                                            <label for="remember">
+                                                Remember Me
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group account-btn text-center m-t-10">
+                                    <!-- /.col -->
+                                    <div class="col-12">
+                                        <loading-button :loading="sending" class="btn btn-lg btn-primary btn-block" type="submit">Login
+                                        </loading-button>
+                                    </div>
+                                    <!-- /.col -->
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <h4 class="auth-header">
-                Ingresar
-            </h4>
-            <div v-if="m_error" class="col">
-                <b-alert :show="Object.values(errors).length>0" variant="danger" dismissible>
-                    {{ Object.values(errors) }}
-                </b-alert>
-            </div>
-            <form @submit.prevent="submit">
-                <div class="input-group mb-3">
-                    <b-form-input
-                        v-model="form.username"
-                        placeholder="Usuario"
-                        trim
-                        type="text"
-                    ></b-form-input>
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="fas fa-envelope"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="input-group mb-3">
-                    <b-form-input
-                        v-model="form.password"
-                        placeholder="Contraseña"
-                        trim
-                        type="password"
-                    ></b-form-input>
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="fas fa-lock"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-8">
-                        <div class="icheck-primary">
-                            <input id="remember" v-model="form.remember" type="checkbox">
-                            <label for="remember">
-                                Remember Me
-                            </label>
-                        </div>
-                    </div>
-                    <!-- /.col -->
-                    <div class="col-4">
-                        <loading-button :loading="sending" class="btn-indigo" type="submit">Login
-                        </loading-button>
-                    </div>
-                    <!-- /.col -->
-                </div>
-            </form>
         </div>
     </div>
 </template>
@@ -92,7 +104,6 @@ export default {
                 onStart: () => this.sending = true,
                 onFinish: () => this.sending = false,
             })
-            console.log(Object.values(this.errors))
         },
     },
 }
