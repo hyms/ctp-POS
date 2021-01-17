@@ -3,10 +3,26 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use function PHPUnit\Framework\isNull;
 
 class Producto extends Model
 {
     protected $table = 'productos';
+    protected static $tables = 'productos';
+
+    public static function getAll(int $sucursal = null)
+    {
+        $productos =DB::table(self::$tables);
+        if (!isNull($sucursal)) {
+            $productos = $productos->where('sucursal', '=', $sucursal);
+        }
+        $productos = $productos
+            ->whereNull('deleted_at')
+            ->orderBy('updated_at', 'desc');
+        return $productos->get();
+
+    }
 
     public function getMovimientoStocks()
     {

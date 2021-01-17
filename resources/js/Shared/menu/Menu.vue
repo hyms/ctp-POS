@@ -1,17 +1,13 @@
 <template>
-    <ul class="main-menu">
-        <li class="sub-header">
-            <span>Diseño</span>
-        </li>
+    <ul class="metismenu" id="side-menu">
+        <li class="menu-title">Diseño</li>
+
         <template v-for="(link, key) in menu">
             <li>
                 <inertia-link
                     :href="link.url"
                     :key="key"
                 >
-                    <div class="icon-w">
-                        <div class=""></div>
-                    </div>
                     <span>{{ link.label }}</span>
                 </inertia-link>
             </li>
@@ -34,15 +30,15 @@ export default {
             menu: [
                 {
                     label: 'Ordenes',
-                    url: '/diseño/orden'
+                    url: '/diseño/ordenes'
                 },
                 {
                     label: 'Reposiciones',
                     url: '/diseño/reposicion'
                 },
                 {
-                    label: 'Clientes',
-                    url: '/diseño/clientes'
+                    label: 'Reportes',
+                    url: '/diseño/reporte'
                 }
             ]
         };

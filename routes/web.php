@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DisenoController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\OrdenesController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,7 +25,7 @@ Route::post('login', [LoginController::class, 'login'])
     ->name('login.attempt')
     ->middleware('guest');
 
-Route::get('logout', [LoginController::class, 'logout'])
+Route::post('logout', [LoginController::class, 'logout'])
     ->name('logout');
 
 
@@ -36,3 +37,5 @@ Route::get('/', [DashboardController::class, 'index'])
 Route::get('/diseno', [DisenoController::class, 'index'])
     ->name('homeDiseno')
     ->middleware('auth');
+Route::get('/diseño/ordenes',[OrdenesController::class, 'getAll'])
+    ->name('getAll');

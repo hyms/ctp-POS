@@ -55,7 +55,7 @@ class LoginController extends Controller
             return redirect()->to(RouteServiceProvider::HOME);
         }
         return back()->withErrors([
-            'email' => 'Las credenciales no son correctas.',
+            'usuario' => 'Las credenciales no son correctas.',
         ]);
 
     }

@@ -86,8 +86,8 @@ export default {
         return {
             sending: false,
             form: {
-                username: 'helier',
-                password: '123456',
+                username: 'admin',
+                password: 'admin',
                 remember: null,
             },
         }
