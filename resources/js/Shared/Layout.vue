@@ -38,15 +38,17 @@
 
                 <ul class="list-inline menu-left mb-0">
                     <li class="float-left">
-                        <button class="button-menu-mobile open-left waves-light waves-effect">
-                            <i class="mdi mdi-menu"></i>
-                        </button>
+                        <b-button v-b-toggle.sidebar-1 class="btn-sidebar">Menu</b-button>
                     </li>
                 </ul>
 
             </nav>
 
         </div>
+
+        <b-sidebar id="sidebar-1" title="" shadow>
+            <MainMenu :nombre="$page.props.auth"/>
+        </b-sidebar>
         <div class="left side-menu">
             <MainMenu :nombre="$page.props.auth"/>
             <!-- Sidebar -->

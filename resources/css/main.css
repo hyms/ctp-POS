@@ -16,7 +16,9 @@ File: Main file css
     padding: 0;
     margin: 0;
 }
-
+.btn-sidebar{
+    display: none;
+}
 .metismenu ul li {
     list-style: none;
 }
@@ -303,7 +305,7 @@ File: Main file css
     cursor: default;
     font-size: 11px;
     text-transform: uppercase;
-    color: #7a7d84;
+    color: #2c303a;
     font-family: "Hind", sans-serif;
 }
 
@@ -648,10 +650,14 @@ File: Main file css
     #wrapper {
         width: 100% !important;
     }
+    .btn-sidebar{
+        display: block;
+    }
     .topbar, .side-menu {
         position: fixed;
     }
     .side-menu {
+        display: none;
         overflow: auto;
         bottom: 0;
         padding-bottom: 30px;

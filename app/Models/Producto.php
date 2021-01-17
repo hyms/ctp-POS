@@ -10,6 +10,7 @@ class Producto extends Model
 {
     protected $table = 'productos';
     protected static $tables = 'productos';
+    protected $guarded = [];
 
     public static function getAll(int $sucursal = null)
     {

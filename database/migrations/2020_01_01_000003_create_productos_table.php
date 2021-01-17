@@ -26,6 +26,7 @@ class CreateProductosTable extends Migration
             $table->id();
             $table->foreignId('producto')->constrained('productos');
             $table->foreignId('sucursal')->constrained('sucursales');
+            $table->integer('orden');
             $table->integer('cantidad');
             $table->integer('alertaCantidad');
             $table->timestamps();

@@ -6,11 +6,17 @@
             :title="(isNew)?titulo1:titulo2"
             @show="reset">
             <form @submit.stop.prevent="enviar">
+                <b-form-group
+                    :label="form.responsable.label"
+                    label-for="responsable"
+                >
             <b-form-input
                 name="responsable"
                 v-model="form.responsable.value"
                 :placeholder="form.responsable.label"
+                id="responsable"
             ></b-form-input>
+                </b-form-group>
             <b-form-spinbutton
                 id="sb-locale"
                 v-model="value"

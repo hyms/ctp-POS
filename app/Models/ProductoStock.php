@@ -3,28 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use function PHPUnit\Framework\isNull;
 
 class ProductoStock extends Model
 {
     protected $table = 'stock';
+    protected static $tables = 'stock';
 
-    public function getMovimientoStocks()
+    public static function getAll(int $sucursal = null)
     {
-        return $this->hasMany(MovimientoStock::class, 'fk_idStockDestino', 'idProductoStock');
+        $stock = DB::table(self::$tables);
+        if(!isNull())
+        {
+            $stock = $stock->where('sucursal','=',$sucursal);
+        }
+        $stock = $stock->where('sucursal','=',$sucursal);
     }
 
-    public function getOrdenDetalles()
-    {
-        return $this->hasMany(detallesOrden::class, 'fk_idProductoStock', 'idProductoStock');
-    }
-
-    public function getProducto()
-    {
-        return $this->hasOne(Producto::class, 'idProducto', 'fk_idProducto');
-    }
-
-    public function getSucursal()
-    {
-        return $this->hasOne(Sucursal::class, 'idSucursal', 'fk_idSucursal');
-    }
 }

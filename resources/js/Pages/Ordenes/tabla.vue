@@ -11,7 +11,7 @@
                    <Orden :isNew="true" id="new"></Orden>
                 </div>
             </div>
-            {{ ordenes }}
+            {{ productos }}
         </div>
     </div>
 </template>

@@ -1,19 +1,20 @@
 <template>
     <ul class="metismenu" id="side-menu">
-        <li class="menu-title">Diseño</li>
-
-        <template v-for="(link, key) in menu">
-            <li>
-                <inertia-link
-                    :href="link.url"
-                    :key="key"
-                >
-                    <span>{{ link.label }}</span>
-                </inertia-link>
-            </li>
+        <template v-for="(value,index) in menu">
+            <li class="menu-title">{{ value.titulo }}</li>
+            <template v-for="(link, key) in value.submenu">
+                <li>
+                    <inertia-link
+                        :href="link.url"
+                        :key="key"
+                    >
+                        <span>{{ link.label }}</span>
+                    </inertia-link>
+                </li>
+            </template>
         </template>
         <li>
-            <inertia-link href="/logout" method="post" >
+            <inertia-link href="/logout" method="post">
                 <div class="icon-w">
                     <div class=""></div>
                 </div>
@@ -27,20 +28,30 @@
 export default {
     data() {
         return {
-            menu: [
+            menu: [{
+                titulo: 'Diseño',
+                submenu: [
+                    {
+                        label: 'Ordenes',
+                        url: '/diseño/ordenes'
+                    },
+                    {
+                        label: 'Reposiciones',
+                        url: '/diseño/reposicion'
+                    },
+                    {
+                        label: 'Reportes',
+                        url: '/diseño/reporte'
+                    }]
+            },
                 {
-                    label: 'Ordenes',
-                    url: '/diseño/ordenes'
-                },
-                {
-                    label: 'Reposiciones',
-                    url: '/diseño/reposicion'
-                },
-                {
-                    label: 'Reportes',
-                    url: '/diseño/reporte'
-                }
-            ]
+                titulo: 'Administracion',
+                submenu: [
+                    {
+                        label: 'Productos',
+                        url: '/admin/productos'
+                    }]
+            }]
         };
     },
     methods: {}

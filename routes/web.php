@@ -4,6 +4,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DisenoController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrdenesController;
+use App\Http\Controllers\ProductosController;
+use App\Http\Controllers\SucursalController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,8 +36,28 @@ Route::get('/', [DashboardController::class, 'index'])
     ->middleware('auth');
 
 //diseño
-Route::get('/diseno', [DisenoController::class, 'index'])
-    ->name('homeDiseno')
-    ->middleware('auth');
-Route::get('/diseño/ordenes',[OrdenesController::class, 'getAll'])
-    ->name('getAll');
+Route::group(['prefix'=>'diseño','middleware' => 'auth'], function () {
+    Route::get('/', [DisenoController::class, 'index'])
+        ->name('homeDiseno');
+    Route::get('ordenes', [OrdenesController::class, 'getAll'])
+        ->name('listaOrdenes');
+});
+//Admin
+Route::group(['prefix'=>'admin','middleware' => 'auth'], function () {
+    //productos
+    Route::get('productos', [ProductosController::class, 'getAll'])
+        ->name('listaProductos');
+    Route::post('producto', [ProductosController::class, 'post'])
+        ->name('guardarProducto');
+    Route::delete('producto/{id}', [ProductosController::class, 'borrar'])
+        ->name('eliminarProducto');
+    //sucursales
+    Route::get('sucursales', [SucursalController::class, 'getAll'])
+        ->name('listaSucursales');
+    Route::post('sucursal', [SucursalController::class, 'post'])
+        ->name('guardarSucursal');
+    Route::delete('sucursal/{id}', [SucursalController::class, 'borrar'])
+        ->name('eliminarSucursal');
+
+});
+
