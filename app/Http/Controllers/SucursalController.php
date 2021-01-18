@@ -20,10 +20,8 @@ class SucursalController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-//               'codigo' => 'required',
-                'formato' => 'required',
-//               'dimension' => 'required',
-                'cantidadPaquete' => 'numeric'
+                'nombre'=>'required',
+                'telefono'=>'required',
             ]);
             if ($validator->fails()) {
                 return response()->json([

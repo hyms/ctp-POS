@@ -50,6 +50,9 @@ export default {
                     {
                         label: 'Productos',
                         url: '/admin/productos'
+                    }, {
+                        label: 'Sucursales',
+                        url: '/admin/sucursales'
                     }]
             }]
         };

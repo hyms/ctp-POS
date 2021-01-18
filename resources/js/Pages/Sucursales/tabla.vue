@@ -27,6 +27,12 @@
                         <template #empty="scope">
                             <p>{{ textoVacio }}</p>
                         </template>
+                        <template v-slot:cell(central)="data">
+                            {{ (data.value === 1)?"Si":"No" }}
+                        </template>
+                        <template v-slot:cell(enable)="data">
+                            {{ (data.value === 1)?"Si":"No" }}
+                        </template>
                         <template v-slot:cell(Acciones)="row">
                             <div class="row-actions">
                                 <b-button v-b-modal="'sucursalModal'" @click="loadModal(false,row)">
@@ -65,13 +71,14 @@ export default {
             textoVacio: 'No existen Sucursales',
             fields:
                 [
-                    'codigo',
-                    'formato',
-                    'dimension',
+                    'nombre',
+                    'telefono',
+                    'gmap',
+                    'central',
                     {
-                        key: 'cantidadPaquete',
+                        key: 'enable',
                         label:
-                            'Cantidad X Paquete',
+                            'Habilitado',
                     },
                     'Acciones'
                 ],

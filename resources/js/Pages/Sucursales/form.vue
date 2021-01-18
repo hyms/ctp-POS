@@ -16,6 +16,7 @@
                         :label-for="key"
                         :state="item.state"
                         :invalid-feedback="item.stateText"
+                        v-if="['text','password','date','textarea'].includes(item.type)"
                     >
                         <b-input
                             :type="item.type"
@@ -23,8 +24,23 @@
                             v-model="item.value"
                             :id="key"
                             :state="item.state"
+                            v-if="['text','password','date'].includes(item.type)"
                         ></b-input>
+                        <b-textarea
+                            v-if="item.type==='textarea'"
+                            :placeholder="item.label"
+                            v-model="item.value"
+                            :id="key"
+                            :state="item.state"
+                        ></b-textarea>
                     </b-form-group>
+                    <b-checkbox
+                        v-if="item.type==='boolean'"
+                        v-model="item.value"
+                        :id="key"
+                        :state="item.state"
+                    >{{ item.label }}
+                    </b-checkbox>
                 </template>
             </form>
         </b-modal>
@@ -43,10 +59,8 @@ export default {
     },
     data() {
         return {
-            boton1: "Nuevo",
-            boton2: "Modificar",
-            titulo1: "Nuevo Producto",
-            titulo2: "Modificar Producto",
+            titulo1: "Nuevo Sucursal",
+            titulo2: "Modificar Sucursal",
             form: {
                 codigo: {
                     label: 'Codigo',
@@ -55,24 +69,45 @@ export default {
                     state: null,
                     stateText: null
                 },
-                formato: {
-                    label: 'Formato',
+                nombre: {
+                    label: 'Nombre',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
                 },
-                dimension: {
-                    label: 'Dimension',
+                descripcion: {
+                    label: 'Descripcion',
+                    value: "",
+                    type: "textarea",
+                    state: null,
+                    stateText: null
+                },
+                telefono: {
+                    label: 'Telefono',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
                 },
-                cantidadPaquete: {
-                    label: 'Cantidad x Paquete',
+                gmap: {
+                    label: 'Coordenadas Gmap',
                     value: "",
                     type: "text",
+                    state: null,
+                    stateText: null
+                },
+                central: {
+                    label: 'Central',
+                    value: "",
+                    type: "boolean",
+                    state: null,
+                    stateText: null
+                },
+                enable: {
+                    label: 'Habilitado',
+                    value: "",
+                    type: "boolean",
                     state: null,
                     stateText: null
                 },
@@ -97,7 +132,11 @@ export default {
                     this.idForm = this.itemRow['id'];
                 }
                 Object.keys(this.form).forEach(key => {
-                    this.form[key].value = this.itemRow[key];
+                    if (['central', 'enable'].includes(key)) {
+                        this.form[key].value = (this.itemRow[key] === 1)
+                    } else {
+                        this.form[key].value = this.itemRow[key];
+                    }
                 })
             }
         },
@@ -120,17 +159,14 @@ export default {
                 producto.append('id', this.idForm);
             }
             Object.keys(this.form).forEach(key => {
-                producto.append(key, this.form[key].value);
+                if (['central', 'enable'].includes(key)) {
+                    producto.append(key, this.form[key].value ? 1 : 0);
+                } else {
+                    producto.append(key, this.form[key].value);
+                }
             })
-            /* this.$inertia.post('/admin/producto',producto, {
-                 onSuccess: (page) => {
-                     console.log(page);
-                 },
-                 onError: (errors) => {
-                     console.log(errors);
-                 }
-             });*/
-            axios.post('/admin/producto', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+
+            axios.post('/admin/sucursal', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
                         location.href = data["path"];
