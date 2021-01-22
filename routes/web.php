@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DisenoController;
 use App\Http\Controllers\LoginController;
@@ -57,6 +58,13 @@ Route::group(['prefix'=>'admin','middleware' => 'auth'], function () {
     Route::post('sucursal', [SucursalController::class, 'post'])
         ->name('guardarSucursal');
     Route::delete('sucursal/{id}', [SucursalController::class, 'borrar'])
+        ->name('eliminarSucursal');
+//clientes
+    Route::get('clientes', [ClienteController::class, 'getAll'])
+        ->name('listaSucursales');
+    Route::post('cliente', [ClienteController::class, 'post'])
+        ->name('guardarSucursal');
+    Route::delete('cliente/{id}', [ClienteController::class, 'borrar'])
         ->name('eliminarSucursal');
 
 });

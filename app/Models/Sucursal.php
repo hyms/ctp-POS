@@ -14,6 +14,7 @@ class Sucursal extends Model
     public static function getAll()
     {
         $sucursales =DB::table(self::$tables);
+        $sucursales = $sucursales->where('enable','=','1');
         $sucursales = $sucursales
             ->whereNull('deleted_at')
             ->orderBy('updated_at', 'desc');

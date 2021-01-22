@@ -53,6 +53,9 @@ export default {
                     }, {
                         label: 'Sucursales',
                         url: '/admin/sucursales'
+                     }, {
+                        label: 'Clientes',
+                        url: '/admin/clientes'
                     }]
             }]
         };
