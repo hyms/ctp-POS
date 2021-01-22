@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CajaController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DisenoController;
@@ -65,6 +66,13 @@ Route::group(['prefix'=>'admin','middleware' => 'auth'], function () {
     Route::post('cliente', [ClienteController::class, 'post'])
         ->name('guardarSucursal');
     Route::delete('cliente/{id}', [ClienteController::class, 'borrar'])
+        ->name('eliminarSucursal');
+//cajas
+    Route::get('cajas', [CajaController::class, 'getAll'])
+        ->name('listaSucursales');
+    Route::post('caja', [CajaController::class, 'post'])
+        ->name('guardarSucursal');
+    Route::delete('caja/{id}', [CajaController::class, 'borrar'])
         ->name('eliminarSucursal');
 
 });

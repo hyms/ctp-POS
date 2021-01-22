@@ -45,19 +45,22 @@ export default {
                     }]
             },
                 {
-                titulo: 'Administracion',
-                submenu: [
-                    {
-                        label: 'Productos',
-                        url: '/admin/productos'
-                    }, {
-                        label: 'Sucursales',
-                        url: '/admin/sucursales'
-                     }, {
-                        label: 'Clientes',
-                        url: '/admin/clientes'
-                    }]
-            }]
+                    titulo: 'Administracion',
+                    submenu: [
+                        {
+                            label: 'Productos',
+                            url: '/admin/productos'
+                        }, {
+                            label: 'Sucursales',
+                            url: '/admin/sucursales'
+                        }, {
+                            label: 'Clientes',
+                            url: '/admin/clientes'
+                        }, {
+                            label: 'Cajas',
+                            url: '/admin/cajas'
+                        }]
+                }]
         };
     },
     methods: {}

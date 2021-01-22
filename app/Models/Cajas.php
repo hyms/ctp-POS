@@ -3,28 +3,28 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use function PHPUnit\Framework\isNull;
 
 class Cajas extends Model
 {
     protected $table = 'cajas';
+    protected static $tables = 'cajas';
+    protected $guarded = [];
 
-    public function getCajaPadre()
+    public static function getAll(int $sucursal = null, int $caja_padre = null)
     {
-        return $this->hasOne(Cajas::class, 'idCaja', 'fk_idCaja');
-    }
-
-    public function getCajas()
-    {
-        return $this->hasMany(Cajas::class, 'fk_idCaja', 'idCaja');
-    }
-
-    public function getSucursal()
-    {
-        return $this->hasOne(Sucursal::class, 'idSucursal', 'fk_idSucursal');
-    }
-
-    public function getMovimientoCajas()
-    {
-        return $this->hasMany(MovimientoCaja::class, 'fk_idCajaOrigen', 'idCaja');
+        $sucursales = DB::table(self::$tables);
+        if (!isNull($sucursal)) {
+            $sucursales = $sucursales->where('enable', '=', '1');
+            $sucursales = $sucursales->where('sucursal', '=', $sucursal);
+        }
+        if (!isNull($caja_padre)) {
+            $sucursales = $sucursales->where('dependeDe', '=', $caja_padre);
+        }
+        $sucursales = $sucursales
+            ->whereNull('deleted_at')
+            ->orderBy('updated_at', 'desc');
+        return $sucursales->get();
     }
 }
