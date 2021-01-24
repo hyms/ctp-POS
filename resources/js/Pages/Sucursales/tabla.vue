@@ -9,7 +9,7 @@
             <div class="row m-b-20">
                 <div class="col">
                     <b-button v-b-modal="'sucursalModal'" @click="loadModal()">{{ boton1 }}</b-button>
-                    <FormProducto :isNew="isNew" id="sucursalModal" :itemRow="itemRow"></FormProducto>
+                    <FormProducto :isNew="isNew" id="sucursalModal" :itemRow="itemRow" :sucursalPadre="sucursalPadre"></FormProducto>
                 </div>
             </div>
 
@@ -82,7 +82,8 @@ export default {
                     },
                     'Acciones'
                 ],
-            itemRow: {}
+            itemRow: {},
+            sucursalPadre: {}
         }
     },
     methods: {
@@ -92,6 +93,13 @@ export default {
             if (!isNew) {
                 this.itemRow = item.item;
             }
+            let sucursalP = {};
+            Object.keys(this.sucursales).forEach(key => {
+                if (item == null || item.item.id !== this.sucursales[key].id) {
+                    sucursalP[this.sucursales[key].id] = this.sucursales[key].nombre;
+                }
+            })
+            this.sucursalPadre = sucursalP;
         },
         borrar(id){
             this.$inertia.delete(`sucursal/${id}`, {

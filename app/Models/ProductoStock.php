@@ -18,7 +18,8 @@ class ProductoStock extends Model
         {
             $stock = $stock->where('sucursal','=',$sucursal);
         }
-        $stock = $stock->where('sucursal','=',$sucursal);
+        $stock = $stock->whereNull('deleted_at');
+        return $stock->get();
     }
 
 }

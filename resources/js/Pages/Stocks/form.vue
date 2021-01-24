@@ -16,7 +16,6 @@
                         :label-for="key"
                         :state="item.state"
                         :invalid-feedback="item.stateText"
-                        v-if="['text','password','date','textarea','select'].includes(item.type)"
                     >
                         <b-input
                             :type="item.type"
@@ -24,32 +23,8 @@
                             v-model="item.value"
                             :id="key"
                             :state="item.state"
-                            v-if="['text','password','date'].includes(item.type)"
                         ></b-input>
-                        <b-textarea
-                            v-if="item.type==='textarea'"
-                            :placeholder="item.label"
-                            v-model="item.value"
-                            :id="key"
-                            :state="item.state"
-                        ></b-textarea>
-                        <b-form-select
-                            v-if="item.type==='select'"
-                            v-model="item.value"
-                            :options="sucursalPadre"
-                        >
-                            <template #first>
-                                <b-form-select-option :value="null">Seleccione una opcion</b-form-select-option>
-                            </template>
-                        </b-form-select>
                     </b-form-group>
-                    <b-checkbox
-                        v-if="item.type==='boolean'"
-                        v-model="item.value"
-                        :id="key"
-                        :state="item.state"
-                    >{{ item.label }}
-                    </b-checkbox>
                 </template>
             </form>
         </b-modal>
@@ -64,13 +39,14 @@ export default {
     props: {
         isNew: Boolean,
         id: String,
-        itemRow: Object,
-        sucursalPadre: Object
+        itemRow: Object
     },
     data() {
         return {
-            titulo1: "Nuevo Sucursal",
-            titulo2: "Modificar Sucursal",
+            boton1: "Nuevo",
+            boton2: "Modificar",
+            titulo1: "Nuevo Producto",
+            titulo2: "Modificar Producto",
             form: {
                 codigo: {
                     label: 'Codigo',
@@ -79,53 +55,24 @@ export default {
                     state: null,
                     stateText: null
                 },
-                nombre: {
-                    label: 'Nombre',
+                formato: {
+                    label: 'Formato',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
                 },
-                descripcion: {
-                    label: 'Descripcion',
-                    value: "",
-                    type: "textarea",
-                    state: null,
-                    stateText: null
-                },
-                telefono: {
-                    label: 'Telefono',
+                dimension: {
+                    label: 'Dimension',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
                 },
-                gmap: {
-                    label: 'Coordenadas Gmap',
+                cantidadPaquete: {
+                    label: 'Cantidad x Paquete',
                     value: "",
                     type: "text",
-                    state: null,
-                    stateText: null
-                },
-                dependeDe: {
-                    label: 'Depende de',
-                    value: "",
-                    type: "select",
-                    state: null,
-                    stateText: null,
-                    options: this.sucursalPadre
-                },
-                central: {
-                    label: 'Central',
-                    value: "",
-                    type: "boolean",
-                    state: null,
-                    stateText: null
-                },
-                enable: {
-                    label: 'Habilitado',
-                    value: "",
-                    type: "boolean",
                     state: null,
                     stateText: null
                 },
@@ -150,11 +97,7 @@ export default {
                     this.idForm = this.itemRow['id'];
                 }
                 Object.keys(this.form).forEach(key => {
-                    if (['central', 'enable'].includes(key)) {
-                        this.form[key].value = (this.itemRow[key] === 1)
-                    } else {
-                        this.form[key].value = this.itemRow[key];
-                    }
+                    this.form[key].value = this.itemRow[key];
                 })
             }
         },
@@ -177,14 +120,17 @@ export default {
                 producto.append('id', this.idForm);
             }
             Object.keys(this.form).forEach(key => {
-                if (['central', 'enable'].includes(key)) {
-                    producto.append(key, this.form[key].value ? 1 : 0);
-                } else {
-                    producto.append(key, this.form[key].value);
-                }
+                producto.append(key, this.form[key].value);
             })
-
-            axios.post('/admin/sucursal', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            /* this.$inertia.post('/admin/producto',producto, {
+                 onSuccess: (page) => {
+                     console.log(page);
+                 },
+                 onError: (errors) => {
+                     console.log(errors);
+                 }
+             });*/
+            axios.post('/admin/producto', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
                         location.href = data["path"];

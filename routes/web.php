@@ -7,6 +7,7 @@ use App\Http\Controllers\DisenoController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrdenesController;
 use App\Http\Controllers\ProductosController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\SucursalController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,14 +39,14 @@ Route::get('/', [DashboardController::class, 'index'])
     ->middleware('auth');
 
 //diseño
-Route::group(['prefix'=>'diseño','middleware' => 'auth'], function () {
+Route::group(['prefix' => 'diseño', 'middleware' => 'auth'], function () {
     Route::get('/', [DisenoController::class, 'index'])
         ->name('homeDiseno');
     Route::get('ordenes', [OrdenesController::class, 'getAll'])
         ->name('listaOrdenes');
 });
 //Admin
-Route::group(['prefix'=>'admin','middleware' => 'auth'], function () {
+Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     //productos
     Route::get('productos', [ProductosController::class, 'getAll'])
         ->name('listaProductos');
@@ -62,18 +63,25 @@ Route::group(['prefix'=>'admin','middleware' => 'auth'], function () {
         ->name('eliminarSucursal');
 //clientes
     Route::get('clientes', [ClienteController::class, 'getAll'])
-        ->name('listaSucursales');
+        ->name('listaClientes');
     Route::post('cliente', [ClienteController::class, 'post'])
-        ->name('guardarSucursal');
+        ->name('guardarCliente');
     Route::delete('cliente/{id}', [ClienteController::class, 'borrar'])
-        ->name('eliminarSucursal');
+        ->name('eliminarCliente');
 //cajas
     Route::get('cajas', [CajaController::class, 'getAll'])
-        ->name('listaSucursales');
+        ->name('listaCajas');
     Route::post('caja', [CajaController::class, 'post'])
-        ->name('guardarSucursal');
+        ->name('guardarCaja');
     Route::delete('caja/{id}', [CajaController::class, 'borrar'])
-        ->name('eliminarSucursal');
+        ->name('eliminarCaja');
+    //stocks
+    Route::get('stocks', [StockController::class, 'getAll'])
+        ->name('listaStocks');
+    Route::post('stock', [StockController::class, 'post'])
+        ->name('guardarStock');
+    Route::delete('stock/{id}', [StockController::class, 'borrar'])
+        ->name('eliminarStock');
 
 });
 
