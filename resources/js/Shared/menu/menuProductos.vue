@@ -1,21 +1,26 @@
 <template>
     <div>
-        <b-nav tabs>
-            <b-nav-item :active="(active===0)"><inertia-link href="stocks">Stoks</inertia-link></b-nav-item>
-            <b-nav-item :active="(active===1)"><inertia-link href="productos">Productos</inertia-link></b-nav-item>
+        <b-nav tabs class="m-b-20">
+            <li class="nav-item">
+                <inertia-link href="stocks" :class="isActive(0)">Stocks</inertia-link>
+            </li>
+            <li class="nav-item">
+                <inertia-link href="productos" :class="isActive(1)">Productos</inertia-link>
+            </li>
         </b-nav>
     </div>
 </template>
 
 <script>
 export default {
-props:{
-    active:Number
-}
+    props: {
+        active: Number
+    },
+    methods: {
+        isActive(item) {
+            return 'nav-link'+((this.active===item)?' active':'')
+        }
+    }
 
 }
 </script>
-
-<style scoped>
-
-</style>

@@ -23,6 +23,7 @@ class Sucursal extends Model
         return $sucursales->get();
     }
 
+
     public function getOrdenCTPs()
     {
         return $this->hasMany(OrdenesTrabajo::class, 'fk_idSucursal', 'idSucursal');

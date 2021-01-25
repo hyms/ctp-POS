@@ -37,69 +37,33 @@ import axios from "axios";
 export default {
     name: "Producto",
     props: {
-        isNew: Boolean,
         id: String,
-        itemRow: Object
+        itemRow: Object,
+        isNew:Boolean,
     },
     data() {
         return {
-            boton1: "Nuevo",
-            boton2: "Modificar",
-            titulo1: "Nuevo Producto",
-            titulo2: "Modificar Producto",
+
+            titulo1: "Añadir",
+            titulo2: "Quitar",
             form: {
-                codigo: {
-                    label: 'Codigo',
+                cantidad: {
+                    label: 'Cantidad',
                     value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },
-                formato: {
-                    label: 'Formato',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },
-                dimension: {
-                    label: 'Dimension',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },
-                cantidadPaquete: {
-                    label: 'Cantidad x Paquete',
-                    value: "",
-                    type: "text",
+                    type: "number",
                     state: null,
                     stateText: null
                 },
             },
-            idForm: null,
             errors: Array
         }
     },
     methods: {
         reset() {
             this.limpiar();
-
-            if (this.isNew) {
-                if ('id' in this.itemRow) {
-                    this.idForm = null;
-                }
-                Object.keys(this.form).forEach(key => {
-                    this.form[key].value = "";
-                })
-            } else {
-                if ('id' in this.itemRow) {
-                    this.idForm = this.itemRow['id'];
-                }
-                Object.keys(this.form).forEach(key => {
-                    this.form[key].value = this.itemRow[key];
-                })
-            }
+            Object.keys(this.form).forEach(key => {
+                this.form[key].value = this.itemRow[key];
+            })
         },
         limpiar() {
             Object.keys(this.form).forEach(key => {
@@ -116,21 +80,10 @@ export default {
         enviar() {
             this.limpiar();
             let producto = new FormData();
-            if (this.idForm) {
-                producto.append('id', this.idForm);
-            }
             Object.keys(this.form).forEach(key => {
                 producto.append(key, this.form[key].value);
             })
-            /* this.$inertia.post('/admin/producto',producto, {
-                 onSuccess: (page) => {
-                     console.log(page);
-                 },
-                 onError: (errors) => {
-                     console.log(errors);
-                 }
-             });*/
-            axios.post('/admin/producto', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            axios.post('/admin/stock', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
                         location.href = data["path"];

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Producto;
+use App\Models\ProductoStock;
 use App\Models\Sucursal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -15,10 +16,12 @@ class StockController extends Controller
     {
         $productos = Producto::getAll();
         $sucursales = Sucursal::getAll();
+        $stocksTable = ProductoStock::getTableAdmin($sucursales,$productos);
         return Inertia::render('Stocks/tabla',
             [
                 'productos' => $productos,
                 'sucursales' => $sucursales,
+                'stocks' => $stocksTable,
             ]);
     }
 
