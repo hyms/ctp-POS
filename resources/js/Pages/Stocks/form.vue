@@ -39,11 +39,10 @@ export default {
     props: {
         id: String,
         itemRow: Object,
-        isNew:Boolean,
+        isNew: Boolean,
     },
     data() {
         return {
-
             titulo1: "Añadir",
             titulo2: "Quitar",
             form: {
@@ -61,9 +60,6 @@ export default {
     methods: {
         reset() {
             this.limpiar();
-            Object.keys(this.form).forEach(key => {
-                this.form[key].value = this.itemRow[key];
-            })
         },
         limpiar() {
             Object.keys(this.form).forEach(key => {
@@ -83,7 +79,17 @@ export default {
             Object.keys(this.form).forEach(key => {
                 producto.append(key, this.form[key].value);
             })
-            axios.post('/admin/stock', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            if (this.itemRow['sucursal']) {
+                producto.append('sucursal', this.itemRow['sucursal']);
+            }
+            if (this.itemRow['producto']) {
+                producto.append('producto',this.itemRow['producto']);
+            }
+            let url ='/admin/stockLess';
+            if(this.isNew){
+                url = '/admin/stockMore';
+            }
+            axios.post(url, producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
                         location.href = data["path"];

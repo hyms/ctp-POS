@@ -78,7 +78,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     //stocks
     Route::get('stocks', [StockController::class, 'getAll'])
         ->name('listaStocks');
-    Route::post('stock', [StockController::class, 'post'])
+    Route::post('stockMore', [StockController::class, 'postMore'])
+        ->name('guardarStock');
+    Route::post('stockLess', [StockController::class, 'postLess'])
         ->name('guardarStock');
     Route::delete('stock/{id}', [StockController::class, 'borrar'])
         ->name('eliminarStock');

@@ -9,7 +9,7 @@ use phpDocumentor\Reflection\Types\Boolean;
 class Sucursal extends Model
 {
     protected $table = 'sucursales';
-    protected static $tables = 'sucursales';
+    public static $tables = 'sucursales';
     protected $guarded = [];
 
     public static function getAll(bool $isAdm=False)

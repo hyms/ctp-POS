@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class MovimientoStock extends Model
 {
     protected $table = 'movimientosStock';
+    public static $tables = 'movimientosStock';
 
     public function getProducto()
     {

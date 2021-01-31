@@ -25,14 +25,13 @@ class StockController extends Controller
             ]);
     }
 
-    public function post(Request $request)
+    public function postMore(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
-//               'codigo' => 'required',
-                'formato' => 'required',
-//               'dimension' => 'required',
-                'cantidadPaquete' => 'numeric'
+                'sucursal' => 'required',
+                'producto' => 'required',
+                'cantidad' => 'required|numeric'
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -40,14 +39,35 @@ class StockController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            $producto = new Producto();
-            if (!empty($request['id'])) {
-                $producto = Producto::find($request['id']);
-            }
-            $producto->fill($request->all());
+            $stock = ProductoStock::more(
+                $request->all()
+            );
+            return response()->json(["status" => 0, 'path' => 'stocks']);
+        } catch (\Exception $error) {
+            Log::error($error->getMessage());
+            return response()->json(["status" => -1,
+                'error' => $error,], 500);
+        }
+    }
 
-            $producto->save();
-            return response()->json(["status" => 0, 'path' => 'productos']);
+    public function postLess(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'sucursal' => 'required',
+                'producto' => 'required',
+                'cantidad' => 'required|numeric'
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => -1,
+                    'errors' => $validator->errors()
+                ]);
+            }
+            $stock = ProductoStock::less(
+                $request->all()
+            );
+            return response()->json(["status" => 0, 'path' => 'stocks']);
         } catch (\Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,

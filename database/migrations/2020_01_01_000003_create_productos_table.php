@@ -26,16 +26,16 @@ class CreateProductosTable extends Migration
             $table->id();
             $table->foreignId('producto')->constrained('productos');
             $table->foreignId('sucursal')->constrained('sucursales');
-            $table->integer('orden');
+            $table->integer('orden')->default(0);
             $table->integer('cantidad');
-            $table->integer('alertaCantidad');
+            $table->integer('alertaCantidad')->default(0);
             $table->timestamps();
         });
         Schema::create('movimientosStock', function (Blueprint $table) {
             $table->id();
             $table->foreignId('producto')->constrained('productos');
-            $table->foreignId('stockOrigen')->constrained('stock');
-            $table->foreignId('stockDestino')->constrained('stock');
+            $table->foreignId('stockOrigen')->nullable()->constrained('stock');
+            $table->foreignId('stockDestino')->nullable()->constrained('stock');
             $table->foreignId('user');
             $table->integer('cantidad');
             $table->text('observaciones');
