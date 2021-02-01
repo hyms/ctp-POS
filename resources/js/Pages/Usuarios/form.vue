@@ -16,6 +16,7 @@
                         :label-for="key"
                         :state="item.state"
                         :invalid-feedback="item.stateText"
+                        v-if="['text','password','date','textarea','email','select'].includes(item.type)"
                     >
                         <b-input
                             :type="item.type"
@@ -23,8 +24,25 @@
                             v-model="item.value"
                             :id="key"
                             :state="item.state"
+                            v-if="['text','password','date','email'].includes(item.type)"
                         ></b-input>
+                        <b-form-select
+                            v-if="item.type==='select'"
+                            v-model="item.value"
+                            :options="(key==='sucursal')?sucursales:roles"
+                        >
+                            <template #first>
+                                <b-form-select-option :value="null">Seleccione una opcion</b-form-select-option>
+                            </template>
+                        </b-form-select>
                     </b-form-group>
+                    <b-checkbox
+                        v-if="item.type==='bool'"
+                        v-model="item.value"
+                        :id="key"
+                        :state="item.state"
+                    >{{ item.label }}
+                    </b-checkbox>
                 </template>
             </form>
         </b-modal>
@@ -35,11 +53,13 @@
 import axios from "axios";
 
 export default {
-    name: "Usuarios",
+    name: "Producto",
     props: {
         isNew: Boolean,
         id: String,
-        itemRow: Object
+        itemRow: Object,
+        sucursales: Object,
+        roles: Array
     },
     data() {
         return {
@@ -48,34 +68,68 @@ export default {
             titulo1: "Nuevo Producto",
             titulo2: "Modificar Producto",
             form: {
-                codigo: {
-                    label: 'Codigo',
+                username: {
+                    label: 'Usuario',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                },
-                formato: {
-                    label: 'Formato',
+                },password: {
+                    label: 'Contraseña',
+                    value: "",
+                    type: "password",
+                    state: null,
+                    stateText: null
+                },apellido: {
+                    label: 'Apellido',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                },
-                dimension: {
-                    label: 'Dimension',
+                },nombre: {
+                    label: 'Nombre',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                },
-                cantidadPaquete: {
-                    label: 'Cantidad x Paquete',
+                },ci: {
+                    label: 'CI',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                },
+                },telefono: {
+                    label: 'Telefono',
+                    value: "",
+                    type: "text",
+                    state: null,
+                    stateText: null
+                },email: {
+                    label: 'Correo',
+                    value: "",
+                    type: "text",
+                    state: null,
+                    stateText: null
+                },sucursal: {
+                    label: 'sucursal',
+                    value: "",
+                    type: "select",
+                    state: null,
+                    stateText: null
+                },role: {
+                    label: 'Rol',
+                    value: "",
+                    type: "select",
+                    state: null,
+                    stateText: null
+                },enable: {
+                    label: 'Habilitado',
+                    value: "",
+                    type: "bool",
+                    state: null,
+                    stateText: null
+                }
+
             },
             idForm: null,
             errors: Array
@@ -115,12 +169,18 @@ export default {
         },
         enviar() {
             this.limpiar();
-            let producto = new FormData();
+            let user = new FormData();
             if (this.idForm) {
-                producto.append('id', this.idForm);
+                user.append('id', this.idForm);
             }
             Object.keys(this.form).forEach(key => {
-                producto.append(key, this.form[key].value);
+                if(this.form[key].value !=null) {
+                    if (['enable'].includes(key)) {
+                        user.append(key, this.form[key].value ? 1 : 0);
+                    } else {
+                        user.append(key, this.form[key].value);
+                    }
+                }
             })
             /* this.$inertia.post('/admin/producto',producto, {
                  onSuccess: (page) => {
@@ -130,7 +190,7 @@ export default {
                      console.log(errors);
                  }
              });*/
-            axios.post('/admin/producto', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            axios.post('/admin/user', user, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
                         location.href = data["path"];

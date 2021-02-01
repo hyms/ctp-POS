@@ -9,6 +9,7 @@ use App\Http\Controllers\OrdenesController;
 use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SucursalController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -84,6 +85,14 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('guardarStock');
     Route::delete('stock/{id}', [StockController::class, 'borrar'])
         ->name('eliminarStock');
-
+    Route::get('movimientosStock', [StockController::class, 'movimientos'])
+        ->name('movimientosStock');
+    //cajas
+    Route::get('users', [UserController::class, 'getAll'])
+        ->name('listaUsuarios');
+    Route::post('user', [UserController::class, 'post'])
+        ->name('guardarUsuarios');
+    Route::delete('user/{id}', [UserController::class, 'borrar'])
+        ->name('eliminarUsuarios');
 });
 

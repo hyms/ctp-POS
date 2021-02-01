@@ -3,34 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class MovimientoStock extends Model
 {
     protected $table = 'movimientosStock';
     public static $tables = 'movimientosStock';
 
-    public function getProducto()
+    public static function gelAll()
     {
-        return $this->hasOne(Producto::class, 'idProducto', 'fk_idProducto');
-    }
-
-    public function getStockOrigen()
-    {
-        return $this->hasOne(ProductoStock::class, 'idProductoStock', 'fk_idStockOrigen');
-    }
-
-    public function getStockDestino()
-    {
-        return $this->hasOne(ProductoStock::class, 'idProductoStock', 'fk_idStockDestino');
-    }
-
-    public function getUsuario()
-    {
-        return $this->hasOne(User::class, 'idUser', 'fk_idUser');
-    }
-
-    public function getOrdenDetalles()
-    {
-        return $this->hasMany(detallesOrden::class, 'fk_idMovimientoStock', 'idMovimientoStock');
+        $movimientos = DB::table(self::$tables);
+        $movimientos = $movimientos
+            ->leftJoin(User::$tables,'user','=',User::$tables.'.id')
+            ->leftJoin(ProductoStock::$tables.' as so','stockOrigen','=','so.id')
+            ->leftJoin(ProductoStock::$tables.' as sd','stockDestino','=','sd.id')
+            ->select(self::$tables.'.*', 'so.sucursal as soSucursal','sd.sucursal as sdSucursal',User::$tables.'.nombre',User::$tables.'.apellido')
+        ->orderBy(self::$tables.'.updated_at','DESC');
+        return $movimientos->get();
     }
 }

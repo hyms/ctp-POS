@@ -59,6 +59,9 @@ export default {
                         }, {
                             label: 'Cajas',
                             url: '/admin/cajas'
+                        }, {
+                            label: 'Usuarios',
+                            url: '/admin/users'
                         }]
                 }]
         };

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MovimientoStock;
 use App\Models\Producto;
 use App\Models\ProductoStock;
 use App\Models\Sucursal;
@@ -80,5 +81,18 @@ class StockController extends Controller
         $producto = Producto::find($id);
         $producto->delete();
         return back()->withInput();
+    }
+
+    public function movimientos()
+    {
+        $productos = Producto::getAll();
+        $sucursales = Sucursal::getAll();
+        $stocks = MovimientoStock::gelAll();
+        return Inertia::render('Stocks/movimientos',
+            [
+                'productos' => $productos,
+                'sucursales' => $sucursales,
+                'movimientos' => $stocks,
+            ]);
     }
 }

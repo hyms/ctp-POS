@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use function PHPUnit\Framework\isNull;
 
@@ -13,6 +14,8 @@ class User extends Model implements AuthenticatableContract
     use Authenticatable;
 
     protected $table = 'users';
+    public static $tables = 'users';
+    protected $guarded = [];
 
     public function getNameAttribute()
     {
@@ -24,47 +27,14 @@ class User extends Model implements AuthenticatableContract
         $this->attributes['password'] = Hash::needsRehash($password) ? Hash::make($password) : $password;
     }
 
-    public function getOrdenCTPs()
+    public static function getAll()
     {
-        return $this->hasMany(OrdenesTrabajo::class, 'user', 'id');
+        $users = DB::table(self::$tables);
+        $users = $users->whereNull('deleted_at');
+        return $users->get();
     }
 
-    public function getOrdenCTPs0()
-    {
-        return $this->hasMany(OrdenesTrabajo::class, 'fk_idUserV', 'idUser');
-    }
-
-    public function getOrdenCTPs1()
-    {
-        return $this->hasMany(OrdenesTrabajo::class, 'fk_idUserD2', 'idUser');
-    }
-
-    public function getMovimientoCajas()
-    {
-        return $this->hasMany(MovimientoCaja::class, 'fk_idUser', 'idUser');
-    }
-
-    public function getMovimientoStocks()
-    {
-        return $this->hasMany(MovimientoStock::class, 'fk_idUser', 'idUser');
-    }
-
-    public function getNotas()
-    {
-        return $this->hasMany(Notas::class, 'fk_idUserCreador', 'idUser');
-    }
-
-    public function getRecibos()
-    {
-        return $this->hasMany(Recibo::class, 'fk_idUser', 'idUser');
-    }
-
-    public function getFkIdSucursal()
-    {
-        return $this->hasOne(Sucursal::class, 'idSucursal', 'fk_idSucursal');
-    }
-
-    public function getRole($int = null)
+    public static function getRole($int = null)
     {
         $roles = array(
             '0' => 'sadmin',
@@ -75,7 +45,14 @@ class User extends Model implements AuthenticatableContract
             '5' => 'auxVenta'
         );
         if (isNull($int)) {
-            return $roles;
+            return array(
+                ['value' => '0', 'text' => 'sadmin'],
+                ['value' => '1', 'text' => 'admin'],
+                ['value' => '2', 'text' => 'venta'],
+                ['value' => '3', 'text' => 'operario'],
+                ['value' => '4', 'text' => 'diseño'],
+                ['value' => '5', 'text' => 'auxVenta'],
+            );
         }
         return $roles[$int];
     }
