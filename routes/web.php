@@ -45,6 +45,8 @@ Route::group(['prefix' => 'diseño', 'middleware' => 'auth'], function () {
         ->name('homeDiseno');
     Route::get('ordenes', [OrdenesController::class, 'getAll'])
         ->name('listaOrdenes');
+    Route::post('orden', [OrdenesController::class, 'post'])
+        ->name('guardarOrden');
 });
 //Admin
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {

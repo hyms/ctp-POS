@@ -15,47 +15,45 @@ class CreateOrdenesTable extends Migration
     {
         Schema::create('ordenesTrabajo', function (Blueprint $table) {
             $table->id();
-            $table->timestamp("fechaCobro");
-            $table->boolean("cfSF");
-            $table->string("nroFactura");
-            $table->integer("tipoPago");
-            $table->string("codigoServicio");
+            $table->timestamp("fechaCobro")->nullable();
+            $table->boolean("cfSF")->nullable();
+            $table->string("nroFactura")->nullable();
+            $table->integer("tipoPago")->nullable();
+            $table->string("codigoServicio")->nullable();
             $table->integer("correlativo");
             $table->decimal("montoVenta");
-            $table->decimal("montoDescuento");
+            $table->decimal("montoDescuento")->nullable();
             $table->tinyInteger("estado");
-            $table->tinyInteger("tipoOrden");
+            $table->tinyInteger("tipoOrden")->nullable();
             $table->tinyInteger("tipoReposicion")->nullable();
             $table->text("observaciones");
             $table->string("responsable");
             $table->string("telefono");
-            $table->boolean("anulado");
-            $table->string("codigoDependiente");
-            $table->string("atribuible");
+            $table->boolean("anulado")->nullable();
+            $table->string("codigoDependiente")->nullable();
+            $table->string("atribuible")->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->foreignId('reposicion')->nullable()->constrained('ordenesTrabajo');
-            $table->foreignId('cliente')->constrained('clientes');
-            $table->foreignId('movimientoCaja')->constrained('movimientoCajas');
+            $table->foreignId('cliente')->nullable()->constrained('clientes');
             $table->foreignId('sucursal')->constrained('sucursales');
             $table->foreignId('userDiseñador')->constrained('users');
-            $table->foreignId('userVenta')->constrained('users');
+            $table->foreignId('userVenta')->nullable()->constrained('users');
             $table->foreignId('userDiseñador2')->nullable()->constrained('users');
         });
         Schema::create('detallesOrden', function (Blueprint $table) {
             $table->id();
-            $table->integer('producto');
-            $table->boolean('c');
-            $table->boolean('m');
-            $table->boolean('y');
-            $table->boolean('k');
+            $table->integer('stock');
+            $table->boolean('c')->nullable();
+            $table->boolean('m')->nullable();
+            $table->boolean('y')->nullable();
+            $table->boolean('k')->nullable();
             $table->integer('cantidad');
             $table->decimal('costo');
-            $table->decimal('adicional');
+            $table->decimal('adicional')->nullable();
             $table->decimal('total');
             $table->timestamps();
             $table->foreignId('ordenTrabajo')->constrained('ordenesTrabajo');
-            $table->foreignId('movimientoStock')->constrained('movimientosStock');
         });
 
     }

@@ -11,6 +11,20 @@ class OrdenesTrabajo extends Model
     protected $table = 'ordenesTrabajo';
     protected static $tables = 'ordenesTrabajo';
 
+    static public function estadoCTP($id = null)
+    {
+        $estado = [
+            '-1' => 'Anulado',
+            '0' => 'Cancelado',
+            '1' => 'En Proceso',
+            '2' => 'Deuda',
+        ];
+        if (is_null($id))
+            return $estado;
+
+        return $estado[$id];
+    }
+
     public static function getAll(int $sucursal = null, int $usuario = null)
     {
         $ordenes = DB::table(self::$tables);
@@ -26,62 +40,27 @@ class OrdenesTrabajo extends Model
         return $ordenes->get();
     }
 
-    public function getCliente()
+    public static function newOrden(array $orden, array $productos)
     {
-        return $this->hasOne(Cliente::class, 'idCliente', 'fk_idCliente');
+        $ordenes = DB::table(self::$tables);
+        $orden['created_at'] = now();
+        $orden['updated_at'] = now();
+        $id = $ordenes->insertGetId($orden);
+        if (!empty($id)) {
+            DetallesOrden::newOrdenDetalle($productos,$id);
+        }
+    }
+    public static function getCorrelativo(int $sucursal){
+        $correlativo = 1;
+        $ot = DB::table(self::$tables)
+            ->where('sucursal','=',$sucursal)
+            ->orderBy('correlativo','desc')
+            ->limit(1);
+        if($ot->count()>0){
+            $correlativo = $ot->get()[0]->correlativo + 1;
+        }
+        return $correlativo;
     }
 
-    public function getMovimientoCaja()
-    {
-        return $this->hasOne(MovimientoCaja::class, 'idMovimientoCaja', 'fk_idMovimientoCaja');
-    }
 
-    public function getOrdenPadre()
-    {
-        return $this->hasOne(OrdenesTrabajo::class, 'idOrdenCTP', 'fk_idParent');
-    }
-
-    public function getOrdenCTPs()
-    {
-        return $this->hasMany(OrdenesTrabajo::class, 'fk_idParent', 'idOrdenCTP');
-    }
-
-    public function getUsuarioDiseño()
-    {
-        return $this->hasOne(User::class, 'idUser', 'fk_idUserD');
-    }
-
-    public function getUsuarioVenta()
-    {
-        return $this->hasOne(User::class, 'idUser', 'fk_idUserV');
-    }
-
-    public function getUsuarioDiseño2()
-    {
-        return $this->hasOne(User::class, 'idUser', 'fk_idUserD2');
-    }
-
-    public function getSucursal()
-    {
-        return $this->hasOne(Sucursal::class, 'idSucursal', 'fk_idSucursal');
-    }
-
-    public function getOrdenDetalle()
-    {
-        return $this->hasMany(detallesOrden::class, 'fk_idOrden', 'idOrdenCTP');
-    }
-
-    static public function estadoCTP($id = null)
-    {
-        $estado = [
-            '-1' => 'Anulado',
-            '0' => 'Cancelado',
-            '1' => 'En Proceso',
-            '2' => 'Deuda',
-        ];
-        if (is_null($id))
-            return $estado;
-
-        return $estado[$id];
-    }
 }

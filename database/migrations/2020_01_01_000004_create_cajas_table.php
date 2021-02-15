@@ -32,17 +32,7 @@ class CreateCajasTable extends Migration
             $table->text('observaciones');
             $table->timestamps();
         });
-        Schema::create('movimientoCajas', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('cajaOrigen')->nullable()->constrained('cajas');
-            $table->foreignId('cajaDestino')->constrained('cajas');
-            $table->foreignId('user')->constrained('users');
-            $table->foreignId('cierre')->nullable()->constrained('cierresCajas');
-            $table->decimal('monto');
-            $table->tinyInteger('tipo');
-            $table->text('observaciones');
-            $table->timestamps();
-        });
+
 
     }
 

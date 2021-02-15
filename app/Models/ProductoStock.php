@@ -5,8 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use PhpParser\Node\Expr\Cast\Object_;
-use function PHPUnit\Framework\isEmpty;
 use function PHPUnit\Framework\isNull;
 
 class ProductoStock extends Model
@@ -21,7 +19,6 @@ class ProductoStock extends Model
         {
             $stock = $stock->where('sucursal','=',$sucursal);
         }
-        $stock = $stock->whereNull('deleted_at');
         return $stock->get();
     }
     public static function get(int $sucursal,int $producto)
@@ -34,11 +31,12 @@ class ProductoStock extends Model
     public static function more(array $request,bool $mov=true)
     {
         $stock = self::get($request['sucursal'],$request['producto']);
-        $cantidad = $stock->get()[0]->cantidad;
+        $cantidad=0;
         if($stock->count()>0)
         {
-            $cantidad += $request['cantidad'];
+            $cantidad = $stock->get()[0]->cantidad;
         }
+        $cantidad += $request['cantidad'];
         $sucursalPadre = DB::table(Sucursal::$tables)
             ->where('id','=',$request['sucursal'])
             ->get('dependeDe')[0]->dependeDe;
@@ -80,11 +78,13 @@ class ProductoStock extends Model
     public static function less(array $request,bool $mov=true)
     {
         $stock = self::get($request['sucursal'],$request['producto']);
-        $cantidad = $stock->get()[0]->cantidad;
+        $cantidad =0;
         if($stock->count()>0)
         {
-            $cantidad -= $request['cantidad'];
+            $cantidad = $stock->get()[0]->cantidad;
+
         }
+        $cantidad -= $request['cantidad'];
         $sucursalPadre = DB::table(Sucursal::$tables)
             ->where('id','=',$request['sucursal'])
             ->get('dependeDe')[0]->dependeDe;
@@ -140,10 +140,11 @@ class ProductoStock extends Model
             $movimiento = DB::table(MovimientoStock::$tables);
             $movimiento->insert([
                 'producto' => $request['producto'],
-                'stockOrigen' => $stock['id'],
+                'stockOrigen' => $stock->get()[0]->id,
                 'stockDestino' => null,
                 'cantidad' => $request['cantidad'],
                 'observaciones'=>"venta de insumos",
+                'detalleOrden'=>!empty($request['detalleOrden'])?$request['detalleOrden']:"",
                 'user'=>Auth::id(),
                 'created_at' => now(),
                 'updated_at' => now()
@@ -172,5 +173,16 @@ class ProductoStock extends Model
             $stock[$sucursal->id] = $stockItem;
         }
         return $stock;
+    }
+    public static function getProducts($sucursal=null)
+    {
+        $stock = DB::table(self::$tables);
+        $stock = $stock->leftJoin(Producto::$tables,'producto','=','productos.id');
+        if(!isNull($sucursal))
+        {
+            $stock = $stock->where('sucursal','=',$sucursal);
+        }
+        $stock = $stock->whereNull('productos.deleted_at');
+        return $stock->get();
     }
 }

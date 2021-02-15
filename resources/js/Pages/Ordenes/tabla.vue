@@ -6,38 +6,113 @@
                     <h4 class="header-title m-t-0 m-b-20">{{ titulo }}</h4>
                 </div>
             </div>
-            <div class="row">
+            <div class="row m-b-20">
                 <div class="col">
-                   <Orden :isNew="true" id="new"></Orden>
+                    <b-button v-b-modal="'ordenModal'" @click="loadModal()">{{ boton1 }}</b-button>
+                    <formOrden
+                        :isNew="isNew"
+                        id="ordenModal"
+                        :itemRow="itemRow"
+                        :productos="productos"
+                        :productosSell="productosSell()"
+                    ></formOrden>
                 </div>
             </div>
-            {{ productos }}
+            <div class="col">
+                <b-table
+                    striped
+                    hover
+                    responsive
+                    :items="ordenes"
+                    :fields="fields"
+                    show-empty
+                    small
+                >
+                    <template #empty="scope">
+                        <p>{{ textoVacio }}</p>
+                    </template>
+                    <template v-slot:cell(central)="data">
+                        {{ (data.value === 1) ? "Si" : "No" }}
+                    </template>
+                    <template v-slot:cell(enable)="data">
+                        {{ (data.value === 1) ? "Si" : "No" }}
+                    </template>
+                    <template v-slot:cell(Acciones)="row">
+                        <div class="row-actions">
+                            <b-button v-b-modal="'ordenModal'" @click="loadModal(false,row)">
+                                {{ boton2 }}
+                            </b-button>
+                            <b-button class="btn-danger" @click="borrar(row.item.id)">{{ boton3 }}</b-button>
+                        </div>
+                    </template>
+                </b-table>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 import Layout from '@/Shared/Layout'
-import Orden from '../../Shared/formularios/Orden'
+import formOrden from './form'
 
 export default {
     name: "Ordenes",
     layout: Layout,
     data() {
         return {
-            titulo: 'Ordenes'
+            isNew: true,
+            titulo: 'Ordenes',
+            boton1: "Nuevo",
+            boton2: "Modificar",
+            boton3: "Borrar",
+            textoVacio: 'No existen Ordenes',
+            fields: [
+                'correlativo',
+                'estado',
+                'responsable',
+                'telefono',
+                {
+                    'key': 'created_at',
+                    'label': 'Fecha'
+                }
+            ],
+            itemRow: {},
         }
     },
     props: {
         ordenes: Array,
         productos: Array,
     },
-    components:{
-        Orden
+    components: {
+        formOrden
+    },
+    methods: {
+        loadModal(isNew = true, item = null) {
+            this.isNew = isNew;
+            this.itemRow = {};
+            if (!isNew) {
+                this.itemRow = item.item;
+            }
+        },
+        borrar(id){
+            this.$inertia.delete(`sucursal/${id}`, {
+                onBefore: () => confirm('Esta seguro?'),
+            })
+        },
+        productosSell()
+        {
+            let sell = [];
+            Object.keys(this.productos).forEach(key=>
+            {
+                sell[key]={
+                    id:this.productos[key].id,
+                    cantidad:0,
+                    costo:this.productos[key].costo,
+                    producto:this.productos[key].producto
+                };
+            })
+            return sell;
+        }
     }
 }
 </script>
-
-<style scoped>
-
-</style>

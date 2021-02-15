@@ -31,16 +31,7 @@ class CreateProductosTable extends Migration
             $table->integer('alertaCantidad')->default(0);
             $table->timestamps();
         });
-        Schema::create('movimientosStock', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('producto')->constrained('productos');
-            $table->foreignId('stockOrigen')->nullable()->constrained('stock');
-            $table->foreignId('stockDestino')->nullable()->constrained('stock');
-            $table->foreignId('user');
-            $table->integer('cantidad');
-            $table->text('observaciones');
-            $table->timestamps();
-        });
+
     }
 
     /**
@@ -50,7 +41,6 @@ class CreateProductosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('movimientosStock');
         Schema::dropIfExists('stock');
         Schema::dropIfExists('productos');
     }

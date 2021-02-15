@@ -3,19 +3,70 @@
 namespace App\Http\Controllers;
 
 use App\Models\OrdenesTrabajo;
-use App\Models\Producto;
+use App\Models\ProductoStock;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+use Psy\Util\Json;
 
 class OrdenesController extends Controller
 {
     public function getAll()
     {
         $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], Auth::user()['id']);
-        $productos = Producto::getAll(Auth::user()['sucursal']);
+        $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
         return Inertia::render('Ordenes/tabla', [
             'ordenes' => $ordenes,
             'productos' => $productos
         ]);
+    }
+
+    public function post(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'responsable' => 'required',
+                'telefono' => 'required',
+                'productos' => 'required'
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => -1,
+                    'errors' => $validator->errors()
+                ]);
+            }
+            //armar orden
+            $orden = array();
+            $orden['sucursal'] = Auth::user()['sucursal'];
+            $orden['estado'] = 1;
+            $orden['correlativo'] = OrdenesTrabajo::getCorrelativo(Auth::user()['sucursal']);
+            $orden['userDiseñador'] = Auth::user()['id'];
+            $orden['responsable'] = $request['responsable'];
+            $orden['telefono'] = $request['telefono'];
+            $orden['observaciones'] = !empty($request['observaciones'])?$request['observaciones']:"";
+            //armar detalleOrden
+            $detalle = array();
+            $orden['montoVenta'] = 0;
+            $products = json_decode($request['productos'], true);
+            foreach ($products as $item) {
+                $tmp = array();
+                $tmp['sucursal'] = Auth::user()['sucursal'];
+                $tmp['producto'] = $item['producto'];
+                $tmp['stock'] = $item['id'];
+                $tmp['cantidad'] = $item['cantidad'];
+                $tmp['costo'] = !empty($item['costo']) ? $item['costo'] : 0;
+                $tmp['total'] = $tmp['cantidad'] * $tmp['costo'];
+                $orden['montoVenta'] +=  $tmp['total'];
+                array_push($detalle, $tmp);
+            }
+            $result = OrdenesTrabajo::newOrden($orden, $detalle);
+            return response()->json(["status" => 0, 'path' => 'ordenes']);
+        } catch (\Exception $error) {
+            Log::error($error->getMessage());
+            return response()->json(["status" => -1,
+                'error' => $error,], 500);
+        }
     }
 }

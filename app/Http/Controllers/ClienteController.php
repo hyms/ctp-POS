@@ -28,7 +28,8 @@ class ClienteController extends Controller
             $validator = Validator::make($request->all(), [
                 'sucursal' => 'required',
                 'nombreCompleto' => 'required',
-                'nombreResponsable' => 'required'
+                'nombreResponsable' => 'required',
+                'ciNit' => 'required'
             ]);
             if ($validator->fails()) {
                 return response()->json([
