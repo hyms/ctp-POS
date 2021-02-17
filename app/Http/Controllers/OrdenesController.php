@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DetallesOrden;
 use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,8 @@ class OrdenesController extends Controller
 {
     public function getAll()
     {
-        $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], Auth::user()['id']);
+        $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], Auth::user()['id'],false);
+        $ordenes = DetallesOrden::getAll($ordenes);
         $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
         return Inertia::render('Ordenes/tabla', [
             'ordenes' => $ordenes,
@@ -68,5 +70,12 @@ class OrdenesController extends Controller
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
         }
+    }
+
+    public function borrar($id)
+    {
+        $Cliente = OrdenesTrabajo::find($id);
+        $Cliente->delete();
+        return back()->withInput();
     }
 }

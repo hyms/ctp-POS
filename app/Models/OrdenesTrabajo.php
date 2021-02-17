@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use function PHPUnit\Framework\isNull;
 
@@ -10,6 +11,7 @@ class OrdenesTrabajo extends Model
 {
     protected $table = 'ordenesTrabajo';
     protected static $tables = 'ordenesTrabajo';
+    protected $guarded = [];
 
     static public function estadoCTP($id = null)
     {
@@ -25,7 +27,7 @@ class OrdenesTrabajo extends Model
         return $estado[$id];
     }
 
-    public static function getAll(int $sucursal = null, int $usuario = null)
+    public static function getAll(int $sucursal = null, int $usuario = null, bool $onlyDay = false)
     {
         $ordenes = DB::table(self::$tables);
         if (!isNull($sucursal)) {
@@ -33,6 +35,9 @@ class OrdenesTrabajo extends Model
         }
         if (!isNull($usuario)) {
             $ordenes = $ordenes->where('userDiseñador', '=', $usuario);
+        }
+        if ($onlyDay) {
+            $ordenes = $ordenes->whereDate('created_at', Carbon::today());
         }
         $ordenes = $ordenes
             ->whereNull('deleted_at')
@@ -47,16 +52,18 @@ class OrdenesTrabajo extends Model
         $orden['updated_at'] = now();
         $id = $ordenes->insertGetId($orden);
         if (!empty($id)) {
-            DetallesOrden::newOrdenDetalle($productos,$id);
+            DetallesOrden::newOrdenDetalle($productos, $id);
         }
     }
-    public static function getCorrelativo(int $sucursal){
+
+    public static function getCorrelativo(int $sucursal)
+    {
         $correlativo = 1;
         $ot = DB::table(self::$tables)
-            ->where('sucursal','=',$sucursal)
-            ->orderBy('correlativo','desc')
+            ->where('sucursal', '=', $sucursal)
+            ->orderBy('correlativo', 'desc')
             ->limit(1);
-        if($ot->count()>0){
+        if ($ot->count() > 0) {
             $correlativo = $ot->get()[0]->correlativo + 1;
         }
         return $correlativo;

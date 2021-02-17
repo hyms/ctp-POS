@@ -16,6 +16,12 @@
                         :productos="productos"
                         :productosSell="productosSell()"
                     ></formOrden>
+                     <item-orden
+                        id="itemModal"
+                        :item="itemRow"
+                        :productos="productos"
+                    ></item-orden>
+
                 </div>
             </div>
             <div class="col">
@@ -39,7 +45,7 @@
                     </template>
                     <template v-slot:cell(Acciones)="row">
                         <div class="row-actions">
-                            <b-button v-b-modal="'ordenModal'" @click="loadModal(false,row)">
+                            <b-button v-b-modal="'itemModal'" @click="loadModal(false,row)">
                                 {{ boton2 }}
                             </b-button>
                             <b-button class="btn-danger" @click="borrar(row.item.id)">{{ boton3 }}</b-button>
@@ -54,6 +60,7 @@
 <script>
 import Layout from '@/Shared/Layout'
 import formOrden from './form'
+import itemOrden from './item'
 
 export default {
     name: "Ordenes",
@@ -63,7 +70,7 @@ export default {
             isNew: true,
             titulo: 'Ordenes',
             boton1: "Nuevo",
-            boton2: "Modificar",
+            boton2: "Ver",
             boton3: "Borrar",
             textoVacio: 'No existen Ordenes',
             fields: [
@@ -74,7 +81,8 @@ export default {
                 {
                     'key': 'created_at',
                     'label': 'Fecha'
-                }
+                },
+                'Acciones'
             ],
             itemRow: {},
         }
@@ -84,7 +92,8 @@ export default {
         productos: Array,
     },
     components: {
-        formOrden
+        formOrden,
+        itemOrden
     },
     methods: {
         loadModal(isNew = true, item = null) {
@@ -95,7 +104,7 @@ export default {
             }
         },
         borrar(id){
-            this.$inertia.delete(`sucursal/${id}`, {
+            this.$inertia.delete(`orden/${id}`, {
                 onBefore: () => confirm('Esta seguro?'),
             })
         },

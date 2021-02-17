@@ -67,6 +67,7 @@ export default {
                         label:'Destino',
                         key:'sdSucursal'
                     },
+                    'cantidad',
                     'nombre',
                     'apellido',
                     'observaciones',

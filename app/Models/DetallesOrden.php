@@ -33,4 +33,17 @@ class DetallesOrden extends Model
            }
        }
    }
+
+    public static function getAll(\Illuminate\Support\Collection $ordenes)
+    {
+        $ordenes = $ordenes->toArray();
+        foreach ($ordenes as $key => $item)
+        {
+            $detalle = DB::table(self::$tables)
+                ->where('ordenTrabajo','=',$item->id)
+                ->get()->toArray();
+            $ordenes[$key]->detallesOrden=$detalle;
+        }
+        return $ordenes;
+    }
 }

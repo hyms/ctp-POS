@@ -127,14 +127,16 @@ class ProductoStock extends Model
     public static function sell(array $request,bool $mov=true)
     {
         $stock = self::get($request['sucursal'],$request['producto']);
+        $cantidad =0;
         if($stock->count()>0)
         {
-            $request['cantidad'] = $stock->get()[0]->cantidad - $request['cantidad'];
+            $cantidad = $stock->get()[0]->cantidad;
         }
+        $cantidad -= $request['cantidad'];
         $stock->updateOrInsert([
             'producto'=>$request['producto'],
             'sucursal'=>$request['sucursal']
-        ],['cantidad'=>$request['cantidad']]);
+        ],['cantidad'=> $cantidad]);
 
         if($mov) {
             $movimiento = DB::table(MovimientoStock::$tables);

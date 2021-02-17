@@ -47,6 +47,8 @@ Route::group(['prefix' => 'diseño', 'middleware' => 'auth'], function () {
         ->name('listaOrdenes');
     Route::post('orden', [OrdenesController::class, 'post'])
         ->name('guardarOrden');
+     Route::delete('orden/{id}', [OrdenesController::class, 'borrar'])
+        ->name('borrarOrden');
 });
 //Admin
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {

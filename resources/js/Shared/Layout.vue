@@ -22,7 +22,7 @@
                            href="#" role="button"
                            aria-haspopup="false" aria-expanded="false">
                             <img src="../../img/users/avatar-1.jpg" alt="user" class="rounded-circle"> <span
-                            class="ml-1">Anderson <i class="mdi mdi-chevron-down"></i> </span>
+                            class="ml-1">{{ $page.props.user.name }} <i class="mdi mdi-chevron-down"></i> </span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right profile-dropdown ">
                             <inertia-link href="" class="dropdown-item notify-item">
@@ -38,6 +38,7 @@
 
                 <ul class="list-inline menu-left mb-0">
                     <li class="float-left">
+
                         <b-button v-b-toggle.sidebar-1 class="btn-sidebar">Menu</b-button>
                     </li>
                 </ul>
@@ -64,6 +65,7 @@
                 </div>
 
                 <div class="footer">
+
                     <div class="pull-right hide-phone">
                         Project Completed <strong class="text-custom">57%</strong>.
                     </div>
