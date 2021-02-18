@@ -53,6 +53,13 @@ export default {
                     state: null,
                     stateText: null
                 },
+                precioUnidad: {
+                    label: 'Precio X unidad',
+                    value: "",
+                    type: "text",
+                    state: null,
+                    stateText: null
+                },
             },
             errors: Array
         }
@@ -60,6 +67,7 @@ export default {
     methods: {
         reset() {
             this.limpiar();
+            this.form.precioUnidad.value=this.itemRow['precioUnidad']
         },
         limpiar() {
             Object.keys(this.form).forEach(key => {

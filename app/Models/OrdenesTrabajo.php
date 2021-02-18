@@ -42,7 +42,7 @@ class OrdenesTrabajo extends Model
         $ordenes = $ordenes
             ->whereNull('deleted_at')
             ->orderBy('updated_at', 'desc');
-        return $ordenes->get();
+        return $ordenes;
     }
 
     public static function newOrden(array $orden, array $productos)

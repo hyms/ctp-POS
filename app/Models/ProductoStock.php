@@ -47,6 +47,10 @@ class ProductoStock extends Model
         {
             $values['orden']=$request['orden'];
         }
+         if(!empty($request['precioUnidad']))
+        {
+            $values['precioUnidad']=$request['precioUnidad'];
+        }
         $stock->updateOrInsert([
           'producto'=>$request['producto'],
           'sucursal'=>$request['sucursal']
@@ -94,6 +98,10 @@ class ProductoStock extends Model
         if(!empty($request['orden']))
         {
             $values['orden']=$request['orden'];
+        }
+        if(!empty($request['precioUnidad']))
+        {
+            $values['precioUnidad']=$request['precioUnidad'];
         }
         $stock->updateOrInsert([
             'producto'=>$request['producto'],
@@ -166,7 +174,7 @@ class ProductoStock extends Model
                     ['producto','=',$producto->id]
                 ]);
                 if($tmp->count()>0) {
-                    $stockItem[$producto->id] = $tmp->get()[0]->cantidad;
+                    $stockItem[$producto->id] = $tmp->get()[0];
                 }
                 else{
                     $stockItem[$producto->id] = null;

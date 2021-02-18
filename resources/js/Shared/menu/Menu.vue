@@ -32,26 +32,39 @@
 export default {
     data() {
         return {
-            menu: [{
-                titulo: 'Diseño',
-                role: [0, 1, 3, 4],
-                submenu: [
-                    {
-                        label: 'Ordenes',
-                        url: '/diseño/ordenes',
-                        role: [0, 1, 3, 4]
-                    },
-                    {
-                        label: 'Reposiciones',
-                        url: '/diseño/reposicion',
-                        role: [0, 1, 3, 4]
-                    },
-                    {
-                        label: 'Reportes',
-                        url: '/diseño/reporte',
-                        role: [0, 1, 3, 4]
-                    }]
-            },
+            menu: [
+                {
+                    titulo: 'Diseño',
+                    role: [0, 1, 3, 4],
+                    submenu: [
+                        {
+                            label: 'Ordenes',
+                            url: '/diseño/ordenes',
+                            role: [0, 1, 3, 4]
+                        },
+                        // {
+                        //     label: 'Reposiciones',
+                        //     url: '/diseño/reposicion',
+                        //     role: [0, 1, 3, 4]
+                        // },
+                        // {
+                        //     label: 'Reportes',
+                        //     url: '/diseño/reporte',
+                        //     role: [0, 1, 3, 4]
+                        // }
+                    ]
+                },
+                {
+                    titulo: 'Venta',
+                    role: [0, 1, 3, 4],
+                    submenu: [
+                        {
+                            label: 'Ordenes',
+                            url: '/venta/ordenes',
+                            role: [0, 1, 3, 4]
+                        },
+                    ]
+                },
                 {
                     titulo: 'Administracion',
                     role: [0, 1],
@@ -60,24 +73,30 @@ export default {
                             label: 'Productos',
                             url: '/admin/productos',
                             role: [0, 1],
-                        }, {
+                        },
+                        {
                             label: 'Sucursales',
                             url: '/admin/sucursales',
                             role: [0, 1],
-                        }, {
+                        },
+                        {
                             label: 'Clientes',
                             url: '/admin/clientes',
                             role: [0, 1],
-                        }, {
+                        },
+                        {
                             label: 'Cajas',
                             url: '/admin/cajas',
                             role: [0, 1],
-                        }, {
+                        },
+                        {
                             label: 'Usuarios',
                             url: '/admin/users',
                             role: [0, 1],
-                        }]
-                }]
+                        }
+                    ]
+                }
+            ]
         };
     },
     methods: {}

@@ -15,6 +15,7 @@
                                         <tr>
                                             <th scope="col">Productos</th>
                                             <th scope="col">Cantidad</th>
+                                            <th scope="col">Precio</th>
                                             <th scope="col">Acciones</th>
                                         </tr>
                                         </thead>
@@ -23,6 +24,7 @@
                                             <tr>
                                                 <td>{{ producto.formato }}({{ producto.dimension }})</td>
                                                 <td>{{ getCantidad(sucursal.id, producto.id) }}</td>
+                                                <td>{{ getPrecio(sucursal.id, producto.id) }}</td>
                                                 <td>
                                                     <b-button v-b-modal="'stockModal'" @click="loadModal(sucursal.id, producto.id,true)">
                                                         Añadir
@@ -83,18 +85,25 @@ export default {
            return {};
        },
         loadModal(sucursal, producto,isUp) {
-            let cantidad = this.stocks[sucursal][producto];
+            let stock = this.stocks[sucursal][producto];
             this.isNew = isUp;
             this.itemRow = {
                 sucursal:sucursal,
                 producto:producto,
-                cantidad:((cantidad===null)?0:cantidad)
+                cantidad:((stock===null)?0:stock['cantidad']),
+                precioUnidad:((stock===null)?0:stock['precioUnidad'])
             };
         },
         getCantidad(sucursal, producto) {
-            let cantidad = this.stocks[sucursal][producto];
+            let cantidad = this.stocks[sucursal][producto]['cantidad'];
             if (cantidad != null)
                 return cantidad;
+            return "-";
+        },
+        getPrecio(sucursal, producto) {
+            let precio = this.stocks[sucursal][producto]['precioUnidad'];
+            if (precio != null)
+                return precio;
             return "-";
         }
     }

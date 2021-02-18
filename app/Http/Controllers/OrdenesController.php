@@ -17,7 +17,19 @@ class OrdenesController extends Controller
     public function getAll()
     {
         $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], Auth::user()['id'],false);
-        $ordenes = DetallesOrden::getAll($ordenes);
+        $ordenes = $ordenes->where('estado','=','1');
+        $ordenes = DetallesOrden::getAll($ordenes->get());
+        $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
+        return Inertia::render('Ordenes/tabla', [
+            'ordenes' => $ordenes,
+            'productos' => $productos
+        ]);
+    }
+    public function getAllVenta()
+    {
+        $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null,false);
+        $ordenes = $ordenes->whereIn('estado',['1','2']);
+        $ordenes = DetallesOrden::getAll($ordenes->get());
         $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
         return Inertia::render('Ordenes/tabla', [
             'ordenes' => $ordenes,

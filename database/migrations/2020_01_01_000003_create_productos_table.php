@@ -28,6 +28,7 @@ class CreateProductosTable extends Migration
             $table->foreignId('sucursal')->constrained('sucursales');
             $table->integer('orden')->default(0);
             $table->integer('cantidad');
+            $table->decimal('precioUnidad')->default(0);
             $table->integer('alertaCantidad')->default(0);
             $table->timestamps();
         });
