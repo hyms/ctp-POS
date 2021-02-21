@@ -176,7 +176,7 @@ export default {
             Object.keys(this.form).forEach(key => {
                 if(this.form[key].value !=null) {
                     if (['enable'].includes(key)) {
-                        user.append(key, this.form[key].value ? 1 : 0);
+                        user.append(key, this.form[key].value ? '1' : '0');
                     } else {
                         user.append(key, this.form[key].value);
                     }
@@ -192,7 +192,7 @@ export default {
              });*/
             axios.post('/admin/user', user, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
-                    if (data["status"] == 0) {
+                    if (data["status"] === 0) {
                         location.href = data["path"];
                     }
                     Object.keys(this.form).forEach(key => {

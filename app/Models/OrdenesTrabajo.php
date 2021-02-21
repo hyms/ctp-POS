@@ -21,8 +21,9 @@ class OrdenesTrabajo extends Model
             '1' => 'En Proceso',
             '2' => 'Deuda',
         ];
-        if (is_null($id))
+        if (is_null($id)) {
             return $estado;
+        }
 
         return $estado[$id];
     }
@@ -39,10 +40,9 @@ class OrdenesTrabajo extends Model
         if ($onlyDay) {
             $ordenes = $ordenes->whereDate('created_at', Carbon::today());
         }
-        $ordenes = $ordenes
+        return $ordenes
             ->whereNull('deleted_at')
             ->orderBy('updated_at', 'desc');
-        return $ordenes;
     }
 
     public static function newOrden(array $orden, array $productos)

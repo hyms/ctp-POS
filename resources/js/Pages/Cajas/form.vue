@@ -171,7 +171,7 @@ export default {
                         producto.append(key, this.form[key].value);
                     }
                 }else if (['enable'].includes(key)) {
-                    producto.append(key, this.form[key].value ? 1 : 0);
+                    producto.append(key, this.form[key].value ? '1' : '0');
                 } else {
                     producto.append(key, this.form[key].value);
                 }
@@ -179,7 +179,7 @@ export default {
 
             axios.post('/admin/caja', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
-                    if (data["status"] == 0) {
+                    if (data["status"] === 0) {
                         location.href = data["path"];
                     }
                     Object.keys(this.form).forEach(key => {

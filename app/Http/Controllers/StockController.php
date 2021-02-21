@@ -40,7 +40,7 @@ class StockController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            $stock = ProductoStock::more(
+            ProductoStock::more(
                 $request->all()
             );
             return response()->json(["status" => 0, 'path' => 'stocks']);
@@ -65,7 +65,7 @@ class StockController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            $stock = ProductoStock::less(
+            ProductoStock::less(
                 $request->all()
             );
             return response()->json(["status" => 0, 'path' => 'stocks']);

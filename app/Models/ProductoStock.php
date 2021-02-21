@@ -23,10 +23,9 @@ class ProductoStock extends Model
     }
     public static function get(int $sucursal,int $producto)
     {
-        $stock = DB::table(self::$tables);
-        $stock = $stock->where('sucursal', '=', $sucursal);
-        $stock = $stock->where('producto', '=', $producto);
-        return $stock;
+        return DB::table(self::$tables)
+            ->where('sucursal', '=', $sucursal)
+            ->where('producto', '=', $producto);
     }
     public static function more(array $request,bool $mov=true)
     {

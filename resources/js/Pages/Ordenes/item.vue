@@ -9,9 +9,9 @@
         <table class="table">
             <thead>
             <tr>
-                <th>#</th>
-                <th>Productos</th>
-                <th>cantidad</th>
+                <th scope="col">#</th>
+                <th scope="col">Productos</th>
+                <th scope="col">cantidad</th>
             </tr>
             </thead>
             <tbody>

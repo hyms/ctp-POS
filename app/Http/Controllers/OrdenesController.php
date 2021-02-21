@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
-use Psy\Util\Json;
 
 class OrdenesController extends Controller
 {
@@ -75,7 +74,7 @@ class OrdenesController extends Controller
                 $orden['montoVenta'] +=  $tmp['total'];
                 array_push($detalle, $tmp);
             }
-            $result = OrdenesTrabajo::newOrden($orden, $detalle);
+            OrdenesTrabajo::newOrden($orden, $detalle);
             return response()->json(["status" => 0, 'path' => 'ordenes']);
         } catch (\Exception $error) {
             Log::error($error->getMessage());
