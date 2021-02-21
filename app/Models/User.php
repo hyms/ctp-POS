@@ -2,42 +2,58 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use function PHPUnit\Framework\isNull;
 
-class User extends Authenticatable
+class User extends Model implements AuthenticatableContract
 {
-    use HasFactory, Notifiable;
+    use Authenticatable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $table = 'users';
+    public static $tables = 'users';
+    protected $guarded = [];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    public function getNameAttribute()
+    {
+        return $this->nombre . ' ' . $this->apellido;
+    }
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    public function setPasswordAttribute($password)
+    {
+        $this->attributes['password'] = Hash::needsRehash($password) ? Hash::make($password) : $password;
+    }
+
+    public static function getAll()
+    {
+        $users = DB::table(self::$tables);
+        $users = $users->whereNull('deleted_at');
+        return $users->get();
+    }
+
+    public static function getRole($int = null)
+    {
+        $roles = array(
+            '0' => 'sadmin',
+            '1' => 'admin',
+            '2' => 'venta',
+            '3' => 'operario',
+            '4' => 'diseño',
+            '5' => 'auxVenta'
+        );
+        if (isNull($int)) {
+            return array(
+                ['value' => '0', 'text' => 'sadmin'],
+                ['value' => '1', 'text' => 'admin'],
+                ['value' => '2', 'text' => 'venta'],
+                ['value' => '3', 'text' => 'operario'],
+                ['value' => '4', 'text' => 'diseño'],
+                ['value' => '5', 'text' => 'auxVenta'],
+            );
+        }
+        return $roles[$int];
+    }
 }
