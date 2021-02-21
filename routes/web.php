@@ -40,7 +40,7 @@ Route::get('/', [DashboardController::class, 'index'])
     ->middleware('auth');
 
 //diseño
-Route::group(['prefix' => 'diseño', 'middleware' => 'auth'], function () {
+Route::group(['prefix' => 'diseno', 'middleware' => 'auth'], function () {
     Route::get('/', [DisenoController::class, 'index'])
         ->name('homeDiseno');
     Route::get('ordenes', [OrdenesController::class, 'getAll'])

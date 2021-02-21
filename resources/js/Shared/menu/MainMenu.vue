@@ -2,10 +2,7 @@
     <!--------------------
               START - Main Menu
               -------------------->
-    <div id="sidebar-menu">
         <Menu/>
-
-    </div>
 </template>
 
 <script>

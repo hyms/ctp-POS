@@ -14,7 +14,7 @@
             </div>
 
             <div class="row m-b-20">
-                <div class="col">
+            <b-card>
                     <b-table
                         striped
                         hover
@@ -40,7 +40,7 @@
                             </div>
                         </template>
                     </b-table>
-                </div>
+            </b-card>
             </div>
         </div>
     </div>

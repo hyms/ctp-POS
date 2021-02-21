@@ -1,14 +1,15 @@
 <template>
-    <ul class="metismenu" id="side-menu">
+    <ul class="nav pcoded-inner-navbar">
         <template v-for="(value,index) in menu">
             <template v-if="value.role.includes($page.props.user.role)">
-                <li class="menu-title">{{ value.titulo }}</li>
+                <li class="nav-item pcoded-menu-caption"><label>{{ value.titulo }}</label></li>
                 <template v-for="(link, key) in value.submenu">
                     <template v-if="value.role.includes($page.props.user.role)">
-                        <li>
+                        <li :class="'nav-item '+(($page.url === link.url)?'active':'')">
                             <inertia-link
                                 :href="link.url"
                                 :key="key"
+                                class="nav-link"
                             >
                                 <span>{{ link.label }}</span>
                             </inertia-link>
@@ -17,8 +18,8 @@
                 </template>
             </template>
         </template>
-        <li>
-            <inertia-link href="/logout" method="post">
+        <li class="nav-item">
+            <inertia-link href="/logout" method="post" class="nav-link ">
                 <div class="icon-w">
                     <div class=""></div>
                 </div>
@@ -39,7 +40,7 @@ export default {
                     submenu: [
                         {
                             label: 'Ordenes',
-                            url: '/diseño/ordenes',
+                            url: '/diseno/ordenes',
                             role: [0, 1, 3, 4]
                         },
                         // {

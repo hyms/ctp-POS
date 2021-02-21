@@ -1,71 +1,57 @@
 <template>
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12">
-
-                <div class="wrapper-page">
-                    <div class="m-t-40 card-box">
-                        <div class="text-center">
-                            <h2 class="text-uppercase m-t-0 m-b-30">
-                                Ingresar
-                            </h2>
-                        </div>
-                        <div class="col">
-                            <b-alert :show="Object.values(errors).length>0" variant="danger" dismissible>
-                                <ul>
-                                    <li v-for="(value,key) in errors">
-                                        {{key}}:{{value}}
-                                    </li>
-                                </ul>
-                            </b-alert>
-                        </div>
-                        <div class="account-content">
-                            <form class="form-horizontal" @submit.prevent="submit">
-                                <div class="form-group m-b-20">
-                                    <div class="col-12">
-                                        <label for="username">Username</label>
-                                        <b-form-input
-                                            id="username"
-                                            v-model="form.username"
-                                            placeholder="Usuario"
-                                            trim
-                                            type="text"
-                                        ></b-form-input>
-                                    </div>
-                                </div>
-                                <div class="form-group m-b-20">
-                                    <div class="col-12">
-                                        <label for="password">Contraseña</label>
-                                        <b-form-input
-                                            id="password"
-                                            v-model="form.password"
-                                            placeholder="Contraseña"
-                                            trim
-                                            type="password"
-                                        ></b-form-input>
-                                    </div>
-                                </div>
-                                <div class="form-group m-b-30">
-                                    <div class="col-8">
-                                        <div class="icheck-primary">
-                                            <input id="remember" v-model="form.remember" type="checkbox">
-                                            <label for="remember">
-                                                Remember Me
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group account-btn text-center m-t-10">
-                                    <!-- /.col -->
-                                    <div class="col-12">
-                                        <loading-button :loading="sending" class="btn btn-lg btn-primary btn-block" type="submit">Login
-                                        </loading-button>
-                                    </div>
-                                    <!-- /.col -->
-                                </div>
-                            </form>
-                        </div>
+    <div class="auth-wrapper">
+        <div class="auth-content">
+            <div class="auth-bg">
+                <span class="r"></span>
+                <span class="r s"></span>
+                <span class="r s"></span>
+                <span class="r"></span>
+            </div>
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="feather icon-unlock auth-icon"></i>
                     </div>
+                    <h3 class="mb-4">Ingresar</h3>
+
+                    <form class="form-horizontal m-t-20" @submit.prevent="submit">
+                        <div class="input-group mb-3">
+                                <b-form-input
+                                    id="username"
+                                    v-model="form.username"
+                                    placeholder="Usuario"
+                                    trim
+                                    type="text"
+                                ></b-form-input>
+                        </div>
+                        <div class="input-group mb-4">
+                                <b-form-input
+                                    id="password"
+                                    v-model="form.password"
+                                    placeholder="Contraseña"
+                                    trim
+                                    type="password"
+                                ></b-form-input>
+                        </div>
+                        <div class="form-group text-left">
+                            <div class="checkbox checkbox-fill d-inline">
+                                    <input id="remember" v-model="form.remember" type="checkbox">
+                                    <label for="remember" class="cr">
+                                        Remember Me
+                                    </label>
+                            </div>
+                        </div>
+                        <div class="form-group account-btn text-center m-t-10">
+                            <!-- /.col -->
+                            <div class="col-12">
+                                <loading-button :loading="sending" class="btn btn-primary shadow-2 mb-4"
+                                                type="submit">Login
+                                </loading-button>
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                    </form>
+
                 </div>
             </div>
         </div>

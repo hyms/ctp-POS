@@ -2,8 +2,7 @@
     <div class="content-w">
         <div class="content-box">
             <Menu :active="2"></Menu>
-            <div class="row">
-                <div class="col">
+            <div class="tab-content">
                     <div class="row m-b-20">
                         <div class="col">
                             <b-table
@@ -30,7 +29,6 @@
                             </b-table>
                         </div>
                     </div>
-                </div>
             </div>
         </div>
     </div>

@@ -2,8 +2,7 @@
     <div class="content-w">
         <div class="content-box">
             <Menu :active="1"></Menu>
-            <div class="row">
-                <div class="col">
+            <div class="tab-content">
 <!--                    <div class="row">-->
 <!--                        <div class="col-sm-12">-->
 <!--                            <h4 class="header-title m-t-0 m-b-20">{{ titulo }}</h4>-->
@@ -17,7 +16,7 @@
                     </div>
 
                     <div class="row m-b-20">
-                        <div class="col">
+                       <b-card>
                             <b-table
                                 striped
                                 hover
@@ -42,11 +41,10 @@
                                     </div>
                                 </template>
                             </b-table>
-                        </div>
+                       </b-card>
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 </template>
 

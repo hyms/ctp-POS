@@ -3,8 +3,7 @@
         <div class="content-box">
             <Menu :active="0"></Menu>
             <Form :isNew="isNew" id="stockModal" :itemRow="itemRow"></Form>
-            <div class="row">
-                <div class="col">
+            <div class="tab-content">
                     <b-card no-body>
                         <b-tabs pills card vertical>
                             <template v-for="(sucursal,key) in sucursales">
@@ -42,7 +41,6 @@
                             </template>
                         </b-tabs>
                     </b-card>
-                </div>
             </div>
         </div>
     </div>
