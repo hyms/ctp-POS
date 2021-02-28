@@ -7,6 +7,7 @@ use App\Http\Controllers\DisenoController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrdenesController;
 use App\Http\Controllers\ProductosController;
+use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\UserController;
@@ -98,5 +99,13 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('guardarUsuarios');
     Route::delete('user/{id}', [UserController::class, 'borrar'])
         ->name('eliminarUsuarios');
+    //reportes
+    Route::get('reportes', [ReporteController::class, 'get'])
+        ->name('listaReportes');
+    Route::get('reportes/placas', [ReporteController::class, 'placas'])
+        ->name('listaReportes');
+    Route::get('reportes/cajas', [ReporteController::class, 'cajas'])
+        ->name('listaReportes');
+
 });
 

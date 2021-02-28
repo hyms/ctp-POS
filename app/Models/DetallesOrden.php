@@ -34,7 +34,7 @@ class DetallesOrden extends Model
        }
    }
 
-    public static function getAll(\Illuminate\Support\Collection $ordenes)
+    public static function getAll(\Illuminate\Support\Collection $ordenes): array
     {
         $ordenes = $ordenes->toArray();
         foreach ($ordenes as $key => $item)
@@ -45,5 +45,14 @@ class DetallesOrden extends Model
             $ordenes[$key]->detallesOrden=$detalle;
         }
         return $ordenes;
+    }
+
+    public static function getOne($orden)
+    {
+            $detalle = DB::table(self::$tables)
+                ->where('ordenTrabajo','=',$orden->id)
+                ->get()->toArray();
+            $orden->detallesOrden=$detalle;
+        return $orden;
     }
 }

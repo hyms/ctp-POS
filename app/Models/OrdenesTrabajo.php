@@ -69,5 +69,19 @@ class OrdenesTrabajo extends Model
         return $correlativo;
     }
 
+    public static function getReport(string $fecha,string $sucursal,string $tipo=null)
+    {
+        $ordenes = DB::table(self::$tables)
+            ->whereBetween('created_at',[$fecha . ' 00:00:00',$fecha . ' 23:59:59'])
+            ->where('sucursal','=',$sucursal)
+        ->whereNull('deleted_at');
+        if(!empty($tipo))
+        {
+            $ordenes = $ordenes->where('tipoOrden','=',$tipo);
+        }
+        $ordenes = $ordenes->orderBy('created_at');
+        return $ordenes->get();
+    }
+
 
 }

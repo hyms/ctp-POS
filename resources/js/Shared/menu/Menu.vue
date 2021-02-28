@@ -71,6 +71,11 @@ export default {
                     role: [0, 1],
                     submenu: [
                         {
+                            label: 'Reportes',
+                            url: '/admin/reportes/placas',
+                            role: [0, 1],
+                        },
+                        {
                             label: 'Productos',
                             url: '/admin/productos',
                             role: [0, 1],

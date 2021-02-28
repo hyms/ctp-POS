@@ -194,4 +194,15 @@ class ProductoStock extends Model
         $stock = $stock->whereNull('productos.deleted_at');
         return $stock->get();
     }
+    public static function getProduct($sucursal,$id)
+    {
+        $stock = DB::table(self::$tables);
+        $stock = $stock->where('sucursal','=',$sucursal);
+        $stock = $stock->where(self::$tables.'.id','=',$id);
+        $stock = $stock->leftJoin(Producto::$tables,'producto','=','productos.id');
+        $stock = $stock->whereNull('productos.deleted_at');
+        return $stock->get()[0];
+    }
+
+
 }
