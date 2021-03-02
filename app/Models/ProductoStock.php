@@ -187,7 +187,7 @@ class ProductoStock extends Model
     {
         $stock = DB::table(self::$tables);
         $stock = $stock->leftJoin(Producto::$tables,'producto','=','productos.id');
-        if(!isNull($sucursal))
+        if(!empty($sucursal))
         {
             $stock = $stock->where('sucursal','=',$sucursal);
         }

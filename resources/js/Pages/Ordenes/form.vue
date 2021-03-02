@@ -167,7 +167,7 @@ export default {
             {
                 producto.append('productos',JSON.stringify(items));
             }
-            axios.post('/diseño/orden', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            axios.post('/diseno/orden', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
                         location.href = data["path"];
