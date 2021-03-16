@@ -24,13 +24,44 @@
         </table>
         <div>
             <p><strong>Observaciones:</strong><br>
-            {{item.observaciones}}
+                {{ item.observaciones }}
             </p>
         </div>
+
+        <vue-html2pdf
+            :show-layout="false"
+            :float-layout="true"
+            :enable-download="false"
+            :preview-modal="true"
+            :paginate-elements-by-height="1400"
+            filename="hee hee"
+            :pdf-quality="2"
+            :manual-pagination="false"
+            pdf-format="a4"
+            pdf-orientation="landscape"
+            pdf-content-width="800px"
+
+            ref="html2Pdf"
+        >
+            <item-pdf slot="pdf-content" :item="item" :productos="productos" :id="id"/>
+        </vue-html2pdf>
+
+        <template #modal-footer="{ ok, cancel }">
+            <!-- Emulate built in modal footer ok and cancel button actions -->
+            <b-button size="sm" variant="primary" @click="ok()">
+                OK
+            </b-button>
+            <b-button size="sm" variant="danger" @click="generateReport()">
+                Imprimir
+            </b-button>
+        </template>
     </b-modal>
 </template>
 
 <script>
+import itemPdf from './pdf';
+import VueHtml2pdf from 'vue-html2pdf'
+
 export default {
     props: {
         productos: Array,
@@ -50,7 +81,14 @@ export default {
                 return item.formato + ' (' + item.dimension + ')';
             }
             return "";
+        },
+        generateReport() {
+            this.$refs.html2Pdf.generatePdf()
         }
+    },
+    components: {
+        VueHtml2pdf,
+        itemPdf
     }
 }
 </script>

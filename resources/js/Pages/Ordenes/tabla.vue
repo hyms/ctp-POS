@@ -21,7 +21,6 @@
                         :item="itemRow"
                         :productos="productos"
                     ></item-orden>
-
                 </div>
             </div>
                 <b-card>
@@ -72,6 +71,7 @@ export default {
             boton1: "Nuevo",
             boton2: "Ver",
             boton3: "Borrar",
+            boton4: "Imprimir",
             textoVacio: 'No existen Ordenes',
             fields: [
                 'correlativo',
@@ -121,6 +121,9 @@ export default {
                 };
             })
             return sell;
+        },
+        printPdf(item){
+            this.itemRow = item.item;
         }
     }
 }
