@@ -15,11 +15,11 @@ class Cajas extends Model
     public static function getAll(int $sucursal = null, int $caja_padre = null)
     {
         $sucursales = DB::table(self::$tables);
-        if (!isNull($sucursal)) {
+        if (!empty($sucursal)) {
             $sucursales = $sucursales->where('enable', '=', '1');
             $sucursales = $sucursales->where('sucursal', '=', $sucursal);
         }
-        if (!isNull($caja_padre)) {
+        if (!empty($caja_padre)) {
             $sucursales = $sucursales->where('dependeDe', '=', $caja_padre);
         }
         $sucursales = $sucursales

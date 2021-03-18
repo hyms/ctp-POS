@@ -2,9 +2,13 @@
 
 namespace App\Models;
 
+use http\Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Mike42\Escpos\CapabilityProfile;
+use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
+use Mike42\Escpos\Printer;
 use function PHPUnit\Framework\isNull;
 
 class OrdenesTrabajo extends Model
@@ -31,10 +35,10 @@ class OrdenesTrabajo extends Model
     public static function getAll(int $sucursal = null, int $usuario = null, bool $onlyDay = false)
     {
         $ordenes = DB::table(self::$tables);
-        if (!isNull($sucursal)) {
+        if (!empty($sucursal)) {
             $ordenes = $ordenes->where('sucursal', '=', $sucursal);
         }
-        if (!isNull($usuario)) {
+        if (!empty($usuario)) {
             $ordenes = $ordenes->where('userDiseñador', '=', $usuario);
         }
         if ($onlyDay) {
@@ -69,19 +73,17 @@ class OrdenesTrabajo extends Model
         return $correlativo;
     }
 
-    public static function getReport(string $fecha,string $sucursal,string $tipo=null)
+    public static function getReport(string $fecha, string $sucursal, string $tipo = null)
     {
         $ordenes = DB::table(self::$tables)
-            ->whereBetween('created_at',[$fecha . ' 00:00:00',$fecha . ' 23:59:59'])
-            ->where('sucursal','=',$sucursal)
-        ->whereNull('deleted_at');
-        if(!empty($tipo))
-        {
-            $ordenes = $ordenes->where('tipoOrden','=',$tipo);
+            ->whereBetween('created_at', [$fecha . ' 00:00:00', $fecha . ' 23:59:59'])
+            ->where('sucursal', '=', $sucursal)
+            ->whereNull('deleted_at');
+        if (!empty($tipo)) {
+            $ordenes = $ordenes->where('tipoOrden', '=', $tipo);
         }
         $ordenes = $ordenes->orderBy('created_at');
         return $ordenes->get();
     }
-
 
 }

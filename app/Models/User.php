@@ -44,7 +44,7 @@ class User extends Model implements AuthenticatableContract
             '4' => 'diseño',
             '5' => 'auxVenta'
         );
-        if (isNull($int)) {
+        if (empty($int)) {
             return array(
                 ['value' => '0', 'text' => 'sadmin'],
                 ['value' => '1', 'text' => 'admin'],

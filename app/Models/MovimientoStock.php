@@ -14,11 +14,11 @@ class MovimientoStock extends Model
     {
         $movimientos = DB::table(self::$tables);
         $movimientos = $movimientos
-            ->leftJoin(User::$tables,'user','=',User::$tables.'.id')
-            ->leftJoin(ProductoStock::$tables.' as so','stockOrigen','=','so.id')
-            ->leftJoin(ProductoStock::$tables.' as sd','stockDestino','=','sd.id')
-            ->select(self::$tables.'.*', 'so.sucursal as soSucursal','sd.sucursal as sdSucursal',User::$tables.'.nombre',User::$tables.'.apellido')
-        ->orderBy(self::$tables.'.updated_at','DESC');
+            ->leftJoin(User::$tables, 'user', '=', User::$tables . '.id')
+            ->leftJoin(ProductoStock::$tables . ' as so', 'stockOrigen', '=', 'so.id')
+            ->leftJoin(ProductoStock::$tables . ' as sd', 'stockDestino', '=', 'sd.id')
+            ->select(self::$tables . '.*', 'so.sucursal as soSucursal', 'sd.sucursal as sdSucursal', User::$tables . '.nombre', User::$tables . '.apellido')
+            ->orderBy(self::$tables . '.updated_at', 'DESC');
         return $movimientos->get();
     }
 }
