@@ -30,6 +30,21 @@ class CreateUsersTable extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+        Schema::create('usersExtras', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user')->constrained('users');
+            $table->string('tipoImpresion');
+            $table->string('impresora');
+            $table->timestamps();
+        });
+
+        Schema::create('controlEventos', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user')->constrained('users');
+            $table->string('evento');
+            $table->string('descripcion');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -39,6 +54,8 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('controlEventos');
+        Schema::dropIfExists('usersExtras');
         Schema::dropIfExists('users');
     }
 }
