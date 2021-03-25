@@ -23,14 +23,14 @@ class DetallesOrden extends Model
                    'updated_at' => now(),
                    'ordenTrabajo' => $ordenTrabajo
                ]);
-           if (!empty($id)) {
-               ProductoStock::sell([
-                   'sucursal' => $item['sucursal'],
-                   'producto' => $item['producto'],
-                   'cantidad' => $item['cantidad'],
-                   'detalleOrden' => $id,
-               ]);
-           }
+//           if (!empty($id)) {
+//               ProductoStock::sell([
+//                   'sucursal' => $item['sucursal'],
+//                   'producto' => $item['producto'],
+//                   'cantidad' => $item['cantidad'],
+//                   'detalleOrden' => $id,
+//               ]);
+//           }
        }
    }
 

@@ -40,6 +40,8 @@ Route::get('/', [DashboardController::class, 'index'])
     ->name('dashboard')
     ->middleware('auth');
 
+Route::get('search/{id}', [ClienteController::class, 'buscar'])
+    ->name('buscar');
 //diseño
 Route::group(['prefix' => 'diseno', 'middleware' => 'auth'], function () {
     Route::get('/', [DisenoController::class, 'index'])
@@ -74,6 +76,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('guardarCliente');
     Route::delete('cliente/{id}', [ClienteController::class, 'borrar'])
         ->name('eliminarCliente');
+
 //cajas
     Route::get('cajas', [CajaController::class, 'getAll'])
         ->name('listaCajas');
