@@ -27,4 +27,10 @@ class Cajas extends Model
             ->orderBy('updated_at', 'desc');
         return $sucursales->get();
     }
+
+    public static function sell(array $array)
+    {
+
+    }
+
 }

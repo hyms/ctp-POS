@@ -89,4 +89,8 @@ class OrdenesTrabajo extends Model
         return $ordenes->get();
     }
 
+    public static function venta(array $orden)
+    {
+    }
+
 }
