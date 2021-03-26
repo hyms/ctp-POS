@@ -11,11 +11,13 @@ use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\Printer;
 use function PHPUnit\Framework\isNull;
 
+
 class OrdenesTrabajo extends Model
 {
     protected $table = 'ordenesTrabajo';
     protected static $tables = 'ordenesTrabajo';
     protected $guarded = [];
+
 
     static public function estadoCTP($id = null)
     {
@@ -32,7 +34,7 @@ class OrdenesTrabajo extends Model
         return $estado[$id];
     }
 
-    public static function getAll(int $sucursal = null, int $usuario = null, bool $onlyDay = false)
+    public static function getAll(int $sucursal = null, int $usuario = null, bool $isReport = false)
     {
         $ordenes = DB::table(self::$tables);
         if (!empty($sucursal)) {
@@ -41,12 +43,13 @@ class OrdenesTrabajo extends Model
         if (!empty($usuario)) {
             $ordenes = $ordenes->where('userDiseñador', '=', $usuario);
         }
-        if ($onlyDay) {
-            $ordenes = $ordenes->whereDate('created_at', Carbon::today());
-        }
-        return $ordenes
+        $ordenes =  $ordenes
             ->whereNull('deleted_at')
             ->orderBy('updated_at', 'desc');
+        if (!$isReport) {
+            $ordenes = $ordenes->limit(10);
+        }
+        return $ordenes;
     }
 
     public static function newOrden(array $orden, array $productos)

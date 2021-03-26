@@ -136,7 +136,8 @@ export default {
             errors: Array,
             options: [],
             responsableValue:"",
-            cliente:""
+            cliente:"",
+            idCliente:null
         }
     },
     methods: {
@@ -192,6 +193,9 @@ export default {
             Object.keys(this.form).forEach(key => {
                 producto.append(key, this.form[key].value);
             })
+            if(this.idCliente){
+                producto.append('cliente', this.idCliente);
+            }
             let items = [];
             Object.keys(this.productosSell).forEach(key => {
                 if (this.productosSell[key].cantidad > 0) {
@@ -239,7 +243,10 @@ export default {
     },
     watch: {
         responsableValue: function(data) { this.search(data) },
-        cliente: function(data) { this.form.telefono.value=data.telefono; }
+        cliente: function(data) {
+            this.form.telefono.value=data.telefono;
+            this.idCliente=data.id
+        }
     }
 }
 </script>

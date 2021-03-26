@@ -116,7 +116,7 @@ export default {
                 sell[key]={
                     id:this.productos[key].id,
                     cantidad:0,
-                    costo:this.productos[key].costo,
+                    costo:this.productos[key].precioUnidad,
                     producto:this.productos[key].producto
                 };
             })
