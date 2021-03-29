@@ -1,5 +1,5 @@
-const mix = require('laravel-mix');
-
+let mix = require('laravel-mix');
+const path = require('path');
 /*
  |--------------------------------------------------------------------------
  | Mix Asset Management
@@ -12,18 +12,19 @@ const mix = require('laravel-mix');
  */
 
 mix.js('resources/js/app.js', 'public/js')
-    .postCss('resources/css/app.css', 'public/css', [])
-    .postCss('resources/css/all.css', 'public/css', [])
-    .postCss('resources/css/main.css', 'public/css', [])
+    .postCss('resources/css/app.css', 'public/css' ,[ ])
+    .postCss('resources/css/all.css', 'public/css' ,[ ])
+    .postCss('resources/css/main.css', 'public/css',[ ])
 
     .webpackConfig({
         output: {chunkFilename: 'js/[name].js?id=[chunkhash]'},
         resolve: {
             alias: {
-                vue$: 'vue/dist/vue.esm.js',
+                //vue$: 'vue/dist/vue.esm.js',
                 '@': path.resolve('resources/js'),
             },
         },
     })
     .version()
+    .vue({ version: 2 });
 
