@@ -12,6 +12,8 @@
                 <th scope="col">#</th>
                 <th scope="col">Productos</th>
                 <th scope="col">cantidad</th>
+                <th scope="col" v-if="isVenta">Precio</th>
+                <th scope="col" v-if="isVenta">Total</th>
             </tr>
             </thead>
             <tbody>
@@ -19,6 +21,8 @@
                 <td>{{ key + 1 }}</td>
                 <td>{{ getProduct(itemOrden.stock) }}</td>
                 <td>{{ itemOrden.cantidad }}</td>
+                <td v-if="isVenta">{{ itemOrden.costo }}</td>
+                <td v-if="isVenta">{{ itemOrden.total }}</td>
             </tr>
             </tbody>
         </table>
@@ -27,11 +31,13 @@
                 {{ item.observaciones }}
             </p>
         </div>
-
+<!--        <div>
+sector de form venta
+</div>-->
         <template #modal-footer="{ ok, cancel }">
             <!-- Emulate built in modal footer ok and cancel button actions -->
             <b-button size="sm" variant="primary" @click="ok()">
-                OK
+                Cerrar
             </b-button>
 <!--            <b-button size="sm" variant="danger" @click="imprimirPos()">-->
 <!--                Imprimir-->
@@ -40,17 +46,23 @@
                 class="btn btn-dark btn-sm"
                 :href="'/ordenPdf/'+item.id"
                 target="_blank"
-            >Imprimir</a>
+            v-if="!isVenta">Imprimir</a>
+            <b-button size="sm" variant="dark" @click="guardarVenta()" v-if="isVenta">
+                Guardar
+            </b-button>
         </template>
     </b-modal>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
     props: {
         productos: Array,
         item: Object,
-        id: String
+        id: String,
+        isVenta:Boolean
     },
     methods: {
         getProduct(id) {
@@ -66,8 +78,29 @@ export default {
             }
             return "";
         },
-        imprimirPos() {
-
+        guardarVenta() {
+            let producto = new FormData();
+            producto.append('id', this.item.id);
+            axios.post('/venta/orden', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+                .then(({data}) => {
+                    if (data["status"] == 0) {
+                        location.href = data["path"];
+                    }
+                    Object.keys(this.form).forEach(key => {
+                        if (key in data.errors) {
+                            this.form[key].state = false;
+                            this.form[key].stateText = data.errors[key][0];
+                        } else {
+                            this.form[key].state = true;
+                            this.form[key].stateText = "";
+                        }
+                    })
+                })
+                .catch(error => {
+                    // handle error
+                    this.errors = error
+                    console.log(error);
+                })
         },
 
     },

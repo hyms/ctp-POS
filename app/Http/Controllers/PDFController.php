@@ -13,6 +13,7 @@ use Mpdf\Mpdf;
 use Mpdf\QrCode\QrCode;
 use Mpdf\QrCode\Output;
 use PDF;
+use Carbon;
 //use QrCode;
 
 
@@ -31,9 +32,12 @@ class PDFController extends Controller
         $qrCode = new QrCode('Orden '.$orden->comprobante);
         $output = new Output\Png();
         $qr = $output->output($qrCode, 100, [255, 255, 255], [0, 0, 0], 9);
+        $mytime = Carbon\Carbon::now();
+
         $data = [
             'orden' => $orden,
             'detalle' => $detalle,
+            'fechaAhora' => $mytime->format("d/m/Y H:i"),
             'QR' =>""
         ];
 

@@ -57,12 +57,12 @@ export default {
                 },
                 {
                     titulo: 'Venta',
-                    role: [0, 1, 3, 4],
+                    role: [0, 1, 2, 5],
                     submenu: [
                         {
                             label: 'Ordenes',
                             url: '/venta/ordenes',
-                            role: [0, 1, 3, 4]
+                            role: [0, 1, 2, 5]
                         },
                     ]
                 },

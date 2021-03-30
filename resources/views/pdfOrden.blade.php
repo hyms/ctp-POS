@@ -2,8 +2,9 @@
 <head>
     <meta charset="utf-8"/>
 </head>
-<body style="font-size: 0.8em;height: auto">
+<body style="font-size: 0.9em;height: auto">
 <h3>Orden <strong>#{{$orden->correlativo}}</strong></h3>
+<div style="width: 100%;text-align: right"><strong>{{$fechaAhora}}</strong></div>
 <div><strong>Cliente:</strong> {{$orden->responsable}}</div>
 <div><strong>Telefono:</strong> {{$orden->telefono}}</div>
 <table style="width: 100%">
@@ -12,8 +13,8 @@
         <th>#</th>
         <th>Producto</th>
         <th>Cant.</th>
-        <th>Precio</th>
-        <th>Total</th>
+{{--        <th>Precio</th>--}}
+{{--        <th>Total</th>--}}
     </tr>
     </thead>
     <tbody>
@@ -22,8 +23,8 @@
             <td style="text-align: center">{{$key+1}}</td>
             <td style="text-align: center">{{$item->stock}}</td>
             <td style="text-align: center">{{$item->cantidad}}</td>
-            <td style="text-align: center">{{$item->costo}}</td>
-            <td style="text-align: center">{{$item->total}}</td>
+{{--            <td style="text-align: center">{{$item->costo}}</td>--}}
+{{--            <td style="text-align: center">{{$item->total}}</td>--}}
         </tr>
     @endforeach
     </tbody>
@@ -32,8 +33,8 @@
         <td style="text-align: center"></td>
         <td style="text-align: center"></td>
         <td style="text-align: center"></td>
-        <td style="text-align: center"></td>
-        <td style="text-align: center">{{$orden->montoVenta}}</td>
+{{--        <td style="text-align: center"></td>--}}
+{{--        <td style="text-align: center">{{$orden->montoVenta}}</td>--}}
     </tr>
     </tfoot>
 </table>

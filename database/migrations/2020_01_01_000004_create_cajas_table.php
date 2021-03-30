@@ -43,7 +43,6 @@ class CreateCajasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('movimientoCajas');
         Schema::dropIfExists('cierresCajas');
         Schema::dropIfExists('cajas');
     }

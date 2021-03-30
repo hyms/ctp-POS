@@ -51,7 +51,12 @@ class DetallesOrden extends Model
     public static function sell(int $idOrden)
     {
         $detalle = DB::table(self::$tables)
-            ->where('ordenTrabajo', '=', $idOrden);
+            ->where('ordenTrabajo', '=', $idOrden)
+        ->leftJoin(ProductoStock::$tables,self::$tables.'.id','=',ProductoStock::$tables.'.id')
+        ->select(self::$tables.'.*',
+            ProductoStock::$tables.'.producto as producto',
+            ProductoStock::$tables.'.sucursal as sucursal'
+        );
         if ($detalle->count() > 0) {
             foreach ($detalle->get() as $item){
                 ProductoStock::sell([
@@ -61,7 +66,7 @@ class DetallesOrden extends Model
                     'detalleOrden' => $item->id,
                 ]);
 
-                Cajas::sell([]);
+
             }
 
         }

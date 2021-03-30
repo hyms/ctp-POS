@@ -99,6 +99,7 @@ export default {
     },
     props: {
         isNew: Boolean,
+        isVenta: Boolean,
         id: String,
         itemRow: Object,
         productos: Array,

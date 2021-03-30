@@ -91,6 +91,20 @@ class OrdenesTrabajo extends Model
 
     public static function venta(array $orden)
     {
+        $ordenes = DB::table(self::$tables);
+        $orden['updated_at'] = now();
+        $id = $ordenes
+            ->where('id', $orden['id'])
+            ->update($orden);
+        if($id) {
+            DetallesOrden::sell($id);
+            $item=OrdenesTrabajo::find($id);
+            Cajas::sell([
+                'sucursal' => $item->sucursal,
+                'montoVenta' => $item->montoVenta,
+                'ordenTrabajo' => $item->id,
+            ]);
+        }
     }
 
 }

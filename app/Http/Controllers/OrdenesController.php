@@ -24,17 +24,7 @@ class OrdenesController extends Controller
             'productos' => $productos
         ]);
     }
-    public function getAllVenta()
-    {
-        $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null,false);
-        $ordenes = $ordenes->whereIn('estado',['1']);
-        $ordenes = DetallesOrden::getAll($ordenes->get());
-        $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
-        return Inertia::render('Ordenes/tabla', [
-            'ordenes' => $ordenes,
-            'productos' => $productos
-        ]);
-    }
+
 
     public function getListDesing()
     {
@@ -106,11 +96,11 @@ class OrdenesController extends Controller
         $Cliente->delete();
         return back()->withInput();
     }
-    public function venta(Request $request)
+    public function postVenta(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
-                'monto' => 'required',
+                'id' => 'required',
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -120,11 +110,9 @@ class OrdenesController extends Controller
             }
             //armar orden
             $orden = array();
-            $orden['estado'] = 1;
+            $orden['id'] = $request['id'];
+            $orden['estado'] = 2;
             $orden['userVenta'] = Auth::user()['id'];
-            $orden['montoVenta'] = 0;
-            $products = json_decode($request['productos'], true);
-
             OrdenesTrabajo::venta($orden);
             return response()->json(["status" => 0, 'path' => 'ordenes']);
         } catch (\Exception $error) {
@@ -132,5 +120,16 @@ class OrdenesController extends Controller
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
         }
+    }
+    public function getAllVenta()
+    {
+        $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null,false);
+        $ordenes = $ordenes->whereIn('estado',['1','2']);
+        $ordenes = DetallesOrden::getAll($ordenes->get());
+        $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
+        return Inertia::render('Ordenes/tablaVenta', [
+            'ordenes' => $ordenes,
+            'productos' => $productos
+        ]);
     }
 }
