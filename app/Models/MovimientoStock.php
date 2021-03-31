@@ -9,6 +9,7 @@ class MovimientoStock extends Model
 {
     protected $table = 'movimientosStock';
     public static $tables = 'movimientosStock';
+    protected $guarded = [];
 
     public static function gelAll()
     {

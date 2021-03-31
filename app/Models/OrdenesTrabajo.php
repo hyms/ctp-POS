@@ -18,7 +18,6 @@ class OrdenesTrabajo extends Model
     protected static $tables = 'ordenesTrabajo';
     protected $guarded = [];
 
-
     static public function estadoCTP($id = null)
     {
         $estado = [
@@ -93,12 +92,12 @@ class OrdenesTrabajo extends Model
     {
         $ordenes = DB::table(self::$tables);
         $orden['updated_at'] = now();
-        $id = $ordenes
+        $realized = $ordenes
             ->where('id', $orden['id'])
             ->update($orden);
-        if($id) {
-            DetallesOrden::sell($id);
-            $item=OrdenesTrabajo::find($id);
+        if($realized) {
+            DetallesOrden::sell($orden['id']);
+            $item=OrdenesTrabajo::find($orden['id']);
             Cajas::sell([
                 'sucursal' => $item->sucursal,
                 'montoVenta' => $item->montoVenta,

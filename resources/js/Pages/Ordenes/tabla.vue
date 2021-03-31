@@ -48,7 +48,9 @@
                             <b-button v-b-modal="'itemModal'" @click="loadModal(false,row)" size="sm">
                                 {{ boton2 }}
                             </b-button>
-                            <b-button class="btn-danger" @click="borrar(row.item.id)" size="sm">{{ boton3 }}</b-button>
+                            <b-button class="btn-danger" @click="borrar(row.item.id)" size="sm"  v-if="row.item.estado==1">
+                                {{ boton3 }}
+                            </b-button>
                         </div>
                     </template>
                 </b-table>

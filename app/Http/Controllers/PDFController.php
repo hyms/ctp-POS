@@ -47,7 +47,7 @@ class PDFController extends Controller
         $this->mpdf->WriteHTML($html);
         $this->mpdf->page = 0;
         $this->mpdf->state = 0;
-        unset($this->mpdf->pages[1]);
+        unset($this->mpdf->pages[0]);
 //
 //        return $this->mpdf->Output($orden->comprobante . '.pdf', 'I');
         $mpdf = PDF::loadView('pdfOrden', $data,[],[
@@ -56,7 +56,7 @@ class PDFController extends Controller
             'margin_bottom' => 5,
             'margin_left' => 5,
             'margin_right' => 5,
-            'format'=>array(100, $this->mpdf->y*1.005)
+            'format'=>array(100, $this->mpdf->y+5)
         ]);
         return $mpdf->stream($orden->comprobante . '.pdf');
     }

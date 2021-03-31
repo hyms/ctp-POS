@@ -11,6 +11,7 @@ class ProductoStock extends Model
 {
     protected $table = 'stock';
     public static $tables = 'stock';
+    protected $guarded = [];
 
     public static function getAll(int $sucursal = null)
     {

@@ -9,6 +9,7 @@ class DetallesOrden extends Model
 {
     protected $table = 'detallesOrden';
     public static $tables = 'detallesOrden';
+    protected $guarded = [];
 
     public static function newOrdenDetalle(array $detalle, int $ordenTrabajo)
     {
@@ -52,7 +53,7 @@ class DetallesOrden extends Model
     {
         $detalle = DB::table(self::$tables)
             ->where('ordenTrabajo', '=', $idOrden)
-        ->leftJoin(ProductoStock::$tables,self::$tables.'.id','=',ProductoStock::$tables.'.id')
+        ->leftJoin(ProductoStock::$tables,self::$tables.'.stock','=',ProductoStock::$tables.'.id')
         ->select(self::$tables.'.*',
             ProductoStock::$tables.'.producto as producto',
             ProductoStock::$tables.'.sucursal as sucursal'

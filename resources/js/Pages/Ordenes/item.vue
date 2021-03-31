@@ -47,7 +47,7 @@ sector de form venta
                 :href="'/ordenPdf/'+item.id"
                 target="_blank"
             v-if="!isVenta">Imprimir</a>
-            <b-button size="sm" variant="dark" @click="guardarVenta()" v-if="isVenta">
+            <b-button size="sm" variant="dark" @click="guardarVenta()" v-if="isVenta && item.estado==1">
                 Guardar
             </b-button>
         </template>

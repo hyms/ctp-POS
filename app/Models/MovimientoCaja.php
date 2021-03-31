@@ -8,5 +8,5 @@ class MovimientoCaja extends Model
 {
     protected $table = 'movimientoCajas';
     public static $tables = 'movimientoCajas';
-
+    protected $guarded = [];
 }
