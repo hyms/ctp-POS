@@ -2,7 +2,7 @@
     <div>
         <b-modal
             :id="id"
-            :title="(isNew)?titulo1:titulo2"
+            :title="titulo1"
             @show="reset"
             @hidden="reset"
             @ok="handleOk">
@@ -29,7 +29,7 @@
                         <b-form-select
                             v-if="item.type==='select'"
                             v-model="item.value"
-                            :options="(key==='sucursal')?sucursales:roles"
+                            :options="options"
                         >
                             <template #first>
                                 <b-form-select-option :value="null">Seleccione una opcion</b-form-select-option>
@@ -55,105 +55,44 @@ import axios from "axios";
 export default {
     name: "Producto",
     props: {
-        isNew: Boolean,
         id: String,
         itemRow: Object,
-        sucursales: Object,
-        roles: Array
     },
     data() {
         return {
             boton1: "Nuevo",
             boton2: "Modificar",
-            titulo1: "Nuevo Usuario",
-            titulo2: "Modificar Usuario",
+            titulo1: "Datos Extras",
             form: {
-                username: {
-                    label: 'Usuario',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },password: {
-                    label: 'Contraseña',
-                    value: "",
-                    type: "password",
-                    state: null,
-                    stateText: null
-                },apellido: {
-                    label: 'Apellido',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },nombre: {
-                    label: 'Nombre',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },ci: {
-                    label: 'CI',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },telefono: {
-                    label: 'Telefono',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },email: {
-                    label: 'Correo',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },sucursal: {
-                    label: 'sucursal',
+                tipoImpresora: {
+                    label: 'Tipo de Impresora',
                     value: "",
                     type: "select",
                     state: null,
                     stateText: null
-                },role: {
-                    label: 'Rol',
+                },impresora: {
+                    label: 'Nombre de la Impresora',
                     value: "",
-                    type: "select",
-                    state: null,
-                    stateText: null
-                },enable: {
-                    label: 'Habilitado',
-                    value: "",
-                    type: "bool",
+                    type: "text",
                     state: null,
                     stateText: null
                 }
-
             },
             idForm: null,
-            errors: Array
+            errors: Array,
+            options:[]
         }
     },
     methods: {
         reset() {
             this.limpiar();
 
-            if (this.isNew) {
-                if ('id' in this.itemRow) {
-                    this.idForm = null;
-                }
-                Object.keys(this.form).forEach(key => {
-                    this.form[key].value = "";
-                })
-            } else {
-                if ('id' in this.itemRow) {
-                    this.idForm = this.itemRow['id'];
-                }
-                Object.keys(this.form).forEach(key => {
-                    this.form[key].value = this.itemRow[key];
-                })
+            if ('id' in this.itemRow) {
+                this.idForm = this.itemRow['id'];
             }
+            Object.keys(this.form).forEach(key => {
+                this.form[key].value = this.itemRow[key];
+            })
         },
         limpiar() {
             Object.keys(this.form).forEach(key => {

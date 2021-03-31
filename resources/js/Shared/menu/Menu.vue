@@ -57,12 +57,12 @@ export default {
                 },
                 {
                     titulo: 'Venta',
-                    role: [0, 1, 3, 4],
+                    role: [0, 1, 2, 5],
                     submenu: [
                         {
                             label: 'Ordenes',
                             url: '/venta/ordenes',
-                            role: [0, 1, 3, 4]
+                            role: [0, 1, 2, 5]
                         },
                     ]
                 },
@@ -70,6 +70,11 @@ export default {
                     titulo: 'Administracion',
                     role: [0, 1],
                     submenu: [
+                        {
+                            label: 'Reportes',
+                            url: '/admin/reportes/placas',
+                            role: [0, 1],
+                        },
                         {
                             label: 'Productos',
                             url: '/admin/productos',

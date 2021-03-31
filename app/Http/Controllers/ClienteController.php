@@ -29,7 +29,7 @@ class ClienteController extends Controller
                 'sucursal' => 'required',
                 'nombreCompleto' => 'required',
                 'nombreResponsable' => 'required',
-                'ciNit' => 'required'
+                 'nitCi' => 'required'
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -57,5 +57,12 @@ class ClienteController extends Controller
         $Cliente = Cliente::find($id);
         $Cliente->delete();
         return back()->withInput();
+    }
+
+    public function buscar($id){
+        $Cliente = Cliente::where('nombreResponsable','like',"%{$id}%");
+        $clientes = $Cliente->select(['nombreResponsable','id','telefono']);
+        $clientes = $Cliente->get();
+        return response()->json(["items"=>$clientes]);
     }
 }

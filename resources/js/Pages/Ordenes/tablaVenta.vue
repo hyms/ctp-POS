@@ -8,17 +8,9 @@
             </div>
             <div class="row m-b-20">
                 <div class="col">
-                    <b-button v-b-modal="'ordenModal'" @click="loadModal()">{{ boton1 }}</b-button>
-                    <formOrden
-                        :isNew="isNew"
-                        id="ordenModal"
-                        :itemRow="itemRow"
-                        :productos="productos"
-                        :productosSell="productosSell()"
-                    ></formOrden>
-                     <item-orden
+                    <item-orden
                         id="itemModal"
-                        :isVenta="false"
+                        :isVenta="true"
                         :item="itemRow"
                         :productos="productos"
                     ></item-orden>
@@ -61,7 +53,6 @@
 
 <script>
 import Layout from '@/Shared/Layout'
-import formOrden from './form'
 import itemOrden from './item'
 
 export default {
@@ -95,8 +86,7 @@ export default {
         productos: Array,
     },
     components: {
-        formOrden,
-        itemOrden
+        itemOrden,
     },
     methods: {
         loadModal(isNew = true, item = null) {

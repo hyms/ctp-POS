@@ -93,15 +93,19 @@ export default {
             };
         },
         getCantidad(sucursal, producto) {
-            let cantidad = this.stocks[sucursal][producto]['cantidad'];
-            if (cantidad != null)
-                return cantidad;
+           if(this.stocks[sucursal][producto]!=null) {
+               let cantidad = this.stocks[sucursal][producto]['cantidad'];
+               if (cantidad != null)
+                   return cantidad;
+           }
             return "-";
         },
         getPrecio(sucursal, producto) {
-            let precio = this.stocks[sucursal][producto]['precioUnidad'];
-            if (precio != null)
-                return precio;
+            if(this.stocks[sucursal][producto]!=null) {
+                let precio = this.stocks[sucursal][producto]['precioUnidad'];
+                if (precio != null)
+                    return precio;
+            }
             return "-";
         }
     }

@@ -13,27 +13,30 @@ use Inertia\Inertia;
 
 class OrdenesController extends Controller
 {
-    public function getAll()
+    private function get(array $estado, string $component, bool $report,bool $venta=false)
     {
-        $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], Auth::user()['id'],false);
-        $ordenes = $ordenes->where('estado','=','1');
+        $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], ($venta) ? null : Auth::user()['id'], $report);
+        $ordenes = $ordenes->whereIn('estado', $estado);
         $ordenes = DetallesOrden::getAll($ordenes->get());
         $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
-        return Inertia::render('Ordenes/tabla', [
+        return Inertia::render($component, [
             'ordenes' => $ordenes,
             'productos' => $productos
         ]);
     }
+    public function getAll()
+    {
+        return self::get([1],'Ordenes/tabla',false);
+    }
+
+    public function getListDesing()
+    {
+        return self::get([0, 2],'Ordenes/tabla',true);
+    }
+
     public function getAllVenta()
     {
-        $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null,false);
-        $ordenes = $ordenes->whereIn('estado',['1','2']);
-        $ordenes = DetallesOrden::getAll($ordenes->get());
-        $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
-        return Inertia::render('Ordenes/tabla', [
-            'ordenes' => $ordenes,
-            'productos' => $productos
-        ]);
+        return self::get([1, 2],'Ordenes/tablaVenta',false,true);
     }
 
     public function post(Request $request)
@@ -58,7 +61,10 @@ class OrdenesController extends Controller
             $orden['userDiseñador'] = Auth::user()['id'];
             $orden['responsable'] = $request['responsable'];
             $orden['telefono'] = $request['telefono'];
-            $orden['observaciones'] = !empty($request['observaciones'])?$request['observaciones']:"";
+            $orden['observaciones'] = !empty($request['observaciones']) ? $request['observaciones'] : "";
+            if (!empty($request['cliente'])) {
+                $orden['cliente'] = $request['cliente'];
+            }
             //armar detalleOrden
             $detalle = array();
             $orden['montoVenta'] = 0;
@@ -71,7 +77,7 @@ class OrdenesController extends Controller
                 $tmp['cantidad'] = $item['cantidad'];
                 $tmp['costo'] = !empty($item['costo']) ? $item['costo'] : 0;
                 $tmp['total'] = $tmp['cantidad'] * $tmp['costo'];
-                $orden['montoVenta'] +=  $tmp['total'];
+                $orden['montoVenta'] += $tmp['total'];
                 array_push($detalle, $tmp);
             }
             OrdenesTrabajo::newOrden($orden, $detalle);
@@ -89,4 +95,32 @@ class OrdenesController extends Controller
         $Cliente->delete();
         return back()->withInput();
     }
+
+    public function postVenta(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => -1,
+                    'errors' => $validator->errors()
+                ]);
+            }
+            //armar orden
+            $orden = array();
+            $orden['id'] = $request['id'];
+            $orden['estado'] = 0;//controlar para deudas
+            $orden['userVenta'] = Auth::user()['id'];
+            OrdenesTrabajo::venta($orden);
+            return response()->json(["status" => 0, 'path' => 'ordenes']);
+        } catch (\Exception $error) {
+            Log::error($error->getMessage());
+            return response()->json(["status" => -1,
+                'error' => $error,], 500);
+        }
+    }
+
+
 }

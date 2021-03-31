@@ -10,26 +10,36 @@
                 <b-alert dismissible :show="errors.length">
                     {{ errors }}
                 </b-alert>
-<b-row>
-                <template v-for="(product,key) in productos">
-                    <div class="col-sm-6 m-b-20">
-                    <b-card :header="product.formato" >
-                        <b-card-text>
-                    Dimension: {{product.dimension}}<br>
-                            Cantidad: {{ product.cantidad}}
-                    <b-form-spinbutton id="demo-sb" v-model="productosSell[key].cantidad" min="1" max="100"></b-form-spinbutton>
-                        </b-card-text>
-                    </b-card>
-                    </div>
-                </template>
-</b-row>
+                 <b-table-simple hover small responsive>
+                    <b-thead>
+                        <b-tr>
+                            <b-th>Formato</b-th>
+                            <b-th>Dimension</b-th>
+                            <b-th>Cantidad</b-th>
+                            <b-th></b-th>
+                        </b-tr>
+                    </b-thead>
+                    <b-tbody>
+                        <template v-for="(product,key) in productos">
+                            <b-tr>
+                                <b-td>{{ product.formato }}</b-td>
+                                <b-td>{{ product.dimension }}</b-td>
+                                <b-td>{{ product.cantidad }}</b-td>
+                                <b-td>
+                                    <b-form-spinbutton id="demo-sb" v-model="productosSell[key].cantidad" min="1"
+                                                       max="100" size="sm" inline></b-form-spinbutton>
+                                </b-td>
+                            </b-tr>
+                        </template>
+                    </b-tbody>
+                </b-table-simple>
                 <template v-for="(item,key) in form">
                     <b-form-group
                         :label="item.label"
                         :label-for="key"
                         :state="item.state"
                         :invalid-feedback="item.stateText"
-                        v-if="['text','password','date','textarea','select'].includes(item.type)"
+                        v-if="['text','password','date','textarea','select','search'].includes(item.type)"
                     >
                         <b-input
                             :type="item.type"
@@ -55,6 +65,15 @@
                                 <b-form-select-option :value="null">Seleccione una opcion</b-form-select-option>
                             </template>
                         </b-form-select>
+                        <vue-bootstrap-typeahead
+                            :placeholder="item.label"
+                            :data="options"
+                            v-model="responsableValue"
+                            v-if="item.type==='search'"
+                            :serializer="s => s.nombreResponsable"
+                            @hit="cliente = $event"
+                        >
+                        </vue-bootstrap-typeahead>
                     </b-form-group>
                     <b-checkbox
                         v-if="item.type==='boolean'"
@@ -71,15 +90,21 @@
 
 <script>
 import axios from "axios";
+import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
 
 export default {
     name: "Orden",
+    components: {
+        VueBootstrapTypeahead
+    },
     props: {
         isNew: Boolean,
+        isVenta: Boolean,
         id: String,
         itemRow: Object,
         productos: Array,
-        productosSell: Array
+        productosSell: Array,
+
     },
     data() {
         return {
@@ -89,7 +114,7 @@ export default {
                 responsable: {
                     label: 'Cliente',
                     value: "",
-                    type: "text",
+                    type: "search",
                     state: null,
                     stateText: null
                 },
@@ -100,7 +125,7 @@ export default {
                     state: null,
                     stateText: null
                 },
-                observaciones:{
+                observaciones: {
                     label: 'Observaciones',
                     value: "",
                     type: "textarea",
@@ -109,7 +134,11 @@ export default {
                 }
             },
             idForm: null,
-            errors: Array
+            errors: Array,
+            options: [],
+            responsableValue:"",
+            cliente:"",
+            idCliente:null
         }
     },
     methods: {
@@ -123,6 +152,8 @@ export default {
                 Object.keys(this.form).forEach(key => {
                     this.form[key].value = "";
                 })
+
+                this.responsableValue=""
             } else {
                 if ('id' in this.itemRow) {
                     this.idForm = this.itemRow['id'];
@@ -130,7 +161,10 @@ export default {
                 Object.keys(this.form).forEach(key => {
                     if (['central', 'enable'].includes(key)) {
                         this.form[key].value = (this.itemRow[key] === 1)
-                    } else {
+                    }else if(['responsable'].includes(key)){
+                        this.responsableValue=this.itemRow[key];
+                    }
+                    else {
                         this.form[key].value = this.itemRow[key];
                     }
                 })
@@ -154,20 +188,25 @@ export default {
             if (this.idForm) {
                 producto.append('id', this.idForm);
             }
+            if(this.responsableValue){
+                this.form.responsable.value=this.responsableValue;
+            }
             Object.keys(this.form).forEach(key => {
-                    producto.append(key, this.form[key].value);
+                producto.append(key, this.form[key].value);
             })
+            if(this.idCliente){
+                producto.append('cliente', this.idCliente);
+            }
             let items = [];
             Object.keys(this.productosSell).forEach(key => {
-                if(this.productosSell[key].cantidad>0) {
-                    items=[...items,this.productosSell[key]];
+                if (this.productosSell[key].cantidad > 0) {
+                    items = [...items, this.productosSell[key]];
                 }
             })
-            if(items.length>0)
-            {
-                producto.append('productos',JSON.stringify(items));
+            if (items.length > 0) {
+                producto.append('productos', JSON.stringify(items));
             }
-            axios.post('/diseño/orden', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            axios.post('/diseno/orden', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
                         location.href = data["path"];
@@ -187,7 +226,28 @@ export default {
                     this.errors = error
                     console.log(error);
                 })
+        },
+        fetchOptions (text) {
+                this.search(text);
+        },
+        async search(search){
+            if(search) {
+                axios.get('/search/' + escape(search)).then(({data}) => {
+                    this.options = data.items
+                });
+            }
+        },
+        selectSeach(item)
+        {
+            this.form.responsable.value=item.nombreResponsable;
         }
     },
+    watch: {
+        responsableValue: function(data) { this.search(data) },
+        cliente: function(data) {
+            this.form.telefono.value=data.telefono;
+            this.idCliente=data.id
+        }
+    }
 }
 </script>

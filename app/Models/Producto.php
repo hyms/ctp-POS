@@ -20,14 +20,4 @@ class Producto extends Model
         return $productos->get();
 
     }
-
-    public function getMovimientoStocks()
-    {
-        return $this->hasMany(MovimientoStock::class, 'fk_idProducto', 'idProducto');
-    }
-
-    public function getProductoStocks()
-    {
-        return $this->hasMany(ProductoStock::class, 'fk_idProducto', 'idProducto');
-    }
 }

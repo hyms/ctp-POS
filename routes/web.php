@@ -6,7 +6,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DisenoController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrdenesController;
+use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ProductosController;
+use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\UserController;
@@ -39,6 +41,8 @@ Route::get('/', [DashboardController::class, 'index'])
     ->name('dashboard')
     ->middleware('auth');
 
+Route::get('search/{id}', [ClienteController::class, 'buscar'])
+    ->name('buscar');
 //diseño
 Route::group(['prefix' => 'diseno', 'middleware' => 'auth'], function () {
     Route::get('/', [DisenoController::class, 'index'])
@@ -47,9 +51,21 @@ Route::group(['prefix' => 'diseno', 'middleware' => 'auth'], function () {
         ->name('listaOrdenes');
     Route::post('orden', [OrdenesController::class, 'post'])
         ->name('guardarOrden');
-     Route::delete('orden/{id}', [OrdenesController::class, 'borrar'])
+    Route::delete('orden/{id}', [OrdenesController::class, 'borrar'])
         ->name('borrarOrden');
 });
+//venta
+Route::group(['prefix' => 'venta', 'middleware' => 'auth'], function () {
+    Route::get('ordenes', [OrdenesController::class, 'getAllVenta'])
+        ->name('listaOrdenesV');
+    Route::post('orden', [OrdenesController::class, 'postVenta'])
+        ->name('guardarOrden');
+    Route::delete('orden/{id}', [OrdenesController::class, 'borrar'])
+        ->name('borrarOrden');
+});
+//pdfs
+Route::get('ordenPdf/{id}', [PDFController::class, 'getOrden'])
+    ->name('pdfOrden')->middleware('auth');
 //Admin
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     //productos
@@ -73,6 +89,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('guardarCliente');
     Route::delete('cliente/{id}', [ClienteController::class, 'borrar'])
         ->name('eliminarCliente');
+
 //cajas
     Route::get('cajas', [CajaController::class, 'getAll'])
         ->name('listaCajas');
@@ -98,5 +115,14 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('guardarUsuarios');
     Route::delete('user/{id}', [UserController::class, 'borrar'])
         ->name('eliminarUsuarios');
+    //reportes
+    Route::get('reportes', [ReporteController::class, 'get'])
+        ->name('listaReportes');
+    Route::get('reportes/placas', [ReporteController::class, 'placas'])
+        ->name('listaReportes');
+    Route::get('reportes/cajas', [ReporteController::class, 'cajas'])
+        ->name('listaReportes');
+
+
 });
 

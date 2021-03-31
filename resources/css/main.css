@@ -112,10 +112,6 @@ p {
     font-size: 14px;
 }
 
-strong {
-    font-weight: 400;
-}
-
 .img-radius {
     border-radius: 50%;
 }
@@ -6948,9 +6944,6 @@ pre[class*=language-]:after, pre[class*=language-]:before {
     height: 2.65rem;
 }
 
-.custom-select {
-    height: calc(2.25rem + 9px);
-}
 
 /* input group End */
 /**====== Form Componant css end ======**/
@@ -7661,8 +7654,6 @@ a.btn-theme.active {
     padding: 10px 20px;
     border-radius: 0.25rem;
     font-size: 14px;
-    margin-bottom: 5px;
-    margin-right: 10px;
     -webkit-transition: all 0.3s ease-in-out;
     transition: all 0.3s ease-in-out;
 }
