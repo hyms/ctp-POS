@@ -12,7 +12,6 @@
                         <div class="col">
                             <b-button v-b-modal="'userModal'" @click="loadModal()">{{ boton1 }}</b-button>
                             <FormUser :isNew="isNew" id="userModal" :itemRow="itemRow" :sucursales="sucursales" :roles="roles"></FormUser>
-                            <FormUserE id="userModalE" :itemRow="itemRow"></FormUserE>
                         </div>
                     </div>
 
@@ -42,9 +41,6 @@
                                         <b-button v-b-modal="'userModal'" @click="loadModal(false,row)">
                                             {{ boton2 }}
                                         </b-button>
-                                        <b-button v-b-modal="'userModal'" @click="loadModal(false,row)">
-                                            {{ boton4 }}
-                                        </b-button>
                                         <b-button class="btn-danger" @click="borrar(row.item.id)">{{
                                                 boton3
                                             }}
@@ -63,7 +59,6 @@
 <script>
 import Layout from '@/Shared/Layout'
 import FormUser from './form'
-import FormUserE from './formExtras'
 
 export default {
     layout: Layout,
@@ -75,7 +70,6 @@ export default {
     },
     components: {
         FormUser,
-        FormUserE,
     },
     data() {
         return {
