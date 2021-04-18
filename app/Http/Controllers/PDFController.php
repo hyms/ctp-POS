@@ -8,13 +8,12 @@ use App\Models\DetallesOrden;
 use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Mpdf\Mpdf;
-use Mpdf\QrCode\QrCode;
-use Mpdf\QrCode\Output;
 use PDF;
 use Carbon;
-//use QrCode;
 
 
 class PDFController extends Controller
@@ -23,42 +22,52 @@ class PDFController extends Controller
 
     public function getOrden($id)
     {
-        $orden = OrdenesTrabajo::find($id);
-        $detalle = DetallesOrden::where('ordenTrabajo', $id)->get();
-        $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
-        $detalle = $this->normalizeDetalle($detalle,$productos);
+        try {
+            $orden = OrdenesTrabajo::find($id);
+            if(empty($orden))
+            {
+                throw new \UnexpectedValueException("pdf: no data for {$id}");
+            }
+            $detalle = DetallesOrden::where('ordenTrabajo', $id)->get();
+            $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
+            $detalle = $this->normalizeDetalle($detalle, $productos);
+            $qr = QrCode::style('round')
+                ->format('png')
+                ->size(150)
+                ->generate('Orden ' . $orden->comprobante);
+            $qr = base64_encode($qr);
+            $mytime = Carbon\Carbon::now();
 
-//        $qr = QrCode::format('svg')->size(100)->generate( 'Orden '.$orden->comprobante);
-        $qrCode = new QrCode('Orden '.$orden->comprobante);
-        $output = new Output\Png();
-        $qr = $output->output($qrCode, 100, [255, 255, 255], [0, 0, 0], 9);
-        $mytime = Carbon\Carbon::now();
+            $data = [
+                'orden' => $orden,
+                'detalle' => $detalle,
+                'fechaAhora' => $mytime->format("d/m/Y H:i"),
+                'QR' => $qr
+            ];
 
-        $data = [
-            'orden' => $orden,
-            'detalle' => $detalle,
-            'fechaAhora' => $mytime->format("d/m/Y H:i"),
-            'QR' =>""
-        ];
-
-        $this->mpdf = new Mpdf();
-        $view = View::make('pdfOrden', $data);
-        $html = $view->render();
-        $this->mpdf->WriteHTML($html);
-        $this->mpdf->page = 0;
-        $this->mpdf->state = 0;
-        unset($this->mpdf->pages[0]);
-//
-//        return $this->mpdf->Output($orden->comprobante . '.pdf', 'I');
-        $mpdf = PDF::loadView('pdfOrden', $data,[],[
-            'title' => 'Orden '.$orden->comprobante,
-            'margin_top' => 5,
-            'margin_bottom' => 5,
-            'margin_left' => 5,
-            'margin_right' => 5,
-            'format'=>array(100, $this->mpdf->y+5)
-        ]);
-        return $mpdf->stream($orden->comprobante . '.pdf');
+            $this->mpdf = new Mpdf();
+            $view = View::make('pdfOrden', $data);
+            $html = $view->render();
+            $this->mpdf->WriteHTML($html);
+            $this->mpdf->page = 0;
+            $this->mpdf->state = 0;
+            unset($this->mpdf->pages[0]);
+            $mpdf = PDF::loadView('pdfOrden', $data, [], [
+                'title' => 'Orden ' . $orden->comprobante,
+                'margin_top' => 5,
+                'margin_bottom' => 5,
+                'margin_left' => 5,
+                'margin_right' => 5,
+//            'format'=>array(80, $this->mpdf->y+5)
+                'format' => array(80, $this->mpdf->y)
+            ]);
+            return $mpdf->stream($orden->comprobante . '.pdf');
+        }
+        catch (\Exception $error)
+        {
+            Log::error($error->getMessage());
+            abort(404);
+        }
     }
 
     function getProduct($id, $products)

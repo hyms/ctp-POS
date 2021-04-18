@@ -43,8 +43,9 @@
     {{$orden->observaciones}}
 </div>
 
-{{--<div>--}}
-{{--    <img src="data:image/png;{{$QR}}" />--}}
-{{--</div>--}}
+<div style="text-align: center;margin-top: 5px;">
+    <img src="data:image/png;base64,{{$QR}}" />
+</div>
+
 </body>
 </html>
