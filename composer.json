@@ -21,8 +21,9 @@
         "laravel/legacy-factories": "^1.0",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.1",
-        "mpdf/qrcode": "^1.1",
         "reinink/remember-query-strings": "^0.1.0",
+        "sentry/sdk": "^3.1",
+        "sentry/sentry-laravel": "^2.4",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "tightenco/ziggy": "^0.8.0"
     },

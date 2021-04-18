@@ -22,6 +22,7 @@ class SucursalController extends Controller
             $validator = Validator::make($request->all(), [
                 'nombre'=>'required',
                 'telefono'=>'required',
+                'gmap'=>'required',
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -49,4 +50,5 @@ class SucursalController extends Controller
         $sucursal->delete();
         return back()->withInput();
     }
+
 }
