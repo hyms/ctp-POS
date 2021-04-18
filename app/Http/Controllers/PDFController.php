@@ -12,11 +12,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Mpdf\Mpdf;
-//use Mpdf\QrCode\QrCode;
-//use Mpdf\QrCode\Output;
 use PDF;
 use Carbon;
-//use QrCode;
 
 
 class PDFController extends Controller
@@ -29,7 +26,7 @@ class PDFController extends Controller
             $orden = OrdenesTrabajo::find($id);
             if(empty($orden))
             {
-                throw new \Exception("no data");
+                throw new \UnexpectedValueException("pdf: no data for {$id}");
             }
             $detalle = DetallesOrden::where('ordenTrabajo', $id)->get();
             $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
