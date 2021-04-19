@@ -54,7 +54,7 @@ class ReporteController extends Controller
 //            }
                 $row = [
                     'fecha' => $orden->created_at,
-                    'cliente' => ((empty($orden->cliente)) ? $orden->responsable : ""),//$orden->cliente->nombreNegocio),
+                    'cliente' => $orden->responsable,
                     'orden' => ($orden->tipoOrden == 0) ? $orden->correlativo : $orden->codigoServicio,
                     'tipo' => ($orden->tipoOrden != null) ? $tipo[$orden->tipoOrden] : "",
                     'estado' => $orden->estado

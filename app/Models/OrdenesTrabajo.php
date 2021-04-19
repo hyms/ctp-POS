@@ -33,7 +33,7 @@ class OrdenesTrabajo extends Model
         return $estado[$id];
     }
 
-    public static function getAll(int $sucursal = null, int $usuario = null, bool $isReport = false)
+    public static function getAll(int $sucursal = null, int $usuario = null, array $report = [])
     {
         $ordenes = DB::table(self::$tables);
         if (!empty($sucursal)) {
@@ -45,8 +45,16 @@ class OrdenesTrabajo extends Model
         $ordenes =  $ordenes
             ->whereNull('deleted_at')
             ->orderBy('updated_at', 'desc');
-        if (!$isReport) {
+        if (count($report)==0) {
             $ordenes = $ordenes->limit(10);
+        }
+        else {
+            if (isset($report['fecha'])) {
+                $ordenes = $ordenes->whereBetween('created_at', [$report['fecha'].' 00:00:00',$report['fecha'].' 23:59:59']);
+            }
+            if (isset($report['orden'])) {
+                $ordenes = $ordenes->where('id', '=', $report['orden']);
+            }
         }
         return $ordenes;
     }
