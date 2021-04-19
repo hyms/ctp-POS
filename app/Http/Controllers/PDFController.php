@@ -24,8 +24,7 @@ class PDFController extends Controller
     {
         try {
             $orden = OrdenesTrabajo::find($id);
-            if(empty($orden))
-            {
+            if (empty($orden)) {
                 throw new \UnexpectedValueException("pdf: no data for {$id}");
             }
             $detalle = DetallesOrden::where('ordenTrabajo', $id)->get();
@@ -58,13 +57,10 @@ class PDFController extends Controller
                 'margin_bottom' => 5,
                 'margin_left' => 5,
                 'margin_right' => 5,
-//            'format'=>array(80, $this->mpdf->y+5)
-                'format' => array(80, $this->mpdf->y)
+                'format' => array(80, $this->mpdf->y + 5)
             ]);
             return $mpdf->stream($orden->comprobante . '.pdf');
-        }
-        catch (\Exception $error)
-        {
+        } catch (\Exception $error) {
             Log::error($error->getMessage());
             abort(404);
         }
@@ -85,11 +81,10 @@ class PDFController extends Controller
         return "";
     }
 
-    function normalizeDetalle($detalle,$productos)
+    function normalizeDetalle($detalle, $productos)
     {
-        foreach ($detalle as $key=>$item)
-        {
-            $detalle[$key]->stock = $this->getProduct($item->stock,$productos);
+        foreach ($detalle as $key => $item) {
+            $detalle[$key]->stock = $this->getProduct($item->stock, $productos);
         }
         return $detalle;
     }
