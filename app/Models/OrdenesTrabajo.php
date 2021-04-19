@@ -45,7 +45,7 @@ class OrdenesTrabajo extends Model
         $ordenes =  $ordenes
             ->whereNull('deleted_at')
             ->orderBy('updated_at', 'desc');
-        if (count($report)==0) {
+        if (empty($report)) {
             $ordenes = $ordenes->limit(10);
         }
         else {

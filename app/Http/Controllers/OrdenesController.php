@@ -34,11 +34,10 @@ class OrdenesController extends Controller
 
     public function getListDesing(Request $request)
     {
-        if (!empty($request->get('orden')) || !empty($request->get('fecha'))) {
-            return self::get([0, 2], 'Ordenes/tablaReporte', $request->all(), true);
-        } else {
-            return self::get([0, 2], 'Ordenes/tablaReporte', [], true);
-        }
+        return self::get([0, 2],
+            'Ordenes/tablaReporte',
+            (!empty($request->get('orden')) || !empty($request->get('fecha'))) ? $request->all() : [],
+            true);
     }
 
     public function getAllVenta()
@@ -48,11 +47,10 @@ class OrdenesController extends Controller
 
     public function getListVenta(Request $request)
     {
-        if (!empty($request->get('orden')) || !empty($request->get('fecha'))) {
-            return self::get([0, 1, 2], 'Ordenes/tablaReporte', $request->all(), true);
-        } else {
-            return self::get([0, 1, 2], 'Ordenes/tablaReporte', [], true);
-        }
+        return self::get([0, 1, 2],
+            'Ordenes/tablaReporte',
+            (!empty($request->get('orden')) || !empty($request->get('fecha'))) ? $request->all() : [],
+            true);
     }
 
     public function post(Request $request)
