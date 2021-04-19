@@ -48,11 +48,11 @@ export default {
                         //     url: '/diseño/reposicion',
                         //     role: [0, 1, 3, 4]
                         // },
-                        // {
-                        //     label: 'Reportes',
-                        //     url: '/diseño/reporte',
-                        //     role: [0, 1, 3, 4]
-                        // }
+                        {
+                            label: 'Reportes',
+                            url: '/diseno/reporte',
+                            role: [0, 1, 3, 4]
+                        }
                     ]
                 },
                 {
@@ -64,6 +64,11 @@ export default {
                             url: '/venta/ordenes',
                             role: [0, 1, 2, 5]
                         },
+                        {
+                            label: 'Reportes',
+                            url: '/venta/reporte',
+                            role: [0, 1, 2, 5]
+                        }
                     ]
                 },
                 {

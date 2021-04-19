@@ -6,16 +6,56 @@
                     <h4 class="header-title m-t-0 m-b-20">{{ titulo }}</h4>
                 </div>
             </div>
-            <div class="row m-b-20">
+            <div class="row">
                 <div class="col">
-                    <item-orden
+                <b-card>
+                    <form class="form-inline" method="get">
+                        <div class="col-sm-5">
+                            <b-form-group
+                                label="Fecha"
+                                label-for="fecha"
+                                label-cols="4"
+                                content-cols="8"
+                            >
+                                <b-input
+                                    type="date"
+                                    placeholder="fecha"
+                                    v-model="searchModel.fecha"
+                                    id="fecha"
+                                    name="fecha"
+                                ></b-input>
+                            </b-form-group>
+                        </div>
+                        <div class="col-sm-5">
+                            <b-form-group
+                                label="Orden"
+                                label-for="orden"
+                                label-cols="4"
+                                content-cols="8"
+                            >
+                                <b-input
+                                    type="text"
+                                    placeholder="orden"
+                                    v-model="searchModel.orden"
+                                    id="orden"
+                                    name="orden"
+                                ></b-input>
+                            </b-form-group>
+                        </div>
+                        <div class="col-sm-2">
+                            <b-button variant="primary" size="sm" type="submit">Enviar</b-button>
+                        </div>
+                    </form>
+                     <item-orden
                         id="itemModal"
-                        :isVenta="true"
+                        :isVenta="false"
                         :item="itemRow"
                         :productos="productos"
                     ></item-orden>
+                </b-card>
                 </div>
             </div>
+
                 <b-card>
                 <b-table
                     striped
@@ -56,6 +96,7 @@
 
 <script>
 import Layout from '@/Shared/Layout'
+import formOrden from './form'
 import itemOrden from './item'
 
 export default {
@@ -82,15 +123,20 @@ export default {
                 'Acciones'
             ],
             itemRow: {},
+            searchModel:{
+                fecha:"",
+                orden:""
+            }
         }
     },
     props: {
         ordenes: Array,
         productos: Array,
-        estados:Array
+        estados: Array,
     },
     components: {
-        itemOrden,
+        formOrden,
+        itemOrden
     },
     methods: {
         loadModal(isNew = true, item = null) {

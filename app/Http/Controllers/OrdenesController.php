@@ -13,30 +13,44 @@ use Inertia\Inertia;
 
 class OrdenesController extends Controller
 {
-    private function get(array $estado, string $component, bool $report,bool $venta=false)
+    private function get(array $estado, string $component, array $report, bool $venta = false)
     {
         $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], ($venta) ? null : Auth::user()['id'], $report);
         $ordenes = $ordenes->whereIn('estado', $estado);
         $ordenes = DetallesOrden::getAll($ordenes->get());
+        $estados = OrdenesTrabajo::estadoCTP();
         $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
         return Inertia::render($component, [
             'ordenes' => $ordenes,
-            'productos' => $productos
+            'productos' => $productos,
+            'estados' => $estados
         ]);
     }
+
     public function getAll()
     {
-        return self::get([1],'Ordenes/tabla',false);
+        return self::get([1], 'Ordenes/tabla', []);
     }
 
-    public function getListDesing()
+    public function getListDesing(Request $request)
     {
-        return self::get([0, 2],'Ordenes/tabla',true);
+        return self::get([0, 2],
+            'Ordenes/tablaReporte',
+            (!empty($request->get('orden')) || !empty($request->get('fecha'))) ? $request->all() : [],
+            true);
     }
 
     public function getAllVenta()
     {
-        return self::get([1, 2],'Ordenes/tablaVenta',false,true);
+        return self::get([1, 2], 'Ordenes/tablaVenta', [], true);
+    }
+
+    public function getListVenta(Request $request)
+    {
+        return self::get([0, 1, 2],
+            'Ordenes/tablaReporte',
+            (!empty($request->get('orden')) || !empty($request->get('fecha'))) ? $request->all() : [],
+            true);
     }
 
     public function post(Request $request)

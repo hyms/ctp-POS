@@ -43,6 +43,9 @@
                     <template v-slot:cell(enable)="data">
                         {{ (data.value === 1) ? "Si" : "No" }}
                     </template>
+                    <template v-slot:cell(estado)="data">
+                        {{ estados[data.value]}}
+                    </template>
                     <template v-slot:cell(Acciones)="row">
                         <div class="row-actions">
                             <b-button v-b-modal="'itemModal'" @click="loadModal(false,row)" size="sm">
@@ -73,7 +76,7 @@ export default {
             titulo: 'Ordenes',
             boton1: "Nuevo",
             boton2: "Ver",
-            boton3: "Borrar",
+            boton3: "Anular",
             boton4: "Imprimir",
             textoVacio: 'No existen Ordenes',
             fields: [
@@ -93,6 +96,7 @@ export default {
     props: {
         ordenes: Array,
         productos: Array,
+        estados: Array,
     },
     components: {
         formOrden,

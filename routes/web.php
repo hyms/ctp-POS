@@ -53,6 +53,8 @@ Route::group(['prefix' => 'diseno', 'middleware' => 'auth'], function () {
         ->name('guardarOrden');
     Route::delete('orden/{id}', [OrdenesController::class, 'borrar'])
         ->name('borrarOrden');
+    Route::get('reporte', [OrdenesController::class, 'getListDesing'])
+        ->name('reporteOrden');
 });
 //venta
 Route::group(['prefix' => 'venta', 'middleware' => 'auth'], function () {
@@ -62,6 +64,8 @@ Route::group(['prefix' => 'venta', 'middleware' => 'auth'], function () {
         ->name('guardarOrden');
     Route::delete('orden/{id}', [OrdenesController::class, 'borrar'])
         ->name('borrarOrden');
+    Route::get('reporte', [OrdenesController::class, 'getListVenta'])
+        ->name('reporteOrden');
 });
 //pdfs
 Route::get('ordenPdf/{id}', [PDFController::class, 'getOrden'])
