@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cliente;
 use App\Models\DetallesOrden;
 use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
@@ -76,9 +77,9 @@ class OrdenesController extends Controller
             $orden['responsable'] = $request['responsable'];
             $orden['telefono'] = $request['telefono'];
             $orden['observaciones'] = !empty($request['observaciones']) ? $request['observaciones'] : "";
-            if (!empty($request['cliente'])) {
-                $orden['cliente'] = $request['cliente'];
-            }
+            $orden['cliente'] = (!empty($request['cliente']))
+                ? $request['cliente']
+                : Cliente::newCliente($request['responsable'], $request['telefono'], $orden['sucursal']);
             //armar detalleOrden
             $detalle = array();
             $orden['montoVenta'] = 0;
