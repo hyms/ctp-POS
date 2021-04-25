@@ -1,10 +1,10 @@
 <template>
     <ul class="nav pcoded-inner-navbar">
         <template v-for="(value,index) in menu">
-            <template v-if="value.role.includes($page.props.user.role)">
+            <template v-if="getPermission(value.role)">
                 <li class="nav-item pcoded-menu-caption"><label>{{ value.titulo }}</label></li>
                 <template v-for="(link, key) in value.submenu">
-                    <template v-if="value.role.includes($page.props.user.role)">
+                    <template v-if="getPermission(value.role)">
                         <li :class="'nav-item '+(($page.url === link.url)?'active':'')">
                             <inertia-link
                                 :href="link.url"
@@ -35,13 +35,13 @@ export default {
         return {
             menu: [
                 {
-                    titulo: 'Diseño',
-                    role: [0, 1, 3, 4],
+                    titulo: 'Diseñador',
+                    role: 'desing',
                     submenu: [
                         {
-                            label: 'Ordenes',
+                            label: 'Nuevas Ordenes',
                             url: '/diseno/ordenes',
-                            role: [0, 1, 3, 4]
+                            role: 'desing',
                         },
                         // {
                         //     label: 'Reposiciones',
@@ -49,67 +49,82 @@ export default {
                         //     role: [0, 1, 3, 4]
                         // },
                         {
-                            label: 'Reportes',
+                            label: 'Buscar Ordenes',
                             url: '/diseno/reporte',
-                            role: [0, 1, 3, 4]
+                            role: 'desing',
                         }
                     ]
                 },
                 {
-                    titulo: 'Venta',
-                    role: [0, 1, 2, 5],
+                    titulo: 'Encargado',
+                    role: 'vendor',
                     submenu: [
                         {
-                            label: 'Ordenes',
+                            label: 'Ordenes en Espera',
                             url: '/venta/ordenes',
-                            role: [0, 1, 2, 5]
+                            role: 'vendor',
                         },
                         {
-                            label: 'Reportes',
+                            label: 'Ordenes Realizadas',
                             url: '/venta/reporte',
-                            role: [0, 1, 2, 5]
+                            role: 'vendor',
                         }
                     ]
                 },
                 {
                     titulo: 'Administracion',
-                    role: [0, 1],
+                    role: 'admin',
                     submenu: [
                         {
                             label: 'Reportes',
                             url: '/admin/reportes/placas',
-                            role: [0, 1],
+                            role: 'admin',
                         },
                         {
                             label: 'Productos',
                             url: '/admin/productos',
-                            role: [0, 1],
+                            role: 'admin',
                         },
                         {
                             label: 'Sucursales',
                             url: '/admin/sucursales',
-                            role: [0, 1],
+                            role: 'admin',
                         },
                         {
                             label: 'Clientes',
                             url: '/admin/clientes',
-                            role: [0, 1],
+                            role: 'admin',
                         },
                         {
                             label: 'Cajas',
                             url: '/admin/cajas',
-                            role: [0, 1],
+                            role: 'admin',
                         },
                         {
                             label: 'Usuarios',
                             url: '/admin/users',
-                            role: [0, 1],
+                            role: 'admin',
                         }
                     ]
                 }
-            ]
+            ],
         };
     },
-    methods: {}
+    methods: {
+        getPermission(role) {
+            let value=false;
+            for (var i = 0; i < Object.keys(this.$page.props.roles).length; i++) {
+                Object.keys(this.$page.props.roles).forEach(key => {
+                    if (key == role) {
+                        if(this.$page.props.roles[key].includes(this.$page.props.user.role)){
+                            value = true;
+                            return;
+                        }
+                    }
+                })
+            }
+            return value;
+        }
+    }
 };
 </script>
