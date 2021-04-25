@@ -1,20 +1,18 @@
 <template>
     <ul class="nav pcoded-inner-navbar">
         <template v-for="(value,index) in menu">
-            <template v-if="getPermission(value.role)">
-                <li class="nav-item pcoded-menu-caption"><label>{{ value.titulo }}</label></li>
-                <template v-for="(link, key) in value.submenu">
-                    <template v-if="getPermission(value.role)">
-                        <li :class="'nav-item '+(($page.url === link.url)?'active':'')">
-                            <inertia-link
-                                :href="link.url"
-                                :key="key"
-                                class="nav-link"
-                            >
-                                <span>{{ link.label }}</span>
-                            </inertia-link>
-                        </li>
-                    </template>
+            <li class="nav-item pcoded-menu-caption"><label>{{ value.titulo }}</label></li>
+            <template v-for="(link, key) in value.submenu">
+                <template v-if="getPermission(link.role)">
+                    <li :class="'nav-item '+(($page.url === link.url)?'active':'')">
+                        <inertia-link
+                            :href="link.url"
+                            :key="key"
+                            class="nav-link"
+                        >
+                            <span>{{ link.label }}</span>
+                        </inertia-link>
+                    </li>
                 </template>
             </template>
         </template>
@@ -35,13 +33,12 @@ export default {
         return {
             menu: [
                 {
-                    titulo: 'Diseñador',
-                    role: 'desing',
+                    titulo: 'Ordenes',
                     submenu: [
                         {
                             label: 'Nuevas Ordenes',
-                            url: '/diseno/ordenes',
-                            role: 'desing',
+                            url: '/ordenes',
+                            role: 'all',
                         },
                         // {
                         //     label: 'Reposiciones',
@@ -50,35 +47,28 @@ export default {
                         // },
                         {
                             label: 'Buscar Ordenes',
-                            url: '/diseno/reporte',
+                            url: '/reporte',
                             role: 'desing',
-                        }
-                    ]
-                },
-                {
-                    titulo: 'Encargado',
-                    role: 'vendor',
-                    submenu: [
+                        },
                         {
                             label: 'Ordenes en Espera',
-                            url: '/venta/ordenes',
+                            url: '/espera',
                             role: 'vendor',
                         },
                         {
                             label: 'Ordenes Realizadas',
-                            url: '/venta/reporte',
+                            url: '/realizados',
                             role: 'vendor',
                         }
                     ]
                 },
                 {
                     titulo: 'Administracion',
-                    role: 'admin',
                     submenu: [
                         {
                             label: 'Reportes',
                             url: '/admin/reportes/placas',
-                            role: 'admin',
+                            role: 'vendor',
                         },
                         {
                             label: 'Productos',
@@ -93,7 +83,7 @@ export default {
                         {
                             label: 'Clientes',
                             url: '/admin/clientes',
-                            role: 'admin',
+                            role: 'all',admin
                         },
                         {
                             label: 'Cajas',
@@ -112,13 +102,13 @@ export default {
     },
     methods: {
         getPermission(role) {
-            let value=false;
+            let value = false;
             for (var i = 0; i < Object.keys(this.$page.props.roles).length; i++) {
                 Object.keys(this.$page.props.roles).forEach(key => {
-                    if (key == role) {
-                        if(this.$page.props.roles[key].includes(this.$page.props.user.role)){
+                    if (key === role) {
+                        if (this.$page.props.roles[key].includes(this.$page.props.user.role)) {
                             value = true;
-                            return;
+                            return true;
                         }
                     }
                 })

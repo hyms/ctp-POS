@@ -14,6 +14,11 @@ use Inertia\Inertia;
 
 class OrdenesController extends Controller
 {
+    public function index()
+    {
+        return Inertia::render('Index');
+    }
+
     private function get(array $estado, string $component, array $report, bool $venta = false)
     {
         $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], ($venta) ? null : Auth::user()['id'], $report);
@@ -129,7 +134,7 @@ class OrdenesController extends Controller
             $orden['estado'] = 0;//controlar para deudas
             $orden['userVenta'] = Auth::user()['id'];
             OrdenesTrabajo::venta($orden);
-            return response()->json(["status" => 0, 'path' => 'ordenes']);
+            return response()->json(["status" => 0, 'path' => 'espera']);
         } catch (\Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,

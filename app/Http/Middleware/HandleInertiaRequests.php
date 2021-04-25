@@ -48,6 +48,7 @@ class HandleInertiaRequests extends Middleware
                 'admin' => [0, 1],
                 'vendor' => [0, 1, 2, 5],
                 'desing' => [0, 1, 3, 4],
+                'all' => [0, 1, 2, 3, 4, 5],
             ],
         ]);
     }

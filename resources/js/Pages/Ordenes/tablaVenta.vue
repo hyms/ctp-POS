@@ -87,7 +87,7 @@ export default {
     props: {
         ordenes: Array,
         productos: Array,
-        estados:Array
+        estados:Object
     },
     components: {
         itemOrden,

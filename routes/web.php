@@ -37,34 +37,29 @@ Route::post('logout', [LoginController::class, 'logout'])
     ->name('logout');
 
 
-Route::get('/', [DashboardController::class, 'index'])
-    ->name('dashboard')
-    ->middleware('auth');
+//Route::get('/', [DashboardController::class, 'index'])
+//    ->name('dashboard')
+//    ->middleware('auth');
 
 Route::get('search/{id}', [ClienteController::class, 'buscar'])
     ->name('buscar');
 //diseño
-Route::group(['prefix' => 'diseno', 'middleware' => 'auth'], function () {
-    Route::get('/', [DisenoController::class, 'index'])
-        ->name('homeDiseno');
+Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
+    Route::get('/', [OrdenesController::class, 'index'])
+        ->name('home');
     Route::get('ordenes', [OrdenesController::class, 'getAll'])
         ->name('listaOrdenes');
     Route::post('orden', [OrdenesController::class, 'post'])
         ->name('guardarOrden');
+    Route::post('ordenVenta', [OrdenesController::class, 'postVenta'])
+        ->name('guardarOrdenV');
     Route::delete('orden/{id}', [OrdenesController::class, 'borrar'])
         ->name('borrarOrden');
     Route::get('reporte', [OrdenesController::class, 'getListDesing'])
         ->name('reporteOrden');
-});
-//venta
-Route::group(['prefix' => 'venta', 'middleware' => 'auth'], function () {
-    Route::get('ordenes', [OrdenesController::class, 'getAllVenta'])
+    Route::get('espera', [OrdenesController::class, 'getAllVenta'])
         ->name('listaOrdenesV');
-    Route::post('orden', [OrdenesController::class, 'postVenta'])
-        ->name('guardarOrden');
-    Route::delete('orden/{id}', [OrdenesController::class, 'borrar'])
-        ->name('borrarOrden');
-    Route::get('reporte', [OrdenesController::class, 'getListVenta'])
+    Route::get('realizados', [OrdenesController::class, 'getListVenta'])
         ->name('reporteOrden');
 });
 //pdfs
