@@ -2,14 +2,9 @@
 
 namespace App\Models;
 
-use http\Exception;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
-use Mike42\Escpos\CapabilityProfile;
-use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
-use Mike42\Escpos\Printer;
-use function PHPUnit\Framework\isNull;
 
 
 class OrdenesTrabajo extends Model
@@ -17,6 +12,7 @@ class OrdenesTrabajo extends Model
     protected $table = 'ordenesTrabajo';
     protected static $tables = 'ordenesTrabajo';
     protected $guarded = [];
+    use SoftDeletes;
 
     static public function estadoCTP($id = null)
     {

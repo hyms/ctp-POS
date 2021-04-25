@@ -33,7 +33,7 @@ export default {
         return {
             menu: [
                 {
-                    titulo: 'Ordenes',
+                    titulo: 'Agencia',
                     submenu: [
                         {
                             label: 'Nuevas Ordenes',
@@ -59,7 +59,17 @@ export default {
                             label: 'Ordenes Realizadas',
                             url: '/realizados',
                             role: 'vendor',
-                        }
+                        },
+                        // {
+                        //     label: 'Caja Chica',
+                        //     url: '/realizados',
+                        //     role: 'vendor',
+                        // },
+                        {
+                            label: 'Arqueo Diario',
+                            url: '/arqueo',
+                            role: 'vendor',
+                        },
                     ]
                 },
                 {
@@ -83,7 +93,7 @@ export default {
                         {
                             label: 'Clientes',
                             url: '/admin/clientes',
-                            role: 'all',admin
+                            role: 'all',
                         },
                         {
                             label: 'Cajas',
@@ -105,10 +115,10 @@ export default {
             let value = false;
             for (var i = 0; i < Object.keys(this.$page.props.roles).length; i++) {
                 Object.keys(this.$page.props.roles).forEach(key => {
-                    if (key === role) {
+                    if (key == role) {
                         if (this.$page.props.roles[key].includes(this.$page.props.user.role)) {
                             value = true;
-                            return true;
+                            return;
                         }
                     }
                 })

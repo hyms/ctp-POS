@@ -61,6 +61,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('listaOrdenesV');
     Route::get('realizados', [OrdenesController::class, 'getListVenta'])
         ->name('reporteOrden');
+    Route::get('arqueo', [CajaController::class, 'Arqueo'])
+        ->name('arqueo');
 });
 //pdfs
 Route::get('ordenPdf/{id}', [PDFController::class, 'getOrden'])
