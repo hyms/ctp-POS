@@ -37,16 +37,16 @@ Route::post('logout', [LoginController::class, 'logout'])
     ->name('logout');
 
 
-//Route::get('/', [DashboardController::class, 'index'])
-//    ->name('dashboard')
-//    ->middleware('auth');
+Route::get('/', [DashboardController::class, 'index'])
+    ->name('dashboard')
+    ->middleware('auth');
 
 Route::get('search/{id}', [ClienteController::class, 'buscar'])
     ->name('buscar');
 //diseño
 Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
-    Route::get('/', [OrdenesController::class, 'index'])
-        ->name('home');
+//    Route::get('/', [OrdenesController::class, 'index'])
+//        ->name('home');
     Route::get('ordenes', [OrdenesController::class, 'getAll'])
         ->name('listaOrdenes');
     Route::post('orden', [OrdenesController::class, 'post'])

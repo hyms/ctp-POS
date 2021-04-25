@@ -2,7 +2,8 @@
     <b-card title="REGISTRO DIARIO">
         <b-card-text class="text-right">{{ fecha }}
         </b-card-text>
-        <b-table-simple  class="table table-hover table-small table-responsive text-small">
+        <div class="table-responsive">
+        <b-table-simple  class="table table-hover text-small">
             <b-thead>
                 <b-tr>
                     <b-th>Comprobante</b-th>
@@ -62,6 +63,7 @@
                 </b-tr>
             </b-tbody>
         </b-table-simple>
+        </div>
     </b-card>
 </template>
 
@@ -72,14 +74,14 @@ export default {
     layout: Layout,
     props: {
         saldo: Number,
-        arqueo: Object,
+        arqueo: Array,
         caja: Object,
-        fecha: Date,
+        fecha: String,
         ventas: Number,
         deudas: Number,
         recibos: Array,
-        cajas: Object,
-        dia: Number,
+        cajas: Number,
+        dia: String,
     },
     data() {
         return {
@@ -97,6 +99,6 @@ export default {
 </script>
 <style>
 .text-small {
-    font-size: 0.8em;
+    font-size: 0.9em;
 }
 </style>

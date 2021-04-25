@@ -33,7 +33,7 @@ class PDFController extends Controller
             $detalle = $this->normalizeDetalle($detalle, $productos);
             $qr = QrCode::style('round')
                 ->format('png')
-                ->size(150)
+                ->size(100)
                 ->generate('Orden ' . $orden->comprobante);
             $qr = base64_encode($qr);
             $mytime = Carbon\Carbon::now();
