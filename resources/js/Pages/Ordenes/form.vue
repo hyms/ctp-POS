@@ -20,7 +20,7 @@
                                 <b-th></b-th>
                             </b-tr>
                         </b-thead>
-                        <b-tbody>
+                        <b-tbody class="texto-small">
                             <template v-for="(product,key) in productos">
                                 <b-tr>
                                     <b-td>{{ product.formato }}</b-td>
@@ -253,3 +253,8 @@ export default {
     }
 }
 </script>
+<style>
+.texto-small{
+font-size:0.9em;
+}
+</style>
