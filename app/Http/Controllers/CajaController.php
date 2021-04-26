@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Cajas;
 use App\Models\MovimientoCaja;
 use App\Models\Sucursal;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
@@ -61,7 +64,19 @@ class CajaController extends Controller
         return back()->withInput();
     }
 
-    public function Arqueo()
+    public function borrarMovimiento($id)
+    {
+        $Cliente = MovimientoCaja::find($id);
+        $Cliente->delete();
+        return back()->withInput();
+    }
+
+    public function getMovimientos()
+    {
+
+    }
+
+    public function arqueo()
     {
         $sucursal = Auth::user()['sucursal'];
         $arqueo = new MovimientoCaja();
@@ -91,5 +106,54 @@ class CajaController extends Controller
                 'cajas' => $variables['cajas'],
                 'dia' => $d,
             ]);
+    }
+
+    public function getRegistro()
+    {
+        $sucursal = Auth::user()['sucursal'];
+        $registros = DB::table(MovimientoCaja::$tables);
+        $caja = Cajas::getOne($sucursal)->first();
+        $registros= $registros
+            ->where('tipo', '=', 2)
+            ->where('cajaOrigen', '=', $caja->id)
+            ->limit(20)
+            ->get();
+
+        return Inertia::render('Cajas/registros', ['registros' => $registros]);
+    }
+
+    public function registro(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'monto' => 'required',
+                'observaciones' => 'required'
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => -1,
+                    'errors' => $validator->errors()
+                ]);
+            }
+            $sucursal = Auth::user()['sucursal'];
+            $registro = DB::table(MovimientoCaja::$tables);
+            $caja = Cajas::getOne($sucursal)->first();
+
+            $id = $registro->insertGetId([
+                'cajaOrigen'=>$caja->id,
+                'user'=>Auth::user()['id'],
+                'monto'=>$request['monto'],
+                'observaciones'=>$request['observaciones'],
+                'tipo'=>2,
+                'created_at'=>Carbon::now(),
+                'updated_at'=>Carbon::now(),
+            ]);
+
+            return response()->json(["status" => 0, 'path' => 'cajaRegistro']);
+        } catch (\Exception $error) {
+            Log::error($error->getMessage());
+            return response()->json(["status" => -1,
+                'error' => $error,], 500);
+        }
     }
 }

@@ -14,6 +14,7 @@ Vue.use(IconsPlugin)
 InertiaProgress.init()
 //axios.defaults.withCredentials = true;
 //axios.defaults.baseURL = "http://localhost:8000";
+Vue.use(require('vue-moment'));
 
 const el = document.getElementById('app')
 new Vue({

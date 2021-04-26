@@ -27,11 +27,13 @@ class Cajas extends Model
             ->orderBy('updated_at', 'desc');
         return $sucursales->get();
     }
+
     public static function getOne(int $sucursal)
     {
         return DB::table(self::$tables)
             ->where('sucursal', '=', $sucursal);
     }
+
     public static function sell(array $request, bool $mov = true)
     {
         $caja = self::getOne($request['sucursal']);
@@ -61,7 +63,7 @@ class Cajas extends Model
         return $caja;
     }
 
-    static public function getSaldo($idCaja, $fechaMovimientos, $array = false, $get = null,$admin=false)
+    static public function getSaldo($idCaja, $fechaMovimientos, $array = false, $get = null, $admin = false)
     {
         if ($array || isset($get['deudas']))
             $deudas = array();
@@ -76,7 +78,7 @@ class Cajas extends Model
         if ($array || isset($get['recibos']))
             $recibos = array();
         else
-            $recibos = [0,0];
+            $recibos = [0, 0];
 
         if ($array || isset($get['cajas']))
             $cajas = array();
@@ -88,26 +90,26 @@ class Cajas extends Model
         else
             $movimientosAll = null;
 
-        $arqueos     = array();
+        $arqueos = array();
         $movimientos = DB::table(MovimientoCaja::$tables)
             ->where(function ($query) use ($idCaja) {
                 $query->where('cajaOrigen', '=', $idCaja)
                     ->orWhere('cajaDestino', '=', $idCaja);
             });
 
-//        if(!$admin) {
-//            if (isset($get['arqueo']))
-//                $movimientos->andFilterWhere(['like', 'fechaCierre', $get['arqueo']]);
-//            else
-//                $movimientos->andWhere(['is', 'fechaCierre', null]);
-//        }
+        if (!$admin) {
+            if (isset($get['arqueo']))
+                $movimientos->where('fechaCierre', 'like', $get['arqueo']);
+            else
+                $movimientos->whereNull('fechaCierre');
+        }
 
-        $movimientos->where('created_at','<=',  date("Y-m-d", strtotime($fechaMovimientos)) . " 23:59:59");
+        $movimientos->where('created_at', '<=', date("Y-m-d", strtotime($fechaMovimientos)) . " 23:59:59");
 //        if($admin) {
-            $movimientos->where( 'created_at','>=', date("Y-m-d", strtotime($fechaMovimientos)) . " 00:00:00");
+        $movimientos->where('created_at', '>=', date("Y-m-d", strtotime($fechaMovimientos)) . " 00:00:00");
 //        }
         $movimientos = $movimientos->get();
-        $total       = 0;
+        $total = 0;
 
         foreach ($movimientos as $key => $movimiento) {
             switch ($movimiento->tipo) {
@@ -155,7 +157,7 @@ class Cajas extends Model
                     $total += $movimiento->monto;
                     break;
                 case 4:
-                    if(!empty($movimiento->recibos)) {
+                    if (!empty($movimiento->recibos)) {
                         if (isset($get['movimientos'])) {
                             array_push($movimientosAll, $movimiento);
                         }
@@ -164,9 +166,9 @@ class Cajas extends Model
                             array_push($recibos, $movimiento->recibos[0]);
                         } else {
                             if ($movimiento->recibos[0]->tipoRecibo)
-                                $recibos[1]+=$movimiento->monto;
+                                $recibos[1] += $movimiento->monto;
                             else
-                                $recibos[0]+=$movimiento->monto;
+                                $recibos[0] += $movimiento->monto;
                         }
                         $total += $movimiento->monto;
                     }
@@ -174,19 +176,19 @@ class Cajas extends Model
             }
         }
         $saldos = DB::table(MovimientoCaja::$tables)
-            ->where('tipo','=',3)
+            ->where('tipo', '=', 3)
             ->where(function ($query) use ($idCaja) {
                 $query->where('cajaOrigen', '=', $idCaja)
                     ->orWhere('cajaDestino', '=', $idCaja);
             })
-            ->where( 'created_at', '<',date("Y-m-d H:i", strtotime($fechaMovimientos)))
-            ->orderBy('created_at','DESC');
-        $saldo=0;
-        if ($saldos->count()>0) {
+            ->where('created_at', '<', date("Y-m-d H:i", strtotime($fechaMovimientos)))
+            ->orderBy('created_at', 'DESC');
+        $saldo = 0;
+        if ($saldos->count() > 0) {
             $saldo = $saldos->first()->cierre;
         }
 
-        $datos = array('ventas' => $ventas, 'deudas' => $deudas, 'recibos' => $recibos, 'cajas' => $cajas, 'saldo' => $saldo, 'movimientos' => $movimientosAll,'arqueos'=>$arqueos);
+        $datos = array('ventas' => $ventas, 'deudas' => $deudas, 'recibos' => $recibos, 'cajas' => $cajas, 'saldo' => $saldo, 'movimientos' => $movimientosAll, 'arqueos' => $arqueos);
         return $datos;
     }
 

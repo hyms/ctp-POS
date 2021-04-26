@@ -61,8 +61,14 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('listaOrdenesV');
     Route::get('realizados', [OrdenesController::class, 'getListVenta'])
         ->name('reporteOrden');
-    Route::get('arqueo', [CajaController::class, 'Arqueo'])
+    Route::get('arqueo', [CajaController::class, 'arqueo'])
         ->name('arqueo');
+    Route::get('cajaRegistro', [CajaController::class, 'getRegistro'])
+        ->name('arqueo');
+    Route::post('cajaRegistro', [CajaController::class, 'registro'])
+        ->name('arqueo');
+    Route::delete('cajaMovimiento', [CajaController::class, 'borrarMovimiento'])
+        ->name('cajaMovimiento');
 });
 //pdfs
 Route::get('ordenPdf/{id}', [PDFController::class, 'getOrden'])
@@ -94,6 +100,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 //cajas
     Route::get('cajas', [CajaController::class, 'getAll'])
         ->name('listaCajas');
+    Route::get('movimientosCajas', [CajaController::class, 'getMovimientos'])
+        ->name('movimientosCajas');
     Route::post('caja', [CajaController::class, 'post'])
         ->name('guardarCaja');
     Route::delete('caja/{id}', [CajaController::class, 'borrar'])
@@ -109,7 +117,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('eliminarStock');
     Route::get('movimientosStock', [StockController::class, 'movimientos'])
         ->name('movimientosStock');
-    //cajas
+    //users
     Route::get('users', [UserController::class, 'getAll'])
         ->name('listaUsuarios');
     Route::post('user', [UserController::class, 'post'])

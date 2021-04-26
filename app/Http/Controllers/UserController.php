@@ -18,7 +18,7 @@ class UserController extends Controller
         $sucursales = Sucursal::getAll();
         $sucursales = $sucursales->pluck('nombre','id');
         $roles = User::getRole();
-        return Inertia::render('Usuarios/tabla', ['users' => $users,'sucursales'=>$sucursales,'roles'=>$roles]);
+        return Inertia::render('Usuarios/tabla', ['userss' => $users,'sucursales'=>$sucursales,'roles'=>$roles]);
     }
 
     public function post(Request $request)

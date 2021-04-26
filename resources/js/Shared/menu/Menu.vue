@@ -60,11 +60,11 @@ export default {
                             url: '/realizados',
                             role: 'vendor',
                         },
-                        // {
-                        //     label: 'Caja Chica',
-                        //     url: '/realizados',
-                        //     role: 'vendor',
-                        // },
+                        {
+                            label: 'Registro de Caja',
+                            url: '/cajaRegistro',
+                            role: 'vendor',
+                        },
                         {
                             label: 'Arqueo Diario',
                             url: '/arqueo',
