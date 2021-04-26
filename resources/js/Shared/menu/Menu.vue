@@ -1,20 +1,18 @@
 <template>
     <ul class="nav pcoded-inner-navbar">
         <template v-for="(value,index) in menu">
-            <template v-if="value.role.includes($page.props.user.role)">
-                <li class="nav-item pcoded-menu-caption"><label>{{ value.titulo }}</label></li>
-                <template v-for="(link, key) in value.submenu">
-                    <template v-if="value.role.includes($page.props.user.role)">
-                        <li :class="'nav-item '+(($page.url === link.url)?'active':'')">
-                            <inertia-link
-                                :href="link.url"
-                                :key="key"
-                                class="nav-link"
-                            >
-                                <span>{{ link.label }}</span>
-                            </inertia-link>
-                        </li>
-                    </template>
+            <li class="nav-item pcoded-menu-caption"><label>{{ value.titulo }}</label></li>
+            <template v-for="(link, key) in value.submenu">
+                <template v-if="getPermission(link.role)">
+                    <li :class="'nav-item '+(($page.url === link.url)?'active':'')">
+                        <inertia-link
+                            :href="link.url"
+                            :key="key"
+                            class="nav-link"
+                        >
+                            <span>{{ link.label }}</span>
+                        </inertia-link>
+                    </li>
                 </template>
             </template>
         </template>
@@ -35,13 +33,12 @@ export default {
         return {
             menu: [
                 {
-                    titulo: 'Diseño',
-                    role: [0, 1, 3, 4],
+                    titulo: 'Agencia',
                     submenu: [
                         {
-                            label: 'Ordenes',
-                            url: '/diseno/ordenes',
-                            role: [0, 1, 3, 4]
+                            label: 'Nuevas Ordenes',
+                            url: '/ordenes',
+                            role: 'all',
                         },
                         // {
                         //     label: 'Reposiciones',
@@ -49,67 +46,85 @@ export default {
                         //     role: [0, 1, 3, 4]
                         // },
                         {
-                            label: 'Reportes',
-                            url: '/diseno/reporte',
-                            role: [0, 1, 3, 4]
-                        }
-                    ]
-                },
-                {
-                    titulo: 'Venta',
-                    role: [0, 1, 2, 5],
-                    submenu: [
-                        {
-                            label: 'Ordenes',
-                            url: '/venta/ordenes',
-                            role: [0, 1, 2, 5]
+                            label: 'Buscar Ordenes',
+                            url: '/reporte',
+                            role: 'desing',
                         },
                         {
-                            label: 'Reportes',
-                            url: '/venta/reporte',
-                            role: [0, 1, 2, 5]
-                        }
+                            label: 'Ordenes en Espera',
+                            url: '/espera',
+                            role: 'vendor',
+                        },
+                        {
+                            label: 'Ordenes Realizadas',
+                            url: '/realizados',
+                            role: 'vendor',
+                        },
+                        {
+                            label: 'Registro de Caja',
+                            url: '/cajaRegistro',
+                            role: 'vendor',
+                        },
+                        {
+                            label: 'Arqueo Diario',
+                            url: '/arqueo',
+                            role: 'vendor',
+                        },
                     ]
                 },
                 {
                     titulo: 'Administracion',
-                    role: [0, 1],
                     submenu: [
                         {
                             label: 'Reportes',
                             url: '/admin/reportes/placas',
-                            role: [0, 1],
+                            role: 'vendor',
                         },
                         {
                             label: 'Productos',
                             url: '/admin/productos',
-                            role: [0, 1],
+                            role: 'admin',
                         },
                         {
                             label: 'Sucursales',
                             url: '/admin/sucursales',
-                            role: [0, 1],
+                            role: 'admin',
                         },
                         {
                             label: 'Clientes',
                             url: '/admin/clientes',
-                            role: [0, 1],
+                            role: 'all',
                         },
                         {
                             label: 'Cajas',
                             url: '/admin/cajas',
-                            role: [0, 1],
+                            role: 'admin',
                         },
                         {
                             label: 'Usuarios',
                             url: '/admin/users',
-                            role: [0, 1],
+                            role: 'admin',
                         }
                     ]
                 }
-            ]
+            ],
         };
     },
-    methods: {}
+    methods: {
+        getPermission(role) {
+            let value = false;
+            for (var i = 0; i < Object.keys(this.$page.props.roles).length; i++) {
+                Object.keys(this.$page.props.roles).forEach(key => {
+                    if (key == role) {
+                        if (this.$page.props.roles[key].includes(this.$page.props.user.role)) {
+                            value = true;
+                            return;
+                        }
+                    }
+                })
+            }
+            return value;
+        }
+    }
 };
 </script>

@@ -46,7 +46,7 @@ class ProductoStock extends Model
         if (!empty($request['orden'])) {
             $values['orden'] = $request['orden'];
         }
-        if (!empty($request['precioUnidad'])) {
+        if (!empty($request['precioUnidad']) && $request['precioUnidad'] != 0) {
             $values['precioUnidad'] = $request['precioUnidad'];
         }
         $stock->updateOrInsert([
@@ -95,7 +95,7 @@ class ProductoStock extends Model
         if (!empty($request['orden'])) {
             $values['orden'] = $request['orden'];
         }
-        if (!empty($request['precioUnidad'])) {
+        if (!empty($request['precioUnidad']) && $request['precioUnidad'] != 0) {
             $values['precioUnidad'] = $request['precioUnidad'];
         }
         $stock->updateOrInsert([
@@ -186,7 +186,7 @@ class ProductoStock extends Model
         }
         $stock = $stock->leftJoin(Producto::$tables, 'producto', '=', 'productos.id');
         $stock = $stock->whereNull('productos.deleted_at');
-        $stock= $stock->select(self::$tables.'.*',Producto::$tables.'.codigo',Producto::$tables.'.formato',Producto::$tables.'.dimension');
+        $stock = $stock->select(self::$tables . '.*', Producto::$tables . '.codigo', Producto::$tables . '.formato', Producto::$tables . '.dimension');
         return $stock->get();
     }
 
@@ -202,6 +202,4 @@ class ProductoStock extends Model
         }
         return null;
     }
-
-
 }

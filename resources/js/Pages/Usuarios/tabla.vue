@@ -22,7 +22,7 @@
                                 striped
                                 hover
                                 responsive
-                                :items="users"
+                                :items="userss"
                                 :fields="fields"
                                 show-empty
                                 small
@@ -68,7 +68,7 @@ import FormUserE from './formExtras'
 export default {
     layout: Layout,
     props: {
-        users: Array,
+        userss: Array,
         sucursales: Object,
         roles: Array,
         errors: Object,

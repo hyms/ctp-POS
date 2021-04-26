@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cliente;
 use App\Models\DetallesOrden;
 use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
@@ -13,6 +14,11 @@ use Inertia\Inertia;
 
 class OrdenesController extends Controller
 {
+    public function index()
+    {
+        return Inertia::render('Index');
+    }
+
     private function get(array $estado, string $component, array $report, bool $venta = false)
     {
         $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null, $report);
@@ -76,9 +82,9 @@ class OrdenesController extends Controller
             $orden['responsable'] = $request['responsable'];
             $orden['telefono'] = $request['telefono'];
             $orden['observaciones'] = !empty($request['observaciones']) ? $request['observaciones'] : "";
-            if (!empty($request['cliente'])) {
-                $orden['cliente'] = $request['cliente'];
-            }
+            $orden['cliente'] = (!empty($request['cliente']))
+                ? $request['cliente']
+                : Cliente::newCliente($request['responsable'], $request['telefono'], $orden['sucursal']);
             //armar detalleOrden
             $detalle = array();
             $orden['montoVenta'] = 0;
@@ -128,7 +134,7 @@ class OrdenesController extends Controller
             $orden['estado'] = 0;//controlar para deudas
             $orden['userVenta'] = Auth::user()['id'];
             OrdenesTrabajo::venta($orden);
-            return response()->json(["status" => 0, 'path' => 'ordenes']);
+            return response()->json(["status" => 0, 'path' => 'espera']);
         } catch (\Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,

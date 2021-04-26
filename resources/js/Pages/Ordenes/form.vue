@@ -10,29 +10,31 @@
                 <b-alert dismissible :show="errors.length">
                     {{ errors }}
                 </b-alert>
-                 <b-table-simple hover small responsive>
-                    <b-thead>
-                        <b-tr>
-                            <b-th>Formato</b-th>
-                            <b-th>Dimension</b-th>
-                            <b-th>Cantidad</b-th>
-                            <b-th></b-th>
-                        </b-tr>
-                    </b-thead>
-                    <b-tbody>
-                        <template v-for="(product,key) in productos">
+                <div class="table-responsive">
+                    <b-table-simple hover small>
+                        <b-thead>
                             <b-tr>
-                                <b-td>{{ product.formato }}</b-td>
-                                <b-td>{{ product.dimension }}</b-td>
-                                <b-td>{{ product.cantidad }}</b-td>
-                                <b-td>
-                                    <b-form-spinbutton id="demo-sb" v-model="productosSell[key].cantidad" min="1"
-                                                       max="100" size="sm" inline></b-form-spinbutton>
-                                </b-td>
+                                <b-th>Formato</b-th>
+                                <b-th>Dimension</b-th>
+                                <b-th>Cantidad</b-th>
+                                <b-th></b-th>
                             </b-tr>
-                        </template>
-                    </b-tbody>
-                </b-table-simple>
+                        </b-thead>
+                        <b-tbody>
+                            <template v-for="(product,key) in productos">
+                                <b-tr>
+                                    <b-td>{{ product.formato }}</b-td>
+                                    <b-td>{{ product.dimension }}</b-td>
+                                    <b-td>{{ product.cantidad }}</b-td>
+                                    <b-td>
+                                        <b-form-spinbutton id="demo-sb" v-model="productosSell[key].cantidad" min="1"
+                                                           max="100" size="sm" inline></b-form-spinbutton>
+                                    </b-td>
+                                </b-tr>
+                            </template>
+                        </b-tbody>
+                    </b-table-simple>
+                </div>
                 <template v-for="(item,key) in form">
                     <b-form-group
                         :label="item.label"
@@ -136,9 +138,9 @@ export default {
             idForm: null,
             errors: Array,
             options: [],
-            responsableValue:"",
-            cliente:"",
-            idCliente:null
+            responsableValue: "",
+            cliente: "",
+            idCliente: null
         }
     },
     methods: {
@@ -153,7 +155,7 @@ export default {
                     this.form[key].value = "";
                 })
 
-                this.responsableValue=""
+                this.responsableValue = ""
             } else {
                 if ('id' in this.itemRow) {
                     this.idForm = this.itemRow['id'];
@@ -161,10 +163,9 @@ export default {
                 Object.keys(this.form).forEach(key => {
                     if (['central', 'enable'].includes(key)) {
                         this.form[key].value = (this.itemRow[key] === 1)
-                    }else if(['responsable'].includes(key)){
-                        this.responsableValue=this.itemRow[key];
-                    }
-                    else {
+                    } else if (['responsable'].includes(key)) {
+                        this.responsableValue = this.itemRow[key];
+                    } else {
                         this.form[key].value = this.itemRow[key];
                     }
                 })
@@ -188,13 +189,13 @@ export default {
             if (this.idForm) {
                 producto.append('id', this.idForm);
             }
-            if(this.responsableValue){
-                this.form.responsable.value=this.responsableValue;
+            if (this.responsableValue) {
+                this.form.responsable.value = this.responsableValue;
             }
             Object.keys(this.form).forEach(key => {
                 producto.append(key, this.form[key].value);
             })
-            if(this.idCliente){
+            if (this.idCliente) {
                 producto.append('cliente', this.idCliente);
             }
             let items = [];
@@ -206,7 +207,7 @@ export default {
             if (items.length > 0) {
                 producto.append('productos', JSON.stringify(items));
             }
-            axios.post('/diseno/orden', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            axios.post('/orden', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
                         location.href = data["path"];
@@ -227,26 +228,27 @@ export default {
                     console.log(error);
                 })
         },
-        fetchOptions (text) {
-                this.search(text);
+        fetchOptions(text) {
+            this.search(text);
         },
-        async search(search){
-            if(search) {
+        async search(search) {
+            if (search) {
                 axios.get('/search/' + escape(search)).then(({data}) => {
                     this.options = data.items
                 });
             }
         },
-        selectSeach(item)
-        {
-            this.form.responsable.value=item.nombreResponsable;
+        selectSeach(item) {
+            this.form.responsable.value = item.nombreResponsable;
         }
     },
     watch: {
-        responsableValue: function(data) { this.search(data) },
-        cliente: function(data) {
-            this.form.telefono.value=data.telefono;
-            this.idCliente=data.id
+        responsableValue: function (data) {
+            this.search(data)
+        },
+        cliente: function (data) {
+            this.form.telefono.value = data.telefono;
+            this.idCliente = data.id
         }
     }
 }

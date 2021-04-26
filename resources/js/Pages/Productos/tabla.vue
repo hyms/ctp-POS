@@ -31,10 +31,10 @@
                                 </template>
                                 <template v-slot:cell(Acciones)="row">
                                     <div class="row-actions">
-                                        <b-button v-b-modal="'productoModal'" @click="loadModal(false,row)">
+                                        <b-button size="sm" v-b-modal="'productoModal'" @click="loadModal(false,row)">
                                             {{ boton2 }}
                                         </b-button>
-                                        <b-button class="btn-danger" @click="borrar(row.item.id)">{{
+                                        <b-button size="sm" class="btn-danger" @click="borrar(row.item.id)">{{
                                                 boton3
                                             }}
                                         </b-button>

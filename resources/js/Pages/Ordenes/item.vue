@@ -81,7 +81,7 @@ export default {
         guardarVenta() {
             let producto = new FormData();
             producto.append('id', this.item.id);
-            axios.post('/venta/orden', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            axios.post('/ordenVenta', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
                         location.href = data["path"];
