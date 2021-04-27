@@ -43,7 +43,7 @@ class OrdenesTrabajo extends Model
             ->orderBy('updated_at', 'desc');
         if (empty($report)) {
 //             $ordenes = $ordenes->limit(10);
-             $ordenes = $ordenes->whereBetween('created_at', [Carbon::now()->toDateString().' 00:00:00',Carbon::now()->toDateString().' 23:59:59']);
+//              $ordenes = $ordenes->whereBetween('created_at', [Carbon::now()->toDateString().' 00:00:00',Carbon::now()->toDateString().' 23:59:59']);
         }
         else {
             if (isset($report['fecha'])) {
