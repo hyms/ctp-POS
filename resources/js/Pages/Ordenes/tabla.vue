@@ -33,6 +33,8 @@
                     :fields="fields"
                     show-empty
                     small
+                    :per-page="2"
+                    :currentPage="1"
                 >
                     <template #empty="scope">
                         <p>{{ textoVacio }}</p>
@@ -46,12 +48,18 @@
                     <template v-slot:cell(estado)="data">
                         {{ estados[data.value]}}
                     </template>
+                    <template v-slot:cell(created_at)="data">
+                        {{ data.value | moment("DD/MM/YYYY HH:mm")}}
+                    </template>
                     <template v-slot:cell(Acciones)="row">
                         <div class="row-actions">
-                            <b-button v-b-modal="'itemModal'" @click="loadModal(false,row)" size="sm">
+                            <b-button v-b-modal="'ordenModal'" @click="loadModal(false,row)" size="sm">
+                                {{ boton5 }}
+                            </b-button>
+                            <b-button variant="primary" v-b-modal="'itemModal'" @click="loadModal(false,row)" size="sm">
                                 {{ boton2 }}
                             </b-button>
-                            <b-button class="btn-danger" @click="borrar(row.item.id)" size="sm"  v-if="row.item.estado==1">
+                            <b-button variant="danger" @click="borrar(row.item.id)" size="sm"  v-if="row.item.estado==1">
                                 {{ boton3 }}
                             </b-button>
                         </div>
@@ -78,6 +86,7 @@ export default {
             boton2: "Ver",
             boton3: "Anular",
             boton4: "Imprimir",
+            boton5: "Modificar",
             textoVacio: 'No existen Ordenes',
             fields: [
                 'correlativo',
