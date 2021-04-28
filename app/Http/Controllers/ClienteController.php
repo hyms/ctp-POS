@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cliente;
 use App\Models\Sucursal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
@@ -60,9 +61,10 @@ class ClienteController extends Controller
     }
 
     public function buscar($id){
-        $Cliente = Cliente::where('nombreResponsable','like',"%{$id}%");
-        $clientes = $Cliente->select(['nombreResponsable','id','telefono']);
-        $clientes = $Cliente->get();
+        $clientes = DB::table(Cliente::$tables)
+            ->where('nombreResponsable','like',"%{$id}%")
+            ->select(['nombreResponsable','id','telefono'])
+            ->get();
         return response()->json(["items"=>$clientes]);
     }
 }

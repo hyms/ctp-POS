@@ -10,31 +10,6 @@
                 <b-alert dismissible :show="errors.length">
                     {{ errors }}
                 </b-alert>
-                <div class="table-responsive">
-                    <b-table-simple hover small>
-                        <b-thead>
-                            <b-tr>
-                                <b-th>Formato</b-th>
-                                <b-th>Dimension</b-th>
-                                <b-th>Cantidad</b-th>
-                                <b-th></b-th>
-                            </b-tr>
-                        </b-thead>
-                        <b-tbody>
-                            <template v-for="(product,key) in productos">
-                                <b-tr>
-                                    <b-td>{{ product.formato }}</b-td>
-                                    <b-td>{{ product.dimension }}</b-td>
-                                    <b-td>{{ product.cantidad }}</b-td>
-                                    <b-td>
-                                        <b-form-spinbutton id="demo-sb" v-model="productosSell[key].cantidad" min="1"
-                                                           max="100" size="sm" inline></b-form-spinbutton>
-                                    </b-td>
-                                </b-tr>
-                            </template>
-                        </b-tbody>
-                    </b-table-simple>
-                </div>
                 <template v-for="(item,key) in form">
                     <b-form-group
                         :label="item.label"
@@ -58,15 +33,6 @@
                             :id="key"
                             :state="item.state"
                         ></b-textarea>
-                        <b-form-select
-                            v-if="item.type==='select'"
-                            v-model="item.value"
-                            :options="sucursalPadre"
-                        >
-                            <template #first>
-                                <b-form-select-option :value="null">Seleccione una opcion</b-form-select-option>
-                            </template>
-                        </b-form-select>
                         <vue-bootstrap-typeahead
                             :placeholder="item.label"
                             :data="options"
@@ -74,6 +40,7 @@
                             v-if="item.type==='search'"
                             :serializer="s => s.nombreResponsable"
                             @hit="cliente = $event"
+                            ref="typeahead"
                         >
                         </vue-bootstrap-typeahead>
                     </b-form-group>
@@ -85,6 +52,32 @@
                     >{{ item.label }}
                     </b-checkbox>
                 </template>
+                <div class="table-responsive">
+                    <b-table-simple hover small>
+                        <b-thead>
+                            <b-tr>
+                                <b-th>Formato</b-th>
+                                <b-th>Dimension</b-th>
+                                <b-th>Cant.</b-th>
+                                <b-th></b-th>
+                            </b-tr>
+                        </b-thead>
+                        <b-tbody class="texto-small">
+                            <template v-for="(product,key) in productos">
+                                <b-tr>
+                                    <b-td>{{ product.formato }}</b-td>
+                                    <b-td>{{ product.dimension }}</b-td>
+                                    <b-td>{{ product.cantidad }}</b-td>
+                                    <b-td>
+                                        <b-form-spinbutton id="demo-sb" v-model="productosSell[key].cantidad" min="0"
+                                                           max="100" size="sm" inline></b-form-spinbutton>
+                                    </b-td>
+                                </b-tr>
+                            </template>
+                        </b-tbody>
+                    </b-table-simple>
+                </div>
+
             </form>
         </b-modal>
     </div>
@@ -154,7 +147,6 @@ export default {
                 Object.keys(this.form).forEach(key => {
                     this.form[key].value = "";
                 })
-
                 this.responsableValue = ""
             } else {
                 if ('id' in this.itemRow) {
@@ -163,11 +155,19 @@ export default {
                 Object.keys(this.form).forEach(key => {
                     if (['central', 'enable'].includes(key)) {
                         this.form[key].value = (this.itemRow[key] === 1)
-                    } else if (['responsable'].includes(key)) {
-                        this.responsableValue = this.itemRow[key];
                     } else {
+                        if (['responsable'].includes(key)) {
+                            this.responsableValue = this.itemRow[key];
+                        }
                         this.form[key].value = this.itemRow[key];
                     }
+                })
+                Object.keys(this.productosSell).forEach(key => {
+                    Object.keys(this.itemRow.detallesOrden).forEach(key2 => {
+                        if (this.productosSell[key].id === this.itemRow.detallesOrden[key2].stock) {
+                            this.productosSell[key].cantidad = this.itemRow.detallesOrden[key2].cantidad;
+                        }
+                    })
                 })
             }
         },
@@ -253,3 +253,8 @@ export default {
     }
 }
 </script>
+<style>
+.texto-small {
+    font-size: 0.85em;
+}
+</style>

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 class OrdenesTrabajo extends Model
 {
     protected $table = 'ordenesTrabajo';
-    protected static $tables = 'ordenesTrabajo';
+    public static $tables = 'ordenesTrabajo';
     protected $guarded = [];
     use SoftDeletes;
 
@@ -55,12 +55,20 @@ class OrdenesTrabajo extends Model
         return $ordenes;
     }
 
-    public static function newOrden(array $orden, array $productos)
+    public static function newOrden(array $orden, array $productos,int $id=null)
     {
         $ordenes = DB::table(self::$tables);
-        $orden['created_at'] = now();
         $orden['updated_at'] = now();
-        $id = $ordenes->insertGetId($orden);
+        if(isset($id))
+        {
+            $ordenes
+                ->where('id','=', $id)
+                ->update($orden);
+        }
+        else{
+            $orden['created_at'] = now();
+            $id = $ordenes->insertGetId($orden);
+        }
         if (!empty($id)) {
             DetallesOrden::newOrdenDetalle($productos, $id);
         }
@@ -82,8 +90,9 @@ class OrdenesTrabajo extends Model
     public static function getReport(string $fecha, string $sucursal, string $tipo = null)
     {
         $ordenes = DB::table(self::$tables)
-            ->whereBetween('created_at', [$fecha . ' 00:00:00', $fecha . ' 23:59:59'])
+            ->whereBetween('updated_at', [$fecha . ' 00:00:00', $fecha . ' 23:59:59'])
             ->where('sucursal', '=', $sucursal)
+            ->where('estado', '=', 0)
             ->whereNull('deleted_at');
         if (!empty($tipo)) {
             $ordenes = $ordenes->where('tipoOrden', '=', $tipo);

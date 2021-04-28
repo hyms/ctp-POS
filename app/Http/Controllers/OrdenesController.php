@@ -75,10 +75,16 @@ class OrdenesController extends Controller
             }
             //armar orden
             $orden = array();
-            $orden['sucursal'] = Auth::user()['sucursal'];
-            $orden['estado'] = 1;
-            $orden['correlativo'] = OrdenesTrabajo::getCorrelativo(Auth::user()['sucursal']);
-            $orden['userDiseñador'] = Auth::user()['id'];
+            $id=null;
+            if (!isset($request['id'])) {
+                $orden['sucursal'] = Auth::user()['sucursal'];
+                $orden['estado'] = 1;
+                $orden['correlativo'] = OrdenesTrabajo::getCorrelativo(Auth::user()['sucursal']);
+                $orden['userDiseñador'] = Auth::user()['id'];
+            }
+            else{
+                $id = $request['id'];
+            }
             $orden['responsable'] = $request['responsable'];
             $orden['telefono'] = $request['telefono'];
             $orden['observaciones'] = !empty($request['observaciones']) ? $request['observaciones'] : "";
@@ -100,7 +106,7 @@ class OrdenesController extends Controller
                 $orden['montoVenta'] += $tmp['total'];
                 array_push($detalle, $tmp);
             }
-            OrdenesTrabajo::newOrden($orden, $detalle);
+            OrdenesTrabajo::newOrden($orden, $detalle,$id);
             return response()->json(["status" => 0, 'path' => 'ordenes']);
         } catch (\Exception $error) {
             Log::error($error->getMessage());

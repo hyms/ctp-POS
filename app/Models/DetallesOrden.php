@@ -13,6 +13,11 @@ class DetallesOrden extends Model
 
     public static function newOrdenDetalle(array $detalle, int $ordenTrabajo)
     {
+        $detalles = DB::table(self::$tables)->where('ordenTrabajo','=',$ordenTrabajo);
+        if($detalles->count()>0)
+        {
+            $detalles->delete();
+        }
         foreach ($detalle as $item) {
             $id = DB::table(self::$tables)
                 ->insertGetId([
