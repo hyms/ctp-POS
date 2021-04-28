@@ -33,8 +33,6 @@
                     :fields="fields"
                     show-empty
                     small
-                    :per-page="2"
-                    :currentPage="1"
                 >
                     <template #empty="scope">
                         <p>{{ textoVacio }}</p>
