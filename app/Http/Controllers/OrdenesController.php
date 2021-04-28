@@ -21,7 +21,7 @@ class OrdenesController extends Controller
 
     private function get(array $estado, string $component, array $report, bool $venta = false)
     {
-        $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], ($venta) ? null : Auth::user()['id'], $report);
+        $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null, $report);
         $ordenes = $ordenes->whereIn('estado', $estado);
         $ordenes = DetallesOrden::getAll($ordenes->get());
         $estados = OrdenesTrabajo::estadoCTP();

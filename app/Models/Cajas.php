@@ -97,12 +97,12 @@ class Cajas extends Model
                     ->orWhere('cajaDestino', '=', $idCaja);
             });
 
-        if (!$admin) {
-            if (isset($get['arqueo']))
-                $movimientos->where('fechaCierre', 'like', $get['arqueo']);
-            else
-                $movimientos->whereNull('fechaCierre');
-        }
+//         if (!$admin) {
+//             if (isset($get['arqueo']))
+//                 $movimientos->where('fechaCierre', 'like', $get['arqueo']);
+//             else
+//                 $movimientos->whereNull('fechaCierre');
+//         }
 
         $movimientos->where('created_at', '<=', date("Y-m-d", strtotime($fechaMovimientos)) . " 23:59:59");
 //        if($admin) {

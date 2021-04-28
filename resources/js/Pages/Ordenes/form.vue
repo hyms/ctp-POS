@@ -256,5 +256,4 @@ export default {
 <style>
 .texto-small {
     font-size: 0.85em;
-}
 </style>

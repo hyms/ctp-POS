@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
-
+use Carbon\Carbon;
 
 class OrdenesTrabajo extends Model
 {
@@ -42,7 +42,8 @@ class OrdenesTrabajo extends Model
             ->whereNull('deleted_at')
             ->orderBy('updated_at', 'desc');
         if (empty($report)) {
-            $ordenes = $ordenes->limit(10);
+//             $ordenes = $ordenes->limit(10);
+//              $ordenes = $ordenes->whereBetween('created_at', [Carbon::now()->toDateString().' 00:00:00',Carbon::now()->toDateString().' 23:59:59']);
         }
         else {
             if (isset($report['fecha'])) {
