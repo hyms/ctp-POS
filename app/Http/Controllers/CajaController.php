@@ -111,6 +111,7 @@ class CajaController extends Controller
     {
         return self::getCreditoDebito(false);
     }
+
     public function getCredito()
     {
         return self::getCreditoDebito(true);
@@ -144,14 +145,10 @@ class CajaController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            if (self::creditoDebito($request->all(), false)) {
-                return response()->json(["status" => 0, 'path' => 'cajaDebito']);
-            } else {
-                return response()->json([
-                    'status' => -1,
-                    'errors' => ['no se logro registrar la transaccion']
-                ]);
-            }
+            return response()->json(self::creditoDebito($request->all(), false)
+                ? ["status" => 0, 'path' => 'cajaDebito']
+                : ['status' => -1, 'errors' => ['no se logro registrar la transaccion']]
+            );
         } catch (\Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
@@ -172,14 +169,10 @@ class CajaController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            if (self::creditoDebito($request->all(), true)) {
-                return response()->json(["status" => 0, 'path' => 'cajaCredito']);
-            } else {
-                return response()->json([
-                    'status' => -1,
-                    'errors' => ['no se logro registrar la transaccion']
-                ]);
-            }
+            return response()->json(self::creditoDebito($request->all(), true)
+                ? ["status" => 0, 'path' => 'cajaCredito']
+                : ['status' => -1, 'errors' => ['no se logro registrar la transaccion']]
+            );
         } catch
         (\Exception $error) {
             Log::error($error->getMessage());
