@@ -6,7 +6,6 @@ use App\Models\Cajas;
 use App\Models\MovimientoCaja;
 use App\Models\Sucursal;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -108,21 +107,32 @@ class CajaController extends Controller
             ]);
     }
 
-    public function getRegistro()
+    public function getDebito()
+    {
+        return self::getCreditoDebito(false);
+    }
+
+    public function getCredito()
+    {
+        return self::getCreditoDebito(true);
+    }
+
+    private function getCreditoDebito(bool $credito)
     {
         $sucursal = Auth::user()['sucursal'];
         $registros = DB::table(MovimientoCaja::$tables);
         $caja = Cajas::getOne($sucursal)->first();
-        $registros= $registros
+        $registros = $registros
             ->where('tipo', '=', 2)
-            ->where('cajaOrigen', '=', $caja->id)
+            ->where($credito ? 'cajaDestino' : 'cajaOrigen', '=', $caja->id)
             ->limit(20)
+            ->orderBy('created_at', 'desc')
             ->get();
 
-        return Inertia::render('Cajas/registros', ['registros' => $registros]);
+        return Inertia::render('Cajas/registros', ['registros' => $registros, 'credito' => $credito]);
     }
 
-    public function registro(Request $request)
+    public function debito(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -135,25 +145,56 @@ class CajaController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            $sucursal = Auth::user()['sucursal'];
-            $registro = DB::table(MovimientoCaja::$tables);
-            $caja = Cajas::getOne($sucursal)->first();
-
-            $id = $registro->insertGetId([
-                'cajaOrigen'=>$caja->id,
-                'user'=>Auth::user()['id'],
-                'monto'=>$request['monto'],
-                'observaciones'=>$request['observaciones'],
-                'tipo'=>2,
-                'created_at'=>Carbon::now(),
-                'updated_at'=>Carbon::now(),
-            ]);
-
-            return response()->json(["status" => 0, 'path' => 'cajaRegistro']);
+            return response()->json(self::creditoDebito($request->all(), false)
+                ? ["status" => 0, 'path' => 'cajaDebito']
+                : ['status' => -1, 'errors' => ['no se logro registrar la transaccion']]
+            );
         } catch (\Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
         }
+    }
+
+    public function credito(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'monto' => 'required',
+                'observaciones' => 'required'
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => -1,
+                    'errors' => $validator->errors()
+                ]);
+            }
+            return response()->json(self::creditoDebito($request->all(), true)
+                ? ["status" => 0, 'path' => 'cajaCredito']
+                : ['status' => -1, 'errors' => ['no se logro registrar la transaccion']]
+            );
+        } catch
+        (\Exception $error) {
+            Log::error($error->getMessage());
+            return response()->json(["status" => -1,
+                'error' => $error,], 500);
+        }
+    }
+
+    private function creditoDebito(array $datos, bool $credito)
+    {
+        $sucursal = Auth::user()['sucursal'];
+        $registro = DB::table(MovimientoCaja::$tables);
+        $caja = Cajas::getOne($sucursal)->first();
+        $id = $registro->insertGetId([
+            $credito ? 'cajaDestino' : 'cajaOrigen' => $caja->id,
+            'user' => Auth::user()['id'],
+            'monto' => $datos['monto'],
+            'observaciones' => $datos['observaciones'],
+            'tipo' => 2,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+        return (isset($id));
     }
 }

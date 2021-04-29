@@ -63,10 +63,14 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('reporteOrden');
     Route::get('arqueo', [CajaController::class, 'arqueo'])
         ->name('arqueo');
-    Route::get('cajaRegistro', [CajaController::class, 'getRegistro'])
-        ->name('arqueo');
-    Route::post('cajaRegistro', [CajaController::class, 'registro'])
-        ->name('arqueo');
+    Route::get('cajaDebito', [CajaController::class, 'getDebito'])
+        ->name('getDebito');
+    Route::get('cajaCredito', [CajaController::class, 'getCredito'])
+        ->name('getCredito');
+    Route::post('cajaDebito', [CajaController::class, 'debito'])
+        ->name('debito');
+    Route::post('cajaCredito', [CajaController::class, 'credito'])
+        ->name('credito');
     Route::delete('cajaMovimiento', [CajaController::class, 'borrarMovimiento'])
         ->name('cajaMovimiento');
 });

@@ -62,7 +62,7 @@ export default {
                         },
                         {
                             label: 'Registro de Caja',
-                            url: '/cajaRegistro',
+                            url: '/cajaDebito',
                             role: 'vendor',
                         },
                         {
