@@ -1,9 +1,15 @@
 <template>
-    <b-card title="REGISTRO DIARIO">
-        <b-card-text class="text-right">{{ fecha }}
-        </b-card-text>
+    <div class="content-w">
+        <div class="content-box">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h4 class="header-title m-t-0 m-b-20">Registro Diario</h4>
+                </div>
+            </div>
+    <b-card :title="fecha|moment('DD/MM/YYYY')">
+
         <div class="table-responsive">
-        <b-table-simple  class="table table-hover text-small">
+        <b-table-simple  class="table table-hover text-small text-uppercase">
             <b-thead>
                 <b-tr>
                     <b-th>Comprobante</b-th>
@@ -13,7 +19,7 @@
                     <b-th>Saldo</b-th>
                 </b-tr>
             </b-thead>
-            <b-tbody>
+            <b-tbody >
                 <b-tr>
                     <td></td>
                     <td>SALDO</td>
@@ -45,10 +51,10 @@
                 </b-tr>
                 <b-tr>
                     <td></td>
-                    <td>CAJA CHICA GASTOS</td>
-                    <td></td>
-                    <td>{{ cajas }}</td>
-                    <td>{{ saldo + ventas + deudas + recibos[1] - recibos[0] - cajas }}</td>
+                    <td>Varios</td>
+                    <td>{{ cajas[0] }}</td>
+                    <td>{{ cajas[1] }}</td>
+                    <td>{{ saldo + ventas + deudas + cajas[0] +recibos[1] - recibos[0] - cajas[1] }}</td>
                 </b-tr>
                 <b-tr v-if="arqueo.monto">
                     <td>{{arqueo.correlativo}}</td>
@@ -65,6 +71,8 @@
         </b-table-simple>
         </div>
     </b-card>
+        </div>
+        </div>
 </template>
 
 <script>
@@ -80,7 +88,7 @@ export default {
         ventas: Number,
         deudas: Number,
         recibos: Array,
-        cajas: Number,
+        cajas: Array,
         dia: String,
     },
     data() {
@@ -90,9 +98,10 @@ export default {
     },
     methods: {
         getTotal() {
+            let monto = this.saldo + this.ventas + this.deudas + this.recibos[1]+this.cajas[0] - this.recibos[0] - this.cajas[1];
             if (this.arqueo.monto)
-                return this.saldo + this.ventas + this.deudas + this.recibos[1] - this.recibos[0] - this.cajas - this.arqueo.monto
-            return this.saldo + this.ventas + this.deudas + this.recibos[1] - this.recibos[0] - this.cajas;
+                return  - this.arqueo.monto
+            return monto;
         },
     }
 }

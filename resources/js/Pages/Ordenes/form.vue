@@ -53,7 +53,7 @@
                     </b-checkbox>
                 </template>
                 <div class="table-responsive">
-                    <b-table-simple hover small>
+                    <b-table-simple class="table-hover table-small texto-small">
                         <b-thead>
                             <b-tr>
                                 <b-th>Formato</b-th>
@@ -62,7 +62,7 @@
                                 <b-th></b-th>
                             </b-tr>
                         </b-thead>
-                        <b-tbody class="texto-small">
+                        <b-tbody >
                             <template v-for="(product,key) in productos">
                                 <b-tr>
                                     <b-td>{{ product.formato }}</b-td>

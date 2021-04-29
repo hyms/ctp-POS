@@ -83,7 +83,7 @@ class Cajas extends Model
         if ($array || isset($get['cajas']))
             $cajas = array();
         else
-            $cajas = 0;
+            $cajas = [0, 0];
 
         if (isset($get['movimientos']))
             $movimientosAll = array();
@@ -148,7 +148,11 @@ class Cajas extends Model
                     if ($array || isset($get['cajas'])) {
                         array_push($cajas, $movimiento);
                     } else {
-                        $cajas += $movimiento->monto;
+                        if(isset($movimiento->cajaDestino)) {
+                            $cajas[0] += $movimiento->monto;
+                        }else {
+                            $cajas[1] += $movimiento->monto;
+                        }
                     }
                     $total += $movimiento->monto;
                     break;

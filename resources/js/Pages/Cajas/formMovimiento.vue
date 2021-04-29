@@ -49,9 +49,12 @@ export default {
         isNew: Boolean,
         id: String,
         itemRow: Object,
+        credito:Boolean,
     },
     data() {
         return {
+            urlDebito: "cajaDebito",
+            urlCredito: "cajaCredito",
             titulo1: "Nuevo Cliente",
             titulo2: "Modificar Cliente",
             form: {
@@ -126,8 +129,7 @@ export default {
                     producto.append(key, this.form[key].value);
                 }
             })
-
-            axios.post('/cajaRegistro', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            axios.post(this.credito?this.urlCredito:this.urlDebito, producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
                         location.href = data["path"];
