@@ -45,18 +45,18 @@ export default {
                         //     url: '/diseño/reposicion',
                         //     role: [0, 1, 3, 4]
                         // },
-                        {
-                            label: 'Buscar Ordenes',
-                            url: '/reporte',
-                            role: 'desing',
-                        },
+                        // {
+                        //     label: 'Buscar Ordenes',
+                        //     url: '/reporte',
+                        //     role: 'desing',
+                        // },
                         {
                             label: 'Ordenes en Espera',
                             url: '/espera',
                             role: 'vendor',
                         },
                         {
-                            label: 'Ordenes Realizadas',
+                            label: 'Buscar Ordenes',
                             url: '/realizados',
                             role: 'vendor',
                         },

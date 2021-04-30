@@ -20,6 +20,8 @@
                                 :fields="fields"
                                 show-empty
                                 small
+                                :current-page="currentPage"
+                                :per-page="perPage"
                             >
                                 <template #empty="scope">
                                     <p>{{ textoVacio }}</p>
@@ -37,6 +39,16 @@
                                 </template>
                             </b-table>
                         </div>
+                        <b-col>
+                            <b-pagination
+                                v-model="currentPage"
+                                :total-rows="totalRows"
+                                :per-page="perPage"
+                                align="center"
+                                class="my-0"
+                                v-if="totalRows>perPage"
+                            ></b-pagination>
+                        </b-col>
                     </b-card>
                 </div>
             </div>
@@ -73,7 +85,10 @@ export default {
                     'label': 'Fecha'
                 },
                 'Acciones'
-            ]
+            ],
+            totalRows: 1,
+            currentPage: 1,
+            perPage: 20,
         }
     },
     methods: {
@@ -86,10 +101,9 @@ export default {
             })
         },
     },
-    filters: {
-        dtFormat(dt, format) {
-            return moment.utc(dt).format(format)
-        }
-    }
+    mounted() {
+        // Set the initial number of items
+        this.totalRows = this.registros.length
+    },
 }
 </script>
