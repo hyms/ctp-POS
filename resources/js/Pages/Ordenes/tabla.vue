@@ -16,7 +16,7 @@
                         :productos="productos"
                         :productosSell="productosSell()"
                     ></formOrden>
-                     <item-orden
+                    <item-orden
                         id="itemModal"
                         :isVenta="false"
                         :item="itemRow"
@@ -24,46 +24,61 @@
                     ></item-orden>
                 </div>
             </div>
-                <b-card>
-                <b-table
-                    striped
-                    hover
-                    responsive
-                    :items="ordenes"
-                    :fields="fields"
-                    show-empty
-                    small
-                >
-                    <template #empty="scope">
-                        <p>{{ textoVacio }}</p>
-                    </template>
-                    <template v-slot:cell(central)="data">
-                        {{ (data.value === 1) ? "Si" : "No" }}
-                    </template>
-                    <template v-slot:cell(enable)="data">
-                        {{ (data.value === 1) ? "Si" : "No" }}
-                    </template>
-                    <template v-slot:cell(estado)="data">
-                        {{ estados[data.value]}}
-                    </template>
-                    <template v-slot:cell(created_at)="data">
-                        {{ data.value | moment("DD/MM/YYYY HH:mm")}}
-                    </template>
-                    <template v-slot:cell(Acciones)="row">
-                        <div class="row-actions">
-                            <b-button v-b-modal="'ordenModal'" @click="loadModal(false,row)" size="sm">
-                                {{ boton5 }}
-                            </b-button>
-                            <b-button variant="primary" v-b-modal="'itemModal'" @click="loadModal(false,row)" size="sm">
-                                {{ boton2 }}
-                            </b-button>
-                            <b-button variant="danger" @click="borrar(row.item.id)" size="sm"  v-if="row.item.estado==1">
-                                {{ boton3 }}
-                            </b-button>
-                        </div>
-                    </template>
-                </b-table>
-                </b-card>
+            <b-card>
+                <div class="table-responsive">
+                    <b-table
+                        striped
+                        hover
+                        :items="ordenes"
+                        :fields="fields"
+                        show-empty
+                        small
+                        :current-page="currentPage"
+                        :per-page="perPage"
+                    >
+                        <template #empty="scope">
+                            <p>{{ textoVacio }}</p>
+                        </template>
+                        <template v-slot:cell(central)="data">
+                            {{ (data.value === 1) ? "Si" : "No" }}
+                        </template>
+                        <template v-slot:cell(enable)="data">
+                            {{ (data.value === 1) ? "Si" : "No" }}
+                        </template>
+                        <template v-slot:cell(estado)="data">
+                            {{ estados[data.value] }}
+                        </template>
+                        <template v-slot:cell(created_at)="data">
+                            {{ data.value | moment("DD/MM/YYYY HH:mm") }}
+                        </template>
+                        <template v-slot:cell(Acciones)="row">
+                            <div class="row-actions">
+                                <b-button v-b-modal="'ordenModal'" @click="loadModal(false,row)" size="sm">
+                                    {{ boton5 }}
+                                </b-button>
+                                <b-button variant="primary" v-b-modal="'itemModal'" @click="loadModal(false,row)"
+                                          size="sm">
+                                    {{ boton2 }}
+                                </b-button>
+                                <b-button variant="danger" @click="borrar(row.item.id)" size="sm"
+                                          v-if="row.item.estado==1">
+                                    {{ boton3 }}
+                                </b-button>
+                            </div>
+                        </template>
+                    </b-table>
+                </div>
+                <b-col>
+                    <b-pagination
+                        v-model="currentPage"
+                        :total-rows="totalRows"
+                        :per-page="perPage"
+                        align="center"
+                        class="my-0"
+                        v-if="totalRows>perPage"
+                    ></b-pagination>
+                </b-col>
+            </b-card>
         </div>
     </div>
 </template>
@@ -98,6 +113,9 @@ export default {
                 'Acciones'
             ],
             itemRow: {},
+            totalRows: 1,
+            currentPage: 1,
+            perPage: 20,
         }
     },
     props: {
@@ -117,28 +135,30 @@ export default {
                 this.itemRow = item.item;
             }
         },
-        borrar(id){
+        borrar(id) {
             this.$inertia.delete(`orden/${id}`, {
                 onBefore: () => confirm('Esta seguro?'),
             })
         },
-        productosSell()
-        {
+        productosSell() {
             let sell = [];
-            Object.keys(this.productos).forEach(key=>
-            {
-                sell[key]={
-                    id:this.productos[key].id,
-                    cantidad:0,
-                    costo:this.productos[key].precioUnidad,
-                    producto:this.productos[key].producto
+            Object.keys(this.productos).forEach(key => {
+                sell[key] = {
+                    id: this.productos[key].id,
+                    cantidad: 0,
+                    costo: this.productos[key].precioUnidad,
+                    producto: this.productos[key].producto
                 };
             })
             return sell;
         },
-        printPdf(item){
+        printPdf(item) {
             this.itemRow = item.item;
         }
-    }
+    },
+    mounted() {
+        // Set the initial number of items
+        this.totalRows = this.ordenes.length
+    },
 }
 </script>
