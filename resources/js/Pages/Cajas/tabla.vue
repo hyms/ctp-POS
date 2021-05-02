@@ -29,7 +29,7 @@
                                 {{ getSucursal(data.value) }}
                             </template>
                             <template v-slot:cell(dependeDe)="data">
-                                {{ getCaja(data.value) }}
+                                {{ getCaja(data.value.nombre) }}
                             </template>
                             <template v-slot:cell(enable)="data">
                                 {{ (data.value === 1) ? "Si" : "No" }}
@@ -40,7 +40,10 @@
                                     <b-button size="sm" v-b-modal="'cajaModal'" @click="loadModal(false,row)">
                                         {{ boton2 }}
                                     </b-button>
-                                    <b-button size="sm" class="btn-danger" @click="borrar(row.item.id)">{{ boton3 }}</b-button>
+                                    <b-button size="sm" class="btn-danger" @click="borrar(row.item.id)">{{
+                                            boton3
+                                        }}
+                                    </b-button>
                                 </div>
                             </template>
                         </b-table>

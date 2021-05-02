@@ -16,36 +16,36 @@
 
                     <form class="form-horizontal m-t-20" @submit.prevent="submit">
                         <div class="input-group mb-3">
-                                <b-form-input
-                                    id="username"
-                                    v-model="form.username"
-                                    placeholder="Usuario"
-                                    trim
-                                    type="text"
-                                ></b-form-input>
+                            <b-form-input
+                                id="username"
+                                v-model="form.username"
+                                placeholder="Usuario"
+                                trim
+                                type="text"
+                            ></b-form-input>
                         </div>
                         <div class="input-group mb-4">
-                                <b-form-input
-                                    id="password"
-                                    v-model="form.password"
-                                    placeholder="Contraseña"
-                                    trim
-                                    type="password"
-                                ></b-form-input>
+                            <b-form-input
+                                id="password"
+                                v-model="form.password"
+                                placeholder="Contraseña"
+                                trim
+                                type="password"
+                            ></b-form-input>
                         </div>
                         <div class="form-group text-left">
                             <div class="checkbox checkbox-fill d-inline">
-                                    <input id="remember" v-model="form.remember" type="checkbox">
-                                    <label for="remember" class="cr">
-                                        Remember Me
-                                    </label>
+                                <input id="remember" v-model="form.remember" type="checkbox">
+                                <label for="remember" class="cr">
+                                    Remember Me
+                                </label>
                             </div>
                         </div>
                         <div class="form-group account-btn text-center m-t-10">
                             <!-- /.col -->
                             <div class="col-12">
                                 <loading-button :loading="sending" class="btn btn-primary shadow-2 mb-4"
-                                                type="submit">Login
+                                                type="submit" :text="'Ingresar'" :textLoad="'Ingresando'">Login
                                 </loading-button>
                             </div>
                             <!-- /.col -->

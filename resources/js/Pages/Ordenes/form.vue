@@ -62,7 +62,7 @@
                                 <b-th></b-th>
                             </b-tr>
                         </b-thead>
-                        <b-tbody >
+                        <b-tbody>
                             <template v-for="(product,key) in productos">
                                 <b-tr>
                                     <b-td>{{ product.formato }}</b-td>
@@ -77,8 +77,15 @@
                         </b-tbody>
                     </b-table-simple>
                 </div>
-
             </form>
+            <template #modal-footer="{ ok, cancel }">
+                <b-button variant="danger" @click="cancel()">
+                    Cancel
+                </b-button>
+                <loading-button :loading="sending" variant="default"
+                                @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
+                </loading-button>
+            </template>
         </b-modal>
     </div>
 </template>
@@ -86,11 +93,13 @@
 <script>
 import axios from "axios";
 import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
+import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
     name: "Orden",
     components: {
-        VueBootstrapTypeahead
+        VueBootstrapTypeahead,
+        LoadingButton
     },
     props: {
         isNew: Boolean,
@@ -103,6 +112,7 @@ export default {
     },
     data() {
         return {
+            sending: false,
             titulo1: "Nueva Orden",
             titulo2: "Modificar Orden",
             form: {
@@ -184,6 +194,7 @@ export default {
             this.enviar();
         },
         enviar() {
+            this.sending = true;
             this.limpiar();
             let producto = new FormData();
             if (this.idForm) {
@@ -210,7 +221,8 @@ export default {
             axios.post('/orden', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
-                        location.href = data["path"];
+                        this.$bvModal.hide(this.id)
+                        this.$inertia.get(data["path"])
                     }
                     Object.keys(this.form).forEach(key => {
                         if (key in data.errors) {
@@ -226,7 +238,9 @@ export default {
                     // handle error
                     this.errors = error
                     console.log(error);
-                })
+                }).finally(() => {
+                this.sending = false;
+            })
         },
         fetchOptions(text) {
             this.search(text);

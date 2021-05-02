@@ -87,7 +87,7 @@
                         <b-tr>
                             <b-th colspan="4" class="text-right"><strong>Total</strong></b-th>
                             <template v-for="(item,key) in data['fields']">
-                            <b-th v-if="(key>=4) && (key<=data['fields'].length-2)"> {{getTotal(item)}}</b-th>
+                                <b-th v-if="(key>=4) && (key<=data['fields'].length-2)"> {{ getTotal(item) }}</b-th>
                             </template>
                             <b-th></b-th>
                         </b-tr>
@@ -151,11 +151,10 @@ export default {
             })
             this.$inertia.get('/admin/reportes/placas', form)
         },
-        getTotal(key)
-        {
+        getTotal(key) {
             let total = 0;
-            Object.values(this.data['table']).forEach( value =>{
-                total +=value[key['key']];
+            Object.values(this.data['table']).forEach(value => {
+                total += value[key['key']];
             })
             return total;
         }

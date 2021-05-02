@@ -28,10 +28,10 @@
                             <p>{{ textoVacio }}</p>
                         </template>
                         <template v-slot:cell(central)="data">
-                            {{ (data.value === 1)?"Si":"No" }}
+                            {{ (data.value === 1) ? "Si" : "No" }}
                         </template>
                         <template v-slot:cell(enable)="data">
-                            {{ (data.value === 1)?"Si":"No" }}
+                            {{ (data.value === 1) ? "Si" : "No" }}
                         </template>
                         <template v-slot:cell(Acciones)="row">
                             <div class="row-actions">
@@ -101,7 +101,7 @@ export default {
             })
             this.sucursalPadre = sucursalP;
         },
-        borrar(id){
+        borrar(id) {
             this.$inertia.delete(`sucursal/${id}`, {
                 onBefore: () => confirm('Esta seguro?'),
             })

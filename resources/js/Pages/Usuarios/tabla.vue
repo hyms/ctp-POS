@@ -11,7 +11,8 @@
                     <div class="row m-b-20 m-t-10">
                         <div class="col">
                             <b-button v-b-modal="'userModal'" @click="loadModal()">{{ boton1 }}</b-button>
-                            <FormUser :isNew="isNew" id="userModal" :itemRow="itemRow" :sucursales="sucursales" :roles="roles"></FormUser>
+                            <FormUser :isNew="isNew" id="userModal" :itemRow="itemRow" :sucursales="sucursales"
+                                      :roles="roles"></FormUser>
                             <FormUserE id="userModalE" :itemRow="itemRow"></FormUserE>
                         </div>
                     </div>
@@ -45,9 +46,8 @@
                                         <b-button v-b-modal="'userModal'" @click="loadModal(false,row)">
                                             {{ boton4 }}
                                         </b-button>
-                                        <b-button class="btn-danger" @click="borrar(row.item.id)">{{
-                                                boton3
-                                            }}
+                                        <b-button class="btn-danger" @click="borrar(row.item.id)">
+                                            {{ boton3 }}
                                         </b-button>
                                     </div>
                                 </template>
@@ -120,7 +120,7 @@ export default {
         getRoles(id) {
             let rol = '';
             Object.keys(this.roles).forEach(
-                key=> {
+                key => {
                     if (this.roles[key].value == id) {
                         rol = this.roles[key].text;
                     }
