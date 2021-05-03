@@ -39,15 +39,23 @@
                             :options="sucursales"
                         ></b-form-select>
                     </b-form-group>
-
                 </template>
             </form>
+            <template #modal-footer="{ ok, cancel }">
+                <b-button variant="danger" @click="cancel()">
+                    Cancel
+                </b-button>
+                <loading-button :loading="sending" variant="default"
+                                @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
+                </loading-button>
+            </template>
         </b-modal>
     </div>
 </template>
 
 <script>
 import axios from "axios";
+import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
     name: "cliente",
@@ -57,8 +65,12 @@ export default {
         itemRow: Object,
         sucursales: Object
     },
+    components: {
+        LoadingButton
+    },
     data() {
         return {
+            sending: false,
             titulo1: "Nuevo Cliente",
             titulo2: "Modificar Cliente",
             form: {
@@ -68,49 +80,49 @@ export default {
                     type: "text",
                     state: null,
                     stateText: null
-                },nombreNegocio: {
+                }, nombreNegocio: {
                     label: 'nombreNegocio',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                },nombreResponsable: {
+                }, nombreResponsable: {
                     label: 'nombreResponsable',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                },correo: {
+                }, correo: {
                     label: 'correo',
                     value: "",
                     type: "email",
                     state: null,
                     stateText: null
-                },telefono: {
+                }, telefono: {
                     label: 'telefono',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                },direccion: {
+                }, direccion: {
                     label: 'direccion',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                },nitCi: {
+                }, nitCi: {
                     label: 'nitCi',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                },codigo: {
+                }, codigo: {
                     label: 'codigo',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                },sucursal: {
+                }, sucursal: {
                     label: 'sucursal',
                     value: "",
                     type: "select",
@@ -159,6 +171,7 @@ export default {
             this.enviar();
         },
         enviar() {
+            this.sending = true;
             this.limpiar();
             let producto = new FormData();
             if (this.idForm) {
@@ -175,7 +188,8 @@ export default {
             axios.post('/admin/cliente', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
-                        location.href = data["path"];
+                        this.$bvModal.hide(this.id)
+                        this.$inertia.get(data["path"])
                     }
                     Object.keys(this.form).forEach(key => {
                         if (key in data.errors) {
@@ -191,7 +205,9 @@ export default {
                     // handle error
                     this.errors = error
                     console.log(error);
-                })
+                }).finally(() => {
+                this.sending = false;
+            })
         }
     },
 }

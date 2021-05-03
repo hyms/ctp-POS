@@ -3,12 +3,12 @@
         <div class="top-bar color-scheme-light overflow-auto text-left">
             <ul class="col-12">
                 <router-link
-                        v-for="(link, key) in links"
-                        :to="url + key"
-                        :key="key"
-                        tag="li"
-                        exact
-                        exact-active-class="active"
+                    v-for="(link, key) in links"
+                    :to="url + key"
+                    :key="key"
+                    tag="li"
+                    exact
+                    exact-active-class="active"
                 >
                     <a>{{ link }}</a>
                 </router-link>
@@ -25,10 +25,10 @@
 </template>
 
 <script>
-    export default {
-        props: {
-            url: null,
-            links: {}
-        }
-    };
+export default {
+    props: {
+        url: null,
+        links: {}
+    }
+};
 </script>

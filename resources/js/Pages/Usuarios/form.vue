@@ -45,12 +45,21 @@
                     </b-checkbox>
                 </template>
             </form>
+            <template #modal-footer="{ ok, cancel }">
+                <b-button variant="danger" @click="cancel()">
+                    Cancel
+                </b-button>
+                <loading-button :loading="sending" variant="default"
+                                @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
+                </loading-button>
+            </template>
         </b-modal>
     </div>
 </template>
 
 <script>
 import axios from "axios";
+import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
     name: "Producto",
@@ -61,8 +70,12 @@ export default {
         sucursales: Object,
         roles: Array
     },
+    components: {
+        LoadingButton
+    },
     data() {
         return {
+            sending: false,
             boton1: "Nuevo",
             boton2: "Modificar",
             titulo1: "Nuevo Usuario",
@@ -74,55 +87,55 @@ export default {
                     type: "text",
                     state: null,
                     stateText: null
-                },password: {
+                }, password: {
                     label: 'Contraseña',
                     value: "",
                     type: "password",
                     state: null,
                     stateText: null
-                },apellido: {
+                }, apellido: {
                     label: 'Apellido',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                },nombre: {
+                }, nombre: {
                     label: 'Nombre',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                },ci: {
+                }, ci: {
                     label: 'CI',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                },telefono: {
+                }, telefono: {
                     label: 'Telefono',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                },email: {
+                }, email: {
                     label: 'Correo',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                },sucursal: {
+                }, sucursal: {
                     label: 'sucursal',
                     value: "",
                     type: "select",
                     state: null,
                     stateText: null
-                },role: {
+                }, role: {
                     label: 'Rol',
                     value: "",
                     type: "select",
                     state: null,
                     stateText: null
-                },enable: {
+                }, enable: {
                     label: 'Habilitado',
                     value: "",
                     type: "bool",
@@ -168,13 +181,14 @@ export default {
             this.enviar();
         },
         enviar() {
+            this.sending = true;
             this.limpiar();
             let user = new FormData();
             if (this.idForm) {
                 user.append('id', this.idForm);
             }
             Object.keys(this.form).forEach(key => {
-                if(this.form[key].value !=null) {
+                if (this.form[key].value != null) {
                     if (['enable'].includes(key)) {
                         user.append(key, this.form[key].value ? '1' : '0');
                     } else {
@@ -193,7 +207,8 @@ export default {
             axios.post('/admin/user', user, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
-                        location.href = data["path"];
+                        this.$bvModal.hide(this.id)
+                        this.$inertia.get(data["path"])
                     }
                     Object.keys(this.form).forEach(key => {
                         if (key in data.errors) {
@@ -209,7 +224,10 @@ export default {
                     // handle error
                     this.errors = error
                     console.log(error);
-                })
+                }).finally(() => {
+                this.sending = false;
+            })
+
         }
     },
 }

@@ -4,9 +4,9 @@
             <Menu :active="0"></Menu>
             <Form :isNew="isNew" id="stockModal" :itemRow="itemRow"></Form>
             <div class="tab-content">
-                    <b-card no-body>
-                        <b-tabs pills card vertical>
-                            <template v-for="(sucursal,key) in sucursales">
+                <b-card no-body>
+                    <b-tabs pills card vertical>
+                        <template v-for="(sucursal,key) in sucursales">
                             <b-tab :title="sucursal.nombre" :active="(key===0)">
                                 <b-card-text>
                                     <table class="table table-striped table-hover text-center">
@@ -25,10 +25,12 @@
                                                 <td>{{ getCantidad(sucursal.id, producto.id) }}</td>
                                                 <td>{{ getPrecio(sucursal.id, producto.id) }}</td>
                                                 <td>
-                                                    <b-button v-b-modal="'stockModal'" @click="loadModal(sucursal.id, producto.id,true)">
+                                                    <b-button v-b-modal="'stockModal'"
+                                                              @click="loadModal(sucursal.id, producto.id,true)">
                                                         Añadir
                                                     </b-button>
-                                                    <b-button v-b-modal="'stockModal'" class="btn-danger" @click="loadModal(sucursal.id, producto.id,false)">
+                                                    <b-button v-b-modal="'stockModal'" class="btn-danger"
+                                                              @click="loadModal(sucursal.id, producto.id,false)">
                                                         Quitar
                                                     </b-button>
                                                 </td>
@@ -38,9 +40,9 @@
                                     </table>
                                 </b-card-text>
                             </b-tab>
-                            </template>
-                        </b-tabs>
-                    </b-card>
+                        </template>
+                    </b-tabs>
+                </b-card>
             </div>
         </div>
     </div>
@@ -56,7 +58,7 @@ export default {
     props: {
         productos: Array,
         sucursales: Array,
-        stocks:Object,
+        stocks: Object,
         errors: Object,
     },
     components: {
@@ -76,32 +78,32 @@ export default {
         }
     },
     methods: {
-       sucursalPadre(item) {
-           if (item.dependeDe != null) {
+        sucursalPadre(item) {
+            if (item.dependeDe != null) {
 
-           }
-           return {};
-       },
-        loadModal(sucursal, producto,isUp) {
+            }
+            return {};
+        },
+        loadModal(sucursal, producto, isUp) {
             let stock = this.stocks[sucursal][producto];
             this.isNew = isUp;
             this.itemRow = {
-                sucursal:sucursal,
-                producto:producto,
-                cantidad:((stock===null)?0:stock['cantidad']),
-                precioUnidad:((stock===null)?0:stock['precioUnidad'])
+                sucursal: sucursal,
+                producto: producto,
+                cantidad: ((stock === null) ? 0 : stock['cantidad']),
+                precioUnidad: ((stock === null) ? 0 : stock['precioUnidad'])
             };
         },
         getCantidad(sucursal, producto) {
-           if(this.stocks[sucursal][producto]!=null) {
-               let cantidad = this.stocks[sucursal][producto]['cantidad'];
-               if (cantidad != null)
-                   return cantidad;
-           }
+            if (this.stocks[sucursal][producto] != null) {
+                let cantidad = this.stocks[sucursal][producto]['cantidad'];
+                if (cantidad != null)
+                    return cantidad;
+            }
             return "-";
         },
         getPrecio(sucursal, producto) {
-            if(this.stocks[sucursal][producto]!=null) {
+            if (this.stocks[sucursal][producto] != null) {
                 let precio = this.stocks[sucursal][producto]['precioUnidad'];
                 if (precio != null)
                     return precio;

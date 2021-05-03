@@ -1,11 +1,11 @@
 <template>
-    <b-button variant="primary" :disabled="loading" >
+    <b-button variant="primary" :disabled="loading">
         <span v-if="loading">
             <b-spinner small></b-spinner>
-            Ingresando...
+            {{ textLoad }}...
           </span>
         <span v-else>
-            Ingresar
+            {{ text }}
           </span>
     </b-button>
 </template>
@@ -14,6 +14,8 @@
 export default {
     props: {
         loading: Boolean,
+        text: String,
+        textLoad: String,
     },
 }
 </script>

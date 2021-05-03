@@ -36,12 +36,21 @@
                     </b-form-group>
                 </template>
             </form>
+            <template #modal-footer="{ ok, cancel }">
+                <b-button variant="danger" @click="cancel()">
+                    Cancel
+                </b-button>
+                <loading-button :loading="sending" variant="default"
+                                @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
+                </loading-button>
+            </template>
         </b-modal>
     </div>
 </template>
 
 <script>
 import axios from "axios";
+import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
     name: "cliente",
@@ -49,10 +58,14 @@ export default {
         isNew: Boolean,
         id: String,
         itemRow: Object,
-        credito:Boolean,
+        credito: Boolean,
+    },
+    components: {
+        LoadingButton
     },
     data() {
         return {
+            sending: false,
             urlDebito: "cajaDebito",
             urlCredito: "cajaCredito",
             titulo1: "Nuevo Cliente",
@@ -64,7 +77,7 @@ export default {
                     type: "textarea",
                     state: null,
                     stateText: null
-                },monto: {
+                }, monto: {
                     label: 'monto',
                     value: "",
                     type: "text",
@@ -113,6 +126,7 @@ export default {
             this.enviar();
         },
         enviar() {
+            this.sending = true;
             this.limpiar();
             let producto = new FormData();
             if (this.idForm) {
@@ -120,19 +134,20 @@ export default {
             }
             Object.keys(this.form).forEach(key => {
                 if (['dependeDe'].includes(key)) {
-                    if(this.form[key].value!=="" && this.form[key].value!==null){
+                    if (this.form[key].value !== "" && this.form[key].value !== null) {
                         producto.append(key, this.form[key].value);
                     }
-                }else if (['enable'].includes(key)) {
+                } else if (['enable'].includes(key)) {
                     producto.append(key, this.form[key].value ? '1' : '0');
                 } else {
                     producto.append(key, this.form[key].value);
                 }
             })
-            axios.post(this.credito?this.urlCredito:this.urlDebito, producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            axios.post(this.credito ? this.urlCredito : this.urlDebito, producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
-                        location.href = data["path"];
+                        this.$bvModal.hide(this.id)
+                        this.$inertia.get(data["path"])
                     }
                     Object.keys(this.form).forEach(key => {
                         if (key in data.errors) {
@@ -148,7 +163,9 @@ export default {
                     // handle error
                     this.errors = error
                     console.log(error);
-                })
+                }).finally(() => {
+                this.sending = false;
+            })
         }
     },
 }

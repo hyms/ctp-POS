@@ -52,12 +52,21 @@
                     </b-checkbox>
                 </template>
             </form>
+            <template #modal-footer="{ ok, cancel }">
+                <b-button variant="danger" @click="cancel()">
+                    Cancel
+                </b-button>
+                <loading-button :loading="sending" variant="default"
+                                @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
+                </loading-button>
+            </template>
         </b-modal>
     </div>
 </template>
 
 <script>
 import axios from "axios";
+import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
     name: "Producto",
@@ -67,8 +76,12 @@ export default {
         itemRow: Object,
         sucursalPadre: Object
     },
+    components: {
+        LoadingButton
+    },
     data() {
         return {
+            sending: false,
             titulo1: "Nuevo Sucursal",
             titulo2: "Modificar Sucursal",
             form: {
@@ -171,6 +184,7 @@ export default {
             this.enviar();
         },
         enviar() {
+            this.sending = true;
             this.limpiar();
             let producto = new FormData();
             if (this.idForm) {
@@ -187,7 +201,8 @@ export default {
             axios.post('/admin/sucursal', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
-                        location.href = data["path"];
+                        this.$bvModal.hide(this.id)
+                        this.$inertia.get(data["path"])
                     }
                     Object.keys(this.form).forEach(key => {
                         if (key in data.errors) {
@@ -203,7 +218,9 @@ export default {
                     // handle error
                     this.errors = error
                     console.log(error);
-                })
+                }).finally(() => {
+                this.sending = false;
+            })
         }
     },
 }

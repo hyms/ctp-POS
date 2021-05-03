@@ -58,7 +58,7 @@ export default {
                         {
                             label: 'Buscar Ordenes',
                             url: '/realizados',
-                            role: 'vendor',
+                            role: 'all',
                         },
                         {
                             label: 'Registro de Caja',

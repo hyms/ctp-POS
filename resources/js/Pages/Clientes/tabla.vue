@@ -9,12 +9,13 @@
             <div class="row m-b-20">
                 <div class="col">
                     <b-button v-b-modal="'clienteModal'" @click="loadModal()">{{ boton1 }}</b-button>
-                    <FormProducto :isNew="isNew" id="clienteModal" :itemRow="itemRow" :sucursales="sucursales"></FormProducto>
+                    <FormProducto :isNew="isNew" id="clienteModal" :itemRow="itemRow"
+                                  :sucursales="sucursales"></FormProducto>
                 </div>
             </div>
 
             <div class="row m-b-20">
-            <b-card>
+                <b-card>
                     <b-table
                         striped
                         hover
@@ -36,11 +37,14 @@
                                 <b-button size="sm" v-b-modal="'clienteModal'" @click="loadModal(false,row)">
                                     {{ boton2 }}
                                 </b-button>
-                                <b-button size="sm" class="btn-danger" @click="borrar(row.item.id)">{{ boton3 }}</b-button>
+                                <b-button size="sm" class="btn-danger" @click="borrar(row.item.id)">{{
+                                        boton3
+                                    }}
+                                </b-button>
                             </div>
                         </template>
                     </b-table>
-            </b-card>
+                </b-card>
             </div>
         </div>
     </div>
@@ -88,13 +92,12 @@ export default {
                 this.itemRow = item.item;
             }
         },
-        borrar(id){
+        borrar(id) {
             this.$inertia.delete(`cliente/${id}`, {
                 onBefore: () => confirm('Esta seguro?'),
             })
         },
-        getSucursal($id)
-        {
+        getSucursal($id) {
             return this.sucursales[$id];
         }
     }
