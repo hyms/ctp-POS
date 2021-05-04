@@ -18,7 +18,7 @@ export default {
     },
     methods: {
         isActive(item) {
-            return 'nav-link'+((this.active===item)?' active':'')
+            return 'nav-link' + ((this.active === item) ? ' active' : '')
         }
     }
 

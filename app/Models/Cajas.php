@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -103,10 +104,10 @@ class Cajas extends Model
 //             else
 //                 $movimientos->whereNull('fechaCierre');
 //         }
-
-        $movimientos->where('created_at', '<=', date("Y-m-d", strtotime($fechaMovimientos)) . " 23:59:59");
+        $fechaArqueo=Carbon::parse($fechaMovimientos);
+        $movimientos->where('created_at', '<=', $fechaArqueo->endOfDay()->toDateTimeString());
 //        if($admin) {
-        $movimientos->where('created_at', '>=', date("Y-m-d", strtotime($fechaMovimientos)) . " 00:00:00");
+        $movimientos->where('created_at', '>=', $fechaArqueo->startOfDay()->toDateTimeString());
 //        }
         $movimientos = $movimientos->get();
         $total = 0;

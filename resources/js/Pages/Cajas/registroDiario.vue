@@ -6,6 +6,31 @@
                     <h4 class="header-title m-t-0 m-b-20">Registro Diario</h4>
                 </div>
             </div>
+            <b-card>
+                <b-form @submit.prevent="enviar">
+                    <b-row>
+                        <b-col md="6" >
+                            <b-form-group
+                                :label="form.fecha.label"
+                                label-for="fecha"
+                                :state="form.fecha.state"
+                                label-cols-sm="3"
+                            >
+                                <b-input
+                                    :type="form.fecha.type"
+                                    :placeholder="form.fecha.label"
+                                    v-model="form.fecha.value"
+                                    id="fecha"
+                                    :state="form.fecha.state"
+                                ></b-input>
+                            </b-form-group>
+                        </b-col>
+                        <b-col>
+                            <b-button type="submit">Buscar</b-button>
+                        </b-col>
+                    </b-row>
+                </b-form>
+            </b-card>
             <b-card :title="fecha|moment('DD/MM/YYYY')">
 
                 <div class="table-responsive">
@@ -93,6 +118,15 @@ export default {
     },
     data() {
         return {
+            form: {
+                fecha: {
+                    label: 'Fecha',
+                    value: "",
+                    type: "date",
+                    state: null,
+                    stateText: null
+                },
+            },
             total: 0
         }
     },
@@ -102,6 +136,13 @@ export default {
             if (this.arqueo.monto)
                 return -this.arqueo.monto
             return monto;
+        },
+        enviar() {
+            let form = {};
+            Object.keys(this.form).forEach(key => {
+                form[key] = this.form[key].value;
+            })
+            this.$inertia.get('/arqueo', form)
         },
     }
 }

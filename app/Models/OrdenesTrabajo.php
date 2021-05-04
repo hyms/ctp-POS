@@ -40,7 +40,7 @@ class OrdenesTrabajo extends Model
         }
         $ordenes =  $ordenes
             ->whereNull('deleted_at')
-            ->orderBy('updated_at', 'desc');
+            ->orderBy('correlativo', 'desc');
         if (empty($report)) {
 //             $ordenes = $ordenes->limit(10);
 //              $ordenes = $ordenes->whereBetween('created_at', [Carbon::now()->toDateString().' 00:00:00',Carbon::now()->toDateString().' 23:59:59']);

@@ -15,7 +15,7 @@
         </div>
         <b-collapse id="my-collapse">
             <div
-                    class="menu-and-user"
+                class="menu-and-user"
             >
                 <div class="logged-user-w">
                     <div class="avatar-w">
@@ -23,7 +23,7 @@
                     </div>
                     <div class="logged-user-info-w">
                         <div class="logged-user-name">
-                            {{nombre}}
+                            {{ nombre }}
                         </div>
                     </div>
                 </div>
@@ -41,20 +41,20 @@
 import Menu from "./Menu";
 
 export default {
-        data() {
-            return {
-                images: {
-                    logo: "../img/logo.png",
-                    avatar: "../img/avatar1.jpg"
-                },
-                botonMenu: false,
-            };
-        },
-        components: {
-            Menu
-        },
-        props: {
-            nombre: String,
-        },
-    };
+    data() {
+        return {
+            images: {
+                logo: "../img/logo.png",
+                avatar: "../img/avatar1.jpg"
+            },
+            botonMenu: false,
+        };
+    },
+    components: {
+        Menu
+    },
+    props: {
+        nombre: String,
+    },
+};
 </script>

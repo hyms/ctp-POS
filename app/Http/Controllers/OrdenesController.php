@@ -6,8 +6,8 @@ use App\Models\Cliente;
 use App\Models\DetallesOrden;
 use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
@@ -53,7 +53,7 @@ class OrdenesController extends Controller
 
     public function getListVenta(Request $request)
     {
-        return self::get([0, 1, 2],
+        return self::get([-1, 0, 1, 2],
             'Ordenes/tablaReporte',
             (!empty($request->get('orden')) || !empty($request->get('fecha'))) ? $request->all() : [],
             true);
@@ -75,14 +75,13 @@ class OrdenesController extends Controller
             }
             //armar orden
             $orden = array();
-            $id=null;
+            $id = null;
             if (!isset($request['id'])) {
                 $orden['sucursal'] = Auth::user()['sucursal'];
                 $orden['estado'] = 1;
                 $orden['correlativo'] = OrdenesTrabajo::getCorrelativo(Auth::user()['sucursal']);
                 $orden['userDiseñador'] = Auth::user()['id'];
-            }
-            else{
+            } else {
                 $id = $request['id'];
             }
             $orden['responsable'] = $request['responsable'];
@@ -106,7 +105,7 @@ class OrdenesController extends Controller
                 $orden['montoVenta'] += $tmp['total'];
                 array_push($detalle, $tmp);
             }
-            OrdenesTrabajo::newOrden($orden, $detalle,$id);
+            OrdenesTrabajo::newOrden($orden, $detalle, $id);
             return response()->json(["status" => 0, 'path' => 'ordenes']);
         } catch (\Exception $error) {
             Log::error($error->getMessage());
@@ -118,7 +117,10 @@ class OrdenesController extends Controller
     public function borrar($id)
     {
         $Cliente = OrdenesTrabajo::find($id);
-        $Cliente->delete();
+        if (isset($Cliente)) {
+            $Cliente->estado = -1;
+            $Cliente->save();
+        }
         return back()->withInput();
     }
 
