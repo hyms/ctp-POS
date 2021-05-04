@@ -75,35 +75,34 @@ class CajaController extends Controller
 
     }
 
-    public function arqueo()
+    public function arqueo(Request $request)
     {
         $sucursal = Auth::user()['sucursal'];
         $arqueo = new MovimientoCaja();
         $caja = Cajas::getOne($sucursal);
-//                    if (isset($post['MovimientoCaja'])) {
-//                        $datos = array('arqueo' => $post['MovimientoCaja'], 'caja' => $caja);
-//                        $arqueoTransaccion = new SGOrdenes();
-//                        $datos = $arqueoTransaccion->arqueo($datos);
-//                        if ($arqueoTransaccion->success) {
-//                            return $this->redirect(['caja', 'op' => 'arqueos']);
-//                        }
-//                    }
-        $d = date("d");
-        $end = date("Y-m-d H:i:s");
+        if($request->has('fecha')){
+            $fecha=Carbon::parse($request['fecha']);
+            $day = $fecha->day;
+            $endDate = $fecha->toDateTimeString();
+        }
+        else{
+            $day = Carbon::now()->day;
+            $endDate = Carbon::now()->toDateTimeString();
+        }
 
-        $variables = Cajas::getSaldo($caja->first()->id, $end, false, false);
+        $variables = Cajas::getSaldo($caja->first()->id, $endDate, false, false);
 
         return Inertia::render('Cajas/registroDiario',
             [
                 'saldo' => $variables['saldo'],
                 'arqueo' => $arqueo,
                 'caja' => $caja,
-                'fecha' => date('Y-m-d H:i:s', strtotime($end)),
+                'fecha' => $endDate,
                 'ventas' => $variables['ventas'],
                 'deudas' => $variables['deudas'],
                 'recibos' => $variables['recibos'],
                 'cajas' => $variables['cajas'],
-                'dia' => $d,
+                'dia' => $day,
             ]);
     }
 

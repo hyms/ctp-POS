@@ -62,7 +62,7 @@
                             </b-form-group>
                         </b-col>
                         <b-col>
-                            <b-button type="submit">Enviar</b-button>
+                            <b-button type="submit">Buscar</b-button>
                         </b-col>
                     </b-row>
                 </form>
