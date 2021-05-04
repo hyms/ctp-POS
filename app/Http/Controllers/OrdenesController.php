@@ -119,6 +119,7 @@ class OrdenesController extends Controller
         $Cliente = OrdenesTrabajo::find($id);
         if (isset($Cliente)) {
             $Cliente->estado = -1;
+             $Cliente->updated_at = now();
             $Cliente->save();
         }
         return back()->withInput();
