@@ -80,10 +80,10 @@ class OrdenesController extends Controller
                 $orden['sucursal'] = Auth::user()['sucursal'];
                 $orden['estado'] = 1;
                 $orden['correlativo'] = OrdenesTrabajo::getCorrelativo(Auth::user()['sucursal']);
-                $orden['userDiseñador'] = Auth::user()['id'];
             } else {
                 $id = $request['id'];
             }
+            $orden['userDiseñador'] = Auth::user()['id'];
             $orden['responsable'] = $request['responsable'];
             $orden['telefono'] = $request['telefono'];
             $orden['observaciones'] = !empty($request['observaciones']) ? $request['observaciones'] : "";
@@ -119,7 +119,7 @@ class OrdenesController extends Controller
         $Cliente = OrdenesTrabajo::find($id);
         if (isset($Cliente)) {
             $Cliente->estado = -1;
-             $Cliente->updated_at = now();
+            $Cliente->updated_at = now();
             $Cliente->save();
         }
         return back()->withInput();
