@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cajas;
 use App\Models\DetallesOrden;
+use App\Models\MovimientoCaja;
 use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
 use App\Models\Sucursal;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -105,6 +109,37 @@ class ReporteController extends Controller
                 'forms' => (object)$request->all(),
                 'errors' => (object)[],
                 'data' => $data,
+            ]);
+    }
+
+    public function arqueos(Request $request)
+    {
+        $sucursal = Auth::user()['sucursal'];
+        $arqueo = new MovimientoCaja();
+        $caja = Cajas::getOne($sucursal);
+        if ($request->has('fechaI') && $request->has('fechaF')) {
+            $fechaI = Carbon::parse($request['fechaI']);
+            $fechaF = Carbon::parse($request['fechaF']);
+            $startDate = $fechaI->toDateTimeString();
+            $endDate = $fechaF->toDateTimeString();
+        } else {
+            $startDate = Carbon::now()->toDateTimeString();
+            $endDate = Carbon::now()->toDateTimeString();
+        }
+
+        $variables = Cajas::getSaldo($caja->first()->id, $startDate, $endDate, false, false);
+
+        return Inertia::render('Reportes/arqueos',
+            [
+                'saldo' => $variables['saldo'],
+                'arqueo' => $arqueo,
+                'caja' => $caja,
+                'fechaI' => $startDate,
+                'fechaF' => $endDate,
+                'ventas' => $variables['ventas'],
+                'deudas' => $variables['deudas'],
+                'recibos' => $variables['recibos'],
+                'cajas' => $variables['cajas'],
             ]);
     }
 

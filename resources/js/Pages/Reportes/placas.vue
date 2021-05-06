@@ -1,6 +1,8 @@
 <template>
     <div class="content-w">
         <div class="content-box">
+            <Menu :active="1"></Menu>
+            <div class="tab-content">
             <b-card>
                 <template #header>
                     <h5 class="mb-0">Filtros</h5>
@@ -95,12 +97,14 @@
 
                 </b-table>
             </b-card>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 import Layout from '@/Shared/Layout'
+import Menu from "@/Shared/menu/menuReportes";
 
 export default {
     layout: Layout,
@@ -109,6 +113,9 @@ export default {
         forms: Object,
         errors: Object,
         data: Object
+    },
+    components:{
+      Menu
     },
     data() {
         return {

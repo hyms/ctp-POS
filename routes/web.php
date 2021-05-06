@@ -133,6 +133,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('listaReportes');
     Route::get('reportes/placas', [ReporteController::class, 'placas'])
         ->name('listaReportes');
+    Route::get('reportes/arqueos', [ReporteController::class, 'arqueos'])
+        ->name('listaArqueos');
     Route::get('reportes/cajas', [ReporteController::class, 'cajas'])
         ->name('listaReportes');
 
