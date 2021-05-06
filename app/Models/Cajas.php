@@ -64,7 +64,7 @@ class Cajas extends Model
         return $caja;
     }
 
-    static public function getSaldo($idCaja, $fechaMovimientos, $array = false, $get = null, $admin = false)
+    static public function getSaldo($idCaja, $fechaMovimientosInicio,$fechaMovimientosFin, $array = false, $get = null, $admin = false)
     {
         if ($array || isset($get['deudas']))
             $deudas = array();
@@ -104,10 +104,11 @@ class Cajas extends Model
 //             else
 //                 $movimientos->whereNull('fechaCierre');
 //         }
-        $fechaArqueo=Carbon::parse($fechaMovimientos);
-        $movimientos->where('created_at', '<=', $fechaArqueo->endOfDay()->toDateTimeString());
+        $fechaArqueoI=Carbon::parse($fechaMovimientosInicio);
+        $fechaArqueoF=Carbon::parse($fechaMovimientosFin);
+        $movimientos->where('created_at', '<=', $fechaArqueoF->endOfDay()->toDateTimeString());
 //        if($admin) {
-        $movimientos->where('created_at', '>=', $fechaArqueo->startOfDay()->toDateTimeString());
+        $movimientos->where('created_at', '>=', $fechaArqueoI->startOfDay()->toDateTimeString());
 //        }
         $movimientos = $movimientos->get();
         $total = 0;
@@ -186,14 +187,14 @@ class Cajas extends Model
                 $query->where('cajaOrigen', '=', $idCaja)
                     ->orWhere('cajaDestino', '=', $idCaja);
             })
-            ->where('created_at', '<', date("Y-m-d H:i", strtotime($fechaMovimientos)))
+            ->where('created_at', '<', $fechaArqueoF->toDateTimeString('minute'))
             ->orderBy('created_at', 'DESC');
         $saldo = 0;
         if ($saldos->count() > 0) {
             $saldo = $saldos->first()->cierre;
         }
 
-        $datos = array('ventas' => $ventas, 'deudas' => $deudas, 'recibos' => $recibos, 'cajas' => $cajas, 'saldo' => $saldo, 'movimientos' => $movimientosAll, 'arqueos' => $arqueos);
+            $datos = array('ventas' => $ventas, 'deudas' => $deudas, 'recibos' => $recibos, 'cajas' => $cajas, 'saldo' => $saldo, 'movimientos' => $movimientosAll, 'arqueos' => $arqueos);
         return $datos;
     }
 

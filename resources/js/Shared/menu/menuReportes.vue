@@ -17,18 +17,13 @@ export default {
             links: [
                 {
                     active: 1,
-                    url: 'productos',
-                    text: 'Productos'
-                },
-                {
-                    active: 0,
-                    url: 'stocks',
-                    text: 'Stocks'
+                    url: 'placas',
+                    text: 'Placas'
                 },
                 {
                     active: 2,
-                    url: 'movimientosStock',
-                    text: 'Movimientos'
+                    url: 'arqueos',
+                    text: 'Arqueos'
                 },
             ]
         }

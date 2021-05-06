@@ -90,7 +90,7 @@ class CajaController extends Controller
             $endDate = Carbon::now()->toDateTimeString();
         }
 
-        $variables = Cajas::getSaldo($caja->first()->id, $endDate, false, false);
+        $variables = Cajas::getSaldo($caja->first()->id, $endDate, $endDate,false, false);
 
         return Inertia::render('Cajas/registroDiario',
             [
