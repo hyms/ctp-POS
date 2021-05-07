@@ -20,10 +20,28 @@
                 <td>{{ key + 1 }}</td>
                 <td>{{ getProduct(itemOrden.stock) }}</td>
                 <td>{{ itemOrden.cantidad }}</td>
-                <td v-if="isVenta">{{ itemOrden.costo }}</td>
-                <td v-if="isVenta">{{ itemOrden.total }}</td>
+                <td v-if="isVenta">
+                    <b-input type="text" size="sm" v-model="itemOrden.costo"></b-input>
+                </td>
+                <td v-if="isVenta">{{ itemOrden.costo * itemOrden.cantidad }}</td>
             </tr>
             </tbody>
+            <tfoot v-if="isVenta">
+            <tr>
+                <td colspan="4" class="text-right"><strong>Total</strong></td>
+                <td>{{ getTotal(item.detallesOrden) }}</td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-right"><strong>Cancelado</strong></td>
+                <td>
+                    <b-input type="text" size="sm" v-model="item.montoVenta"></b-input>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-right"><strong>Cambio</strong></td>
+                <td>{{ getCambio() }}</td>
+            </tr>
+            </tfoot>
         </table>
         <div>
             <p><strong>Observaciones:</strong><br>
@@ -52,7 +70,8 @@ import axios from "axios";
 export default {
     data() {
         return {
-            titulo: "Orden"
+            titulo: "Orden",
+            total: 0
         }
     },
     props: {
@@ -99,8 +118,23 @@ export default {
                     console.log(error);
                 })
         },
-
+        getTotal(detalle) {
+            if (detalle) {
+                let total = 0;
+                Object.values(detalle).forEach(value => {
+                    if (value) {
+                        total += value.costo * value.cantidad;
+                    }
+                })
+                this.total = total;
+                return total;
+            }
+            return 0;
+        },
+        getCambio() {
+            return this.total - this.item.montoVenta;
+        }
     },
-    components: {}
+    components: {},
 }
 </script>
