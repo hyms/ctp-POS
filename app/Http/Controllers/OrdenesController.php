@@ -29,9 +29,7 @@ class OrdenesController extends Controller
         return Inertia::render($component, [
             'ordenes' => $ordenes,
             'productos' => $productos,
-            'estados' => $estados,
-            'isVenta'=>$venta,
-            'report'=>$report
+            'estados' => $estados
         ]);
     }
 
@@ -43,14 +41,14 @@ class OrdenesController extends Controller
     public function getListDesing(Request $request)
     {
         return self::get([0, 2],
-            'Ordenes/tabla',
+            'Ordenes/tablaReporte',
             (!empty($request->get('orden')) || !empty($request->get('fecha'))) ? $request->all() : [],
             true);
     }
 
     public function getAllVenta()
     {
-        return self::get([1, 2], 'Ordenes/tabla', [], true);
+        return self::get([1, 2], 'Ordenes/tablaVenta', [], true);
     }
 
     public function getListVenta(Request $request)

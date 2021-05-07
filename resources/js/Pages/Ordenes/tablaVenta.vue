@@ -8,17 +8,9 @@
             </div>
             <div class="row m-b-20">
                 <div class="col">
-                    <b-button v-b-modal="'ordenModal'" @click="loadModal()">{{ boton1 }}</b-button>
-                    <formOrden
-                        :isNew="isNew"
-                        id="ordenModal"
-                        :itemRow="itemRow"
-                        :productos="productos"
-                        :productosSell="productosSell()"
-                    ></formOrden>
                     <item-orden
                         id="itemModal"
-                        :isVenta="false"
+                        :isVenta="true"
                         :item="itemRow"
                         :productos="productos"
                     ></item-orden>
@@ -48,19 +40,12 @@
                         <template v-slot:cell(estado)="data">
                             {{ estados[data.value] }}
                         </template>
-                        <template v-slot:cell(created_at)="data">
-                            {{ data.value | moment("DD/MM/YYYY HH:mm") }}
-                        </template>
                         <template v-slot:cell(Acciones)="row">
                             <div class="row-actions">
-                                <b-button v-b-modal="'ordenModal'" @click="loadModal(false,row)" size="sm">
-                                    {{ boton5 }}
-                                </b-button>
-                                <b-button variant="primary" v-b-modal="'itemModal'" @click="loadModal(false,row)"
-                                          size="sm">
+                                <b-button v-b-modal="'itemModal'" @click="loadModal(false,row)" size="sm">
                                     {{ boton2 }}
                                 </b-button>
-                                <b-button variant="danger" @click="borrar(row.item.id)" size="sm"
+                                <b-button class="btn-danger" @click="borrar(row.item.id)" size="sm"
                                           v-if="row.item.estado==1">
                                     {{ boton3 }}
                                 </b-button>
@@ -85,7 +70,6 @@
 
 <script>
 import Layout from '@/Shared/Layout'
-import formOrden from './form'
 import itemOrden from './item'
 
 export default {
@@ -99,7 +83,6 @@ export default {
             boton2: "Ver",
             boton3: "Anular",
             boton4: "Imprimir",
-            boton5: "Modificar",
             textoVacio: 'No existen Ordenes',
             fields: [
                 'correlativo',
@@ -121,11 +104,10 @@ export default {
     props: {
         ordenes: Array,
         productos: Array,
-        estados: Object,
+        estados: Object
     },
     components: {
-        formOrden,
-        itemOrden
+        itemOrden,
     },
     methods: {
         loadModal(isNew = true, item = null) {

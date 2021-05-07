@@ -43,7 +43,7 @@
                                 </b-form-group>
                             </div>
                             <div class="col-sm-2">
-                                <b-button size="sm" type="submit">Buscar</b-button>
+                                <b-button variant="primary" size="sm" type="submit">Enviar</b-button>
                             </div>
                         </form>
                         <item-orden
@@ -150,7 +150,6 @@ export default {
         ordenes: Array,
         productos: Array,
         estados: Object,
-        report: Object,
     },
     components: {
         formOrden,
@@ -187,10 +186,7 @@ export default {
     },
     mounted() {
         // Set the initial number of items
-        this.totalRows = this.ordenes.length;
-        Object.keys(this.report).forEach(key=>{
-            this.searchModel[key] = this.report[key];
-        })
+        this.totalRows = this.ordenes.length
     },
 }
 </script>
