@@ -18,7 +18,7 @@
                     ></formOrden>
                     <item-orden
                         id="itemModal"
-                        :isVenta="false"
+                        :isVenta="isVenta"
                         :item="itemRow"
                         :productos="productos"
                     ></item-orden>
@@ -53,10 +53,10 @@
                         </template>
                         <template v-slot:cell(Acciones)="row">
                             <div class="row-actions">
-                                <b-button v-b-modal="'ordenModal'" @click="loadModal(false,row)" size="sm">
+                                <b-button variant="dark" v-b-modal="'ordenModal'" @click="loadModal(false,row)" size="sm" v-if="!isVenta">
                                     {{ boton5 }}
                                 </b-button>
-                                <b-button variant="primary" v-b-modal="'itemModal'" @click="loadModal(false,row)"
+                                <b-button variant="secondary" v-b-modal="'itemModal'" @click="loadModal(false,row)"
                                           size="sm">
                                     {{ boton2 }}
                                 </b-button>
@@ -122,6 +122,7 @@ export default {
         ordenes: Array,
         productos: Array,
         estados: Object,
+        isVenta: Boolean,
     },
     components: {
         formOrden,

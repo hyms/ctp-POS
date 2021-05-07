@@ -1,8 +1,7 @@
 <template>
     <b-modal
         :id="id"
-        title="Comprobante">
-        <h4 class="text-right">{{ item.correlativo }}</h4>
+        :title="titulo + ' #'+item.correlativo">
         <div><strong>Cliente:</strong> {{ item.responsable }}</div>
         <div><strong>Telefono:</strong> {{ item.telefono }}</div>
         <br>
@@ -31,22 +30,15 @@
                 {{ item.observaciones }}
             </p>
         </div>
-<!--        <div>
-sector de form venta
-</div>-->
         <template #modal-footer="{ ok, cancel }">
-            <!-- Emulate built in modal footer ok and cancel button actions -->
-            <b-button size="sm" variant="primary" @click="ok()">
+            <b-button size="sm" variant="danger" @click="cancel()">
                 Cerrar
             </b-button>
-<!--            <b-button size="sm" variant="danger" @click="imprimirPos()">-->
-<!--                Imprimir-->
-<!--            </b-button>-->
             <a
                 class="btn btn-dark btn-sm"
                 :href="'/ordenPdf/'+item.id"
                 target="_blank"
-            v-if="!isVenta">Imprimir</a>
+                v-if="!isVenta">Imprimir</a>
             <b-button size="sm" variant="dark" @click="guardarVenta()" v-if="isVenta && item.estado==1">
                 Guardar
             </b-button>
@@ -58,11 +50,16 @@ sector de form venta
 import axios from "axios";
 
 export default {
+    data() {
+        return {
+            titulo: "Orden"
+        }
+    },
     props: {
         productos: Array,
         item: Object,
         id: String,
-        isVenta:Boolean
+        isVenta: Boolean
     },
     methods: {
         getProduct(id) {
@@ -104,7 +101,6 @@ export default {
         },
 
     },
-    components: {
-    }
+    components: {}
 }
 </script>
