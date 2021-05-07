@@ -1,8 +1,7 @@
 <template>
     <b-modal
         :id="id"
-        title="Comprobante">
-        <h4 class="text-right">{{ item.correlativo }}</h4>
+        :title="titulo + ' #'+item.correlativo">
         <div><strong>Cliente:</strong> {{ item.responsable }}</div>
         <div><strong>Telefono:</strong> {{ item.telefono }}</div>
         <br>
@@ -21,32 +20,43 @@
                 <td>{{ key + 1 }}</td>
                 <td>{{ getProduct(itemOrden.stock) }}</td>
                 <td>{{ itemOrden.cantidad }}</td>
-                <td v-if="isVenta">{{ itemOrden.costo }}</td>
-                <td v-if="isVenta">{{ itemOrden.total }}</td>
+                <td v-if="isVenta">
+                    <b-input type="text" size="sm" v-model="itemOrden.costo"></b-input>
+                </td>
+                <td v-if="isVenta">{{ itemOrden.costo * itemOrden.cantidad }}</td>
             </tr>
             </tbody>
+            <tfoot v-if="isVenta">
+            <tr>
+                <td colspan="4" class="text-right"><strong>Total</strong></td>
+                <td>{{ getTotal(item.detallesOrden) }}</td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-right"><strong>Cancelado</strong></td>
+                <td>
+                    <b-input type="text" size="sm" v-model="item.montoVenta"></b-input>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-right"><strong>Cambio</strong></td>
+                <td>{{ getCambio() }}</td>
+            </tr>
+            </tfoot>
         </table>
         <div>
             <p><strong>Observaciones:</strong><br>
                 {{ item.observaciones }}
             </p>
         </div>
-<!--        <div>
-sector de form venta
-</div>-->
         <template #modal-footer="{ ok, cancel }">
-            <!-- Emulate built in modal footer ok and cancel button actions -->
-            <b-button size="sm" variant="primary" @click="ok()">
+            <b-button size="sm" variant="danger" @click="cancel()">
                 Cerrar
             </b-button>
-<!--            <b-button size="sm" variant="danger" @click="imprimirPos()">-->
-<!--                Imprimir-->
-<!--            </b-button>-->
             <a
                 class="btn btn-dark btn-sm"
                 :href="'/ordenPdf/'+item.id"
                 target="_blank"
-            v-if="!isVenta">Imprimir</a>
+                v-if="!isVenta">Imprimir</a>
             <b-button size="sm" variant="dark" @click="guardarVenta()" v-if="isVenta && item.estado==1">
                 Guardar
             </b-button>
@@ -58,11 +68,17 @@ sector de form venta
 import axios from "axios";
 
 export default {
+    data() {
+        return {
+            titulo: "Orden",
+            total: 0
+        }
+    },
     props: {
         productos: Array,
         item: Object,
         id: String,
-        isVenta:Boolean
+        isVenta: Boolean
     },
     methods: {
         getProduct(id) {
@@ -102,9 +118,23 @@ export default {
                     console.log(error);
                 })
         },
-
+        getTotal(detalle) {
+            if (detalle) {
+                let total = 0;
+                Object.values(detalle).forEach(value => {
+                    if (value) {
+                        total += value.costo * value.cantidad;
+                    }
+                })
+                this.total = total;
+                return total;
+            }
+            return 0;
+        },
+        getCambio() {
+            return this.total - this.item.montoVenta;
+        }
     },
-    components: {
-    }
+    components: {},
 }
 </script>
