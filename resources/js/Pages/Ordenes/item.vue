@@ -21,7 +21,8 @@
                 <td>{{ getProduct(itemOrden.stock) }}</td>
                 <td>{{ itemOrden.cantidad }}</td>
                 <td v-if="isVenta">
-                    <b-input type="text" size="sm" v-model="itemOrden.costo"></b-input>
+                    <b-input type="text" size="sm" v-model="itemOrden.costo" v-if="item.estado==1"></b-input>
+                    <template v-else>{{ itemOrden.costo }}</template>
                 </td>
                 <td v-if="isVenta">{{ itemOrden.costo * itemOrden.cantidad }}</td>
             </tr>
@@ -34,7 +35,8 @@
             <tr>
                 <td colspan="4" class="text-right"><strong>Cancelado</strong></td>
                 <td>
-                    <b-input type="text" size="sm" v-model="item.montoVenta"></b-input>
+                    <b-input type="text" size="sm" v-model="item.montoVenta" v-if="item.estado==1"></b-input>
+                    <template v-else>{{ item.montoVenta }}</template>
                 </td>
             </tr>
             <tr>
@@ -95,8 +97,9 @@ export default {
             return "";
         },
         guardarVenta() {
+            this.reajusteOrden();
             let producto = new FormData();
-            producto.append('id', this.item.id);
+            producto.append('item', JSON.stringify(this.item));
             axios.post('/ordenVenta', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
@@ -132,7 +135,12 @@ export default {
             return 0;
         },
         getCambio() {
-            return this.total - this.item.montoVenta;
+            return (this.item.montoVenta - this.total);
+        },
+        reajusteOrden() {
+            if (this.item.montoVenta > this.total) {
+                this.item.montoVenta = this.total;
+            }
         }
     },
     components: {},

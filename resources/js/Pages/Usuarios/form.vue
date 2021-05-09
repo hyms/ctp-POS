@@ -162,6 +162,7 @@ export default {
             } else {
                 if ('id' in this.itemRow) {
                     this.idForm = this.itemRow['id'];
+                    this.titulo2=this.titulo2 +' '+this.itemRow['correlativo']
                 }
                 Object.keys(this.form).forEach(key => {
                     this.form[key].value = this.itemRow[key];
@@ -174,6 +175,7 @@ export default {
                 this.form[key].stateText = null;
             })
             this.errors = [];
+            this.titulo2= "Modificar Orden";
         },
         handleOk(bvModalEvt) {
             // Prevent modal from closing

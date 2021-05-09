@@ -74,7 +74,22 @@ class DetallesOrden extends Model
 
 
             }
-
         }
+    }
+
+    public static function getTotal(int $idOrden,array $detalleOrden)
+    {
+        $total = 0;
+        foreach ($detalleOrden as $item) {
+            $total += $item['costo']*$item['cantidad'];
+            DB::table(self::$tables)
+                ->where('ordenTrabajo', '=', $idOrden)
+                ->where('stock', '=', $item['stock'])
+                ->update([
+                    'costo'=>$item['costo'],
+                    'total'=>$item['costo']*$item['cantidad'],
+                ]);
+        }
+        return $total;
     }
 }

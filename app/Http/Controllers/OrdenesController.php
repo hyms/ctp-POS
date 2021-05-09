@@ -131,7 +131,7 @@ class OrdenesController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'id' => 'required',
+                'item' => 'required',
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -139,10 +139,17 @@ class OrdenesController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
+            $ordenPost = json_decode($request['item'], true);
             //armar orden
             $orden = array();
-            $orden['id'] = $request['id'];
-            $orden['estado'] = 0;//controlar para deudas
+            $orden['id'] = $ordenPost['id'];
+            $total = DetallesOrden::getTotal($orden['id'], $ordenPost['detallesOrden']);
+            if ($ordenPost['montoVenta'] >= $total) {
+                $orden['estado'] = 0;
+            } else {
+                $orden['estado'] = 2;
+            }
+            $orden['montoVenta'] = $ordenPost['montoVenta'];
             $orden['userVenta'] = Auth::user()['id'];
             OrdenesTrabajo::venta($orden);
             return response()->json(["status" => 0, 'path' => 'espera']);
