@@ -1,6 +1,6 @@
 <template>
     <ul class="nav pcoded-inner-navbar">
-        <template v-for="(value,index) in menu">
+        <template v-for="(value) in menu">
             <li class="nav-item pcoded-menu-caption"><label>{{ value.titulo }}</label></li>
             <template v-for="(link, key) in value.submenu">
                 <template v-if="getPermission(link.role)">
