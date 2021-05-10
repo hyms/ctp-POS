@@ -3,11 +3,11 @@
 use App\Http\Controllers\CajaController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DisenoController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrdenesController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ProductosController;
+use App\Http\Controllers\ReciboController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SucursalController;
@@ -45,19 +45,19 @@ Route::get('search/{id}', [ClienteController::class, 'buscar'])
     ->name('buscar');
 //diseño
 Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
-//    Route::get('/', [OrdenesController::class, 'index'])
-//        ->name('home');
     Route::get('ordenes', [OrdenesController::class, 'getAll'])
         ->name('listaOrdenes');
     Route::post('orden', [OrdenesController::class, 'post'])
         ->name('guardarOrden');
     Route::post('ordenVenta', [OrdenesController::class, 'postVenta'])
         ->name('guardarOrdenV');
+    Route::post('ordenDeuda', [OrdenesController::class, 'postDeuda'])
+        ->name('guardarOrdenD');
     Route::delete('orden/{id}', [OrdenesController::class, 'borrar'])
         ->name('borrarOrden');
-    Route::get('reporte', [OrdenesController::class, 'getListDesing'])
-        ->name('reporteOrden');
     Route::get('espera', [OrdenesController::class, 'getAllVenta'])
+        ->name('listaOrdenesV');
+    Route::get('mora', [OrdenesController::class, 'getAllMora'])
         ->name('listaOrdenesV');
     Route::get('realizados', [OrdenesController::class, 'getListVenta'])
         ->name('reporteOrden');
@@ -73,6 +73,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('credito');
     Route::delete('cajaMovimiento', [CajaController::class, 'borrarMovimiento'])
         ->name('cajaMovimiento');
+    Route::get('recibosIngreso',[ReciboController::class, 'getAll'])
+    ->name('recibosI');
 });
 //pdfs
 Route::get('ordenPdf/{id}', [PDFController::class, 'getOrden'])

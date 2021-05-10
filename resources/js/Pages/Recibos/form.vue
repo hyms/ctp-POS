@@ -26,10 +26,17 @@
                             :state="item.state"
                             v-if="['text','password','date','email'].includes(item.type)"
                         ></b-input>
+                        <b-textarea
+                            v-if="item.type==='textarea'"
+                            :placeholder="item.label"
+                            v-model="item.value"
+                            :id="key"
+                            :state="item.state"
+                        ></b-textarea>
                         <b-form-select
                             v-if="item.type==='select'"
                             v-model="item.value"
-                            :options="(key==='sucursal')?sucursales:roles"
+                            :options="(key==='sucursal')?sucursales:cajasPadre"
                         >
                             <template #first>
                                 <b-form-select-option :value="null">Seleccione una opcion</b-form-select-option>
@@ -37,12 +44,18 @@
                         </b-form-select>
                     </b-form-group>
                     <b-checkbox
-                        v-if="item.type==='bool'"
+                        v-if="item.type==='boolean'"
                         v-model="item.value"
                         :id="key"
                         :state="item.state"
                     >{{ item.label }}
                     </b-checkbox>
+                    <input
+                        type="hidden"
+                        v-if="item.type==='hidden'"
+                        v-model="item.value"
+                        :id="key"
+                    />
                 </template>
             </form>
             <template #modal-footer="{ ok, cancel }">
@@ -62,13 +75,13 @@ import axios from "axios";
 import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
-    name: "Producto",
+    name: "cliente",
     props: {
         isNew: Boolean,
         id: String,
         itemRow: Object,
         sucursales: Object,
-        roles: Array
+        cajasPadre: Object
     },
     components: {
         LoadingButton
@@ -76,51 +89,19 @@ export default {
     data() {
         return {
             sending: false,
-            boton1: "Nuevo",
-            boton2: "Modificar",
-            titulo1: "Nuevo Usuario",
-            titulo2: "Modificar Usuario",
+            titulo1: "Nuevo Cliente",
+            titulo2: "Modificar Cliente",
             form: {
-                username: {
-                    label: 'Usuario',
+                nombre: {
+                    label: 'nombre',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                }, password: {
-                    label: 'Contraseña',
+                }, descripcion: {
+                    label: 'descripcion',
                     value: "",
-                    type: "password",
-                    state: null,
-                    stateText: null
-                }, apellido: {
-                    label: 'Apellido',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                }, nombre: {
-                    label: 'Nombre',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                }, ci: {
-                    label: 'CI',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                }, telefono: {
-                    label: 'Telefono',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                }, email: {
-                    label: 'Correo',
-                    value: "",
-                    type: "text",
+                    type: "textarea",
                     state: null,
                     stateText: null
                 }, sucursal: {
@@ -128,21 +109,28 @@ export default {
                     value: "",
                     type: "select",
                     state: null,
-                    stateText: null
-                }, role: {
-                    label: 'Rol',
+                    stateText: null,
+                    options: this.sucursales
+                }, dependeDe: {
+                    label: 'Depende de',
                     value: "",
                     type: "select",
                     state: null,
-                    stateText: null
+                    stateText: null,
+                    options: this.cajasPadre
                 }, enable: {
-                    label: 'Habilitado',
+                    label: 'enable',
                     value: "",
-                    type: "bool",
+                    type: "boolean",
+                    state: null,
+                    stateText: null
+                }, monto: {
+                    label: '',
+                    value: "",
+                    type: "hidden",
                     state: null,
                     stateText: null
                 }
-
             },
             idForm: null,
             errors: Array
@@ -162,10 +150,13 @@ export default {
             } else {
                 if ('id' in this.itemRow) {
                     this.idForm = this.itemRow['id'];
-                    this.titulo2=this.titulo2 +' '+this.itemRow['correlativo']
                 }
                 Object.keys(this.form).forEach(key => {
-                    this.form[key].value = this.itemRow[key];
+                    if (['enable'].includes(key)) {
+                        this.form[key].value = (this.itemRow[key] === 1)
+                    } else {
+                        this.form[key].value = this.itemRow[key];
+                    }
                 })
             }
         },
@@ -175,7 +166,6 @@ export default {
                 this.form[key].stateText = null;
             })
             this.errors = [];
-            this.titulo2= "Modificar Orden";
         },
         handleOk(bvModalEvt) {
             // Prevent modal from closing
@@ -185,28 +175,23 @@ export default {
         enviar() {
             this.sending = true;
             this.limpiar();
-            let user = new FormData();
+            let producto = new FormData();
             if (this.idForm) {
-                user.append('id', this.idForm);
+                producto.append('id', this.idForm);
             }
             Object.keys(this.form).forEach(key => {
-                if (this.form[key].value != null) {
-                    if (['enable'].includes(key)) {
-                        user.append(key, this.form[key].value ? '1' : '0');
-                    } else {
-                        user.append(key, this.form[key].value);
+                if (['dependeDe'].includes(key)) {
+                    if (this.form[key].value !== "" && this.form[key].value !== null) {
+                        producto.append(key, this.form[key].value);
                     }
+                } else if (['enable'].includes(key)) {
+                    producto.append(key, this.form[key].value ? '1' : '0');
+                } else {
+                    producto.append(key, this.form[key].value);
                 }
             })
-            /* this.$inertia.post('/admin/producto',producto, {
-                 onSuccess: (page) => {
-                     console.log(page);
-                 },
-                 onError: (errors) => {
-                     console.log(errors);
-                 }
-             });*/
-            axios.post('/admin/user', user, {headers: {'Content-Type': 'multipart/form-data'}})
+
+            axios.post('/admin/caja', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
                         this.$bvModal.hide(this.id)
@@ -229,7 +214,6 @@ export default {
                 }).finally(() => {
                 this.sending = false;
             })
-
         }
     },
 }

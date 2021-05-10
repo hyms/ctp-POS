@@ -1,10 +1,10 @@
 <template>
     <ul class="nav pcoded-inner-navbar">
-        <template v-for="(value,index) in menu">
+        <template v-for="(value) in menu">
             <li class="nav-item pcoded-menu-caption"><label>{{ value.titulo }}</label></li>
             <template v-for="(link, key) in value.submenu">
                 <template v-if="getPermission(link.role)">
-                    <li :class="'nav-item '+(($page.url === link.url)?'active':'')">
+                    <li :class="'nav-item '+(($page.url === link.url ||$page.url === link.url2)?'active':'')">
                         <inertia-link
                             :href="link.url"
                             :key="key"
@@ -38,17 +38,12 @@ export default {
                         {
                             label: 'Nuevas Ordenes',
                             url: '/ordenes',
-                            role: 'all',
+                            role: 'desing',
                         },
                         // {
                         //     label: 'Reposiciones',
                         //     url: '/diseño/reposicion',
                         //     role: [0, 1, 3, 4]
-                        // },
-                        // {
-                        //     label: 'Buscar Ordenes',
-                        //     url: '/reporte',
-                        //     role: 'desing',
                         // },
                         {
                             label: 'Ordenes en Espera',
@@ -56,9 +51,20 @@ export default {
                             role: 'vendor',
                         },
                         {
+                            label: 'Ordenes en Mora',
+                            url: '/mora',
+                            role: 'vendor',
+                        },
+                        {
                             label: 'Buscar Ordenes',
                             url: '/realizados',
                             role: 'all',
+                        },
+                        {
+                            label: 'Recibos',
+                            url: '/recibosIngreso',
+                            url2: '/recibosEgreso',
+                            role: 'vendor',
                         },
                         {
                             label: 'Registro de Caja',

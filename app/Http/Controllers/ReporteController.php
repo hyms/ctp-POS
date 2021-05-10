@@ -42,6 +42,7 @@ class ReporteController extends Controller
             }
             $ordenes = OrdenesTrabajo::getReport(
                 $request['fecha'],
+                $request['fecha'],
                 $request['sucursal'],
                 isset($request['tipoOrden']) ? $request['tipoOrden'] : null);
             $placas = ProductoStock::getProducts($request['sucursal']);
@@ -52,22 +53,19 @@ class ReporteController extends Controller
             ];
 
             foreach ($ordenes as $orden) {
-//            if ($orden->tipoOrden == 0) {
-//                if ($orden->estado == 1)
-//                    continue;
-//            }
                 $row = [
                     'fecha' => $orden->created_at,
                     'cliente' => $orden->responsable,
                     'orden' => ($orden->tipoOrden == 0) ? $orden->correlativo : $orden->codigoServicio,
                     'tipo' => ($orden->tipoOrden != null) ? $tipo[$orden->tipoOrden] : "",
-                    'estado' => $orden->estado
+                    'estado' => $orden->estado,
+//                    'monto' => $orden->montoVenta,
                 ];
                 foreach ($placas as $key => $placa) {
                     $row[$placa->formato] = 0;
                 }
                 $row['observaciones'] = "";
-                if ($orden->estado >= 0) {
+                if ($orden->estado == 0 || $orden->estado == 2) {
                     $orden = DetallesOrden::getOne($orden);
                     foreach ($orden->detallesOrden as $detalle) {
                         $productoTmp = ProductoStock::getProduct($request['sucursal'], $detalle->stock);
@@ -75,7 +73,7 @@ class ReporteController extends Controller
                             $row[$productoTmp->formato] += $detalle->cantidad;
                         }
                     }
-                } else {
+                } else if($orden->estado == -1) {
                     $row['observaciones'] = "<span class=\"text-danger\">Anulado</span>";
                 }
                 if ($orden->tipoOrden != 0) {
@@ -96,7 +94,8 @@ class ReporteController extends Controller
                 '#',
                 'fecha',
                 'cliente',
-                'orden'
+                'orden',
+//                'monto'
             ];
             foreach ($placas as $row) {
                 array_push($data['fields'], $row->formato);

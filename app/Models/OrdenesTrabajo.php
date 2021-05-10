@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class OrdenesTrabajo extends Model
 {
@@ -38,16 +39,15 @@ class OrdenesTrabajo extends Model
         if (!empty($usuario)) {
             $ordenes = $ordenes->where('userDiseñador', '=', $usuario);
         }
-        $ordenes =  $ordenes
+        $ordenes = $ordenes
             ->whereNull('deleted_at')
             ->orderBy('correlativo', 'desc');
         if (empty($report)) {
 //             $ordenes = $ordenes->limit(10);
 //              $ordenes = $ordenes->whereBetween('created_at', [Carbon::now()->toDateString().' 00:00:00',Carbon::now()->toDateString().' 23:59:59']);
-        }
-        else {
+        } else {
             if (isset($report['fecha'])) {
-                $ordenes = $ordenes->whereBetween('created_at', [$report['fecha'].' 00:00:00',$report['fecha'].' 23:59:59']);
+                $ordenes = $ordenes->whereBetween('created_at', [$report['fecha'] . ' 00:00:00', $report['fecha'] . ' 23:59:59']);
             }
             if (isset($report['orden'])) {
                 $ordenes = $ordenes->where('id', '=', $report['orden']);
@@ -56,17 +56,15 @@ class OrdenesTrabajo extends Model
         return $ordenes;
     }
 
-    public static function newOrden(array $orden, array $productos,int $id=null)
+    public static function newOrden(array $orden, array $productos, int $id = null)
     {
         $ordenes = DB::table(self::$tables);
         $orden['updated_at'] = now();
-        if(isset($id))
-        {
+        if (isset($id)) {
             $ordenes
-                ->where('id','=', $id)
+                ->where('id', '=', $id)
                 ->update($orden);
-        }
-        else{
+        } else {
             $orden['created_at'] = now();
             $id = $ordenes->insertGetId($orden);
         }
@@ -88,12 +86,14 @@ class OrdenesTrabajo extends Model
         return $correlativo;
     }
 
-    public static function getReport(string $fecha, string $sucursal, string $tipo = null)
+    public static function getReport(string $fechaI, string $fechaF, string $sucursal, string $tipo = null)
     {
+        $fechaRI = Carbon::parse($fechaI);
+        $fechaRF = Carbon::parse($fechaF);
         $ordenes = DB::table(self::$tables)
-            ->whereBetween('updated_at', [$fecha . ' 00:00:00', $fecha . ' 23:59:59'])
+            ->whereBetween('updated_at', [$fechaRI->startOfDay()->toDateTimeString(), $fechaRF->endOfDay()->toDateTimeString()])
             ->where('sucursal', '=', $sucursal)
-            ->where('estado', '=', 0)
+            ->whereIn('estado', [0, 2])
             ->whereNull('deleted_at');
         if (!empty($tipo)) {
             $ordenes = $ordenes->where('tipoOrden', '=', $tipo);
@@ -109,14 +109,46 @@ class OrdenesTrabajo extends Model
         $realized = $ordenes
             ->where('id', $orden['id'])
             ->update($orden);
-        if($realized) {
+        if ($realized) {
             DetallesOrden::sell($orden['id']);
-            $item=OrdenesTrabajo::find($orden['id']);
+            $item = OrdenesTrabajo::find($orden['id']);
             Cajas::sell([
                 'sucursal' => $item->sucursal,
                 'montoVenta' => $item->montoVenta,
                 'ordenTrabajo' => $item->id,
             ]);
+        }
+    }
+
+    public static function deuda(array $orden, float $saldo, float $monto)
+    {
+        $ordenes = DB::table(self::$tables);
+        $realized = $ordenes
+            ->where('id', $orden['id'])
+            ->update($orden);
+        if ($realized) {
+            $item = OrdenesTrabajo::find($orden['id']);
+            $values = [
+                'codigo' => '',
+                'detalle' => 'pago de deuda de orden #' . $item->correlativo,
+                'nombre' => $item->responsable,
+                'ciNit' => '',
+                'codigoVenta' => $item->correlativo,
+                'saldo' => $saldo,
+                'monto' => $monto,
+                'acuenta' => $saldo - $monto,
+                'tipo' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'sucursal' => $item->sucursal,
+                'userVenta' => Auth::id(),
+            ];
+            $caja = Cajas::sell([
+                'sucursal' => $item->sucursal,
+                'montoVenta' => $item->montoVenta,
+                'ordenTrabajo' => $item->id,
+            ], false);
+            Recibo::guardarDeuda($values, $caja->get()[0]->id, $item->correlativo);
         }
     }
 
