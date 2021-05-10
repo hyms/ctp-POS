@@ -49,7 +49,7 @@ class Cajas extends Model
 
         if ($mov) {
             $movimiento = DB::table(MovimientoCaja::$tables);
-            $movID=$movimiento->insertGetId([
+            $movimiento->insertGetId([
                 'cajaOrigen' => null,
                 'cajaDestino' => $caja->get()[0]->id,
                 'tipo' => 0,

@@ -48,7 +48,7 @@ class Recibo extends Model
             ]);
         $request['secuencia'] = $secuencia;
         $request['movimientoCaja'] = $idMovimiento;
-        $recibos = DB::table(self::$tables)
+        DB::table(self::$tables)
             ->insertGetId($request);
     }
 

@@ -157,12 +157,15 @@ export default {
             }
             return "";
         },
-        guardarVenta() {
+        guardar(url) {
             this.sending = true;
             this.reajusteOrden();
             let producto = new FormData();
             producto.append('item', JSON.stringify(this.item));
-            axios.post('/ordenVenta', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            if (this.monto) {
+                producto.append('monto', this.monto);
+            }
+            axios.post(url, producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
                         this.$bvModal.hide(this.id)
@@ -186,36 +189,11 @@ export default {
                 this.sending = false;
             })
         },
+        guardarVenta() {
+            this.guardar('/ordenVenta');
+        },
         guardarDeuda() {
-            this.sending = true;
-            this.reajusteOrden();
-            let producto = new FormData();
-            producto.append('item', JSON.stringify(this.item));
-            producto.append('monto', this.monto);
-            axios.post('/ordenDeuda', producto, {headers: {'Content-Type': 'multipart/form-data'}})
-                .then(({data}) => {
-                    if (data["status"] == 0) {
-                        this.$bvModal.hide(this.id)
-                        this.$inertia.get(data["path"])
-                    }
-                    Object.keys(this.form).forEach(key => {
-                        if (key in data.errors) {
-                            this.form[key].state = false;
-                            this.form[key].stateText = data.errors[key][0];
-                        } else {
-                            this.form[key].state = true;
-                            this.form[key].stateText = "";
-                        }
-                    })
-                })
-                .catch(error => {
-                    // handle error
-                    this.errors = error
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.sending = false;
-                })
+            this.guardar('/ordenDeuda');
         },
         getTotal(detalle) {
             if (detalle) {

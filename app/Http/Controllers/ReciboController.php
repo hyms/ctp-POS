@@ -12,7 +12,6 @@ class ReciboController extends Controller
     public function getAll()
     {
         $recibos = Recibo::getAll(Auth::user()['sucursal']);
-        $sucursales = Sucursal::getAll();
         return Inertia::render('Recibos/tabla', [
             'recibos' => $recibos,
         ]);
