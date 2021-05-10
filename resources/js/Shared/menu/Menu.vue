@@ -1,10 +1,10 @@
 <template>
     <ul class="nav pcoded-inner-navbar">
-        <template v-for="(value) in menu">
+        <template v-for="(value,index) in menu">
             <li class="nav-item pcoded-menu-caption"><label>{{ value.titulo }}</label></li>
             <template v-for="(link, key) in value.submenu">
                 <template v-if="getPermission(link.role)">
-                    <li :class="'nav-item '+(($page.url === link.url ||$page.url === link.url2)?'active':'')">
+                    <li :class="'nav-item '+(($page.url === link.url)?'active':'')">
                         <inertia-link
                             :href="link.url"
                             :key="key"
@@ -69,7 +69,6 @@ export default {
                         {
                             label: 'Registro de Caja',
                             url: '/cajaDebito',
-                            url2: '/cajaCredito',
                             role: 'vendor',
                         },
                         {
