@@ -4,7 +4,7 @@
             <li class="nav-item pcoded-menu-caption"><label>{{ value.titulo }}</label></li>
             <template v-for="(link, key) in value.submenu">
                 <template v-if="getPermission(link.role)">
-                    <li :class="'nav-item '+(($page.url === link.url)?'active':'')">
+                    <li :class="'nav-item '+(($page.url === link.url ||$page.url === link.url2)?'active':'')">
                         <inertia-link
                             :href="link.url"
                             :key="key"
