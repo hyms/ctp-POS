@@ -48,7 +48,7 @@
                         </form>
                         <item-orden
                             id="itemModal"
-                            :isVenta="false"
+                            :isVenta="isVenta"
                             :item="itemRow"
                             :productos="productos"
                         ></item-orden>
@@ -150,7 +150,8 @@ export default {
         ordenes: Array,
         productos: Array,
         estados: Object,
-        report: Object,
+        report: Array,
+        isVenta: Boolean,
     },
     components: {
         formOrden,

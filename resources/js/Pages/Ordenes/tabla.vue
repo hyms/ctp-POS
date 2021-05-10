@@ -53,8 +53,9 @@
                         </template>
                         <template v-slot:cell(Acciones)="row">
                             <div class="row-actions">
-                                <b-button variant="dark" v-b-modal="'ordenModal'" @click="loadModal(false,row)" size="sm" v-if="!isVenta">
-                                    {{ boton5 }}
+                                <b-button variant="dark" v-b-modal="'ordenModal'" @click="loadModal(false,row)"
+                                          size="sm" v-if="!isVenta">
+                                    {{ boton4 }}
                                 </b-button>
                                 <b-button variant="secondary" v-b-modal="'itemModal'" @click="loadModal(false,row)"
                                           size="sm">
@@ -98,8 +99,7 @@ export default {
             boton1: "Nuevo",
             boton2: "Ver",
             boton3: "Anular",
-            boton4: "Imprimir",
-            boton5: "Modificar",
+            boton4: "Modificar",
             textoVacio: 'No existen Ordenes',
             fields: [
                 'correlativo',

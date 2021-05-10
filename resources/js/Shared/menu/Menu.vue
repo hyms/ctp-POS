@@ -38,17 +38,12 @@ export default {
                         {
                             label: 'Nuevas Ordenes',
                             url: '/ordenes',
-                            role: 'all',
+                            role: 'desing',
                         },
                         // {
                         //     label: 'Reposiciones',
                         //     url: '/diseño/reposicion',
                         //     role: [0, 1, 3, 4]
-                        // },
-                        // {
-                        //     label: 'Buscar Ordenes',
-                        //     url: '/reporte',
-                        //     role: 'desing',
                         // },
                         {
                             label: 'Ordenes en Espera',
@@ -56,9 +51,20 @@ export default {
                             role: 'vendor',
                         },
                         {
+                            label: 'Ordenes en Mora',
+                            url: '/mora',
+                            role: 'vendor',
+                        },
+                        {
                             label: 'Buscar Ordenes',
                             url: '/realizados',
                             role: 'all',
+                        },
+                        {
+                            label: 'Recibos',
+                            url: '/recibosIngreso',
+                            url2: '/recibosEgreso',
+                            role: 'vendor',
                         },
                         {
                             label: 'Registro de Caja',

@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class OrdenesTrabajo extends Model
@@ -85,7 +86,7 @@ class OrdenesTrabajo extends Model
         return $correlativo;
     }
 
-    public static function getReport(string $fechaI,string $fechaF, string $sucursal, string $tipo = null)
+    public static function getReport(string $fechaI, string $fechaF, string $sucursal, string $tipo = null)
     {
         $fechaRI = Carbon::parse($fechaI);
         $fechaRF = Carbon::parse($fechaF);
@@ -116,6 +117,38 @@ class OrdenesTrabajo extends Model
                 'montoVenta' => $item->montoVenta,
                 'ordenTrabajo' => $item->id,
             ]);
+        }
+    }
+
+    public static function deuda(array $orden, float $saldo, float $monto)
+    {
+        $ordenes = DB::table(self::$tables);
+        $realized = $ordenes
+            ->where('id', $orden['id'])
+            ->update($orden);
+        if ($realized) {
+            $item = OrdenesTrabajo::find($orden['id']);
+            $values = [
+                'codigo' => '',
+                'detalle' => 'pago de deuda de orden #' . $item->correlativo,
+                'nombre' => $item->responsable,
+                'ciNit' => '',
+                'codigoVenta' => $item->correlativo,
+                'saldo' => $saldo,
+                'monto' => $monto,
+                'acuenta' => $saldo - $monto,
+                'tipo' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'sucursal' => $item->sucursal,
+                'userVenta' => Auth::id(),
+            ];
+            $caja = Cajas::sell([
+                'sucursal' => $item->sucursal,
+                'montoVenta' => $item->montoVenta,
+                'ordenTrabajo' => $item->id,
+            ], false);
+            Recibo::guardarDeuda($values, $caja->get()[0]->id, $item->correlativo);
         }
     }
 

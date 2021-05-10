@@ -1,5 +1,5 @@
 <template>
-    <b-button variant="primary" :disabled="loading">
+    <b-button :variant="(variant)?variant:'primary'" :disabled="loading">
         <span v-if="loading">
             <b-spinner small></b-spinner>
             {{ textLoad }}...
@@ -16,6 +16,7 @@ export default {
         loading: Boolean,
         text: String,
         textLoad: String,
+        variant: String
     },
 }
 </script>

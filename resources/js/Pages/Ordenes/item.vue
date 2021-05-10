@@ -32,19 +32,71 @@
                 <td colspan="4" class="text-right"><strong>Total</strong></td>
                 <td>{{ getTotal(item.detallesOrden) }}</td>
             </tr>
-            <tr>
-                <td colspan="4" class="text-right"><strong>Cancelado</strong></td>
-                <td>
-                    <b-input type="text" size="sm" v-model="item.montoVenta" v-if="item.estado==1"></b-input>
-                    <template v-else>{{ item.montoVenta }}</template>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="4" class="text-right"><strong>Cambio</strong></td>
-                <td>{{ getCambio() }}</td>
-            </tr>
+            <template v-if="item.estado==1">
+                <tr>
+                    <td colspan="4" class="text-right"><strong>Cancelado</strong></td>
+                    <td>
+                        <b-input type="text" size="sm" v-model="item.montoVenta" v-if="item.estado==1"></b-input>
+                        <template v-else>{{ item.montoVenta }}</template>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="text-right"><strong>Cambio</strong></td>
+                    <td>{{ getCambio() }}</td>
+                </tr>
+            </template>
             </tfoot>
         </table>
+        <div v-if="item.estado==2">
+            <form>
+                <b-row>
+                    <b-col>
+                        <b-form-group
+                            label="Cancelado"
+                            label-for="cancelado"
+                        >
+                            <b-input
+                                type="text"
+                                placeholder="Cancelado"
+                                v-model="item.montoVenta"
+                                id="cancelado"
+                                name="cancelado"
+                                disabled
+                            ></b-input>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            label="A Cuenta"
+                            label-for="cuenta"
+                        >
+                            <b-input
+                                type="text"
+                                placeholder="Cuenta"
+                                v-model="monto"
+                                id="cuenta"
+                                name="cuenta"
+                            ></b-input>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            label="Saldo"
+                            label-for="saldo"
+                        >
+                            <b-input
+                                type="text"
+                                placeholder="Saldo"
+                                :value="getSaldo()"
+                                id="saldo"
+                                name="saldo"
+                                disabled
+                            ></b-input>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+            </form>
+        </div>
         <div>
             <p><strong>Observaciones:</strong><br>
                 {{ item.observaciones }}
@@ -59,21 +111,27 @@
                 :href="'/ordenPdf/'+item.id"
                 target="_blank"
                 v-if="!isVenta">Imprimir</a>
-            <b-button size="sm" variant="dark" @click="guardarVenta()" v-if="isVenta && item.estado==1">
-                Guardar
-            </b-button>
+            <loading-button :loading="sending" :variant="'dark'" v-if="isVenta && item.estado==1"
+                            @click.native="guardarVenta()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
+            </loading-button>
+            <loading-button :loading="sending" :variant="'dark'" v-if="isVenta && item.estado==2"
+                            @click.native="guardarDeuda()" :text="'Pagar'" :textLoad="'Pagando'">Pagar
+            </loading-button>
         </template>
     </b-modal>
 </template>
 
 <script>
 import axios from "axios";
+import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
     data() {
         return {
             titulo: "Orden",
-            total: 0
+            total: 0,
+            monto: 0,
+            sending: false,
         }
     },
     props: {
@@ -81,6 +139,9 @@ export default {
         item: Object,
         id: String,
         isVenta: Boolean
+    },
+    components: {
+        LoadingButton
     },
     methods: {
         getProduct(id) {
@@ -97,13 +158,15 @@ export default {
             return "";
         },
         guardarVenta() {
+            this.sending = true;
             this.reajusteOrden();
             let producto = new FormData();
             producto.append('item', JSON.stringify(this.item));
             axios.post('/ordenVenta', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
-                        location.href = data["path"];
+                        this.$bvModal.hide(this.id)
+                        this.$inertia.get(data["path"])
                     }
                     Object.keys(this.form).forEach(key => {
                         if (key in data.errors) {
@@ -119,6 +182,39 @@ export default {
                     // handle error
                     this.errors = error
                     console.log(error);
+                }).finally(() => {
+                this.sending = false;
+            })
+        },
+        guardarDeuda() {
+            this.sending = true;
+            this.reajusteOrden();
+            let producto = new FormData();
+            producto.append('item', JSON.stringify(this.item));
+            producto.append('monto', this.monto);
+            axios.post('/ordenDeuda', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+                .then(({data}) => {
+                    if (data["status"] == 0) {
+                        this.$bvModal.hide(this.id)
+                        this.$inertia.get(data["path"])
+                    }
+                    Object.keys(this.form).forEach(key => {
+                        if (key in data.errors) {
+                            this.form[key].state = false;
+                            this.form[key].stateText = data.errors[key][0];
+                        } else {
+                            this.form[key].state = true;
+                            this.form[key].stateText = "";
+                        }
+                    })
+                })
+                .catch(error => {
+                    // handle error
+                    this.errors = error
+                    console.log(error);
+                })
+                .finally(() => {
+                    this.sending = false;
                 })
         },
         getTotal(detalle) {
@@ -137,12 +233,14 @@ export default {
         getCambio() {
             return (this.item.montoVenta - this.total);
         },
+        getSaldo() {
+            return (this.total - this.item.montoVenta - this.monto);
+        },
         reajusteOrden() {
             if (this.item.montoVenta > this.total) {
                 this.item.montoVenta = this.total;
             }
         }
     },
-    components: {},
 }
 </script>

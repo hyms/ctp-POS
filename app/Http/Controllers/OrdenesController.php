@@ -30,8 +30,8 @@ class OrdenesController extends Controller
             'ordenes' => $ordenes,
             'productos' => $productos,
             'estados' => $estados,
-            'isVenta'=>$venta,
-            'report'=>$report
+            'isVenta' => $venta,
+            'report' => $report
         ]);
     }
 
@@ -40,17 +40,14 @@ class OrdenesController extends Controller
         return self::get([1], 'Ordenes/tabla', []);
     }
 
-    public function getListDesing(Request $request)
+    public function getAllMora(Request $request)
     {
-        return self::get([0, 2],
-            'Ordenes/tabla',
-            (!empty($request->get('orden')) || !empty($request->get('fecha'))) ? $request->all() : [],
-            true);
+        return self::get([2], 'Ordenes/tabla', [], true);
     }
 
     public function getAllVenta()
     {
-        return self::get([1, 2], 'Ordenes/tabla', [], true);
+        return self::get([1], 'Ordenes/tabla', [], true);
     }
 
     public function getListVenta(Request $request)
@@ -58,7 +55,7 @@ class OrdenesController extends Controller
         return self::get([-1, 0, 1, 2],
             'Ordenes/tablaReporte',
             (!empty($request->get('orden')) || !empty($request->get('fecha'))) ? $request->all() : [],
-            true);
+            (Auth::user()->role >= 0 && Auth::user()->role <= 2));
     }
 
     public function post(Request $request)
@@ -160,5 +157,40 @@ class OrdenesController extends Controller
         }
     }
 
+    public function postDeuda(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'item' => 'required',
+                'monto' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => -1,
+                    'errors' => $validator->errors()
+                ]);
+            }
+            $ordenPost = json_decode($request['item'], true);
+            //armar orden
+            $orden = array();
+            $orden['id'] = $ordenPost['id'];
+            $total = DetallesOrden::getTotal($orden['id'], $ordenPost['detallesOrden']);
+            $saldo = $total - $ordenPost['montoVenta'];
+            $orden['montoVenta'] = $ordenPost['montoVenta']+$request['monto'];
+            if ($orden['montoVenta'] >= $total) {
+                $orden['estado'] = 0;
+                $orden['montoVenta'] = $total;
+            } else {
+                $orden['estado'] = 2;
+            }
+            $orden['userVenta'] = Auth::user()['id'];
+            OrdenesTrabajo::deuda($orden,$saldo,$request['monto']);
+            return response()->json(["status" => 0, 'path' => 'recibosIngreso']);
+        } catch (\Exception $error) {
+            Log::error($error->getMessage());
+            return response()->json(["status" => -1,
+                'error' => $error,], 500);
+        }
+    }
 
 }

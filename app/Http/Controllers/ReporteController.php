@@ -59,7 +59,7 @@ class ReporteController extends Controller
                     'orden' => ($orden->tipoOrden == 0) ? $orden->correlativo : $orden->codigoServicio,
                     'tipo' => ($orden->tipoOrden != null) ? $tipo[$orden->tipoOrden] : "",
                     'estado' => $orden->estado,
-                    'monto' => $orden->montoVenta,
+//                    'monto' => $orden->montoVenta,
                 ];
                 foreach ($placas as $key => $placa) {
                     $row[$placa->formato] = 0;
@@ -95,7 +95,7 @@ class ReporteController extends Controller
                 'fecha',
                 'cliente',
                 'orden',
-                'monto'
+//                'monto'
             ];
             foreach ($placas as $row) {
                 array_push($data['fields'], $row->formato);
