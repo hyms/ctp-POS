@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use function PHPUnit\Framework\isNull;
 
 class ProductoStock extends Model
 {
@@ -31,64 +30,29 @@ class ProductoStock extends Model
 
     public static function more(array $request, bool $mov = true)
     {
-        $stock = self::get($request['sucursal'], $request['producto']);
-        $cantidad = 0;
-        if ($stock->count() > 0) {
-            $cantidad = $stock->get()[0]->cantidad;
-        }
-        $cantidad += $request['cantidad'];
-        $sucursalPadre = DB::table(Sucursal::$tables)
-            ->where('id', '=', $request['sucursal'])
-            ->get('dependeDe')[0]->dependeDe;
-        $values = array(
-            'cantidad' => $cantidad,
-        );
-        if (!empty($request['orden'])) {
-            $values['orden'] = $request['orden'];
-        }
-        if (!empty($request['precioUnidad']) && $request['precioUnidad'] != 0) {
-            $values['precioUnidad'] = $request['precioUnidad'];
-        }
-        $stock->updateOrInsert([
-            'producto' => $request['producto'],
-            'sucursal' => $request['sucursal']
-        ], $values);
-        $stockOrigen = null;
-        if (!empty($sucursalPadre)) {
-            $stockOrigen = self::less(array(
-                'sucursal' => $sucursalPadre,
-                'producto' => $request['producto'],
-                'cantidad' => $request['cantidad']
-            ), false);
-        }
-        if ($mov) {
-            $movimiento = DB::table(MovimientoStock::$tables);
-            $movimiento->insert([
-                'producto' => $request['producto'],
-                'stockOrigen' => ((!empty($stockOrigen) && $stockOrigen->count() > 0) ? $stockOrigen->get()[0]->id : null),
-                'stockDestino' => $stock->get()[0]->id,
-                'cantidad' => $request['cantidad'],
-                'observaciones' => ((!empty($stockOrigen) && $stockOrigen->count() > 0) ? "Traspaso de insumos" : "Compra de insumos"),
-                'user' => Auth::id(),
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-        }
-        return $stock;
+        return self::moreLess($request, $mov, true);
     }
 
     public static function less(array $request, bool $mov = true)
     {
+        return self::moreLess($request, $mov, false);
+    }
+
+    private static function moreLess(array $request, bool $mov, bool $more)
+    {
         $stock = self::get($request['sucursal'], $request['producto']);
         $cantidad = 0;
         if ($stock->count() > 0) {
-            $cantidad = $stock->get()[0]->cantidad;
+            $cantidad = $stock->get()->first()->cantidad;
 
         }
-        $cantidad -= $request['cantidad'];
+        $cantidad = $more
+            ? $cantidad + $request['cantidad']
+            : $cantidad - $request['cantidad'];
+
         $sucursalPadre = DB::table(Sucursal::$tables)
             ->where('id', '=', $request['sucursal'])
-            ->get('dependeDe')[0]->dependeDe;
+            ->get('dependeDe')->first()->dependeDe;
         $values = array(
             'cantidad' => $cantidad,
         );
@@ -104,21 +68,34 @@ class ProductoStock extends Model
         ], $values);
         $stockOrigen = null;
         if (!empty($sucursalPadre)) {
-            $stockOrigen = self::more(array(
+            $moreLess = array(
                 'sucursal' => $sucursalPadre,
                 'producto' => $request['producto'],
                 'cantidad' => $request['cantidad']
-            ), false);
+            );
+            $stockOrigen = $more
+                ? self::more($moreLess, false)
+                : self::less($moreLess, false);
         }
 
         if ($mov) {
             $movimiento = DB::table(MovimientoStock::$tables);
+            if ($more) {
+                $origen = ((!empty($stockOrigen) && $stockOrigen->count() > 0) ? $stockOrigen->get()->first()->id : null);
+                $destino = $stock->get()->first()->id;
+                $observaciones = ((!empty($stockOrigen) && $stockOrigen->count() > 0) ? "Traspaso de insumos" : "Compra de insumos");
+            } else {
+                $origen = $stock->get()->first()->id;
+                $destino = ((!empty($stockOrigen) && $stockOrigen->count() > 0) ? $stockOrigen->get()->first()->id : null);
+                $observaciones = ((!empty($stockOrigen) && $stockOrigen->count() > 0) ? "Devolucion de insumos" : "devolucion de compra");
+            }
+
             $movimiento->insert([
                 'producto' => $request['producto'],
-                'stockOrigen' => $stock->get()[0]->id,
-                'stockDestino' => ((!empty($stockOrigen) && $stockOrigen->count() > 0) ? $stockOrigen->get()[0]->id : null),
+                'stockOrigen' => $origen,
+                'stockDestino' => $destino,
                 'cantidad' => $request['cantidad'],
-                'observaciones' => ((!empty($stockOrigen) && $stockOrigen->count() > 0) ? "Devolucion de insumos" : "devolucion de compra"),
+                'observaciones' => $observaciones,
                 'user' => Auth::id(),
                 'created_at' => now(),
                 'updated_at' => now()
@@ -132,7 +109,7 @@ class ProductoStock extends Model
         $stock = self::get($request['sucursal'], $request['producto']);
         $cantidad = 0;
         if ($stock->count() > 0) {
-            $cantidad = $stock->get()[0]->cantidad;
+            $cantidad = $stock->get()->first()->cantidad;
         }
         $cantidad -= $request['cantidad'];
         $stock->updateOrInsert([
@@ -144,7 +121,7 @@ class ProductoStock extends Model
             $movimiento = DB::table(MovimientoStock::$tables);
             $movimiento->insert([
                 'producto' => $request['producto'],
-                'stockOrigen' => $stock->get()[0]->id,
+                'stockOrigen' => $stock->get()->first()->id,
                 'stockDestino' => null,
                 'cantidad' => $request['cantidad'],
                 'observaciones' => "venta de insumos",
@@ -168,7 +145,7 @@ class ProductoStock extends Model
                     ['producto', '=', $producto->id]
                 ]);
                 if ($tmp->count() > 0) {
-                    $stockItem[$producto->id] = $tmp->get()[0];
+                    $stockItem[$producto->id] = $tmp->get()->first();
                 } else {
                     $stockItem[$producto->id] = null;
                 }
@@ -198,7 +175,7 @@ class ProductoStock extends Model
         $stock = $stock->leftJoin(Producto::$tables, 'producto', '=', 'productos.id');
         $stock = $stock->whereNull('productos.deleted_at');
         if ($stock->count() > 0) {
-            return $stock->get()[0];
+            return $stock->get()->first();
         }
         return null;
     }

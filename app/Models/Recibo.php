@@ -18,22 +18,8 @@ class Recibo extends Model
     use SoftDeletes;
 
     //tipo recibo 0:ingreso, 1:egreso
-    public static function getCodigo(int $sucursal)
-    {
-        $correlativo = 1;
-        $ot = DB::table(self::$tables)
-            ->where('sucursal', '=', $sucursal)
-            ->orderBy('secuencia', 'desc')
-            ->limit(1);
-        if ($ot->count() > 0) {
-            $correlativo = $ot->get()[0]->secuencia + 1;
-        }
-        return $correlativo;
-    }
-
     public static function guardarDeuda(array $request, int $idcaja, int $ordenTrabajo = null)
     {
-        $secuencia = self::getCodigo($request['sucursal']);
         $idMovimiento = DB::table(MovimientoCaja::$tables)
             ->insertGetId([
                 'cajaOrigen' => null,
@@ -46,10 +32,20 @@ class Recibo extends Model
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
-        $request['secuencia'] = $secuencia;
-        $request['movimientoCaja'] = $idMovimiento;
-        DB::table(self::$tables)
-            ->insertGetId($request);
+        DB::transaction(function () use ($request, $idMovimiento) {
+            $secuencia = 1;
+            $ot = DB::table(self::$tables)
+                ->where('sucursal', '=', $request['sucursal'])
+                ->orderBy('secuencia', 'desc')
+                ->limit(1);
+            if ($ot->count() > 0) {
+                $secuencia = $ot->get()->first()->secuencia + 1;
+            }
+            $request['secuencia'] = $secuencia;
+            $request['movimientoCaja'] = $idMovimiento;
+            DB::table(self::$tables)
+                ->insertGetId($request);
+        });
     }
 
     public static function getAll(int $sucursal)
