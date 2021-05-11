@@ -3,16 +3,17 @@
         <div class="content-box">
             <Menu :active="2"></Menu>
             <div class="tab-content">
-                <div class="row m-b-20">
-                    <div class="col">
+                <div class="m-b-20">
+                    <div class="table-responsive">
                         <b-table
                             striped
                             hover
-                            responsive
                             :items="movimientos"
                             :fields="fields"
                             show-empty
                             small
+                            :current-page="currentPage"
+                            :per-page="perPage"
                         >
                             <template #empty="scope">
                                 <p>{{ textoVacio }}</p>
@@ -29,6 +30,16 @@
                             </template>
                         </b-table>
                     </div>
+                    <b-col>
+                        <b-pagination
+                            v-model="currentPage"
+                            :total-rows="totalRows"
+                            :per-page="perPage"
+                            align="center"
+                            class="my-0"
+                            v-if="totalRows>perPage"
+                        ></b-pagination>
+                    </b-col>
                 </div>
             </div>
         </div>
@@ -75,7 +86,10 @@ export default {
                         key: 'updated_at'
                     }
                 ],
-            itemRow: {}
+            itemRow: {},
+            totalRows: 1,
+            currentPage: 1,
+            perPage: 20,
         }
     },
     methods: {
@@ -101,7 +115,11 @@ export default {
             )
             return nombre;
         }
-    }
+    },
+    mounted() {
+        // Set the initial number of items
+        this.totalRows = this.movimientos.length
+    },
 }
 </script>
 

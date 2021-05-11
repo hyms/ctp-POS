@@ -5,48 +5,50 @@
         <div><strong>Cliente:</strong> {{ item.responsable }}</div>
         <div><strong>Telefono:</strong> {{ item.telefono }}</div>
         <br>
-        <table class="table">
-            <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Productos</th>
-                <th scope="col">cantidad</th>
-                <th scope="col" v-if="isVenta">Precio</th>
-                <th scope="col" v-if="isVenta">Total</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="(itemOrden,key) in item.detallesOrden">
-                <td>{{ key + 1 }}</td>
-                <td>{{ getProduct(itemOrden.stock) }}</td>
-                <td>{{ itemOrden.cantidad }}</td>
-                <td v-if="isVenta">
-                    <b-input type="text" size="sm" v-model="itemOrden.costo" v-if="item.estado==1"></b-input>
-                    <template v-else>{{ itemOrden.costo }}</template>
-                </td>
-                <td v-if="isVenta">{{ itemOrden.costo * itemOrden.cantidad }}</td>
-            </tr>
-            </tbody>
-            <tfoot v-if="isVenta">
-            <tr>
-                <td colspan="4" class="text-right"><strong>Total</strong></td>
-                <td>{{ getTotal(item.detallesOrden) }}</td>
-            </tr>
-            <template v-if="item.estado==1">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
                 <tr>
-                    <td colspan="4" class="text-right"><strong>Cancelado</strong></td>
-                    <td>
-                        <b-input type="text" size="sm" v-model="item.montoVenta" v-if="item.estado==1"></b-input>
-                        <template v-else>{{ item.montoVenta }}</template>
+                    <th scope="col">#</th>
+                    <th scope="col">Productos</th>
+                    <th scope="col">cantidad</th>
+                    <th scope="col" v-if="isVenta">Precio</th>
+                    <th scope="col" v-if="isVenta">Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(itemOrden,key) in item.detallesOrden">
+                    <td>{{ key + 1 }}</td>
+                    <td>{{ getProduct(itemOrden.stock) }}</td>
+                    <td>{{ itemOrden.cantidad }}</td>
+                    <td v-if="isVenta">
+                        <b-input type="text" size="sm" v-model="itemOrden.costo" v-if="item.estado==1"></b-input>
+                        <template v-else>{{ itemOrden.costo }}</template>
                     </td>
+                    <td v-if="isVenta">{{ itemOrden.costo * itemOrden.cantidad }}</td>
                 </tr>
+                </tbody>
+                <tfoot v-if="isVenta">
                 <tr>
-                    <td colspan="4" class="text-right"><strong>Cambio</strong></td>
-                    <td>{{ getCambio() }}</td>
+                    <td colspan="4" class="text-right"><strong>Total</strong></td>
+                    <td>{{ getTotal(item.detallesOrden) }}</td>
                 </tr>
-            </template>
-            </tfoot>
-        </table>
+                <template v-if="item.estado==1">
+                    <tr>
+                        <td colspan="4" class="text-right"><strong>Cancelado</strong></td>
+                        <td>
+                            <b-input type="text" size="sm" v-model="item.montoVenta" v-if="item.estado==1"></b-input>
+                            <template v-else>{{ item.montoVenta }}</template>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="text-right"><strong>Cambio</strong></td>
+                        <td>{{ getCambio() }}</td>
+                    </tr>
+                </template>
+                </tfoot>
+            </table>
+        </div>
         <div v-if="item.estado==2">
             <form>
                 <b-row>
@@ -107,13 +109,13 @@
                 Cerrar
             </b-button>
             <a
-                class="btn btn-dark btn-sm"
+                class="btn btn-secondary btn-sm"
                 :href="'/ordenPdf/'+item.id"
                 target="_blank">Imprimir</a>
-            <loading-button :loading="sending" :variant="'dark'" v-if="isVenta && item.estado==1"
+            <loading-button :loading="sending" :variant="'dark'" :size="'sm'" v-if="isVenta && item.estado==1"
                             @click.native="guardarVenta()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
             </loading-button>
-            <loading-button :loading="sending" :variant="'dark'" v-if="isVenta && item.estado==2"
+            <loading-button :loading="sending" :variant="'dark'" :size="'sm'" v-if="isVenta && item.estado==2"
                             @click.native="guardarDeuda()" :text="'Pagar'" :textLoad="'Pagando'">Pagar
             </loading-button>
         </template>
