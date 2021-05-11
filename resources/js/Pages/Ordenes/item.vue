@@ -109,8 +109,7 @@
             <a
                 class="btn btn-dark btn-sm"
                 :href="'/ordenPdf/'+item.id"
-                target="_blank"
-                v-if="!isVenta">Imprimir</a>
+                target="_blank">Imprimir</a>
             <loading-button :loading="sending" :variant="'dark'" v-if="isVenta && item.estado==1"
                             @click.native="guardarVenta()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
             </loading-button>
