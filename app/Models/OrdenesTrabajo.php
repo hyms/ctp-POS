@@ -42,12 +42,11 @@ class OrdenesTrabajo extends Model
         $ordenes = $ordenes
             ->whereNull('deleted_at')
             ->orderBy('correlativo', 'desc');
-        if (empty($report)) {
-//             $ordenes = $ordenes->limit(10);
-//              $ordenes = $ordenes->whereBetween('created_at', [Carbon::now()->toDateString().' 00:00:00',Carbon::now()->toDateString().' 23:59:59']);
-        } else {
+
+        if (!empty($report)) {
             if (isset($report['fecha'])) {
-                $ordenes = $ordenes->whereBetween('created_at', [$report['fecha'] . ' 00:00:00', $report['fecha'] . ' 23:59:59']);
+                $fecha = Carbon::parse($report['fecha']);
+                $ordenes = $ordenes->whereBetween('created_at', [$fecha->startOfDay()->toDateTimeString(), $fecha->endOfDay()->toDateTimeString()]);
             }
             if (isset($report['orden'])) {
                 $ordenes = $ordenes->where('id', '=', $report['orden']);
@@ -65,25 +64,23 @@ class OrdenesTrabajo extends Model
                 ->where('id', '=', $id)
                 ->update($orden);
         } else {
-            $orden['created_at'] = now();
-            $id = $ordenes->insertGetId($orden);
+            $id = DB::transaction(function () use ($orden) {
+                $correlativo = 1;
+                $ot = DB::table(self::$tables)
+                    ->where('sucursal', '=', $orden['sucursal'])
+                    ->orderBy('correlativo', 'desc')
+                    ->limit(1);
+                if ($ot->count() > 0) {
+                    $correlativo = $ot->get()->first()->correlativo + 1;
+                }
+                $orden['correlativo'] = $correlativo;
+                $orden['created_at'] = now();
+                return DB::table(self::$tables)->insertGetId($orden);
+            });
         }
         if (!empty($id)) {
             DetallesOrden::newOrdenDetalle($productos, $id);
         }
-    }
-
-    public static function getCorrelativo(int $sucursal)
-    {
-        $correlativo = 1;
-        $ot = DB::table(self::$tables)
-            ->where('sucursal', '=', $sucursal)
-            ->orderBy('correlativo', 'desc')
-            ->limit(1);
-        if ($ot->count() > 0) {
-            $correlativo = $ot->get()[0]->correlativo + 1;
-        }
-        return $correlativo;
     }
 
     public static function getReport(string $fechaI, string $fechaF, string $sucursal, string $tipo = null)
@@ -111,7 +108,7 @@ class OrdenesTrabajo extends Model
             ->update($orden);
         if ($realized) {
             DetallesOrden::sell($orden['id']);
-            $item = OrdenesTrabajo::find($orden['id']);
+            $item = DB::table(self::$tables)->where('id', '=', $orden['id'])->get()->first();
             Cajas::sell([
                 'sucursal' => $item->sucursal,
                 'montoVenta' => $item->montoVenta,
@@ -127,7 +124,7 @@ class OrdenesTrabajo extends Model
             ->where('id', $orden['id'])
             ->update($orden);
         if ($realized) {
-            $item = OrdenesTrabajo::find($orden['id']);
+            $item = DB::table(self::$tables)->where('id', '=', $orden['id'])->get()->first();
             $values = [
                 'codigo' => '',
                 'detalle' => 'pago de deuda de orden #' . $item->correlativo,
@@ -148,7 +145,7 @@ class OrdenesTrabajo extends Model
                 'montoVenta' => $item->montoVenta,
                 'ordenTrabajo' => $item->id,
             ], false);
-            Recibo::guardarDeuda($values, $caja->get()[0]->id, $item->correlativo);
+            Recibo::guardarDeuda($values, $caja->get()->first()->id, $item->correlativo);
         }
     }
 

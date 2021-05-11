@@ -78,11 +78,10 @@ class OrdenesController extends Controller
             if (!isset($request['id'])) {
                 $orden['sucursal'] = Auth::user()['sucursal'];
                 $orden['estado'] = 1;
-                $orden['correlativo'] = OrdenesTrabajo::getCorrelativo(Auth::user()['sucursal']);
             } else {
                 $id = $request['id'];
             }
-            $orden['userDiseñador'] = Auth::user()['id'];
+            $orden['userDiseñador'] = Auth::id();
             $orden['responsable'] = $request['responsable'];
             $orden['telefono'] = $request['telefono'];
             $orden['observaciones'] = !empty($request['observaciones']) ? $request['observaciones'] : "";
@@ -176,7 +175,7 @@ class OrdenesController extends Controller
             $orden['id'] = $ordenPost['id'];
             $total = DetallesOrden::getTotal($orden['id'], $ordenPost['detallesOrden']);
             $saldo = $total - $ordenPost['montoVenta'];
-            $orden['montoVenta'] = $ordenPost['montoVenta']+$request['monto'];
+            $orden['montoVenta'] = $ordenPost['montoVenta'] + $request['monto'];
             if ($orden['montoVenta'] >= $total) {
                 $orden['estado'] = 0;
                 $orden['montoVenta'] = $total;
@@ -184,7 +183,7 @@ class OrdenesController extends Controller
                 $orden['estado'] = 2;
             }
             $orden['userVenta'] = Auth::user()['id'];
-            OrdenesTrabajo::deuda($orden,$saldo,$request['monto']);
+            OrdenesTrabajo::deuda($orden, $saldo, $request['monto']);
             return response()->json(["status" => 0, 'path' => 'recibosIngreso']);
         } catch (\Exception $error) {
             Log::error($error->getMessage());

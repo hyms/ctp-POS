@@ -13,7 +13,7 @@ class Producto extends Model
 
     public static function getAll()
     {
-        $productos =DB::table(self::$tables);
+        $productos = DB::table(self::$tables);
         $productos = $productos
             ->whereNull('deleted_at')
             ->orderBy('updated_at', 'desc');
