@@ -2,7 +2,10 @@
 <head>
     <meta charset="utf-8"/>
 </head>
-<body style="font-size: 0.9em;height: auto">
+<style>
+    @page { margin: 0.2cm 0.5cm}
+</style>
+<body style="font-size: 0.9em">
 <h3>Orden <strong>#{{$orden->correlativo}}</strong></h3>
 <div style="width: 100%;text-align: right"><strong>{{$fechaAhora}}</strong></div>
 <div><strong>Cliente:</strong> {{$orden->responsable}}</div>
