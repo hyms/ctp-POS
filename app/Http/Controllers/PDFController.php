@@ -99,7 +99,7 @@ class PDFController extends Controller
     function paperFormat()
     {
         // change the values below
-        $width = 80; //mm!
+        $width = 72; //mm!
         $height = 115; //mm!
 
         //convert mm to points
