@@ -1,23 +1,46 @@
 <html>
 <head>
     <meta charset="utf-8"/>
+    <link href="{{ mix('/css/all.css') }}" rel="stylesheet"/>
 </head>
 <style>
-    @page { margin: 0.2cm 0.5cm}
+    @page {
+        margin: 0.2cm 0.5cm
+    }
+
+    @font-face {
+        font-family: 'Open Sans', sans-serif;
+    }
+
+    body {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 0.9em
+    }
+
+    table {
+        width: 100%;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    table th, table td {
+        vertical-align: top;
+        padding: 1px;
+    }
 </style>
-<body style="font-size: 0.9em">
-<h3>Orden <strong>#{{$orden->correlativo}}</strong></h3>
-<div style="width: 100%;text-align: right"><strong>{{$fechaAhora}}</strong></div>
+<body>
+<div style="margin-top: 5px; text-align: right"><strong>{{$fechaAhora}}</strong></div>
+<h2 style="margin: 5px 0;text-align: center">Orden <strong>#{{$orden->correlativo}}</strong></h2>
 <div><strong>Cliente:</strong> {{$orden->responsable}}</div>
 <div><strong>Telefono:</strong> {{$orden->telefono}}</div>
-<table style="width: 100%">
+<table>
     <thead>
     <tr>
         <th>#</th>
         <th>Producto</th>
         <th>Cant.</th>
-{{--        <th>Precio</th>--}}
-{{--        <th>Total</th>--}}
+        {{--        <th>Precio</th>--}}
+        {{--        <th>Total</th>--}}
     </tr>
     </thead>
     <tbody>
@@ -26,28 +49,16 @@
             <td style="text-align: center">{{$key+1}}</td>
             <td style="text-align: center">{{$item->stock}}</td>
             <td style="text-align: center">{{$item->cantidad}}</td>
-{{--            <td style="text-align: center">{{$item->costo}}</td>--}}
-{{--            <td style="text-align: center">{{$item->total}}</td>--}}
+            {{--            <td style="text-align: center">{{$item->costo}}</td>--}}
+            {{--            <td style="text-align: center">{{$item->total}}</td>--}}
         </tr>
     @endforeach
     </tbody>
-    <tfoot>
-    <tr>
-        <td style="text-align: center"></td>
-        <td style="text-align: center"></td>
-        <td style="text-align: center"></td>
-{{--        <td style="text-align: center"></td>--}}
-{{--        <td style="text-align: center">{{$orden->montoVenta}}</td>--}}
-    </tr>
-    </tfoot>
+
 </table>
 <div>
     <strong>Observaciones:</strong><br>
     {{$orden->observaciones}}
-</div>
-
-<div style="text-align: center;margin-top: 5px;">
-    <img src="data:image/png;base64,{{$QR}}" />
 </div>
 
 </body>

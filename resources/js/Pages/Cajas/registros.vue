@@ -31,7 +31,7 @@
                                 </template>
                                 <template v-slot:cell(Acciones)="row">
                                     <div class="row-actions">
-                                        <b-button size="sm" class="btn-danger" @click="borrar(row.item.id)">{{
+                                        <b-button size="sm" class="btn-danger" @click="borrar(row.item.id)" v-if="viewModify(row.item.created_at)">{{
                                                 boton3
                                             }}
                                         </b-button>
@@ -60,6 +60,7 @@
 import Layout from '@/Shared/Layout'
 import Form from './formMovimiento'
 import Menu from '@/Shared/menu/menuRegistroCajas';
+import moment from 'moment';
 
 export default {
     layout: Layout,
@@ -100,6 +101,11 @@ export default {
                 onBefore: () => confirm('Esta seguro?'),
             })
         },
+        viewModify(date){
+            const today = moment();
+            date = moment(date);
+            return moment(today).isSame(date,'day');
+        }
     },
     mounted() {
         // Set the initial number of items

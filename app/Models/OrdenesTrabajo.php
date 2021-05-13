@@ -52,6 +52,9 @@ class OrdenesTrabajo extends Model
                 $ordenes = $ordenes->where('id', '=', $report['orden']);
             }
         }
+        else{
+            $ordenes->limit(100);
+        }
         return $ordenes;
     }
 

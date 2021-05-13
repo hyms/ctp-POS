@@ -54,7 +54,7 @@
                         <template v-slot:cell(Acciones)="row">
                             <div class="row-actions">
                                 <b-button variant="dark" v-b-modal="'ordenModal'" @click="loadModal(false,row)"
-                                          size="sm" v-if="!isVenta">
+                                          size="sm" v-if="!isVenta && viewModify(row.item.created_at)">
                                     {{ boton4 }}
                                 </b-button>
                                 <b-button variant="secondary" v-b-modal="'itemModal'" @click="loadModal(false,row)"
@@ -62,7 +62,7 @@
                                     {{ boton2 }}
                                 </b-button>
                                 <b-button variant="danger" @click="borrar(row.item.id)" size="sm"
-                                          v-if="row.item.estado==1">
+                                          v-if="row.item.estado==1 && viewModify(row.item.created_at)">
                                     {{ boton3 }}
                                 </b-button>
                             </div>
@@ -88,6 +88,7 @@
 import Layout from '@/Shared/Layout'
 import formOrden from './form'
 import itemOrden from './item'
+import moment from 'moment';
 
 export default {
     name: "Ordenes",
@@ -153,8 +154,10 @@ export default {
             })
             return sell;
         },
-        printPdf(item) {
-            this.itemRow = item.item;
+        viewModify(date){
+            const today = moment();
+            date = moment(date);
+            return moment(today).isSame(date,'day');
         }
     },
     mounted() {
