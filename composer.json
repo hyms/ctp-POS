@@ -24,6 +24,7 @@
         "reinink/remember-query-strings": "^0.1.0",
         "sentry/sdk": "^3.1",
         "sentry/sentry-laravel": "^2.4",
+"barryvdh/laravel-dompdf":"*",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "tightenco/ziggy": "^0.8.0"
     },
