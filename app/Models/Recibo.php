@@ -24,7 +24,7 @@ class Recibo extends Model
             ->insertGetId([
                 'cajaOrigen' => null,
                 'cajaDestino' => $idcaja,
-                'tipo' => 0,
+                'tipo' => 4,
                 'monto' => $request['monto'],
                 'observaciones' => "venta de insumos",
                 'ordenTrabajo' => !empty($ordenTrabajo) ? $ordenTrabajo : "",
