@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use PDF;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PDFController extends Controller
 {
@@ -28,12 +29,18 @@ class PDFController extends Controller
             $detalle = DetallesOrden::where('ordenTrabajo', $id)->get();
             $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
             $detalle = $this->normalizeDetalle($detalle, $productos);
+            $qr = QrCode::style('round')
+                ->format('png')
+                ->size(100)
+                ->generate('Orden ' . $orden->comprobante);
+            $qr = base64_encode($qr);
             $mytime = Carbon::now();
 
             $data = [
                 'orden' => $orden,
                 'detalle' => $detalle,
                 'fechaAhora' => $mytime->format("d/m/Y H:i"),
+                'QR' => $qr
             ];
             $html = View::make('pdfOrden', $data);
 
@@ -99,7 +106,7 @@ class PDFController extends Controller
     function paperFormat()
     {
         // change the values below
-        $width = 72; //mm!
+        $width = 72.1; //mm!
         $height = 115; //mm!
 
         //convert mm to points
