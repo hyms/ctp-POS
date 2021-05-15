@@ -2,13 +2,8 @@
 <head>
     <meta charset="utf-8"/>
 </head>
-<style>
-    @page {
-        margin: 0.2cm 0.5cm
-    }
-</style>
-<body style="font-size: 0.9em; font-family: 'Open Sans', sans-serif;">
-<div style="margin-top: 5px; text-align: right"><strong>{{$fechaAhora}}</strong></div>
+<body style="font-size: 0.9em;">
+<div style="text-align: right"><strong>{{$fechaAhora}}</strong></div>
 <h2 style="margin: 5px 0;text-align: center">Orden <strong>#{{$orden->correlativo}}</strong></h2>
 <div><strong>Cliente:</strong> {{$orden->responsable}}</div>
 <div><strong>Telefono:</strong> {{$orden->telefono}}</div>
