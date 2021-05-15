@@ -64,7 +64,7 @@ class Cajas extends Model
         return $caja;
     }
 
-    static public function getSaldo($idCaja, $fechaMovimientosInicio,$fechaMovimientosFin, $array = false, $get = null, $admin = false)
+    static public function getSaldo($idCaja, $fechaMovimientosInicio, $fechaMovimientosFin, $array = false, $get = null, $admin = false)
     {
         if ($array || isset($get['deudas']))
             $deudas = array();
@@ -104,8 +104,8 @@ class Cajas extends Model
 //             else
 //                 $movimientos->whereNull('fechaCierre');
 //         }
-        $fechaArqueoI=Carbon::parse($fechaMovimientosInicio);
-        $fechaArqueoF=Carbon::parse($fechaMovimientosFin);
+        $fechaArqueoI = Carbon::parse($fechaMovimientosInicio);
+        $fechaArqueoF = Carbon::parse($fechaMovimientosFin);
         $movimientos->where('created_at', '<=', $fechaArqueoF->endOfDay()->toDateTimeString());
 //        if($admin) {
         $movimientos->where('created_at', '>=', $fechaArqueoI->startOfDay()->toDateTimeString());
@@ -150,9 +150,9 @@ class Cajas extends Model
                     if ($array || isset($get['cajas'])) {
                         array_push($cajas, $movimiento);
                     } else {
-                        if(isset($movimiento->cajaDestino)) {
+                        if (isset($movimiento->cajaDestino)) {
                             $cajas[0] += $movimiento->monto;
-                        }else {
+                        } else {
                             $cajas[1] += $movimiento->monto;
                         }
                     }
@@ -163,7 +163,9 @@ class Cajas extends Model
                     $total += $movimiento->monto;
                     break;
                 case 4:
-                    if (!empty($movimiento->recibos)) {
+                    $movimientoRecibo = DB::table(Recibo::$tables)
+                        ->where('movimientoCaja', '=', $movimiento->id);
+                    if ($movimientoRecibo->count() > 0) {
                         if (isset($get['movimientos'])) {
                             array_push($movimientosAll, $movimiento);
                         }
@@ -171,10 +173,11 @@ class Cajas extends Model
                             $tmp = $movimiento->recibos;
                             array_push($recibos, $movimiento->recibos[0]);
                         } else {
-                            if ($movimiento->recibos[0]->tipoRecibo)
-                                $recibos[1] += $movimiento->monto;
-                            else
+                            if ($movimientoRecibo->get()->first()->tipo) {
                                 $recibos[0] += $movimiento->monto;
+                            } else {
+                                $recibos[1] += $movimiento->monto;
+                            }
                         }
                         $total += $movimiento->monto;
                     }
@@ -194,7 +197,7 @@ class Cajas extends Model
             $saldo = $saldos->first()->cierre;
         }
 
-            $datos = array('ventas' => $ventas, 'deudas' => $deudas, 'recibos' => $recibos, 'cajas' => $cajas, 'saldo' => $saldo, 'movimientos' => $movimientosAll, 'arqueos' => $arqueos);
+        $datos = array('ventas' => $ventas, 'deudas' => $deudas, 'recibos' => $recibos, 'cajas' => $cajas, 'saldo' => $saldo, 'movimientos' => $movimientosAll, 'arqueos' => $arqueos);
         return $datos;
     }
 

@@ -8,11 +8,12 @@ use App\Models\DetallesOrden;
 use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
 use Carbon\Carbon;
-use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
+use Mpdf\Mpdf;
 use PDF;
+
 
 class PDFController extends Controller
 {
@@ -28,45 +29,31 @@ class PDFController extends Controller
             $detalle = DetallesOrden::where('ordenTrabajo', $id)->get();
             $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
             $detalle = $this->normalizeDetalle($detalle, $productos);
-            $mytime = Carbon::now();
+
+            $mytime = Carbon::parse($orden->updated_at);
 
             $data = [
                 'orden' => $orden,
                 'detalle' => $detalle,
                 'fechaAhora' => $mytime->format("d/m/Y H:i"),
             ];
-            $html = View::make('pdfOrden', $data);
 
-            $dompdf = new Dompdf();
-            $_dompdf_paper_size=self::paperFormat();
-            $dompdf->setPaper($_dompdf_paper_size);
-
-            $GLOBALS['bodyHeight'] = 0;
-
-            $dompdf->setCallbacks(
-                array(
-                    'myCallbacks' => array(
-                        'event' => 'end_frame', 'f' => function ($infos) {
-                            $frame = $infos["frame"];
-                            if (strtolower($frame->get_node()->nodeName) === "body") {
-                                $padding_box = $frame->get_padding_box();
-                                $GLOBALS['bodyHeight'] += $padding_box['h'];
-                            }
-                        }
-                    )
-                )
-            );
-
-            $dompdf->loadHtml($html);
-            $dompdf->render();
-            unset($dompdf);
-
-            if( ! empty( $_dompdf_paper_size  ) ) {
-                $_dompdf_paper_size[3] = $GLOBALS['bodyHeight'] + 30;
-            }
-            $pdf = PDF::loadHTML($html)
-                ->setPaper($_dompdf_paper_size);
-            return $pdf->stream($orden->comprobante . '.pdf');
+            $this->mpdf = new Mpdf();
+            $view = View::make('pdfOrden', $data);
+            $html = $view->render();
+            $this->mpdf->WriteHTML($html);
+            $this->mpdf->page = 0;
+            $this->mpdf->state = 0;
+            unset($this->mpdf->pages[0]);
+            $mpdf = PDF::loadView('pdfOrden', $data, [], [
+                'title' => 'Orden ' . $orden->comprobante,
+                'margin_top' => 5,
+                'margin_bottom' => 5,
+                'margin_left' => 5,
+                'margin_right' => 5,
+                'format' => array(72.1, $this->mpdf->y + 2)
+            ]);
+            return $mpdf->stream($orden->comprobante . '.pdf');
         } catch (\Exception $error) {
             Log::error($error->getMessage());
             abort(404);
@@ -94,17 +81,5 @@ class PDFController extends Controller
             $detalle[$key]->stock = $this->getProduct($item->stock, $productos);
         }
         return $detalle;
-    }
-
-    function paperFormat()
-    {
-        // change the values below
-        $width = 80; //mm!
-        $height = 115; //mm!
-
-        //convert mm to points
-        $paper_format = array(0, 0, ($width / 25.4) * 72, ($height / 25.4) * 72);
-
-        return $paper_format;
     }
 }
