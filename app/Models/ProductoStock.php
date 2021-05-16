@@ -164,6 +164,7 @@ class ProductoStock extends Model
         $stock->leftJoin(Producto::$tables, 'producto', '=', 'productos.id');
         $stock->whereNull('productos.deleted_at');
         $stock->where('enable', '=', true);
+        $stock->orderBy('productos.formato', 'asc');
         $stock->select(self::$tables . '.*', Producto::$tables . '.codigo', Producto::$tables . '.formato', Producto::$tables . '.dimension');
 
         if ($tiposProductos) {
