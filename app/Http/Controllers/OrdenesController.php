@@ -19,43 +19,51 @@ class OrdenesController extends Controller
         return Inertia::render('Index');
     }
 
-    private function get(array $estado, string $component, array $report, bool $venta = false)
+    private function get(array $estado, bool $venta = false,array $report=[],int $typeReport=0)
     {
         $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null, $report);
         $ordenes = $ordenes->whereIn('estado', $estado);
         $ordenes = DetallesOrden::getAll($ordenes->get());
         $estados = OrdenesTrabajo::estadoCTP();
         $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
-        return Inertia::render($component, [
+        if($typeReport==2 && isset($report['responsable'])){
+            $report['total']=OrdenesTrabajo::getDeuda($ordenes);
+        }
+        return Inertia::render('Ordenes/tabla', [
             'ordenes' => $ordenes,
             'productos' => $productos,
             'estados' => $estados,
             'isVenta' => $venta,
-            'report' => $report
+            'report' => $report,
+            'typeReport'=>$typeReport,
         ]);
     }
 
     public function getAll()
     {
-        return self::get([1], 'Ordenes/tabla', []);
+        return self::get([1]);
     }
 
     public function getAllMora(Request $request)
     {
-        return self::get([2], 'Ordenes/tabla', [], true);
+        return self::get([2],
+            true,
+            (!empty($request->get('responsable'))  ? $request->all() : []),
+            2);
     }
 
     public function getAllVenta()
     {
-        return self::get([1], 'Ordenes/tabla', [], true);
+        return self::get([1], true);
     }
 
     public function getListVenta(Request $request)
     {
         return self::get([-1, 0, 1, 2],
-            'Ordenes/tablaReporte',
+            (Auth::user()->role >= 0 && Auth::user()->role <= 2),
             (!empty($request->get('orden')) || !empty($request->get('fecha'))) ? $request->all() : [],
-            (Auth::user()->role >= 0 && Auth::user()->role <= 2));
+            1
+        );
     }
 
     public function post(Request $request)

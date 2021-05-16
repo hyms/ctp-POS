@@ -6,9 +6,11 @@
                     <h4 class="header-title m-t-0 m-b-20">{{ titulo }}</h4>
                 </div>
             </div>
-            <div class="row m-b-20">
+            <formSearch :report="report" v-if="typeReport===1"></formSearch>
+            <formClientSearch :report="report" v-if="typeReport===2"></formClientSearch>
+            <div class="row m-b-20" v-if="typeReport===0">
                 <div class="col">
-                    <b-button v-b-modal="'ordenModal'" @click="loadModal()">{{ boton1 }}</b-button>
+                    <b-button v-b-modal="'ordenModal'" @click="loadModal()" >{{ boton1 }}</b-button>
                     <formOrden
                         :isNew="isNew"
                         id="ordenModal"
@@ -16,15 +18,15 @@
                         :productos="productos"
                         :productosSell="productosSell()"
                     ></formOrden>
-                    <item-orden
-                        id="itemModal"
-                        :isVenta="isVenta"
-                        :item="itemRow"
-                        :productos="productos"
-                    ></item-orden>
                 </div>
             </div>
             <b-card>
+                <item-orden
+                    id="itemModal"
+                    :isVenta="isVenta"
+                    :item="itemRow"
+                    :productos="productos"
+                ></item-orden>
                 <div class="table-responsive">
                     <b-table
                         striped
@@ -38,12 +40,6 @@
                     >
                         <template #empty="scope">
                             <p>{{ textoVacio }}</p>
-                        </template>
-                        <template v-slot:cell(central)="data">
-                            {{ (data.value === 1) ? "Si" : "No" }}
-                        </template>
-                        <template v-slot:cell(enable)="data">
-                            {{ (data.value === 1) ? "Si" : "No" }}
                         </template>
                         <template v-slot:cell(estado)="data">
                             {{ estados[data.value] }}
@@ -88,6 +84,8 @@
 import Layout from '@/Shared/Layout'
 import formOrden from './form'
 import itemOrden from './item'
+import formSearch from "./formSearch";
+import formClientSearch from "./formClientSearch";
 import moment from 'moment';
 
 export default {
@@ -123,11 +121,15 @@ export default {
         ordenes: Array,
         productos: Array,
         estados: Object,
+        report: Array,
         isVenta: Boolean,
+        typeReport: Number,
     },
     components: {
         formOrden,
-        itemOrden
+        itemOrden,
+        formSearch,
+        formClientSearch
     },
     methods: {
         loadModal(isNew = true, item = null) {
@@ -154,10 +156,10 @@ export default {
             })
             return sell;
         },
-        viewModify(date){
+        viewModify(date) {
             const today = moment();
             date = moment(date);
-            return moment(today).isSame(date,'day');
+            return moment(today).isSame(date, 'day');
         }
     },
     mounted() {

@@ -49,10 +49,12 @@ class OrdenesTrabajo extends Model
                 $ordenes = $ordenes->whereBetween('created_at', [$fecha->startOfDay()->toDateTimeString(), $fecha->endOfDay()->toDateTimeString()]);
             }
             if (isset($report['orden'])) {
-                $ordenes = $ordenes->where('id', '=', $report['orden']);
+                $ordenes = $ordenes->where('correlativo', '=', $report['orden']);
             }
-        }
-        else{
+            if (isset($report['responsable'])) {
+                $ordenes = $ordenes->where('responsable', '=', $report['responsable']);
+            }
+        } else {
             $ordenes->limit(100);
         }
         return $ordenes;
@@ -150,6 +152,26 @@ class OrdenesTrabajo extends Model
             ], false);
             Recibo::guardarDeuda($values, $caja->get()->first()->id, $item->correlativo);
         }
+    }
+
+    public static function getDeuda(array $ordenes)
+    {
+        $pagado=0;
+        $total=0;
+        foreach ($ordenes as $orden){
+            $detalle = $orden->detallesOrden;
+            foreach ($detalle as $item){
+                $total+=$item->total;
+            }
+            $movimientos = DB::table(MovimientoCaja::$tables)
+                ->where('ordenTrabajo','=',$orden->id)
+                ->get();
+            foreach ($movimientos as $movimiento)
+            {
+                $pagado += $movimiento->monto;
+            }
+        }
+        return $total-$pagado;
     }
 
 }

@@ -51,7 +51,8 @@ class Recibo extends Model
     public static function getAll(int $sucursal)
     {
         $recibos = DB::table(self::$tables)
-            ->where('sucursal', '=', $sucursal);
+            ->where('sucursal', '=', $sucursal)
+        ->orderBy('created_at','desc');
 
         return $recibos->get();
     }
