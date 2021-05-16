@@ -51,7 +51,8 @@ class PDFController extends Controller
                 'margin_bottom' => 5,
                 'margin_left' => 5,
                 'margin_right' => 5,
-                'format' => array(72.1, $this->mpdf->y + 2)
+                'format' => array(72.1, $this->mpdf->y + 2),
+                'orientation' => 'L'
             ]);
             return $mpdf->stream($orden->codigoServicio . '.pdf');
         } catch (\Exception $error) {
