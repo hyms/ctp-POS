@@ -41,9 +41,6 @@ class ProductosController extends Controller
                 ]);
             }
             $producto = new Producto();
-            if (!empty($request['id'])) {
-                $produccantidadPaqueteto = Producto::find($request['id']);
-            }
             $producto->fill($request->all());
             $producto->save();
             return response()->json(["status" => 0, 'path' => 'productos']);
@@ -84,7 +81,6 @@ class ProductosController extends Controller
                 $producto = TipoProductos::find($request['id']);
             }
             $producto->fill($request->all());
-            $tipos = $producto->save();
             return response()->json(["status" => 0, 'path' => ' tipoProductos']);
         } catch (\Exception $error) {
             Log::error($error->getMessage());
