@@ -6,6 +6,7 @@ use App\Models\Cliente;
 use App\Models\DetallesOrden;
 use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
+use App\Models\TipoProductos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -19,15 +20,17 @@ class OrdenesController extends Controller
         return Inertia::render('Index');
     }
 
-    private function get(array $estado, bool $venta = false,array $report=[],int $typeReport=0)
+    private function get(array $estado, bool $venta = false, array $report = [], int $typeReport = 0)
     {
         $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null, $report);
         $ordenes = $ordenes->whereIn('estado', $estado);
         $ordenes = DetallesOrden::getAll($ordenes->get());
         $estados = OrdenesTrabajo::estadoCTP();
-        $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
-        if($typeReport==2 && isset($report['responsable'])){
-            $report['total']=OrdenesTrabajo::getDeuda($ordenes);
+        $tiposProductos = TipoProductos::getAll();
+        $productos = ProductoStock::getProducts(Auth::user()['sucursal'],$tiposProductos->toArray());
+
+        if ($typeReport == 2 && isset($report['responsable'])) {
+            $report['total'] = OrdenesTrabajo::getDeuda($ordenes);
         }
         return Inertia::render('Ordenes/tabla', [
             'ordenes' => $ordenes,
@@ -35,7 +38,8 @@ class OrdenesController extends Controller
             'estados' => $estados,
             'isVenta' => $venta,
             'report' => $report,
-            'typeReport'=>$typeReport,
+            'typeReport' => $typeReport,
+            'tiposProductos'=>$tiposProductos,
         ]);
     }
 
@@ -48,7 +52,7 @@ class OrdenesController extends Controller
     {
         return self::get([2],
             true,
-            (!empty($request->get('responsable'))  ? $request->all() : []),
+            (!empty($request->get('responsable')) ? $request->all() : []),
             2);
     }
 
@@ -90,6 +94,7 @@ class OrdenesController extends Controller
                 $id = $request['id'];
             }
             $orden['userDiseñador'] = Auth::id();
+            $orden['tipoOrden'] = $request['tipo'];
             $orden['responsable'] = $request['responsable'];
             $orden['telefono'] = $request['telefono'];
             $orden['observaciones'] = !empty($request['observaciones']) ? $request['observaciones'] : "";

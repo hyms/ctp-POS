@@ -75,6 +75,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('cajaMovimiento');
     Route::get('recibosIngreso',[ReciboController::class, 'getAll'])
     ->name('recibosI');
+    Route::get('reportes/placas', [ReporteController::class, 'placasV'])
+        ->name('listaReportes');
 });
 //pdfs
 Route::get('ordenPdf/{id}', [PDFController::class, 'getOrden'])
@@ -88,6 +90,10 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('guardarProducto');
     Route::delete('producto/{id}', [ProductosController::class, 'borrar'])
         ->name('eliminarProducto');
+    Route::get('tipoProductos', [ProductosController::class, 'tipos'])
+        ->name('tipoProductos');
+    Route::post('tipoProductos', [ProductosController::class, 'tiposPost'])
+        ->name('tipoProductos');
     //sucursales
     Route::get('sucursales', [SucursalController::class, 'getAll'])
         ->name('listaSucursales');
@@ -121,8 +127,11 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('guardarStock');
     Route::delete('stock/{id}', [StockController::class, 'borrar'])
         ->name('eliminarStock');
+    Route::post('stockEnable', [StockController::class, 'enableStock'])
+        ->name('enablestock');
     Route::get('movimientosStock', [StockController::class, 'movimientos'])
         ->name('movimientosStock');
+
     //users
     Route::get('users', [UserController::class, 'getAll'])
         ->name('listaUsuarios');
@@ -133,7 +142,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     //reportes
     Route::get('reportes', [ReporteController::class, 'get'])
         ->name('listaReportes');
-    Route::get('reportes/placas', [ReporteController::class, 'placas'])
+    Route::get('reportes/placas', [ReporteController::class, 'placasA'])
         ->name('listaReportes');
     Route::get('reportes/arqueos', [ReporteController::class, 'arqueos'])
         ->name('listaArqueos');

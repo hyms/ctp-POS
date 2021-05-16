@@ -1,13 +1,12 @@
 <template>
     <div class="content-w">
         <div class="content-box">
-            <Menu :active="1"></Menu>
+            <Menu :active="3"></Menu>
             <div class="tab-content">
                 <div class="row m-b-20 m-t-10">
                     <div class="col">
                         <b-button v-b-modal="'productoModal'" @click="loadModal()">{{ boton1 }}</b-button>
-                        <FormProducto :isNew="isNew" id="productoModal" :itemRow="itemRow"
-                                      :tipoProducto="tipoProducto"></FormProducto>
+                        <FormProducto :isNew="isNew" id="productoModal" :itemRow="itemRow"></FormProducto>
                     </div>
                 </div>
 
@@ -17,7 +16,7 @@
                             striped
                             hover
                             responsive
-                            :items="productos"
+                            :items="tipos"
                             :fields="fields"
                             show-empty
                             small
@@ -25,16 +24,13 @@
                             <template #empty="scope">
                                 <p>{{ textoVacio }}</p>
                             </template>
-                            <template v-slot:cell(tipo)="data">
-                                <p>{{ getTipo(data.value) }}</p>
-                            </template>
                             <template v-slot:cell(Acciones)="row">
                                 <div class="row-actions">
                                     <b-button size="sm" v-b-modal="'productoModal'" @click="loadModal(false,row)">
                                         {{ boton2 }}
                                     </b-button>
                                     <b-button size="sm" class="btn-danger" @click="borrar(row.item.id)">{{
-                                        boton3
+                                            boton3
                                         }}
                                     </b-button>
                                 </div>
@@ -55,8 +51,7 @@ import Menu from '@/Shared/menu/menuProductos';
 export default {
     layout: Layout,
     props: {
-        productos: Array,
-        tipoProducto: Object,
+        tipos: Array,
         errors: Object,
     },
     components: {
@@ -74,19 +69,8 @@ export default {
             idModal: 'productoModal',
             fields:
                 [
+                    'nombre',
                     'codigo',
-                    {
-                        key: 'formato',
-                        label: 'Nombre'
-                    },
-                    {
-                        key: 'dimension',
-                        label: 'detalle'
-                    },
-                    {
-                        key: 'tipo',
-                        label: 'Tipo Producto'
-                    },
                     'Acciones'
                 ],
             itemRow: {}
@@ -99,9 +83,6 @@ export default {
             if (!isNew) {
                 this.itemRow = item.item;
             }
-        },
-        getTipo(tipo) {
-            return this.tipoProducto[tipo];
         },
         borrar(id) {
             this.$inertia.delete(`producto/${id}`, {

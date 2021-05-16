@@ -155,25 +155,35 @@ class ProductoStock extends Model
         return $stock;
     }
 
-    public static function getProducts($sucursal = null)
+    public static function getProducts($sucursal = null, array $tiposProductos = [])
     {
         $stock = DB::table(self::$tables);
         if (!empty($sucursal)) {
-            $stock = $stock->where('sucursal', '=', $sucursal);
+            $stock->where('sucursal', '=', $sucursal);
         }
-        $stock = $stock->leftJoin(Producto::$tables, 'producto', '=', 'productos.id');
-        $stock = $stock->whereNull('productos.deleted_at');
-        $stock = $stock->select(self::$tables . '.*', Producto::$tables . '.codigo', Producto::$tables . '.formato', Producto::$tables . '.dimension');
-        return $stock->get();
+        $stock->leftJoin(Producto::$tables, 'producto', '=', 'productos.id');
+        $stock->whereNull('productos.deleted_at');
+        $stock->where('enable', '=', true);
+        $stock->select(self::$tables . '.*', Producto::$tables . '.codigo', Producto::$tables . '.formato', Producto::$tables . '.dimension');
+
+        if ($tiposProductos) {
+            $stocks = array();
+            foreach ($tiposProductos as $tiposProducto) {
+                $stockTmp = $stock->clone();
+                $stocks[$tiposProducto->id]=$stockTmp->where('productos.tipo', '=', $tiposProducto->id)->get()->toArray();
+            }
+            return $stocks;
+        }
+        return $stock->get()->toArray();
     }
 
     public static function getProduct($sucursal, $id)
     {
         $stock = DB::table(self::$tables);
-        $stock = $stock->where('sucursal', '=', $sucursal);
-        $stock = $stock->where(self::$tables . '.id', '=', $id);
-        $stock = $stock->leftJoin(Producto::$tables, 'producto', '=', 'productos.id');
-        $stock = $stock->whereNull('productos.deleted_at');
+        $stock->where('sucursal', '=', $sucursal);
+        $stock->where(self::$tables . '.id', '=', $id);
+        $stock->leftJoin(Producto::$tables, 'producto', '=', 'productos.id');
+        $stock->whereNull('productos.deleted_at');
         if ($stock->count() > 0) {
             return $stock->get()->first();
         }

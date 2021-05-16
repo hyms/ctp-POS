@@ -18,22 +18,12 @@
                         :invalid-feedback="item.stateText"
                     >
                         <b-input
-                            v-if="item.type==='text'"
                             :type="item.type"
                             :placeholder="item.label"
                             v-model="item.value"
                             :id="key"
                             :state="item.state"
                         ></b-input>
-                        <b-form-select
-                            v-if="item.type==='select'"
-                            v-model="item.value"
-                            :options="tipoProducto"
-                        >
-                            <template #first>
-                                <b-form-select-option :value="null">Seleccione una opcion</b-form-select-option>
-                            </template>
-                        </b-form-select>
                     </b-form-group>
                 </template>
             </form>
@@ -41,7 +31,7 @@
                 <b-button variant="danger" @click="cancel()">
                     Cancel
                 </b-button>
-                <loading-button :loading="sending" variant="secondary"
+                <loading-button :loading="sending" variant="secundary"
                                 @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
                 </loading-button>
             </template>
@@ -54,11 +44,11 @@ import axios from "axios";
 import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
+    name: "Usuarios",
     props: {
         isNew: Boolean,
         id: String,
-        itemRow: Object,
-        tipoProducto:Object,
+        itemRow: Object
     },
     components: {
         LoadingButton
@@ -69,9 +59,16 @@ export default {
 
             boton1: "Nuevo",
             boton2: "Modificar",
-            titulo1: "Nuevo Producto",
-            titulo2: "Modificar Producto",
+            titulo1: "Nuevo Tipo Producto",
+            titulo2: "Modificar Tipo Producto",
             form: {
+                nombre: {
+                    label: 'Nombre',
+                    value: "",
+                    type: "text",
+                    state: null,
+                    stateText: null
+                },
                 codigo: {
                     label: 'Codigo',
                     value: "",
@@ -79,27 +76,6 @@ export default {
                     state: null,
                     stateText: null
                 },
-                formato: {
-                    label: 'Nombre',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },
-                dimension: {
-                    label: 'Detalle',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },
-                tipo:{
-                    label: 'Tipo Producto',
-                    value: "",
-                    type: "select",
-                    state: null,
-                    stateText: null
-                }
             },
             idForm: null,
             errors: Array
@@ -147,15 +123,7 @@ export default {
             Object.keys(this.form).forEach(key => {
                 producto.append(key, this.form[key].value);
             })
-            /* this.$inertia.post('/admin/producto',producto, {
-                 onSuccess: (page) => {
-                     console.log(page);
-                 },
-                 onError: (errors) => {
-                     console.log(errors);
-                 }
-             });*/
-            axios.post('/admin/producto', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            axios.post('/admin/tipoProductos', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
                         this.$bvModal.hide(this.id)

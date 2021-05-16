@@ -70,15 +70,18 @@ class OrdenesTrabajo extends Model
                 ->update($orden);
         } else {
             $id = DB::transaction(function () use ($orden) {
+                $tipo = DB::table(TipoProductos::$tables)->where('id', '=', $orden['tipoOrden'])->get()->first();
                 $correlativo = 1;
                 $ot = DB::table(self::$tables)
                     ->where('sucursal', '=', $orden['sucursal'])
+                    ->where('tipoOrden', '=', $orden['tipoOrden'])
                     ->orderBy('correlativo', 'desc')
                     ->limit(1);
                 if ($ot->count() > 0) {
                     $correlativo = $ot->get()->first()->correlativo + 1;
                 }
                 $orden['correlativo'] = $correlativo;
+                $orden['codigoServicio'] = $tipo->codigo . '-' . $correlativo;
                 $orden['created_at'] = now();
                 return DB::table(self::$tables)->insertGetId($orden);
             });
@@ -156,22 +159,21 @@ class OrdenesTrabajo extends Model
 
     public static function getDeuda(array $ordenes)
     {
-        $pagado=0;
-        $total=0;
-        foreach ($ordenes as $orden){
+        $pagado = 0;
+        $total = 0;
+        foreach ($ordenes as $orden) {
             $detalle = $orden->detallesOrden;
-            foreach ($detalle as $item){
-                $total+=$item->total;
+            foreach ($detalle as $item) {
+                $total += $item->total;
             }
             $movimientos = DB::table(MovimientoCaja::$tables)
-                ->where('ordenTrabajo','=',$orden->id)
+                ->where('ordenTrabajo', '=', $orden->id)
                 ->get();
-            foreach ($movimientos as $movimiento)
-            {
+            foreach ($movimientos as $movimiento) {
                 $pagado += $movimiento->monto;
             }
         }
-        return $total-$pagado;
+        return $total - $pagado;
     }
 
 }

@@ -1,7 +1,12 @@
 <template>
     <div class="content-w">
         <div class="content-box">
-            <Menu :active="1"></Menu>
+            <Menu :active="1" v-if="sucursales.length>0"></Menu>
+            <div class="row" v-else>
+                <div class="col-sm-12">
+                    <h4 class="header-title m-t-0 m-b-20">Registro Placas</h4>
+                </div>
+            </div>
             <div class="tab-content">
                 <b-card>
                     <template #header>
@@ -9,7 +14,7 @@
                     </template>
                     <form @submit.prevent="enviar">
                         <b-row>
-                            <b-col md="4" sm="6">
+                            <b-col md="4" sm="6" v-if="sucursales.length>0">
                                 <b-form-group
                                     :label="form.sucursal.label"
                                     label-for="sucursal"
@@ -53,7 +58,7 @@
                                     <b-form-select
                                         :placeholder="form.tipoOrden.label"
                                         v-model="form.tipoOrden.value"
-                                        :options="this.tipoOrden"
+                                        :options="tipoPlacas"
                                         id="tipoOrden"
                                         :state="form.tipoOrden.state"
                                     >
@@ -113,7 +118,8 @@ export default {
     layout: Layout,
     props: {
         sucursales: Object,
-        forms: Object,
+        forms: Array,
+        tipoPlacas:Object,
         errors: Object,
         data: Object
     },
@@ -145,12 +151,6 @@ export default {
                     stateText: null
                 }
             },
-            tipoOrden: {
-                '0': "Orden de Trabajo",
-                //'1': "Orden Interna",
-                '2': "Reposicion",
-            }
-
         }
     },
     methods: {
@@ -159,7 +159,11 @@ export default {
             Object.keys(this.form).forEach(key => {
                 form[key] = this.form[key].value;
             })
-            this.$inertia.get('/admin/reportes/placas', form)
+            let url = '/reportes/placas';
+            if(this.sucursales.length>0){
+                url = '/admin/reportes/placas';
+            }
+            this.$inertia.get(url, form)
         },
         getTotal(key) {
             let total = 0;

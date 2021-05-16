@@ -1,5 +1,5 @@
 <template>
-    <b-nav tabs class="m-b-20">
+    <b-nav tabs >
         <template v-for="link in links">
             <li class="nav-item">
                 <inertia-link :href="link.url" :class="isActive(link.active)">{{ link.text }}</inertia-link>
