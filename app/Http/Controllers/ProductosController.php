@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Producto;
 use App\Models\TipoProductos;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -41,6 +42,9 @@ class ProductosController extends Controller
                 ]);
             }
             $producto = new Producto();
+            if (!empty($request['id'])) {
+                $producto = Producto::find($request['id']);
+            }
             $producto->fill($request->all());
             $producto->save();
             return response()->json(["status" => 0, 'path' => 'productos']);
