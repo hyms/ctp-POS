@@ -21,6 +21,11 @@ export default {
                     text: 'Productos'
                 },
                 {
+                    active: 3,
+                    url: 'tipoProductos',
+                    text: 'Tipo Productos'
+                },
+                {
                     active: 0,
                     url: 'stocks',
                     text: 'Stocks'

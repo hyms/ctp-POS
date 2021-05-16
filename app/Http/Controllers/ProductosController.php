@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Producto;
+use App\Models\TipoProductos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -14,7 +15,14 @@ class ProductosController extends Controller
     public function getAll()
     {
         $productos = Producto::getAll();
-        return Inertia::render('Productos/tabla', ['productos' => $productos]);
+        $tipoProducto = TipoProductos::getAll();
+        $tipoProducto = $tipoProducto->pluck('nombre', 'id');
+        return Inertia::render('Productos/tabla',
+            [
+                'productos' => $productos,
+                'tipoProducto' => $tipoProducto
+            ]
+        );
     }
 
     public function post(Request $request)
@@ -23,8 +31,8 @@ class ProductosController extends Controller
             $validator = Validator::make($request->all(), [
 //               'codigo' => 'required',
                 'formato' => 'required',
-//               'dimension' => 'required',
-                'cantidadPaquete' => 'numeric'
+                'dimension' => 'required',
+//                'cantidadPaquete' => 'numeric'
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -33,11 +41,7 @@ class ProductosController extends Controller
                 ]);
             }
             $producto = new Producto();
-            if (!empty($request['id'])) {
-                $producto = Producto::find($request['id']);
-            }
             $producto->fill($request->all());
-
             $producto->save();
             return response()->json(["status" => 0, 'path' => 'productos']);
         } catch (\Exception $error) {
@@ -52,5 +56,36 @@ class ProductosController extends Controller
         $producto = Producto::find($id);
         $producto->delete();
         return back()->withInput();
+    }
+
+    public function tipos()
+    {
+        $tipos = TipoProductos::all();
+        return Inertia::render('TipoProducto/tabla', ['tipos' => $tipos]);
+    }
+
+    public function tiposPost(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'nombre' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => -1,
+                    'errors' => $validator->errors()
+                ]);
+            }
+            $producto = new TipoProductos();
+            if (!empty($request['id'])) {
+                $producto = TipoProductos::find($request['id']);
+            }
+            $producto->fill($request->all());
+            return response()->json(["status" => 0, 'path' => ' tipoProductos']);
+        } catch (\Exception $error) {
+            Log::error($error->getMessage());
+            return response()->json(["status" => -1,
+                'error' => $error,], 500);
+        }
     }
 }

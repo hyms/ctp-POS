@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class DetallesOrden extends Model
@@ -32,7 +33,7 @@ class DetallesOrden extends Model
         }
     }
 
-    public static function getAll(\Illuminate\Support\Collection $ordenes): array
+    public static function getAll(Collection $ordenes): array
     {
         $ordenes = $ordenes->toArray();
         foreach ($ordenes as $key => $item) {

@@ -76,6 +76,11 @@ export default {
                             url: '/arqueo',
                             role: 'vendor',
                         },
+                        {
+                            label: 'Registro Diario',
+                            url: '/reportes/placas',
+                            role: 'vendor',
+                        },
                     ]
                 },
                 {
@@ -84,7 +89,7 @@ export default {
                         {
                             label: 'Reportes',
                             url: '/admin/reportes/placas',
-                            role: 'vendor',
+                            role: 'admin',
                         },
                         {
                             label: 'Productos',

@@ -108,7 +108,7 @@ export default {
         itemRow: Object,
         productos: Array,
         productosSell: Array,
-
+        tipo:Number,
     },
     data() {
         return {
@@ -197,6 +197,7 @@ export default {
             this.sending = true;
             this.limpiar();
             let producto = new FormData();
+            producto.append('tipo', this.tipo);
             if (this.idForm) {
                 producto.append('id', this.idForm);
             }
