@@ -11,19 +11,19 @@
             <div class="row m-b-20" v-if="typeReport===0">
                 <div class="col">
                     <b-button-group>
-                    <b-button v-for="(tipoProducto,key) in tiposProductos"
-                              :key="key"
-                              v-b-modal="'ordenModal'"
-                              @click="loadModal(tipoProducto.id)">
-                        {{ boton1 + ' ' + tipoProducto.nombre }}
-                    </b-button>
+                        <b-button v-for="(tipoProducto,key) in tiposProductos"
+                                  :key="key"
+                                  v-b-modal="'ordenModal'"
+                                  @click="loadModal(tipoProducto.id)">
+                            {{ boton1 + ' ' + tipoProducto.nombre }}
+                        </b-button>
                     </b-button-group>
                     <formOrden
                         :isNew="isNew"
                         id="ordenModal"
                         :itemRow="itemRow"
                         :productos="productos[tipoProductoFiltro]"
-                        :productosSell="productosSell(tipoProductoFiltro)"
+                        :productosSell="productosSell()"
                         :tipo="tipoProductoFiltro"
                     ></formOrden>
                 </div>
@@ -33,7 +33,7 @@
                     id="itemModal"
                     :isVenta="isVenta"
                     :item="itemRow"
-                    :productos="productos[tipoProductoFiltro]"
+                    :productos="productosAll"
                 ></item-orden>
                 <div class="table-responsive">
                     <b-table
@@ -135,6 +135,7 @@ export default {
     props: {
         ordenes: Array,
         productos: Object,
+        productosAll: Array,
         estados: Object,
         report: Array,
         isVenta: Boolean,
@@ -161,9 +162,10 @@ export default {
                 onBefore: () => confirm('Esta seguro?'),
             })
         },
-        productosSell(tipoProducto) {
+        productosSell() {
             let sell = [];
-            if (tipoProducto != null) {
+            if (this.tipoProductoFiltro != null) {
+                const tipoProducto=this.tipoProductoFiltro;
                 Object.keys(this.productos[tipoProducto]).forEach(key => {
                     sell[key] = {
                         id: this.productos[tipoProducto][key].id,
@@ -180,11 +182,11 @@ export default {
             date = moment(date);
             return moment(today).isSame(date, 'day');
         },
-        getTipoOrden(value){
+        getTipoOrden(value) {
             let text = "";
-            Object.keys(this.tiposProductos).forEach(key=>{
-                if(this.tiposProductos[key].id===value){
-                    text=this.tiposProductos[key].nombre;
+            Object.keys(this.tiposProductos).forEach(key => {
+                if (this.tiposProductos[key].id === value) {
+                    text = this.tiposProductos[key].nombre;
                     return;
                 }
             })

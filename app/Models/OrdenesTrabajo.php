@@ -41,7 +41,7 @@ class OrdenesTrabajo extends Model
         }
         $ordenes = $ordenes
             ->whereNull('deleted_at')
-            ->orderBy('correlativo', 'desc');
+            ->orderBy('created_at', 'desc');
 
         if (!empty($report)) {
             if (isset($report['fecha'])) {

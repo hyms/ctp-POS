@@ -1,7 +1,7 @@
 <template>
     <b-modal
         :id="id"
-        :title="titulo + ' '+item.codigoServicio">
+        :title="titulo + ' '+(item.codigoServicio?item.codigoServicio:item.correlativo)">
         <div><strong>Cliente:</strong> {{ item.responsable }}</div>
         <div><strong>Telefono:</strong> {{ item.telefono }}</div>
         <br>

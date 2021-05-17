@@ -28,6 +28,7 @@ class OrdenesController extends Controller
         $estados = OrdenesTrabajo::estadoCTP();
         $tiposProductos = TipoProductos::getAll();
         $productos = ProductoStock::getProducts(Auth::user()['sucursal'],$tiposProductos->toArray());
+        $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
 
         if ($typeReport == 2 && isset($report['responsable'])) {
             $report['total'] = OrdenesTrabajo::getDeuda($ordenes);
@@ -35,6 +36,7 @@ class OrdenesController extends Controller
         return Inertia::render('Ordenes/tabla', [
             'ordenes' => $ordenes,
             'productos' => $productos,
+            'productosAll' => $productosAll,
             'estados' => $estados,
             'isVenta' => $venta,
             'report' => $report,
