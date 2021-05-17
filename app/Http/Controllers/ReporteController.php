@@ -32,7 +32,6 @@ class ReporteController extends Controller
         $validator = Validator::make($request->all(), [
             'sucursal' => 'required',
             'fecha' => 'required',
-            'tipoOrden' => 'required'
         ]);
         if ($validator->fails()) {
             return Inertia::render('Reportes/placas',
@@ -51,7 +50,6 @@ class ReporteController extends Controller
         $tipo = TipoProductos::getAll();
         $validator = Validator::make($request->all(), [
             'fecha' => 'required',
-            'tipoOrden' => 'required'
         ]);
         if ($validator->fails()) {
             return Inertia::render('Reportes/placas',
@@ -71,13 +69,21 @@ class ReporteController extends Controller
     private function placas($request,$sucursales,$tipo)
     {
         $data=['table' => [], 'fields' => []];
+        
         $ordenes = OrdenesTrabajo::getReport(
             $request['fecha'],
             $request['fecha'],
             $request['sucursal'],
             $request['tipoOrden']);
         $tipoProducto = DB::table(TipoProductos::$tables)->where('id','=',$request['tipoOrden']);
-        $placas = ProductoStock::getProducts($request['sucursal'],$tipoProducto->get()->toArray());
+        if(!empty($request['tipoOrden'])){
+           $placas = ProductoStock::getProducts($request['sucursal'],$tipoProducto->get()->toArray());
+        }
+        else
+        {
+             $placas = ProductoStock::getProducts($request['sucursal']);
+        }
+       
 
         foreach ($ordenes as $orden) {
             $row = [
