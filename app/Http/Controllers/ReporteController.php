@@ -77,8 +77,8 @@ class ReporteController extends Controller
             $request['fecha'],
             $request['sucursal'],
             $request['tipoOrden']);
-        $tipoProducto = DB::table(TipoProductos::$tables)->where('id','=',$request['tipoOrden']);
         if(!empty($request['tipoOrden'])){
+           $tipoProducto = DB::table(TipoProductos::$tables)->where('id','=',$request['tipoOrden']);
            $placas = ProductoStock::getProducts($request['sucursal'],$tipoProducto->get()->toArray());
         }
         else
