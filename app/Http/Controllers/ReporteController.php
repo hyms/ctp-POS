@@ -69,7 +69,9 @@ class ReporteController extends Controller
     private function placas($request,$sucursales,$tipo)
     {
         $data=['table' => [], 'fields' => []];
-        
+         if(!isset($request['tipoOrden'])){
+             $request['tipoOrden'] = null;
+         }
         $ordenes = OrdenesTrabajo::getReport(
             $request['fecha'],
             $request['fecha'],
