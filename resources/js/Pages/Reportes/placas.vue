@@ -14,7 +14,7 @@
                     </template>
                     <form @submit.prevent="enviar">
                         <b-row>
-                            <b-col md="4" sm="6" v-if="sucursales.length>0">
+                            <b-col md="4" sm="6" v-if="Object.keys(sucursales).length>0">
                                 <b-form-group
                                     :label="form.sucursal.label"
                                     label-for="sucursal"
