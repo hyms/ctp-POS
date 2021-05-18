@@ -11,7 +11,7 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Productos</th>
-                    <th scope="col">cantidad</th>
+                    <th scope="col">Cant.</th>
                     <th scope="col" v-if="isVenta">Precio</th>
                     <th scope="col" v-if="isVenta">Total</th>
                 </tr>

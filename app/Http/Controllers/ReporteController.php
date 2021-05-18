@@ -85,7 +85,7 @@ class ReporteController extends Controller
         {
              $placas = ProductoStock::getProducts($request['sucursal']);
         }
-       
+
 
         foreach ($ordenes as $orden) {
             $row = [
@@ -96,7 +96,10 @@ class ReporteController extends Controller
                 'estado' => $orden->estado,
 //                    'monto' => $orden->montoVenta,
             ];
-            foreach ($placas[$request['tipoOrden']] as $key => $placa) {
+            if(!empty($request['tipoOrden'])){
+                $placas=$placas[$request['tipoOrden']];
+            }
+            foreach ($placas as $key => $placa) {
                 $row[$placa->formato] = 0;
             }
             $row['observaciones'] = "";
@@ -132,7 +135,7 @@ class ReporteController extends Controller
             'orden',
 //                'monto'
         ];
-        foreach ($placas[$request['tipoOrden']] as $row) {
+        foreach ($placas as $row) {
             array_push($data['fields'], $row->formato);
         }
         array_push($data['fields'], 'observaciones');
