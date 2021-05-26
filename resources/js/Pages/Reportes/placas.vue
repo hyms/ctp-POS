@@ -91,6 +91,9 @@
                             <template #cell(#)="data">
                                 {{ data.index + 1 }}
                             </template>
+                            <template v-slot:cell(observaciones)="data">
+                                <span v-html="data.value"></span>
+                            </template>
                             <template #custom-foot="data">
                                 <b-tr>
                                     <b-th colspan="4" class="text-right"><strong>Total</strong></b-th>

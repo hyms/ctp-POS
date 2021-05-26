@@ -22,7 +22,7 @@
                     <td>{{ getProduct(itemOrden.stock) }}</td>
                     <td>{{ itemOrden.cantidad }}</td>
                     <td v-if="isVenta">
-                        <b-input type="text" size="sm" v-model="itemOrden.costo" v-if="item.estado==1"></b-input>
+                        <b-input type="text" size="sm" v-model="itemOrden.costo" v-if="[1,5].includes(item.estado)"></b-input>
                         <template v-else>{{ itemOrden.costo }}</template>
                     </td>
                     <td v-if="isVenta">{{ itemOrden.costo * itemOrden.cantidad }}</td>
@@ -33,11 +33,11 @@
                     <td colspan="4" class="text-right"><strong>Total</strong></td>
                     <td>{{ getTotal(item.detallesOrden) }}</td>
                 </tr>
-                <template v-if="item.estado==1">
+                <template v-if="[1,5].includes(item.estado)">
                     <tr>
                         <td colspan="4" class="text-right"><strong>Cancelado</strong></td>
                         <td>
-                            <b-input type="text" size="sm" v-model="item.montoVenta" v-if="item.estado==1"></b-input>
+                            <b-input type="text" size="sm" v-model="item.montoVenta" v-if="[1,5].includes(item.estado)"></b-input>
                             <template v-else>{{ item.montoVenta }}</template>
                         </td>
                     </tr>
@@ -105,6 +105,9 @@
             </p>
         </div>
         <template #modal-footer="{ ok, cancel }">
+            <loading-button :loading="sending" :variant="'warning'" :size="'sm'" v-if="![0,2,5].includes(item.estado)"
+                            @click.native="quemado(item.id)" :text="'Quemado'" :textLoad="'Quemado...'">Quemado
+            </loading-button>
             <b-button size="sm" variant="danger" @click="cancel()">
                 Cerrar
             </b-button>
@@ -112,7 +115,7 @@
                 class="btn btn-secondary btn-sm"
                 :href="'/ordenPdf/'+item.id"
                 target="_blank">Imprimir</a>
-            <loading-button :loading="sending" :variant="'dark'" :size="'sm'" v-if="isVenta && item.estado==1"
+            <loading-button :loading="sending" :variant="'dark'" :size="'sm'" v-if="isVenta && [1,5].includes(item.estado)"
                             @click.native="guardarVenta()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
             </loading-button>
             <loading-button :loading="sending" :variant="'dark'" :size="'sm'" v-if="isVenta && item.estado==2"
@@ -195,6 +198,16 @@ export default {
         },
         guardarDeuda() {
             this.guardar('/ordenDeuda');
+        },
+        quemado(id) {
+            this.sending = true;
+            this.$inertia.post('/orden/quemado', {id: id}, {
+                onBefore: () => confirm('Esta seguro?'),
+                onSuccess: () => {
+                    this.$bvModal.hide(this.id);
+                    this.sending = false;
+                },
+            })
         },
         getTotal(detalle) {
             if (detalle) {

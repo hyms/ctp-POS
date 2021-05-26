@@ -15,8 +15,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
-use PhpParser\Node\Expr\Cast\Object_;
-use function GuzzleHttp\Promise\all;
 
 class ReporteController extends Controller
 {
@@ -43,8 +41,9 @@ class ReporteController extends Controller
                     'data' => ['table' => [], 'fields' => []]
                 ]);
         }
-        return $this->placas($request->all(),$sucursales);
+        return $this->placas($request->all(), $sucursales);
     }
+
     public function placasV(Request $request)
     {
         $tipo = TipoProductos::getAll();
@@ -54,7 +53,7 @@ class ReporteController extends Controller
         if ($validator->fails()) {
             return Inertia::render('Reportes/placas',
                 [
-                    'sucursales' => (Object)[],
+                    'sucursales' => (object)[],
                     'forms' => $request->all(),
 //                    'errors' => $validator->errors(),
                     'tipoPlacas' => $tipo->pluck('nombre', 'id'),
@@ -63,30 +62,28 @@ class ReporteController extends Controller
         }
         $request = $request->all();
         $request['sucursal'] = Auth::user()['sucursal'];
-        return $this->placas($request, [],$tipo);
+        return $this->placas($request, [], $tipo);
     }
 
-    private function placas($request,$sucursales,$tipo)
+    private function placas($request, $sucursales, $tipo)
     {
-        $data=['table' => [], 'fields' => []];
-         if(!isset($request['tipoOrden'])){
-             $request['tipoOrden'] = null;
-         }
+        $data = ['table' => [], 'fields' => []];
+        if (!isset($request['tipoOrden'])) {
+            $request['tipoOrden'] = null;
+        }
         $ordenes = OrdenesTrabajo::getReport(
             $request['fecha'],
             $request['fecha'],
             $request['sucursal'],
             $request['tipoOrden']);
-        if(!empty($request['tipoOrden'])){
-           $tipoProducto = DB::table(TipoProductos::$tables)->where('id','=',$request['tipoOrden']);
-           $placas = ProductoStock::getProducts($request['sucursal'],$tipoProducto->get()->toArray());
+        if (!empty($request['tipoOrden'])) {
+            $tipoProducto = DB::table(TipoProductos::$tables)->where('id', '=', $request['tipoOrden']);
+            $placas = ProductoStock::getProducts($request['sucursal'], $tipoProducto->get()->toArray());
+        } else {
+            $placas = ProductoStock::getProducts($request['sucursal']);
         }
-        else
-        {
-             $placas = ProductoStock::getProducts($request['sucursal']);
-        }
-        if(!empty($request['tipoOrden'])){
-            $placas=$placas[$request['tipoOrden']];
+        if (!empty($request['tipoOrden'])) {
+            $placas = $placas[$request['tipoOrden']];
         }
 
         foreach ($ordenes as $orden) {
@@ -103,7 +100,7 @@ class ReporteController extends Controller
                 $row[$placa->formato] = 0;
             }
             $row['observaciones'] = "";
-            if ($orden->estado == 0 || $orden->estado == 2) {
+            if ($orden->estado == 0 || $orden->estado == 2 || $orden->estado == 5) {
                 $orden = DetallesOrden::getOne($orden);
                 foreach ($orden->detallesOrden as $detalle) {
                     $productoTmp = ProductoStock::getProduct($request['sucursal'], $detalle->stock);
@@ -111,8 +108,18 @@ class ReporteController extends Controller
                         $row[$productoTmp->formato] += $detalle->cantidad;
                     }
                 }
-            } else if ($orden->estado == -1) {
-                $row['observaciones'] = "<span class=\"text-danger\">Anulado</span>";
+
+            }
+            switch ($orden->estado){
+                case 2:
+                    $row['observaciones'] = "<span class=\"text-primary\">Deuda</span>";
+                    break;
+                case 5:
+                    $row['observaciones'] = "<span class=\"text-warning\">Quemado</span>";
+                    break;
+                case -1:
+                    $row['observaciones'] = "<span class=\"text-danger\">Anulado</span>";
+                    break;
             }
             if ($orden->tipoOrden == 0) {
 //                if ($orden->tipoOrden == 2) {
@@ -148,6 +155,7 @@ class ReporteController extends Controller
                 'data' => $data,
             ]);
     }
+
     public function arqueos(Request $request)
     {
         $sucursal = Auth::user()['sucursal'];

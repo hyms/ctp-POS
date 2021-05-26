@@ -22,6 +22,7 @@ class OrdenesTrabajo extends Model
             '0' => 'Cancelado',
             '1' => 'En Proceso',
             '2' => 'Deuda',
+            '5' => 'Quemado'
         ];
         if (is_null($id)) {
             return $estado;
@@ -98,7 +99,7 @@ class OrdenesTrabajo extends Model
         $ordenes = DB::table(self::$tables)
             ->whereBetween('updated_at', [$fechaRI->startOfDay()->toDateTimeString(), $fechaRF->endOfDay()->toDateTimeString()])
             ->where('sucursal', '=', $sucursal)
-            ->whereIn('estado', [0, 2])
+            ->whereIn('estado', [0, 2, 5,-1])
             ->whereNull('deleted_at');
         if (!empty($tipo)) {
             $ordenes = $ordenes->where('tipoOrden', '=', $tipo);

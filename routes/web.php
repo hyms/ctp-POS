@@ -49,6 +49,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('listaOrdenes');
     Route::post('orden', [OrdenesController::class, 'post'])
         ->name('guardarOrden');
+    Route::post('orden/quemado', [OrdenesController::class, 'quemado'])
+        ->name('guardarOrden');
     Route::post('ordenVenta', [OrdenesController::class, 'postVenta'])
         ->name('guardarOrdenV');
     Route::post('ordenDeuda', [OrdenesController::class, 'postDeuda'])
