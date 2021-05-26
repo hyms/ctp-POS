@@ -27,7 +27,7 @@ class OrdenesController extends Controller
         $ordenes = DetallesOrden::getAll($ordenes->get());
         $estados = OrdenesTrabajo::estadoCTP();
         $tiposProductos = TipoProductos::getAll();
-        $productos = ProductoStock::getProducts(Auth::user()['sucursal'],$tiposProductos->toArray());
+        $productos = ProductoStock::getProducts(Auth::user()['sucursal'], $tiposProductos->toArray());
         $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
 
         if ($typeReport == 2 && isset($report['responsable'])) {
@@ -41,7 +41,7 @@ class OrdenesController extends Controller
             'isVenta' => $venta,
             'report' => $report,
             'typeReport' => $typeReport,
-            'tiposProductos'=>$tiposProductos,
+            'tiposProductos' => $tiposProductos,
         ]);
     }
 
@@ -60,12 +60,12 @@ class OrdenesController extends Controller
 
     public function getAllVenta()
     {
-        return self::get([1], true);
+        return self::get([1, 5], true);
     }
 
     public function getListVenta(Request $request)
     {
-        return self::get([-1, 0, 1, 2],
+        return self::get([-1, 0, 1, 2, 5],
             (Auth::user()->role >= 0 && Auth::user()->role <= 2),
             (!empty($request->get('orden')) || !empty($request->get('fecha'))) ? $request->all() : [],
             1
@@ -129,11 +129,31 @@ class OrdenesController extends Controller
 
     public function borrar($id)
     {
-        $Cliente = OrdenesTrabajo::find($id);
-        if (isset($Cliente)) {
-            $Cliente->estado = -1;
-            $Cliente->updated_at = now();
-            $Cliente->save();
+        $orden = OrdenesTrabajo::find($id);
+        if (isset($orden)) {
+            $orden->estado = -1;
+            $orden->updated_at = now();
+            $orden->save();
+        }
+        return back()->withInput();
+    }
+
+    public function quemado(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => -1,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $orden = OrdenesTrabajo::find($request['id']);
+        if (isset($orden)) {
+            $orden->estado = 5;
+            $orden->updated_at = now();
+            $orden->save();
         }
         return back()->withInput();
     }
@@ -207,4 +227,28 @@ class OrdenesController extends Controller
         }
     }
 
+    public function postRepocision(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'orden' => 'required',
+                'detalle' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => -1,
+                    'errors' => $validator->errors()
+                ]);
+            }
+        } catch (\Exception $error) {
+            Log::error($error->getMessage());
+            return response()->json(["status" => -1,
+                'error' => $error,], 500);
+        }
+    }
+
+    public function OrdenUpdate(Request $request)
+    {
+
+    }
 }
