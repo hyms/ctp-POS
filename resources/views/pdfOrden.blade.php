@@ -32,7 +32,7 @@
 </table>
 <div>
     <strong>Observaciones:</strong><br>
-    {{$orden->observaciones}}
+    {!!nl2br($orden->observaciones)!!}
 </div>
 
 </body>

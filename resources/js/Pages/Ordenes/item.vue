@@ -101,7 +101,7 @@
         </div>
         <div>
             <p><strong>Observaciones:</strong><br>
-                {{ item.observaciones }}
+                <span v-html="getObservaciones(item.observaciones)"></span>
             </p>
         </div>
         <template #modal-footer="{ ok, cancel }">
@@ -227,6 +227,10 @@ export default {
         },
         getSaldo() {
             return (this.total - this.item.montoVenta - this.monto);
+        },
+        getObservaciones(item)
+        {
+            return item.replace(/\n/g, "<br/>");
         },
         reajusteOrden() {
             if (this.item.montoVenta > this.total) {
