@@ -20,6 +20,7 @@
         "cross-env": "^7.0",
         "eslint": "^7.26.0",
         "eslint-plugin-vue": "^7.9.0",
+        "firebase": "^8.6.2",
         "inertia": "0.0.7",
         "laravel-mix": "^6.0.19",
         "lodash": "^4.17.21",
