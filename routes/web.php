@@ -40,6 +40,9 @@ Route::post('logout', [LoginController::class, 'logout'])
 Route::get('/', [DashboardController::class, 'index'])
     ->name('dashboard')
     ->middleware('auth');
+Route::post('/savePush', [UserController::class, 'savePush'])
+    ->name('push')
+    ->middleware('auth');
 
 Route::get('search/{id}', [ClienteController::class, 'buscar'])
     ->name('buscar');
@@ -75,8 +78,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('credito');
     Route::delete('cajaMovimiento', [CajaController::class, 'borrarMovimiento'])
         ->name('cajaMovimiento');
-    Route::get('recibosIngreso',[ReciboController::class, 'getAll'])
-    ->name('recibosI');
+    Route::get('recibosIngreso', [ReciboController::class, 'getAll'])
+        ->name('recibosI');
     Route::get('reportes/placas', [ReporteController::class, 'placasV'])
         ->name('listaReportes');
 });
@@ -150,7 +153,5 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('listaArqueos');
     Route::get('reportes/cajas', [ReporteController::class, 'cajas'])
         ->name('listaReportes');
-
-
 });
 

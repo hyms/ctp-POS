@@ -165,7 +165,7 @@ export default {
         productosSell() {
             let sell = [];
             if (this.tipoProductoFiltro != null) {
-                const tipoProducto=this.tipoProductoFiltro;
+                const tipoProducto = this.tipoProductoFiltro;
                 Object.keys(this.productos[tipoProducto]).forEach(key => {
                     sell[key] = {
                         id: this.productos[tipoProducto][key].id,
@@ -195,7 +195,18 @@ export default {
     },
     mounted() {
         // Set the initial number of items
-        this.totalRows = this.ordenes.length
+        this.totalRows = this.ordenes.length;
+
+        // // console.log('Firebase cloud messaging object', this.$messaging);
+        // this.$messaging.onMessage((payload) => {
+        //     console.log('Message received. ', payload);
+        //     // ...
+        // });
     },
+    // created() {
+    //     this.$messaging.onMessage((payload) => {
+    //         console.log("Message received. ", payload);
+    //     });
+    // }
 }
 </script>

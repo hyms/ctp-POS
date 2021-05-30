@@ -18,6 +18,14 @@ InertiaProgress.init()
 Vue.use(require('vue-moment'));
 Vue.prototype.$messaging = firebase
 
+// navigator.serviceWorker.register('./firebase-messaging-sw.js')
+//     .then((registration) => {
+//         console.log(registration);
+//         Vue.prototype.$messaging.useServiceWorker(registration);
+//     }).catch(err => {
+//     console.log(err)
+// })
+
 const el = document.getElementById('app')
 new Vue({
     render: h => h(App, {

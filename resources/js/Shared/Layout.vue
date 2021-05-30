@@ -97,6 +97,19 @@ export default {
     methods: {},
     props:{
         title:String
+    },
+    created() {
+        this.$messaging.onMessage((payload) => {
+
+            if(!window.Notification) {
+                console.log('Browser does not support notifications.');
+            } else {
+                const notification = payload.notification;
+                const notify = new Notification(notification.title, {
+                    body: notification.body,
+                });
+            }
+        });
     }
 }
 </script>
