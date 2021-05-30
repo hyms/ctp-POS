@@ -1,7 +1,6 @@
 import firebase from 'firebase/app'
 import "firebase/analytics";
 import 'firebase/firebase-messaging'
-import axios from "axios";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDlJjbLe9GcEOVSKpCnT3Xin1hF6Rj2AEc",
@@ -16,6 +15,4 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig)
 const analytics = firebase.analytics();
 
-const messaging = firebase.messaging();
-
-export default messaging;
+export default firebase.messaging();

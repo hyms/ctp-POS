@@ -216,9 +216,10 @@ export default {
         getSaldo() {
             return (this.total - this.item.montoVenta - this.monto);
         },
-        getObservaciones(item)
-        {
-            return item.replace(/\n/g, "<br/>");
+        getObservaciones(item) {
+            if (item)
+                return item.replace(/\n/g, "<br/>");
+            return "";
         },
         reajusteOrden() {
             if (this.item.montoVenta > this.total) {

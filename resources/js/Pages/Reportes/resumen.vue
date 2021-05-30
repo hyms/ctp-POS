@@ -45,7 +45,7 @@
                     </b-form>
                 </b-card>
                 <h5>{{fechaI|moment('DD/MM/YYYY')}}-{{fechaF|moment('DD/MM/YYYY')}}</h5>
-                <b-card v-for="values in totalOrdenes">
+                <b-card v-for="(values,key) in totalOrdenes" :key="key">
                     <template #header>
                         <h5 class="mb-0">{{ values.name }}</h5>
                     </template>
@@ -53,13 +53,13 @@
                         <b-thead head-variant="dark">
                             <b-tr>
                                 <b-th></b-th>
-                                <b-th v-for="value in values.value">{{ value.name }}</b-th>
+                                <b-th v-for="(value,key2) in values.value" :key="key2">{{ value.name }}</b-th>
                             </b-tr>
                         </b-thead>
                         <b-tbody>
-                            <b-tr v-for="(row,rowkey) in values.value[0].value">
+                            <b-tr v-for="(row,rowkey) in values.value[0].value" :key="rowkey">
                                 <b-td>{{ row.name }}</b-td>
-                                <b-td v-for="value in values.value">{{ value.value[rowkey].value }}</b-td>
+                                <b-td v-for="(value,key2) in values.value" :key="key2">{{ value.value[rowkey].value }}</b-td>
                             </b-tr>
                         </b-tbody>
                     </b-table-simple>

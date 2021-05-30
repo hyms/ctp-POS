@@ -203,7 +203,8 @@ export default {
                 console.log('Browser does not support notifications.');
             } else {
                 let notification = payload.notification;
-                new Notification(notification.title, {
+                new Notification(
+                    notification.title, {
                     body: notification.body,
                 });
                 if (payload.data.newOrden) {

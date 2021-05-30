@@ -82,14 +82,11 @@ export default {
     },
     created() {
         this.$messaging.getToken({vapidKey: "BCh0lo5r7kS5T777wXDvyN87J2j_uVSWQZy092QuigHK3ZIyYKdGjo7s7YqhRksd8qSBA7Uya_ZVEKA1Bf02L_Q"})
-            // messaging.getToken()
             .then((currentToken) => {
                 if (currentToken) {
                     let form = new FormData();
                     form.append('token', currentToken)
-                    if (this.$page !== undefined && this.$page.url != '/login') {
-                        axios.post('/savePush', form)
-                    }
+                    axios.post('/savePush', form)
                 } else {
                     console.log('No registration token available. Request permission to generate one.');
                 }
