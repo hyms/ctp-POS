@@ -20,7 +20,6 @@
         <!-- [ Header ] start -->
         <header class="navbar pcoded-header navbar-expand-lg navbar-light">
             <div class="m-header">
-<!--                <a class="mobile-menu" id="mobile-collapse1" href="javascript:"><span></span></a>-->
                 <a class="mobile-menu" id="mobile-collapse1" v-b-toggle.sidebar-1>
                     <span></span>
                 </a>
@@ -50,24 +49,6 @@
             <div class="pcoded-wrapper">
                 <div class="pcoded-content">
                     <div class="pcoded-inner-content">
-                        <!-- [ breadcrumb ] start -->
-<!--                        <div class="page-header">-->
-<!--                            <div class="page-block">-->
-<!--                                <div class="row align-items-center">-->
-<!--                                    <div class="col-md-12">-->
-<!--                                        <div class="page-header-title">-->
-<!--                                            <h4 class="m-b-10">{{ title }}</h4>-->
-<!--                                        </div>-->
-<!--&lt;!&ndash;                                        <ul class="breadcrumb">&ndash;&gt;-->
-<!--&lt;!&ndash;                                            <li class="breadcrumb-item"><inertia-link href="/"><i&ndash;&gt;-->
-<!--&lt;!&ndash;                                                class="feather icon-home"></i></inertia-link></li>&ndash;&gt;-->
-<!--&lt;!&ndash;                                            <li class="breadcrumb-item"><a href="javascript:">Sample Page</a></li>&ndash;&gt;-->
-<!--&lt;!&ndash;                                        </ul>&ndash;&gt;-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-                        <!-- [ breadcrumb ] end -->
                         <div class="main-body">
                             <div class="page-wrapper">
                                 <slot/>
@@ -85,6 +66,7 @@
 <script>
 import MainMenuMobile from "./menu/MainMenuMobile";
 import MainMenu from "./menu/MainMenu";
+import axios from "axios";
 
 export default {
     components: {
@@ -95,9 +77,25 @@ export default {
         return {}
     },
     methods: {},
-    props:{
-        title:String
+    props: {
+        title: String
     },
-
+    created() {
+        this.$messaging.getToken({vapidKey: "BCh0lo5r7kS5T777wXDvyN87J2j_uVSWQZy092QuigHK3ZIyYKdGjo7s7YqhRksd8qSBA7Uya_ZVEKA1Bf02L_Q"})
+            // messaging.getToken()
+            .then((currentToken) => {
+                if (currentToken) {
+                    let form = new FormData();
+                    form.append('token', currentToken)
+                    if (this.$page !== undefined && this.$page.url != '/login') {
+                        axios.post('/savePush', form)
+                    }
+                } else {
+                    console.log('No registration token available. Request permission to generate one.');
+                }
+            }).catch((err) => {
+            console.log('An error occurred while retrieving token. ', err);
+        });
+    }
 }
 </script>

@@ -23,7 +23,7 @@
                         <b-button size="sm" type="submit">Buscar</b-button>
                     </div>
                     <div class="col-sm-5">
-                        <h4><strong>Total:</strong> {{searchModel.total}}</h4>
+                        <h4><strong>Total:</strong> {{ searchModel.total }}</h4>
                     </div>
 
                 </form>
@@ -34,8 +34,8 @@
 
 <script>
 export default {
-    data(){
-        return{
+    data() {
+        return {
             searchModel: {
                 responsable: "",
                 total: "0"
@@ -46,9 +46,9 @@ export default {
         report: Array,
     },
     mounted() {
-        Object.keys(this.report).forEach(key=>{
-            this.searchModel[key]=this.report[key];
-        })
+        for (const key in this.report) {
+            this.searchModel[key] = this.report[key];
+        }
     }
 }
 </script>

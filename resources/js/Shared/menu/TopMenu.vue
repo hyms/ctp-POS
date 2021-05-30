@@ -1,11 +1,11 @@
 <template>
-    <b-nav tabs >
+    <ul class="nav nav-tabs">
         <template v-for="link in links">
             <li class="nav-item">
                 <inertia-link :href="link.url" :class="isActive(link.active)">{{ link.text }}</inertia-link>
             </li>
         </template>
-    </b-nav>
+    </ul>
 </template>
 
 <script>

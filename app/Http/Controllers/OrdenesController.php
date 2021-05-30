@@ -103,7 +103,7 @@ class OrdenesController extends Controller
             $orden['observaciones'] = !empty($request['observaciones']) ? $request['observaciones'] : "";
             $orden['cliente'] = (!empty($request['cliente']))
                 ? $request['cliente']
-                : Cliente::newCliente($request['responsable'], $request['telefono'], $orden['sucursal']);
+                : Cliente::newCliente($request['responsable'], $request['telefono'], Auth::user()['sucursal']);
             //armar detalleOrden
             $detalle = array();
             $orden['montoVenta'] = 0;
@@ -145,12 +145,7 @@ class OrdenesController extends Controller
         $validator = Validator::make($request->all(), [
             'id' => 'required',
         ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => -1,
-                'errors' => $validator->errors()
-            ]);
-        }
+        $validator->validate();
         $orden = OrdenesTrabajo::find($request['id']);
         if (isset($orden)) {
             $orden->estado = 5;
@@ -247,10 +242,5 @@ class OrdenesController extends Controller
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
         }
-    }
-
-    public function OrdenUpdate(Request $request)
-    {
-
     }
 }
