@@ -165,15 +165,15 @@ export default {
         productosSell() {
             let sell = [];
             if (this.tipoProductoFiltro != null) {
-                const tipoProducto=this.tipoProductoFiltro;
-                Object.keys(this.productos[tipoProducto]).forEach(key => {
+                const tipoProducto = this.tipoProductoFiltro;
+                for (let key in this.productos[tipoProducto]) {
                     sell[key] = {
                         id: this.productos[tipoProducto][key].id,
                         cantidad: 0,
                         costo: this.productos[tipoProducto][key].precioUnidad,
                         producto: this.productos[tipoProducto][key].producto
                     };
-                })
+                }
             }
             return sell;
         },
@@ -184,18 +184,35 @@ export default {
         },
         getTipoOrden(value) {
             let text = "";
-            Object.keys(this.tiposProductos).forEach(key => {
-                if (this.tiposProductos[key].id === value) {
-                    text = this.tiposProductos[key].nombre;
-                    return;
+            for (let tipoProducto of this.tiposProductos) {
+                if (tipoProducto.id === value) {
+                    text = tipoProducto.nombre;
+                    break;
                 }
-            })
+            }
             return text;
         }
     },
     mounted() {
         // Set the initial number of items
-        this.totalRows = this.ordenes.length
+        this.totalRows = this.ordenes.length;
     },
+    created() {
+        this.$messaging.onMessage((payload) => {
+            if (!window.Notification) {
+                console.log('Browser does not support notifications.');
+            } else {
+                let notification = payload.notification;
+                new Notification(notification.title, {
+                    body: notification.body,
+                });
+                if (payload.data.newOrden) {
+                    if (this.ordenes[0].id <= payload.data.orden) {
+                        this.$inertia.reload();
+                    }
+                }
+            }
+        });
+    }
 }
 </script>

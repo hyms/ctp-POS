@@ -13,7 +13,11 @@
                         <i class="feather icon-unlock auth-icon"></i>
                     </div>
                     <h3 class="mb-4">Ingresar</h3>
-
+                    <b-alert variant="danger" dismissible :show="Object.values(errors).length > 0">
+                        <div v-for="(value,key) in errors">
+                            {{ key }}: {{ value }}
+                        </div>
+                    </b-alert>
                     <form class="form-horizontal m-t-20" @submit.prevent="submit">
                         <div class="input-group mb-3">
                             <b-form-input

@@ -22,7 +22,8 @@
                     <td>{{ getProduct(itemOrden.stock) }}</td>
                     <td>{{ itemOrden.cantidad }}</td>
                     <td v-if="isVenta">
-                        <b-input type="text" size="sm" v-model="itemOrden.costo" v-if="[1,5].includes(item.estado)"></b-input>
+                        <b-input type="text" size="sm" v-model="itemOrden.costo"
+                                 v-if="[1,5].includes(item.estado)"></b-input>
                         <template v-else>{{ itemOrden.costo }}</template>
                     </td>
                     <td v-if="isVenta">{{ itemOrden.costo * itemOrden.cantidad }}</td>
@@ -37,7 +38,8 @@
                     <tr>
                         <td colspan="4" class="text-right"><strong>Cancelado</strong></td>
                         <td>
-                            <b-input type="text" size="sm" v-model="item.montoVenta" v-if="[1,5].includes(item.estado)"></b-input>
+                            <b-input type="text" size="sm" v-model="item.montoVenta"
+                                     v-if="[1,5].includes(item.estado)"></b-input>
                             <template v-else>{{ item.montoVenta }}</template>
                         </td>
                     </tr>
@@ -105,9 +107,6 @@
             </p>
         </div>
         <template #modal-footer="{ ok, cancel }">
-            <loading-button :loading="sending" :variant="'warning'" :size="'sm'" v-if="![0,2,5].includes(item.estado)"
-                            @click.native="quemado(item.id)" :text="'Quemado'" :textLoad="'Quemado...'">Quemado
-            </loading-button>
             <b-button size="sm" variant="danger" @click="cancel()">
                 Cerrar
             </b-button>
@@ -115,7 +114,8 @@
                 class="btn btn-secondary btn-sm"
                 :href="'/ordenPdf/'+item.id"
                 target="_blank">Imprimir</a>
-            <loading-button :loading="sending" :variant="'dark'" :size="'sm'" v-if="isVenta && [1,5].includes(item.estado)"
+            <loading-button :loading="sending" :variant="'dark'" :size="'sm'"
+                            v-if="isVenta && [1,5].includes(item.estado)"
                             @click.native="guardarVenta()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
             </loading-button>
             <loading-button :loading="sending" :variant="'dark'" :size="'sm'" v-if="isVenta && item.estado==2"
@@ -126,7 +126,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
@@ -150,12 +149,12 @@ export default {
     methods: {
         getProduct(id) {
             let item = {};
-            Object.values(this.productos).forEach((value) => {
+            for (let value of this.productos) {
                 if (value.id == id) {
                     item = value;
-                    return value;
+                    break;
                 }
-            })
+            }
             if (item) {
                 return item.formato + ' (' + item.dimension + ')';
             }
@@ -175,7 +174,7 @@ export default {
                         this.$bvModal.hide(this.id)
                         this.$inertia.get(data["path"])
                     }
-                    Object.keys(this.form).forEach(key => {
+                    for (let key in this.form) {
                         if (key in data.errors) {
                             this.form[key].state = false;
                             this.form[key].stateText = data.errors[key][0];
@@ -183,7 +182,7 @@ export default {
                             this.form[key].state = true;
                             this.form[key].stateText = "";
                         }
-                    })
+                    }
                 })
                 .catch(error => {
                     // handle error
@@ -199,28 +198,17 @@ export default {
         guardarDeuda() {
             this.guardar('/ordenDeuda');
         },
-        quemado(id) {
-            this.sending = true;
-            this.$inertia.post('/orden/quemado', {id: id}, {
-                onBefore: () => confirm('Esta seguro?'),
-                onSuccess: () => {
-                    this.$bvModal.hide(this.id);
-                    this.sending = false;
-                },
-            })
-        },
         getTotal(detalle) {
+            let total = 0;
             if (detalle) {
-                let total = 0;
-                Object.values(detalle).forEach(value => {
+                for (let value of detalle) {
                     if (value) {
                         total += value.costo * value.cantidad;
                     }
-                })
+                }
                 this.total = total;
-                return total;
             }
-            return 0;
+            return total;
         },
         getCambio() {
             return (this.item.montoVenta - this.total);

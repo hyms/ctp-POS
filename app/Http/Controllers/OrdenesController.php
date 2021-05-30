@@ -33,6 +33,7 @@ class OrdenesController extends Controller
         if ($typeReport == 2 && isset($report['responsable'])) {
             $report['total'] = OrdenesTrabajo::getDeuda($ordenes);
         }
+
         return Inertia::render('Ordenes/tabla', [
             'ordenes' => $ordenes,
             'productos' => $productos,
@@ -102,7 +103,7 @@ class OrdenesController extends Controller
             $orden['observaciones'] = !empty($request['observaciones']) ? $request['observaciones'] : "";
             $orden['cliente'] = (!empty($request['cliente']))
                 ? $request['cliente']
-                : Cliente::newCliente($request['responsable'], $request['telefono'], $orden['sucursal']);
+                : Cliente::newCliente($request['responsable'], $request['telefono'], Auth::user()['sucursal']);
             //armar detalleOrden
             $detalle = array();
             $orden['montoVenta'] = 0;
@@ -118,7 +119,8 @@ class OrdenesController extends Controller
                 $orden['montoVenta'] += $tmp['total'];
                 array_push($detalle, $tmp);
             }
-            OrdenesTrabajo::newOrden($orden, $detalle, $id);
+            $id = OrdenesTrabajo::newOrden($orden, $detalle, $id);
+            OrdenesTrabajo::notifyNewOrden($id);
             return response()->json(["status" => 0, 'path' => 'ordenes']);
         } catch (\Exception $error) {
             Log::error($error->getMessage());
@@ -143,12 +145,7 @@ class OrdenesController extends Controller
         $validator = Validator::make($request->all(), [
             'id' => 'required',
         ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => -1,
-                'errors' => $validator->errors()
-            ]);
-        }
+        $validator->validate();
         $orden = OrdenesTrabajo::find($request['id']);
         if (isset($orden)) {
             $orden->estado = 5;
@@ -245,10 +242,5 @@ class OrdenesController extends Controller
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
         }
-    }
-
-    public function OrdenUpdate(Request $request)
-    {
-
     }
 }

@@ -108,7 +108,7 @@ export default {
         itemRow: Object,
         productos: Array,
         productosSell: Array,
-        tipo:Number,
+        tipo: Number,
     },
     data() {
         return {
@@ -147,45 +147,41 @@ export default {
         }
     },
     methods: {
-        reset() {
+        reset: function () {
             this.limpiar();
-
             if (this.isNew) {
-                if ('id' in this.itemRow) {
-                    this.idForm = null;
-                }
-                Object.keys(this.form).forEach(key => {
+                this.idForm = null;
+                for (let key in this.form) {
                     this.form[key].value = "";
-                })
+                }
                 this.responsableValue = ""
             } else {
                 if ('id' in this.itemRow) {
                     this.idForm = this.itemRow['id'];
                 }
-                Object.keys(this.form).forEach(key => {
+                for (let key in this.form) {
                     if (['central', 'enable'].includes(key)) {
                         this.form[key].value = (this.itemRow[key] === 1)
+                    } else if (['responsable'].includes(key)) {
+                        this.responsableValue = this.itemRow[key];
                     } else {
-                        if (['responsable'].includes(key)) {
-                            this.responsableValue = this.itemRow[key];
-                        }
                         this.form[key].value = this.itemRow[key];
                     }
-                })
-                Object.keys(this.productosSell).forEach(key => {
-                    Object.keys(this.itemRow.detallesOrden).forEach(key2 => {
-                        if (this.productosSell[key].id === this.itemRow.detallesOrden[key2].stock) {
-                            this.productosSell[key].cantidad = this.itemRow.detallesOrden[key2].cantidad;
+                }
+                for (let key in this.productosSell) {
+                    for (let value of this.itemRow.detallesOrden) {
+                        if (this.productosSell[key].id === value.stock) {
+                            this.productosSell[key].cantidad = value.cantidad;
                         }
-                    })
-                })
+                    }
+                }
             }
         },
         limpiar() {
-            Object.keys(this.form).forEach(key => {
+            for (let key in this.form) {
                 this.form[key].state = null;
                 this.form[key].stateText = null;
-            })
+            }
             this.errors = [];
         },
         handleOk(bvModalEvt) {
@@ -204,18 +200,18 @@ export default {
             if (this.responsableValue) {
                 this.form.responsable.value = this.responsableValue;
             }
-            Object.keys(this.form).forEach(key => {
+            for (let key in this.form) {
                 producto.append(key, this.form[key].value);
-            })
+            }
             if (this.idCliente) {
                 producto.append('cliente', this.idCliente);
             }
             let items = [];
-            Object.keys(this.productosSell).forEach(key => {
-                if (this.productosSell[key].cantidad > 0) {
-                    items = [...items, this.productosSell[key]];
+            for (let value of this.productosSell) {
+                if (value.cantidad > 0) {
+                    items = [...items, value];
                 }
-            })
+            }
             if (items.length > 0) {
                 producto.append('productos', JSON.stringify(items));
             }
@@ -225,7 +221,7 @@ export default {
                         this.$bvModal.hide(this.id)
                         this.$inertia.get(data["path"])
                     }
-                    Object.keys(this.form).forEach(key => {
+                    for (let key in this.form) {
                         if (key in data.errors) {
                             this.form[key].state = false;
                             this.form[key].stateText = data.errors[key][0];
@@ -233,7 +229,7 @@ export default {
                             this.form[key].state = true;
                             this.form[key].stateText = "";
                         }
-                    })
+                    }
                 })
                 .catch(error => {
                     // handle error

@@ -190,4 +190,13 @@ class ProductoStock extends Model
         }
         return null;
     }
+    public static function getTipos($sucursal)
+    {
+        $stock = DB::table(self::$tables);
+        $stock->where('sucursal', '=', $sucursal);
+        $stock->where('enable', '=', true);
+        $stock->leftJoin(Producto::$tables, 'producto', '=', 'productos.id');
+        $stock->whereNull('productos.deleted_at');
+        return $stock->get('tipo');
+    }
 }

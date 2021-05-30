@@ -5,7 +5,7 @@
     <div class="menu-mobile menu-activated-on-click color-scheme-dark">
         <div class="mm-logo-buttons-w">
             <inertia-link to="/" class="mm-logo">
-                <img :src="images.logo"/><span>CTP</span>
+                <img :src="images.logo" alt="logo"/><span>CTP</span>
             </inertia-link>
             <div class="mm-buttons">
                 <div class="mobile-menu-trigger" v-b-toggle.my-collapse>

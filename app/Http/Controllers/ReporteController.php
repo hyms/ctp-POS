@@ -18,8 +18,44 @@ use Inertia\Inertia;
 
 class ReporteController extends Controller
 {
-    public function get()
+    public function resumen(Request $request)
     {
+        $fechaInicio = null;
+        $fechaFin = null;
+        if (count($request->all()) == 0) {
+            $fechaInicio = Carbon::now();
+            $fechaFin = Carbon::now();
+        }
+        else{
+            $fechaInicio = Carbon::parse($request['fechaI']);
+            $fechaFin = Carbon::parse($request['fechaF']);
+        }
+        $sucursales = Sucursal::getAll();
+        $totalOrdenes = array();
+        foreach ($sucursales as $key=>$sucursal) {
+            $totalOrdenes[$key]=['name'=>$sucursal->nombre,'value'=>[]];
+            $tipos = ProductoStock::getTipos($sucursal->id);
+            foreach (OrdenesTrabajo::estadoCTP() as $keyEstado=>$estado) {
+                $totalOrdenes[$key]['value'][$keyEstado] = ['name'=>$estado,'value'=>[]];
+                foreach ($tipos as $tipo) {
+                    $tipoProducto = DB::table(TipoProductos::$tables)->where('id','=',$tipo->tipo)->first();
+                    $total = DB::table(OrdenesTrabajo::$tables)
+                        ->where('tipoOrden','=',$tipoProducto->id)
+                        ->where('estado','=',$keyEstado)
+                        ->where('sucursal','=',$sucursal->id)
+                        ->whereBetween('updated_at',[$fechaInicio->startOfDay()->toDateTimeString(),$fechaFin->endOfDay()->toDateTimeString()])
+                        ->count();
+                    $totalOrdenes[$key]['value'][$keyEstado]['value'][$tipoProducto->id]=['name'=>$tipoProducto->nombre,'value'=>$total];
+                }
+            }
+        }
+
+        return Inertia::render('Reportes/resumen',
+            [
+                'totalOrdenes' => $totalOrdenes,
+                'fechaI'=>$fechaInicio,
+                'fechaF'=>$fechaFin
+            ]);
     }
 
     public function placasA(Request $request)
@@ -36,7 +72,6 @@ class ReporteController extends Controller
                 [
                     'sucursales' => $sucursales,
                     'forms' => $request->all(),
-//                    'errors' => $validator->errors(),
                     'tipoPlacas' => $tipo->pluck('nombre', 'id'),
                     'data' => ['table' => [], 'fields' => []]
                 ]);
@@ -55,7 +90,6 @@ class ReporteController extends Controller
                 [
                     'sucursales' => (object)[],
                     'forms' => $request->all(),
-//                    'errors' => $validator->errors(),
                     'tipoPlacas' => $tipo->pluck('nombre', 'id'),
                     'data' => ['table' => [], 'fields' => []]
                 ]);
@@ -110,7 +144,7 @@ class ReporteController extends Controller
                 }
 
             }
-            switch ($orden->estado){
+            switch ($orden->estado) {
                 case 2:
                     $row['observaciones'] = "<span class=\"text-primary\">Deuda</span>";
                     break;
@@ -187,7 +221,4 @@ class ReporteController extends Controller
             ]);
     }
 
-    public function cajas()
-    {
-    }
 }

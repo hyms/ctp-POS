@@ -46,8 +46,8 @@
 
 <script>
 export default {
-    data(){
-        return{
+    data() {
+        return {
             searchModel: {
                 fecha: "",
                 orden: ""
@@ -58,9 +58,9 @@ export default {
         report: Array,
     },
     mounted() {
-        Object.keys(this.report).forEach(key=>{
-            this.searchModel[key]=this.report[key];
-        })
+        for (const key in this.report) {
+            this.searchModel[key] = this.report[key];
+        }
     }
 }
 </script>

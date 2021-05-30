@@ -124,15 +124,13 @@ export default {
     methods: {
         getPermission(role) {
             let value = false;
-            for (var i = 0; i < Object.keys(this.$page.props.roles).length; i++) {
-                Object.keys(this.$page.props.roles).forEach(key => {
-                    if (key == role) {
-                        if (this.$page.props.roles[key].includes(this.$page.props.user.role)) {
-                            value = true;
-                            return;
-                        }
+            for (const key in this.$page.props.roles) {
+                if (key == role) {
+                    if (this.$page.props.roles[key].includes(this.$page.props.user.role)) {
+                        value = true;
+                        break;
                     }
-                })
+                }
             }
             return value;
         }

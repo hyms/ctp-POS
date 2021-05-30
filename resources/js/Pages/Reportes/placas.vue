@@ -1,7 +1,7 @@
 <template>
     <div class="content-w">
         <div class="content-box">
-            <Menu :active="1" v-if="sucursales.length>0"></Menu>
+            <Menu :active="1" v-if="Object.keys(sucursales).length>0"></Menu>
             <div class="row" v-else>
                 <div class="col-sm-12">
                     <h4 class="header-title m-t-0 m-b-20">Registro Placas</h4>

@@ -45,7 +45,7 @@ class PDFController extends Controller
             $this->mpdf->page = 0;
             $this->mpdf->state = 0;
             unset($this->mpdf->pages[0]);
-            $mpdf = PDF::loadView('pdfOrden', $data, [], [
+            $mpdfView = PDF::loadView('pdfOrden', $data, [], [
                 'title' => 'Orden ' . $orden->codigoServicio,
                 'margin_top' => 5,
                 'margin_bottom' => 5,
@@ -54,7 +54,7 @@ class PDFController extends Controller
                 'format' => array(72.1, $this->mpdf->y + 15),
                 'orientation' => 'P'
             ]);
-            return $mpdf->stream($orden->codigoServicio . '.pdf');
+            return $mpdfView->stream($orden->codigoServicio . '.pdf');
         } catch (\Exception $error) {
             Log::error($error->getMessage());
             abort(404);
