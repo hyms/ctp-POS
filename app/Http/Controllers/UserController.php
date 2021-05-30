@@ -74,7 +74,7 @@ class UserController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            $user = User::find(Auth::user()->id);
+            $user = User::find(Auth::id());
             $user->tokenpush = $request['token'];
             $user->save();
             return response()->json([

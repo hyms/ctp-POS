@@ -196,17 +196,23 @@ export default {
     mounted() {
         // Set the initial number of items
         this.totalRows = this.ordenes.length;
-
-        // // console.log('Firebase cloud messaging object', this.$messaging);
-        // this.$messaging.onMessage((payload) => {
-        //     console.log('Message received. ', payload);
-        //     // ...
-        // });
     },
-    // created() {
-    //     this.$messaging.onMessage((payload) => {
-    //         console.log("Message received. ", payload);
-    //     });
-    // }
+    created() {
+        this.$messaging.onMessage((payload) => {
+            if(!window.Notification) {
+                console.log('Browser does not support notifications.');
+            } else {
+                let notification = payload.notification;
+                const notify = new Notification(notification.title, {
+                    body: notification.body,
+                });
+                if(payload.data.newOrden && this.$page.url==="/ordenes"){
+                    if(this.ordenes[0].id<=payload.data.orden){
+                        this.$inertia.reload();
+                    }
+                }
+            }
+        });
+    }
 }
 </script>

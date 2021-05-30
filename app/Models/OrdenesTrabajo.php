@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Kutia\Larafirebase\Facades\Larafirebase;
 
 class OrdenesTrabajo extends Model
 {
@@ -90,6 +91,7 @@ class OrdenesTrabajo extends Model
         if (!empty($id)) {
             DetallesOrden::newOrdenDetalle($productos, $id);
         }
+        return $id;
     }
 
     public static function getReport(string $fechaI, string $fechaF, string $sucursal, string $tipo = null)
@@ -177,4 +179,22 @@ class OrdenesTrabajo extends Model
         return $total - $pagado;
     }
 
+    public static function notifyNewOrden($idOrden)
+    {
+        $orden = DB::table(self::$tables)->where('id',$idOrden)->first();
+        $fcmTokens = DB::table(User::$tables)
+            ->where('id', '!=', Auth::id())
+            ->pluck('tokenpush')->toArray();
+        $data = Larafirebase::fromRaw([
+            'registration_ids' => $fcmTokens,
+            'data' => [
+                'newOrden' => true,
+                'orden' => $orden->id
+            ],
+            'notification' => [
+                'title' => "Nueva Orden",
+                'body' => "Orden ".$orden->codigoServicio
+            ],
+        ])->send();
+    }
 }

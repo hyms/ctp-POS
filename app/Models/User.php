@@ -5,9 +5,10 @@ namespace App\Models;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use function PHPUnit\Framework\isNull;
+use Kutia\Larafirebase\Facades\Larafirebase;
 
 class User extends Model implements AuthenticatableContract
 {
@@ -55,5 +56,23 @@ class User extends Model implements AuthenticatableContract
             );
         }
         return $roles[$int];
+    }
+
+    public static function sendNotify($message, $title, $orden = 0)
+    {
+        $fcmTokens = DB::table(self::$tables)
+            ->where('id', '!=', Auth::id())
+            ->pluck('tokenpush')->toArray();
+        $data = Larafirebase::fromRaw([
+            'registration_ids' => $fcmTokens,
+            'data' => [
+                'newOrden' => true,
+                'orden' => $orden
+            ],
+            'notification' => [
+                'title' => $title,
+                'body' => $message
+            ],
+        ])->send();
     }
 }
