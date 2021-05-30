@@ -16,6 +16,11 @@ export default {
         return {
             links: [
                 {
+                    active: 0,
+                    url: 'resumen',
+                    text: 'Resumen'
+                },
+                {
                     active: 1,
                     url: 'placas',
                     text: 'Placas'
