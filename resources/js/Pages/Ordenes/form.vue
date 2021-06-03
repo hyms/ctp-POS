@@ -220,14 +220,16 @@ export default {
                     if (data["status"] == 0) {
                         this.$bvModal.hide(this.id)
                         this.$inertia.get(data["path"])
-                    }
-                    for (let key in this.form) {
-                        if (key in data.errors) {
-                            this.form[key].state = false;
-                            this.form[key].stateText = data.errors[key][0];
-                        } else {
-                            this.form[key].state = true;
-                            this.form[key].stateText = "";
+                        window.open('/ordenPdf/'+data["id"], '_blank');
+                    } else {
+                        for (let key in this.form) {
+                            if (key in data.errors) {
+                                this.form[key].state = false;
+                                this.form[key].stateText = data.errors[key][0];
+                            } else {
+                                this.form[key].state = true;
+                                this.form[key].stateText = "";
+                            }
                         }
                     }
                 })
