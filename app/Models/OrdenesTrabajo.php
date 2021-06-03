@@ -125,7 +125,9 @@ class OrdenesTrabajo extends Model
                 'montoVenta' => $item->montoVenta,
                 'ordenTrabajo' => $item->id,
             ]);
+            return $orden['id'];
         }
+        return 0;
     }
 
     public static function deuda(array $orden, float $saldo, float $monto)

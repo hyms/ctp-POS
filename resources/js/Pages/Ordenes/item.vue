@@ -110,10 +110,7 @@
             <b-button size="sm" variant="danger" @click="cancel()">
                 Cerrar
             </b-button>
-            <a
-                class="btn btn-secondary btn-sm"
-                :href="'/ordenPdf/'+item.id"
-                target="_blank">Imprimir</a>
+            <a class="btn btn-secondary btn-sm" :href="getUrlPrint(item.id)" target="_blank">Imprimir</a>
             <loading-button :loading="sending" :variant="'dark'" :size="'sm'"
                             v-if="isVenta && [1,5].includes(item.estado)"
                             @click.native="guardarVenta()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
@@ -174,6 +171,9 @@ export default {
                     if (data["status"] == 0) {
                         this.$bvModal.hide(this.id)
                         this.$inertia.get(data["path"])
+                        if(data["id"]){
+                            window.open('/ordenPdfV/'+data["id"], '_blank');
+                        }
                     } else {
                         for (let key in this.form) {
                             if (key in data.errors) {
@@ -227,6 +227,12 @@ export default {
             if (this.item.montoVenta > this.total) {
                 this.item.montoVenta = this.total;
             }
+        },
+        getUrlPrint(id) {
+            if (this.isVenta) {
+                return '/ordenPdfV/' + id
+            }
+            return '/ordenPdf/' + id;
         }
     },
 }

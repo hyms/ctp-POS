@@ -19,7 +19,17 @@ class PDFController extends Controller
 {
     protected $mpdf;
 
-    public function getOrden($id)
+    public function getOrdenVenta($id)
+    {
+        $this->getOrden($id, true);
+    }
+
+    public function getOrdenDiseño($id)
+    {
+        $this->getOrden($id, false);
+    }
+
+    private function getOrden($id, bool $isVenta)
     {
         try {
             $orden = OrdenesTrabajo::find($id);
@@ -35,7 +45,8 @@ class PDFController extends Controller
             $data = [
                 'orden' => $orden,
                 'detalle' => $detalle,
-                'fechaAhora' => $mytime->format("d/m/Y H:i"),
+                'fechaOrden' => $mytime->format("d/m/Y H:i"),
+                'isVenta' => $isVenta
             ];
 
             $this->mpdf = new Mpdf();
