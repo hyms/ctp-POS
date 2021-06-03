@@ -84,8 +84,10 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('listaReportes');
 });
 //pdfs
-Route::get('ordenPdf/{id}', [PDFController::class, 'getOrden'])
-    ->name('pdfOrden')->middleware('auth');
+Route::get('ordenPdf/{id}', [PDFController::class, 'getOrdenDiseño'])
+    ->name('pdfOrdenD')->middleware('auth');
+Route::get('ordenPdfV/{id}', [PDFController::class, 'getOrdenVenta'])
+    ->name('pdfOrdenV')->middleware('auth');
 //Admin
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     //productos

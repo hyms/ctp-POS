@@ -121,7 +121,7 @@ class OrdenesController extends Controller
             }
             $id = OrdenesTrabajo::newOrden($orden, $detalle, $id);
             OrdenesTrabajo::notifyNewOrden($id);
-            return response()->json(["status" => 0, 'path' => 'ordenes']);
+            return response()->json(["status" => 0, 'path' => 'ordenes', 'id' => $id]);
         } catch (\Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
@@ -179,8 +179,8 @@ class OrdenesController extends Controller
             }
             $orden['montoVenta'] = $ordenPost['montoVenta'];
             $orden['userVenta'] = Auth::user()['id'];
-            OrdenesTrabajo::venta($orden);
-            return response()->json(["status" => 0, 'path' => 'espera']);
+            $id = OrdenesTrabajo::venta($orden);
+            return response()->json(["status" => 0, 'path' => 'espera', 'id' => $id]);
         } catch (\Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
