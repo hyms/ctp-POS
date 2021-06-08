@@ -203,13 +203,18 @@ export default {
                 console.log('Browser does not support notifications.');
             } else {
                 let notification = payload.notification;
-                new Notification(
+                const alert = new Notification(
                     notification.title, {
                     body: notification.body,
                 });
-                if (payload.data.newOrden) {
-                    if (this.ordenes[0].id <= payload.data.orden) {
-                        this.$inertia.reload();
+                if(payload.data.orden) {
+                    alert.addEventListener('click', () => {
+                        window.open('/ordenPdf/' + payload.data.orden, '_blank');
+                    });
+                    if (payload.data.newOrden) {
+                        if (this.ordenes[0].id <= payload.data.orden) {
+                            this.$inertia.reload();
+                        }
                     }
                 }
             }
