@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Kutia\Larafirebase\Facades\Larafirebase;
 
 class OrdenesTrabajo extends Model
@@ -183,20 +184,28 @@ class OrdenesTrabajo extends Model
 
     public static function notifyNewOrden($idOrden)
     {
-        $orden = DB::table(self::$tables)->where('id',$idOrden)->first();
-        $fcmTokens = DB::table(User::$tables)
-            ->where('id', '!=', Auth::id())
-            ->pluck('tokenpush')->toArray();
-        $data = Larafirebase::fromRaw([
-            'registration_ids' => $fcmTokens,
-            'data' => [
-                'newOrden' => true,
-                'orden' => $orden->id
-            ],
-            'notification' => [
-                'title' => "Nueva Orden",
-                'body' => "Orden ".$orden->codigoServicio
-            ],
-        ])->send();
+        try {
+            $orden = DB::table(self::$tables)->where('id', $idOrden)->first();
+            $fcmTokens = DB::table(User::$tables)
+                ->where('id', '!=', Auth::id())
+                ->select('tokenpush')
+                ->groupBy('tokenpush')
+                ->pluck('tokenpush')->toArray();
+            $data = Larafirebase::fromRaw([
+                'registration_ids' => $fcmTokens,
+                'data' => [
+                    'newOrden' => true,
+                    'orden' => $orden->id
+                ],
+                'notification' => [
+                    'title' => "Nueva Orden",
+                    'body' => "Orden " . $orden->codigoServicio
+                ],
+            ])->send();
+        }
+        catch (\Exception $error )
+        {
+            Log::error($error->getMessage());
+        }
     }
 }
