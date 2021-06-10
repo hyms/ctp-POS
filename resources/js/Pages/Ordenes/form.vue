@@ -220,7 +220,6 @@ export default {
                     if (data["status"] == 0) {
                         this.$bvModal.hide(this.id)
                         this.$inertia.get(data["path"])
-                        window.open('/ordenPdf/'+data["id"], '_blank');
                     } else {
                         for (let key in this.form) {
                             if (key in data.errors) {

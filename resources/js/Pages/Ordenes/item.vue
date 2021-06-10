@@ -171,9 +171,6 @@ export default {
                     if (data["status"] == 0) {
                         this.$bvModal.hide(this.id)
                         this.$inertia.get(data["path"])
-                        if(data["id"]){
-                            window.open('/ordenPdfV/'+data["id"], '_blank');
-                        }
                     } else {
                         for (let key in this.form) {
                             if (key in data.errors) {
