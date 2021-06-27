@@ -1,7 +1,7 @@
 <template>
     <div class="content-w">
         <div class="content-box">
-            <Menu :active="4" ></Menu>
+            <Menu :active="4"></Menu>
             <div class="tab-content">
                 <b-row>
                     <b-col md="8">
@@ -75,7 +75,7 @@
                             </template>
                             <b-row>
                                 <b-col>
-                                    <h2>{{total}}</h2>
+                                    <h2>{{ total }}</h2>
                                 </b-col>
                             </b-row>
                         </b-card>
@@ -86,6 +86,64 @@
                     <template #header>
                         <h5 class="mb-0">Resultados</h5>
                     </template>
+                    <b-modal id="cliente"
+                             :title="'Cliente: '+ item.nombreResponsable" size="lg">
+                        <div class="table-responsive">
+                            <b-table
+                                striped
+                                hover
+                                :items="item.ordenes"
+                                :fields="item.fields"
+                                show-empty
+                                small>
+                                <template #empty="scope">
+                                    <p>No existen deudas</p>
+                                </template>
+                                <template v-slot:cell(created_at)="data">
+                                    {{ data.value | moment("DD/MM/YYYY HH:mm") }}
+                                </template>
+
+                                <template #cell(detalle)="row">
+                                    <b-button size="sm" @click="row.toggleDetails" class="mr-2">
+                                        {{ row.detailsShowing ? 'Ocultar' : 'Mostrar' }} Orden
+                                    </b-button>
+                                </template>
+
+                                <template #row-details="row">
+                                    <b-card>
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <thead>
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">Productos</th>
+                                                    <th scope="col">Cant.</th>
+                                                    <th scope="col">Precio</th>
+                                                    <th scope="col">Total</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr v-for="(itemOrden,key) in row.item.detallesOrden">
+                                                    <td>{{ key + 1 }}</td>
+                                                    <td>{{ getProduct(itemOrden.stock) }}</td>
+                                                    <td>{{ itemOrden.cantidad }}</td>
+                                                    <td>{{ itemOrden.costo }}</td>
+                                                    <td>{{ itemOrden.costo * itemOrden.cantidad }}</td>
+                                                </tr>
+                                                </tbody>
+                                                <tfoot>
+                                                <tr>
+                                                    <td colspan="4" class="text-right"><strong>Total</strong></td>
+                                                    <td>{{ getTotal(row.item.detallesOrden) }}</td>
+                                                </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </b-card>
+                                </template>
+                            </b-table>
+                        </div>
+                    </b-modal>
                     <div class="table-responsive">
                         <b-table
                             striped
@@ -98,8 +156,13 @@
                             <template #cell(#)="data">
                                 {{ data.index + 1 }}
                             </template>
-                            <template v-slot:cell(observaciones)="data">
-                                <span v-html="data.value"></span>
+                            <template #empty="scope">
+                                <p>No existen clientes</p>
+                            </template>
+                            <template v-slot:cell(nombreResponsable)="row">
+                                <b-button variant="link" v-b-modal="'cliente'" @click="loadModal(row.item)">
+                                    {{ row.item.nombreResponsable }}
+                                </b-button>
                             </template>
                         </b-table>
                     </div>
@@ -117,11 +180,12 @@ export default {
     layout: Layout,
     props: {
         sucursales: Object,
-        request:Object,
-        clientes:Array,
-        total:Number,
+        productos: Array,
+        request: Object,
+        clientes: Array,
+        total: Number,
         errors: Object,
-        data:Object,
+        data: Object,
     },
     components: {
         Menu
@@ -142,7 +206,7 @@ export default {
                     type: "date",
                     state: null,
                     stateText: null
-                },fechaF: {
+                }, fechaF: {
                     label: 'Fecha Fin',
                     value: "",
                     type: "date",
@@ -150,6 +214,7 @@ export default {
                     stateText: null
                 },
             },
+            item: {},
         }
     },
     methods: {
@@ -159,6 +224,33 @@ export default {
                 form[key] = this.form[key].value;
             })
             this.$inertia.get('/admin/reportes/mora', form)
+        },
+        loadModal(item) {
+            this.item = item;
+        },
+        getTotal(detalle) {
+            let total = 0;
+            if (detalle) {
+                for (let value of detalle) {
+                    if (value) {
+                        total += value.costo * value.cantidad;
+                    }
+                }
+            }
+            return total;
+        },
+        getProduct(id) {
+            let item = {};
+            for (let value of this.productos) {
+                if (value.id == id) {
+                    item = value;
+                    break;
+                }
+            }
+            if (item) {
+                return item.formato + ' (' + item.dimension + ')';
+            }
+            return "";
         },
     },
     created() {
@@ -171,7 +263,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-
-</style>
