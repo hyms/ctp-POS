@@ -236,8 +236,8 @@ class ReporteController extends Controller
         $data = ['table' => [], 'fields' => []];
         if (!$validator->fails()) {
             $tipoBusqueda = 2;
-            $clientes = Cliente::getAll($request['sucursal'])->toArray();
-            foreach ($clientes as $key => $cliente) {
+            $clientesAll = Cliente::getAll($request['sucursal'])->toArray();
+            foreach ($clientesAll as $key => $cliente) {
                 $totalCliente = 0;
                 $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, ['cliente' => $cliente->id, 'fechaI' => $request['fechaI'], 'fechaF' => $request['fechaF']]);
                 $ordenes->where('estado', '=', $tipoBusqueda);
@@ -256,12 +256,25 @@ class ReporteController extends Controller
                     $ordenes[$keyO]->totalDeuda = $totalVenta - $totalPagado;
                 }
                 $total += $totalCliente;
-                $clientes[$key]->ordenes = $ordenes;
-                $clientes[$key]->fields = ['codigoServicio', 'totalDeuda', [
-                    'key' => 'created_at',
-                    'label' => 'Fecha'
-                ], 'detalle'];
-                $clientes[$key]->mora = $totalCliente;
+                if ($totalCliente > 0) {
+                    array_push(
+                        $clientes,
+                        [
+                            'nombreResponsable'=>$cliente->nombreResponsable,
+                            'ordenes' => $ordenes,
+                            'fields' => [
+                                'codigoServicio',
+                                'totalDeuda',
+                                [
+                                    'key' => 'created_at',
+                                    'label' => 'Fecha'
+                                ],
+                                'detalle'
+                            ],
+                            'mora' => $totalCliente
+                        ]
+                    );
+                }
             }
             $data = ['table' => $clientes, 'fields' => ['nombreResponsable', 'mora']];
         }
