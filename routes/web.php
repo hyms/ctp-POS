@@ -156,5 +156,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('reportes/cajas', [ReporteController::class, 'cajas'])
         ->name('listaReportes');
     Route::get('reportes/resumen', [ReporteController::class, 'resumen']);
+    Route::get('reportes/mora', [ReporteController::class, 'clientes']);
+
 });
 

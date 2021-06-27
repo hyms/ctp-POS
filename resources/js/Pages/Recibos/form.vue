@@ -33,29 +33,7 @@
                             :id="key"
                             :state="item.state"
                         ></b-textarea>
-                        <b-form-select
-                            v-if="item.type==='select'"
-                            v-model="item.value"
-                            :options="(key==='sucursal')?sucursales:cajasPadre"
-                        >
-                            <template #first>
-                                <b-form-select-option :value="null">Seleccione una opcion</b-form-select-option>
-                            </template>
-                        </b-form-select>
                     </b-form-group>
-                    <b-checkbox
-                        v-if="item.type==='boolean'"
-                        v-model="item.value"
-                        :id="key"
-                        :state="item.state"
-                    >{{ item.label }}
-                    </b-checkbox>
-                    <input
-                        type="hidden"
-                        v-if="item.type==='hidden'"
-                        v-model="item.value"
-                        :id="key"
-                    />
                 </template>
             </form>
             <template #modal-footer="{ ok, cancel }">
@@ -75,13 +53,11 @@ import axios from "axios";
 import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
-    name: "cliente",
+    name: "recibo",
     props: {
         isNew: Boolean,
         id: String,
         itemRow: Object,
-        sucursales: Object,
-        cajasPadre: Object
     },
     components: {
         LoadingButton
@@ -89,8 +65,8 @@ export default {
     data() {
         return {
             sending: false,
-            titulo1: "Nuevo Cliente",
-            titulo2: "Modificar Cliente",
+            titulo1: "Nuevo Recibo",
+            titulo2: "Modificar Recibo",
             form: {
                 nombre: {
                     label: 'nombre',
@@ -195,17 +171,7 @@ export default {
                 .then(({data}) => {
                     if (data["status"] === 0) {
                         this.$bvModal.hide(this.id)
-                        this.$inertia.get(data["path"])
                     }
-                    Object.keys(this.form).forEach(key => {
-                        if (key in data.errors) {
-                            this.form[key].state = false;
-                            this.form[key].stateText = data.errors[key][0];
-                        } else {
-                            this.form[key].state = true;
-                            this.form[key].stateText = "";
-                        }
-                    })
                 })
                 .catch(error => {
                     // handle error

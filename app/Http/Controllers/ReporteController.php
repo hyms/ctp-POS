@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cajas;
+use App\Models\Cliente;
 use App\Models\DetallesOrden;
 use App\Models\MovimientoCaja;
 use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
+use App\Models\Recibo;
 use App\Models\Sucursal;
 use App\Models\TipoProductos;
 use Carbon\Carbon;
@@ -25,27 +27,26 @@ class ReporteController extends Controller
         if (count($request->all()) == 0) {
             $fechaInicio = Carbon::now();
             $fechaFin = Carbon::now();
-        }
-        else{
+        } else {
             $fechaInicio = Carbon::parse($request['fechaI']);
             $fechaFin = Carbon::parse($request['fechaF']);
         }
         $sucursales = Sucursal::getAll();
         $totalOrdenes = array();
-        foreach ($sucursales as $key=>$sucursal) {
-            $totalOrdenes[$key]=['name'=>$sucursal->nombre,'value'=>[]];
+        foreach ($sucursales as $key => $sucursal) {
+            $totalOrdenes[$key] = ['name' => $sucursal->nombre, 'value' => []];
             $tipos = ProductoStock::getTipos($sucursal->id);
-            foreach (OrdenesTrabajo::estadoCTP() as $keyEstado=>$estado) {
-                $totalOrdenes[$key]['value'][$keyEstado] = ['name'=>$estado,'value'=>[]];
+            foreach (OrdenesTrabajo::estadoCTP() as $keyEstado => $estado) {
+                $totalOrdenes[$key]['value'][$keyEstado] = ['name' => $estado, 'value' => []];
                 foreach ($tipos as $tipo) {
-                    $tipoProducto = DB::table(TipoProductos::$tables)->where('id','=',$tipo->tipo)->first();
+                    $tipoProducto = DB::table(TipoProductos::$tables)->where('id', '=', $tipo->tipo)->first();
                     $total = DB::table(OrdenesTrabajo::$tables)
-                        ->where('tipoOrden','=',$tipoProducto->id)
-                        ->where('estado','=',$keyEstado)
-                        ->where('sucursal','=',$sucursal->id)
-                        ->whereBetween('updated_at',[$fechaInicio->startOfDay()->toDateTimeString(),$fechaFin->endOfDay()->toDateTimeString()])
+                        ->where('tipoOrden', '=', $tipoProducto->id)
+                        ->where('estado', '=', $keyEstado)
+                        ->where('sucursal', '=', $sucursal->id)
+                        ->whereBetween('updated_at', [$fechaInicio->startOfDay()->toDateTimeString(), $fechaFin->endOfDay()->toDateTimeString()])
                         ->count();
-                    $totalOrdenes[$key]['value'][$keyEstado]['value'][$tipoProducto->id]=['name'=>$tipoProducto->nombre,'value'=>$total];
+                    $totalOrdenes[$key]['value'][$keyEstado]['value'][$tipoProducto->id] = ['name' => $tipoProducto->nombre, 'value' => $total];
                 }
             }
         }
@@ -53,8 +54,8 @@ class ReporteController extends Controller
         return Inertia::render('Reportes/resumen',
             [
                 'totalOrdenes' => $totalOrdenes,
-                'fechaI'=>$fechaInicio,
-                'fechaF'=>$fechaFin
+                'fechaI' => $fechaInicio,
+                'fechaF' => $fechaFin
             ]);
     }
 
@@ -221,4 +222,57 @@ class ReporteController extends Controller
             ]);
     }
 
+    public function clientes(Request $request)
+    {
+        $total = 0;
+        $sucursales = Sucursal::getAll()->pluck('nombre', 'id');
+        $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
+        $validator = Validator::make($request->all(), [
+            'sucursal' => 'required',
+            'fechaI' => 'required',
+            'fechaF' => 'required',
+        ]);
+        $clientes = [];
+        $data = ['table' => [], 'fields' => []];
+        if (!$validator->fails()) {
+            $tipoBusqueda = 2;
+            $clientes = Cliente::getAll($request['sucursal'])->toArray();
+            foreach ($clientes as $key => $cliente) {
+                $totalCliente = 0;
+                $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, ['cliente' => $cliente->id, 'fechaI' => $request['fechaI'], 'fechaF' => $request['fechaF']]);
+                $ordenes->where('estado', '=', $tipoBusqueda);
+                $ordenes = DetallesOrden::getAll($ordenes->get());
+                $ordenes = Recibo::getAllOrdenes($ordenes);
+                foreach ($ordenes as $keyO => $orden) {
+                    $totalVenta = 0;
+                    $totalPagado = 0;
+                    foreach ($orden->detallesOrden as $detalle) {
+                        $totalVenta += $detalle->total;
+                    }
+                    foreach ($orden->recibos as $recibo) {
+                        $totalVenta += $recibo->monto;
+                    }
+                    $totalCliente += $totalVenta - $totalPagado;
+                    $ordenes[$keyO]->totalDeuda = $totalVenta - $totalPagado;
+                }
+                $total += $totalCliente;
+                $clientes[$key]->ordenes = $ordenes;
+                $clientes[$key]->fields = ['codigoServicio', 'totalDeuda', [
+                    'key' => 'created_at',
+                    'label' => 'Fecha'
+                ], 'detalle'];
+                $clientes[$key]->mora = $totalCliente;
+            }
+            $data = ['table' => $clientes, 'fields' => ['nombreResponsable', 'mora']];
+        }
+        return Inertia::render('Reportes/mora',
+            [
+                'sucursales' => $sucursales,
+                'productos' => $productosAll,
+                'request' => (object)$request,
+                'clientes' => $clientes,
+                'total' => $total,
+                'data' => $data
+            ]);
+    }
 }
