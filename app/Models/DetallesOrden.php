@@ -33,14 +33,16 @@ class DetallesOrden extends Model
         }
     }
 
-    public static function getAll(Collection $ordenes): array
+    public static function getAll(Collection $ordenes)
     {
         $ordenes = $ordenes->toArray();
-        foreach ($ordenes as $key => $item) {
-            $detalle = DB::table(self::$tables)
-                ->where('ordenTrabajo', '=', $item->id)
-                ->get()->toArray();
-            $ordenes[$key]->detallesOrden = $detalle;
+        if (count($ordenes) > 0) {
+            foreach ($ordenes as $key => $item) {
+                $detalle = DB::table(self::$tables)
+                    ->where('ordenTrabajo', '=', $item->id)
+                    ->get()->toArray();
+                $ordenes[$key]->detallesOrden = $detalle;
+            }
         }
         return $ordenes;
     }

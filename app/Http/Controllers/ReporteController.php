@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cajas;
+use App\Models\Cliente;
 use App\Models\DetallesOrden;
 use App\Models\MovimientoCaja;
 use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
+use App\Models\Recibo;
 use App\Models\Sucursal;
 use App\Models\TipoProductos;
 use Carbon\Carbon;
@@ -221,4 +223,51 @@ class ReporteController extends Controller
             ]);
     }
 
+    public function clientes(Request $request)
+    {
+        $total=0;
+        $sucursales = Sucursal::getAll()->pluck('nombre', 'id');
+        $validator = Validator::make($request->all(), [
+            'sucursal' => 'required',
+            'fechaI' => 'required',
+            'fechaF' => 'required',
+        ]);
+        $clientes=[];
+        $data=['table' => [], 'fields' => []];
+        if (!$validator->fails()) {
+            $tipoBusqueda = 2;
+            $clientes = Cliente::getAll($request['sucursal'])->toArray();
+            foreach ($clientes as $key=>$cliente) {
+                $totalCliente=0;
+                $ordenes = OrdenesTrabajo::getAll($request['sucursal'],null,['cliente'=>$cliente->id,'fechaI'=>$request['fechaI'],'fechaF'=>$request['fechaF']]);
+                $ordenes->where('estado','=',$tipoBusqueda);
+                $ordenes = DetallesOrden::getAll($ordenes->get());
+                $ordenes = Recibo::getAllOrdenes($ordenes);
+                foreach ($ordenes as $orden)
+                {
+                    $totalVenta=0;
+                    $totalPagado=0;
+                    foreach ($orden->detallesOrden as $detalle){
+                        $totalVenta+=$detalle->total;
+                    }
+                    foreach ($orden->recibos as $recibo){
+                        $totalVenta+=$recibo->monto;
+                    }
+                    $totalCliente += $totalVenta-$totalPagado;
+                }
+                $total+=$totalCliente;
+                $clientes[$key]->ordenes=$ordenes;
+                $clientes[$key]->mora=$totalCliente;
+            }
+            $data=['table' => $clientes, 'fields' => ['nombreResponsable','mora']];
+        }
+        return Inertia::render('Reportes/mora',
+            [
+                'sucursales' => $sucursales,
+                'request'=>(object)$request,
+                'clientes'=>$clientes,
+                'total'=>$total,
+                'data'=>$data
+            ]);
+    }
 }

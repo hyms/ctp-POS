@@ -52,8 +52,21 @@ class Recibo extends Model
     {
         $recibos = DB::table(self::$tables)
             ->where('sucursal', '=', $sucursal)
-        ->orderBy('created_at','desc');
+            ->orderBy('created_at', 'desc');
 
         return $recibos->get();
+    }
+
+    public static function getAllOrdenes(array $ordenes)
+    {
+        if (count($ordenes) > 0) {
+            foreach ($ordenes as $key => $item) {
+                $detalle = DB::table(self::$tables)
+                    ->where('codigoVenta', '=', $item->id)
+                    ->get()->toArray();
+                $ordenes[$key]->recibos = $detalle;
+            }
+        }
+        return $ordenes;
     }
 }

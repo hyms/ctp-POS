@@ -30,6 +30,11 @@ export default {
                     url: 'arqueos',
                     text: 'Arqueos'
                 },
+                {
+                    active: 4,
+                    url: 'mora',
+                    text: 'Mora'
+                },
             ]
         }
     }

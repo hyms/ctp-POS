@@ -33,7 +33,7 @@ class OrdenesTrabajo extends Model
         return $estado[$id];
     }
 
-    public static function getAll(int $sucursal = null, int $usuario = null, array $report = [])
+    public static function getAll(int $sucursal = null, int $usuario = null, array $report = [],int $tipo=null)
     {
         $ordenes = DB::table(self::$tables);
         if (!empty($sucursal)) {
@@ -45,17 +45,27 @@ class OrdenesTrabajo extends Model
         $ordenes = $ordenes
             ->whereNull('deleted_at')
             ->orderBy('created_at', 'desc');
-
+        if (!empty($tipo)) {
+            $ordenes = $ordenes->where('tipoOrden', '=', $tipo);
+        }
         if (!empty($report)) {
             if (isset($report['fecha'])) {
                 $fecha = Carbon::parse($report['fecha']);
                 $ordenes = $ordenes->whereBetween('created_at', [$fecha->startOfDay()->toDateTimeString(), $fecha->endOfDay()->toDateTimeString()]);
+            }
+            if (isset($report['fechaI'])&&isset($report['fechaF'])) {
+                $fechaI = Carbon::parse($report['fechaI']);
+                $fechaF = Carbon::parse($report['fechaF']);
+                $ordenes = $ordenes->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()]);
             }
             if (isset($report['orden'])) {
                 $ordenes = $ordenes->where('correlativo', '=', $report['orden']);
             }
             if (isset($report['responsable'])) {
                 $ordenes = $ordenes->where('responsable', '=', $report['responsable']);
+            }
+            if (isset($report['cliente'])) {
+                $ordenes = $ordenes->where('cliente', '=', $report['cliente']);
             }
         } else {
             $ordenes->limit(100);
