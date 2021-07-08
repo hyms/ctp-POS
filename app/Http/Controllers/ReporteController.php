@@ -11,6 +11,7 @@ use App\Models\ProductoStock;
 use App\Models\Recibo;
 use App\Models\Sucursal;
 use App\Models\TipoProductos;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -236,8 +237,8 @@ class ReporteController extends Controller
         $data = ['table' => [], 'fields' => []];
         if (!$validator->fails()) {
             $tipoBusqueda = 2;
-            $clientes = Cliente::getAll($request['sucursal'])->toArray();
-            foreach ($clientes as $key => $cliente) {
+            $clientesAll = Cliente::getAll($request['sucursal'])->toArray();
+            foreach ($clientesAll as $key => $cliente) {
                 $totalCliente = 0;
                 $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, ['cliente' => $cliente->id, 'fechaI' => $request['fechaI'], 'fechaF' => $request['fechaF']]);
                 $ordenes->where('estado', '=', $tipoBusqueda);
@@ -256,12 +257,25 @@ class ReporteController extends Controller
                     $ordenes[$keyO]->totalDeuda = $totalVenta - $totalPagado;
                 }
                 $total += $totalCliente;
-                $clientes[$key]->ordenes = $ordenes;
-                $clientes[$key]->fields = ['codigoServicio', 'totalDeuda', [
-                    'key' => 'created_at',
-                    'label' => 'Fecha'
-                ], 'detalle'];
-                $clientes[$key]->mora = $totalCliente;
+                if ($totalCliente > 0) {
+                    array_push(
+                        $clientes,
+                        [
+                            'nombreResponsable' => $cliente->nombreResponsable,
+                            'ordenes' => $ordenes,
+                            'fields' => [
+                                'codigoServicio',
+                                'totalDeuda',
+                                [
+                                    'key' => 'created_at',
+                                    'label' => 'Fecha'
+                                ],
+                                'detalle'
+                            ],
+                            'mora' => $totalCliente
+                        ]
+                    );
+                }
             }
             $data = ['table' => $clientes, 'fields' => ['nombreResponsable', 'mora']];
         }
@@ -274,5 +288,58 @@ class ReporteController extends Controller
                 'total' => $total,
                 'data' => $data
             ]);
+    }
+
+    private function rendicion(Request $request, bool $isAdmin)
+    {
+        $movimientos = ['egreso' => [], 'ingreso' => []];
+        $fields = [];
+        if ($isAdmin) {
+            $validator = Validator::make($request->all(), [
+                'sucursal' => 'required',
+                'fechaI' => 'required',
+                'fechaF' => 'required',
+            ]);
+        } else {
+            $validator = Validator::make($request->all(), [
+                'fechaI' => 'required',
+            ]);
+            $request['sucursal']=Auth::user()['sucursal'];
+        }
+        if (!$validator->fails()) {
+            $fechaI = Carbon::parse($request['fechaI']);
+            if ($isAdmin) {
+                $fechaF = Carbon::parse($request['fechaF']);
+            } else {
+                $fechaF = $fechaI;
+            }
+
+            $caja = Cajas::getAll($request['sucursal'])->first();
+            $movimientosGral = DB::table(MovimientoCaja::$tables)
+                ->whereNull('deleted_at')
+                ->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()]);
+            $movimientos = [
+                'egreso' => $movimientosGral->where('cajaOrigen', $caja->id)->get()->toArray(),
+                'ingreso' => $movimientosGral->where('cajaDestino', $caja->id)->get()->toArray()
+            ];
+            $fields=['observaciones',['key'=>'created_at','label'=>'Fecha'],'monto'];
+        }
+        $data = ['table' => $movimientos, 'fields' => $fields];
+        return Inertia::render('Reportes/rendicionDiaria',
+            [
+                'request' => (object)$request,
+                'data' => $data,
+                'admin' => $isAdmin
+            ]);
+    }
+
+    public function rendicionDiaria(Request $request)
+    {
+        return $this->rendicion($request, false);
+    }
+
+    public function rendicionDiariaAdm(Request $request)
+    {
+        return $this->rendicion($request, true);
     }
 }

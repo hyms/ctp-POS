@@ -82,6 +82,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('recibosI');
     Route::get('reportes/placas', [ReporteController::class, 'placasV'])
         ->name('listaReportes');
+    Route::get('reportes/diario', [ReporteController::class, 'rendicionDiaria'])
+        ->name('listaReportes');
 });
 //pdfs
 Route::get('ordenPdf/{id}', [PDFController::class, 'getOrdenDiseño'])
@@ -157,6 +159,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('listaReportes');
     Route::get('reportes/resumen', [ReporteController::class, 'resumen']);
     Route::get('reportes/mora', [ReporteController::class, 'clientes']);
+    Route::get('reportes/rendicion', [ReporteController::class, 'rendicionDiariaAdm']);
 
 });
 

@@ -81,6 +81,11 @@ export default {
                             url: '/reportes/placas',
                             role: 'vendor',
                         },
+                        {
+                            label: 'Rendicion Diaria',
+                            url: '/reportes/diario',
+                            role: 'vendor',
+                        },
                     ]
                 },
                 {
