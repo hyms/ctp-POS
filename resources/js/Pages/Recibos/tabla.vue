@@ -14,6 +14,8 @@
                             :fields="fields"
                             show-empty
                             small
+                            :current-page="currentPage"
+                            :per-page="perPage"
                         >
                             <template #empty="scope">
                                 <p>{{ textoVacio }}</p>
@@ -35,6 +37,16 @@
                         </b-table>
                     </b-card>
                 </div>
+                <b-col>
+                    <b-pagination
+                        v-model="currentPage"
+                        :total-rows="totalRows"
+                        :per-page="perPage"
+                        align="center"
+                        class="my-0"
+                        v-if="totalRows>perPage"
+                    ></b-pagination>
+                </b-col>
             </div>
         </div>
     </div>
@@ -75,6 +87,9 @@ export default {
                     },
                 ],
             itemRow: {},
+            totalRows: 1,
+            currentPage: 1,
+            perPage: 20,
         }
     },
     methods: {
@@ -93,7 +108,11 @@ export default {
         getSucursal($id) {
             return this.sucursales[$id];
         },
-    }
+    },
+    mounted() {
+        // Set the initial number of items
+        this.totalRows = this.ordenes.length;
+    },
 }
 </script>
 
