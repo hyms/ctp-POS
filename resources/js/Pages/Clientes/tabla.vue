@@ -118,7 +118,7 @@ export default {
     },
     mounted() {
         // Set the initial number of items
-        this.totalRows = this.ordenes.length;
+        this.totalRows = this.clientes.length;
     },
 }
 </script>
