@@ -44,7 +44,7 @@ class HandleInertiaRequests extends Middleware
             'user' => fn() => $request->user()
                 ? $request->user()->only('id', 'name', 'email', 'role', 'telefono', 'sucursal')
                 : null,
-            'roles' => [
+            'rolesP' => [
                 'admin' => [0, 1],
                 'vendor' => [0, 1, 2, 5],
                 'desing' => [0, 1, 3, 4],
