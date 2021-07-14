@@ -124,7 +124,7 @@ class CajaController extends Controller
         $registros = $registros
             ->where('tipo', '=', 2)
             ->where($credito ? 'cajaDestino' : 'cajaOrigen', '=', $caja->id)
-            ->limit(20)
+//            ->limit(20)
             ->orderBy('created_at', 'desc')
             ->get();
 
