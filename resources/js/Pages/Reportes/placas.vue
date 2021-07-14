@@ -122,7 +122,7 @@ export default {
     props: {
         sucursales: Object,
         forms: Array,
-        tipoPlacas:Object,
+        tipoPlacas: Object,
         errors: Object,
         data: Object
     },
@@ -159,34 +159,33 @@ export default {
     methods: {
         enviar() {
             let form = {};
-            Object.keys(this.form).forEach(key => {
+            for (let key in this.form) {
                 form[key] = this.form[key].value;
-            })
+            }
             let url = '/reportes/placas';
-            if(this.sucursales.length>0){
+            if (this.sucursales.length > 0) {
                 url = '/admin/reportes/placas';
             }
             this.$inertia.get(url, form)
         },
         getTotal(key) {
             let total = 0;
-            Object.values(this.data['table']).forEach(value => {
-                total += (value[key['key']]*1);
-            })
+            for (let value of this.data['table']) {
+                total += (value[key['key']] * 1);
+            }
             return total;
         }
     },
     created() {
-        Object.keys(this.forms).forEach(key => {
+        for (let key in this.form) {
             this.form[key].value = this.forms[key];
             // if (this.errors[key])) {
             //     this.form[key].state = false;
             // }
-
-        });
-        Object.keys(this.errors).forEach(key => {
+        }
+        for (let key in this.errors()) {
             this.form[key].state = false;
-        })
+        }
     }
 }
 </script>

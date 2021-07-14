@@ -220,9 +220,9 @@ export default {
     methods: {
         enviar() {
             let form = {};
-            Object.keys(this.form).forEach(key => {
+            for(let key in this.form){
                 form[key] = this.form[key].value;
-            })
+            }
             this.$inertia.get('/admin/reportes/mora', form)
         },
         loadModal(item) {
@@ -254,12 +254,12 @@ export default {
         },
     },
     created() {
-        Object.keys(this.request).forEach(key => {
+        for(let key in this.request){
             this.form[key].value = this.request[key];
-        });
-        Object.keys(this.errors).forEach(key => {
+        }
+        for(let key in this.errors){
             this.form[key].state = false;
-        })
+        }
     }
 }
 </script>
