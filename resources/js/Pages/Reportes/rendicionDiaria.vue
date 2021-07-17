@@ -7,7 +7,7 @@
                     <h4 class="header-title m-t-0 m-b-20">Rendición Diaria</h4>
                 </div>
             </div>
-            <b-card >
+            <b-card>
                 <b-form @submit.prevent="enviar">
                     <b-row>
                         <b-col md="5">
@@ -48,37 +48,53 @@
                     </b-row>
                 </b-form>
             </b-card>
-            <b-card>
-                <b-table
-                    striped
-                    hover
-                    :items="data['table']['ingreso']"
-                    :fields="data['fields']"
-                    show-empty
-                    small
-                >
-                    <template v-slot:cell(created_at)="data">
-                        {{ data.value | moment("DD/MM/YYYY HH:mm") }}
-                    </template>
-                    <template #empty="scope">
-                        <p>No existen Datos</p>
-                    </template>
-                </b-table>
-                <b-table
-                    striped
-                    hover
-                    :items="data['table']['egreso']"
-                    :fields="data['fields']"
-                    show-empty
-                    small
-                >
-                    <template v-slot:cell(created_at)="data">
-                        {{ data.value | moment("DD/MM/YYYY HH:mm") }}
-                    </template>
-                    <template #empty="scope">
-                        <p>No existen Datos</p>
-                    </template>
-                </b-table>
+            <b-card no-body class="mb-1">
+                <b-card-header header-tag="header" class="p-1" role="tab">
+                    <b-button block v-b-toggle.accordion-1 variant="secondary">INGRESOS DIARIOS</b-button>
+                </b-card-header>
+                <b-collapse id="accordion-1" visible accordion="my-accordion" role="tabpanel">
+                    <b-card-body class="table-responsive">
+                        <b-table
+                            striped
+                            hover
+                            :items="data['table']['ingreso']"
+                            :fields="data['fields']"
+                            show-empty
+                            small
+                        >
+                            <template v-slot:cell(created_at)="data">
+                                {{ data.value | moment("DD/MM/YYYY HH:mm") }}
+                            </template>
+                            <template #empty="scope">
+                                <p>No existen Datos</p>
+                            </template>
+                        </b-table>
+                    </b-card-body>
+                </b-collapse>
+            </b-card>
+            <b-card no-body class="mb-1">
+                <b-card-header header-tag="header" class="p-1" role="tab">
+                    <b-button block v-b-toggle.accordion-2 variant="secondary">EGRESOS DIARIOS</b-button>
+                </b-card-header>
+                <b-collapse id="accordion-2" visible accordion="my-accordion" role="tabpanel">
+                    <b-card-body class="table-responsive">
+                        <b-table
+                            striped
+                            hover
+                            :items="data['table']['egreso']"
+                            :fields="data['fields']"
+                            show-empty
+                            small
+                        >
+                            <template v-slot:cell(created_at)="data">
+                                {{ data.value | moment("DD/MM/YYYY HH:mm") }}
+                            </template>
+                            <template #empty="scope">
+                                <p>No existen Datos</p>
+                            </template>
+                        </b-table>
+                    </b-card-body>
+                </b-collapse>
             </b-card>
         </div>
     </div>
@@ -96,11 +112,11 @@ export default {
     },
     props: {
         admin: Boolean,
-        sucursales:Object,
-        request:Object,
-        data:Array
+        sucursales: Object,
+        request: Object,
+        data: Object
     },
-    data(){
+    data() {
         return {
             form: {
                 fechaI: {
@@ -120,15 +136,22 @@ export default {
             },
         }
     },
-    methods:{
-        enviar(){
+    methods: {
+        enviar() {
             let form = {};
-            form['fechaI']=this.form.fechaI.value;
-            if(this.admin){
-                form['fechaF']=this.form.fechaF.value;
+            form['fechaI'] = this.form.fechaI.value;
+            if (this.admin) {
+                form['fechaF'] = this.form.fechaF.value;
                 // form.append('fechaI',this.form.fechaI.value);
             }
-            this.$inertia.get(window.location.pathname,form);
+            this.$inertia.get(window.location.pathname, form);
+        }
+    },
+    mounted() {
+        for(const key in this.form) {
+            if (this.request[key] !== undefined && this.request[key] !== '') {
+                this.form[key].value = this.request[key];
+            }
         }
     }
 }

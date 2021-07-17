@@ -11,7 +11,6 @@ use App\Models\ProductoStock;
 use App\Models\Recibo;
 use App\Models\Sucursal;
 use App\Models\TipoProductos;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -304,7 +303,7 @@ class ReporteController extends Controller
             $validator = Validator::make($request->all(), [
                 'fechaI' => 'required',
             ]);
-            $request['sucursal']=Auth::user()['sucursal'];
+            $request['sucursal'] = Auth::user()['sucursal'];
         }
         if (!$validator->fails()) {
             $fechaI = Carbon::parse($request['fechaI']);
@@ -315,14 +314,29 @@ class ReporteController extends Controller
             }
 
             $caja = Cajas::getAll($request['sucursal'])->first();
-            $movimientosGral = DB::table(MovimientoCaja::$tables)
+            $egreso = DB::table(MovimientoCaja::$tables)
                 ->whereNull('deleted_at')
-                ->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()]);
+                ->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()])
+                ->where('cajaOrigen', $caja->id)
+                ->get()
+                ->toArray();
+            $ingreso = DB::table(MovimientoCaja::$tables)
+                ->whereNull(MovimientoCaja::$tables.'.deleted_at')
+                ->whereBetween(MovimientoCaja::$tables.'.created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()])
+                ->where('cajaDestino', $caja->id)
+//                ->rightJoin(OrdenesTrabajo::$tables,OrdenesTrabajo::$tables.'.id','=','ordenTrabajo')
+//                ->select(MovimientoCaja::$tables.'.created_at as created_at',MovimientoCaja::$tables.'.monto as monto',DB::raw('CONCAT(movimientoCajas.Observaciones,\' Orden \',ordenesTrabajo.codigoServicio  ) as observaciones'))
+                ->get()
+                ->toArray();
+            ///recorrer array para llenado de datos del array
+//            $ordenes = DB::table(OrdenesTrabajo::$tables)
+//                ->whereIn('id', $ingreso->pluck('ordenTrabajo'))
+//                ->get();
             $movimientos = [
-                'egreso' => $movimientosGral->where('cajaOrigen', $caja->id)->get()->toArray(),
-                'ingreso' => $movimientosGral->where('cajaDestino', $caja->id)->get()->toArray()
+                'egreso' => $egreso,
+                'ingreso' => $ingreso
             ];
-            $fields=['observaciones',['key'=>'created_at','label'=>'Fecha'],'monto'];
+            $fields = ['observaciones', ['key' => 'created_at', 'label' => 'Fecha'], 'monto'];
         }
         $data = ['table' => $movimientos, 'fields' => $fields];
         return Inertia::render('Reportes/rendicionDiaria',
