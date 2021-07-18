@@ -63,7 +63,6 @@
 <script>
 import Layout from '@/Shared/Layout'
 import FormUser from './form'
-import FormUserE from './formExtras'
 
 export default {
     layout: Layout,
@@ -75,7 +74,6 @@ export default {
     },
     components: {
         FormUser,
-        FormUserE,
     },
     data() {
         return {
@@ -119,13 +117,11 @@ export default {
         },
         getRoles(id) {
             let rol = '';
-            Object.keys(this.roles).forEach(
-                key => {
-                    if (this.roles[key].value == id) {
-                        rol = this.roles[key].text;
-                    }
+            for (let key in this.roles) {
+                if (this.roles[key].value == id) {
+                    rol = this.roles[key].text;
                 }
-            )
+            }
             return rol;
         },
     }

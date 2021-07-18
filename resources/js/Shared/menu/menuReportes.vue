@@ -35,6 +35,11 @@ export default {
                     url: 'mora',
                     text: 'Mora'
                 },
+                {
+                    active: 6,
+                    text: 'Rendicion Diaria',
+                    url: 'rendicion',
+                },
             ]
         }
     }

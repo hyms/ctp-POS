@@ -260,7 +260,7 @@ class ReporteController extends Controller
                     array_push(
                         $clientes,
                         [
-                            'nombreResponsable'=>$cliente->nombreResponsable,
+                            'nombreResponsable' => $cliente->nombreResponsable,
                             'ordenes' => $ordenes,
                             'fields' => [
                                 'codigoServicio',
@@ -287,5 +287,99 @@ class ReporteController extends Controller
                 'total' => $total,
                 'data' => $data
             ]);
+    }
+
+    private function rendicion(Request $request, bool $isAdmin)
+    {
+        $movimientos = ['egreso' => [], 'ingreso' => []];
+        $fields = [];
+        if ($isAdmin) {
+            $validator = Validator::make($request->all(), [
+                'sucursal' => 'required',
+                'fechaI' => 'required',
+                'fechaF' => 'required',
+            ]);
+        } else {
+            $validator = Validator::make($request->all(), [
+                'fechaI' => 'required',
+            ]);
+            $request['sucursal'] = Auth::user()['sucursal'];
+        }
+        if (!$validator->fails()) {
+            $fechaI = Carbon::parse($request['fechaI']);
+            if ($isAdmin) {
+                $fechaF = Carbon::parse($request['fechaF']);
+            } else {
+                $fechaF = $fechaI;
+            }
+
+            $caja = Cajas::getAll($request['sucursal'])->first();
+            $egreso = DB::table(MovimientoCaja::$tables)
+                ->whereNull('deleted_at')
+                ->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()])
+                ->where('cajaOrigen', $caja->id)
+                ->get()
+                ->toArray();
+            $ingreso = DB::table(MovimientoCaja::$tables)
+                ->whereNull(MovimientoCaja::$tables.'.deleted_at')
+                ->whereBetween(MovimientoCaja::$tables.'.created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()])
+                ->where('cajaDestino', $caja->id)
+//                ->rightJoin(OrdenesTrabajo::$tables,OrdenesTrabajo::$tables.'.id','=','ordenTrabajo')
+//                ->select(MovimientoCaja::$tables.'.created_at as created_at',MovimientoCaja::$tables.'.monto as monto',DB::raw('CONCAT(movimientoCajas.Observaciones,\' Orden \',ordenesTrabajo.codigoServicio  ) as observaciones'))
+                ->get()
+                ->toArray();
+            ///recorrer array para llenado de datos del array
+            foreach ($ingreso as $key=>$item){
+                switch ($item->tipo) {
+                    case 0:
+                        $orden = DB::table(OrdenesTrabajo::$tables)
+                            ->where('id',$item->ordenTrabajo)
+                            ->get()
+                            ->first();
+                        $ingreso[$key]->observaciones = "Orden ".(($orden->tipoOrden == null) ? "#".$orden->correlativo : $orden->codigoServicio);
+                        break;
+                    case 4:
+                        $recibo = DB::table(Recibo::$tables)
+                            ->where('movimientoCaja',$item->id)
+                            ->get()
+                            ->first();
+                        if($recibo->codigoVenta) {
+                            $orden = DB::table(OrdenesTrabajo::$tables)
+                                ->where('id', $recibo->codigoVenta)
+                                ->get()
+                                ->first();
+                            $ingreso[$key]->observaciones = "Pago de deuda de la Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
+                        }
+                        else{
+                            $ingreso[$key]->observaciones = $recibo->detalle;
+                        }
+                        break;
+                }
+            }
+            $movimientos = [
+                'egreso' => $egreso,
+                'ingreso' => $ingreso
+            ];
+            $fields = ['observaciones', ['key' => 'created_at', 'label' => 'Fecha'], 'monto'];
+        }
+        $sucursales = Sucursal::getAll()->pluck('nombre', 'id');
+        $data = ['table' => $movimientos, 'fields' => $fields];
+        return Inertia::render('Reportes/rendicionDiaria',
+            [
+                'request' => (object)$request,
+                'data' => $data,
+                'admin' => $isAdmin,
+                'sucursales'=>$sucursales
+            ]);
+    }
+
+    public function rendicionDiaria(Request $request)
+    {
+        return $this->rendicion($request, false);
+    }
+
+    public function rendicionDiariaAdm(Request $request)
+    {
+        return $this->rendicion($request, true);
     }
 }

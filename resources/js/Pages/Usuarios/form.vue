@@ -156,26 +156,25 @@ export default {
                 if ('id' in this.itemRow) {
                     this.idForm = null;
                 }
-                Object.keys(this.form).forEach(key => {
+                for(let key in this.form){
                     this.form[key].value = "";
-                })
+                }
             } else {
                 if ('id' in this.itemRow) {
                     this.idForm = this.itemRow['id'];
                     this.titulo2=this.titulo2 +' '+this.itemRow['correlativo']
                 }
-                Object.keys(this.form).forEach(key => {
+                for(let key in this.form){
                     this.form[key].value = this.itemRow[key];
-                })
+                }
             }
         },
         limpiar() {
-            Object.keys(this.form).forEach(key => {
+            for(let key in this.form){
                 this.form[key].state = null;
                 this.form[key].stateText = null;
-            })
+            }
             this.errors = [];
-            this.titulo2= "Modificar Orden";
         },
         handleOk(bvModalEvt) {
             // Prevent modal from closing
@@ -189,7 +188,7 @@ export default {
             if (this.idForm) {
                 user.append('id', this.idForm);
             }
-            Object.keys(this.form).forEach(key => {
+            for(let key in this.form){
                 if (this.form[key].value != null) {
                     if (['enable'].includes(key)) {
                         user.append(key, this.form[key].value ? '1' : '0');
@@ -197,7 +196,7 @@ export default {
                         user.append(key, this.form[key].value);
                     }
                 }
-            })
+            }
             /* this.$inertia.post('/admin/producto',producto, {
                  onSuccess: (page) => {
                      console.log(page);
@@ -212,7 +211,7 @@ export default {
                         this.$bvModal.hide(this.id)
                         this.$inertia.get(data["path"])
                     }
-                    Object.keys(this.form).forEach(key => {
+                    for(let key in this.form){
                         if (key in data.errors) {
                             this.form[key].state = false;
                             this.form[key].stateText = data.errors[key][0];
@@ -220,7 +219,7 @@ export default {
                             this.form[key].state = true;
                             this.form[key].stateText = "";
                         }
-                    })
+                    }
                 })
                 .catch(error => {
                     // handle error

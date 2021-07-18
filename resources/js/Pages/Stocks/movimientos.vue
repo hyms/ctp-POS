@@ -95,24 +95,20 @@ export default {
     methods: {
         getSucursal(value) {
             let nombre = '';
-            Object.keys(this.sucursales).forEach(
-                key => {
-                    if (value === this.sucursales[key].id) {
-                        nombre = this.sucursales[key].nombre;
-                    }
+            for (let key in this.sucursales) {
+                if (value === this.sucursales[key].id) {
+                    nombre = this.sucursales[key].nombre;
                 }
-            )
+            }
             return nombre;
         },
         getProducto(value) {
             let nombre = '';
-            Object.keys(this.productos).forEach(
-                key => {
-                    if (value === this.productos[key].id) {
-                        nombre = this.productos[key].formato + ' (' + this.productos[key].dimension + ')';
-                    }
+            for (let key in this.productos) {
+                if (value === this.productos[key].id) {
+                    nombre = this.productos[key].formato + ' (' + this.productos[key].dimension + ')';
                 }
-            )
+            }
             return nombre;
         }
     },

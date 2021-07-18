@@ -142,27 +142,27 @@ export default {
                 if ('id' in this.itemRow) {
                     this.idForm = null;
                 }
-                Object.keys(this.form).forEach(key => {
+                for(let key in this.form){
                     this.form[key].value = "";
-                })
+                }
             } else {
                 if ('id' in this.itemRow) {
                     this.idForm = this.itemRow['id'];
                 }
-                Object.keys(this.form).forEach(key => {
+                for(let key in this.form){
                     if (['central', 'enable'].includes(key)) {
                         this.form[key].value = (this.itemRow[key] === 1)
                     } else {
                         this.form[key].value = this.itemRow[key];
                     }
-                })
+                }
             }
         },
         limpiar() {
-            Object.keys(this.form).forEach(key => {
+            for(let key in this.form){
                 this.form[key].state = null;
                 this.form[key].stateText = null;
-            })
+            }
             this.errors = [];
         },
         handleOk(bvModalEvt) {
@@ -177,13 +177,13 @@ export default {
             if (this.idForm) {
                 producto.append('id', this.idForm);
             }
-            Object.keys(this.form).forEach(key => {
+            for(let key in this.form){
                 if (['central', 'enable'].includes(key)) {
                     producto.append(key, this.form[key].value ? 1 : 0);
                 } else {
                     producto.append(key, this.form[key].value);
                 }
-            })
+            }
 
             axios.post('/admin/cliente', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
@@ -191,7 +191,7 @@ export default {
                         this.$bvModal.hide(this.id)
                         this.$inertia.get(data["path"])
                     }
-                    Object.keys(this.form).forEach(key => {
+                    for(let key in this.form){
                         if (key in data.errors) {
                             this.form[key].state = false;
                             this.form[key].stateText = data.errors[key][0];
@@ -199,7 +199,7 @@ export default {
                             this.form[key].state = true;
                             this.form[key].stateText = "";
                         }
-                    })
+                    }
                 })
                 .catch(error => {
                     // handle error

@@ -139,9 +139,9 @@ export default {
         },
         enviar() {
             let form = {};
-            Object.keys(this.form).forEach(key => {
+            for(let key in this.form){
                 form[key] = this.form[key].value;
-            })
+            }
             this.$inertia.get('/arqueo', form)
         },
     }

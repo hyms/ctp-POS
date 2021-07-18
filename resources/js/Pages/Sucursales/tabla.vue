@@ -94,11 +94,11 @@ export default {
                 this.itemRow = item.item;
             }
             let sucursalP = {};
-            Object.keys(this.sucursales).forEach(key => {
+            for(let key in this.sucursales){
                 if (item == null || item.item.id !== this.sucursales[key].id) {
                     sucursalP[this.sucursales[key].id] = this.sucursales[key].nombre;
                 }
-            })
+            }
             this.sucursalPadre = sucursalP;
         },
         borrar(id) {
