@@ -22,8 +22,6 @@ class ReporteController extends Controller
 {
     public function resumen(Request $request)
     {
-        $fechaInicio = null;
-        $fechaFin = null;
         if (count($request->all()) == 0) {
             $fechaInicio = Carbon::now();
             $fechaFin = Carbon::now();
@@ -131,7 +129,7 @@ class ReporteController extends Controller
 //                    'monto' => $orden->montoVenta,
             ];
 
-            foreach ($placas as $key => $placa) {
+            foreach ($placas as $placa) {
                 $row[$placa->formato] = 0;
             }
             $row['observaciones'] = "";
@@ -237,7 +235,7 @@ class ReporteController extends Controller
         if (!$validator->fails()) {
             $tipoBusqueda = 2;
             $clientesAll = Cliente::getAll($request['sucursal'])->toArray();
-            foreach ($clientesAll as $key => $cliente) {
+            foreach ($clientesAll as $cliente) {
                 $totalCliente = 0;
                 $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, ['cliente' => $cliente->id, 'fechaI' => $request['fechaI'], 'fechaF' => $request['fechaF']]);
                 $ordenes->where('estado', '=', $tipoBusqueda);
@@ -307,11 +305,7 @@ class ReporteController extends Controller
         }
         if (!$validator->fails()) {
             $fechaI = Carbon::parse($request['fechaI']);
-            if ($isAdmin) {
-                $fechaF = Carbon::parse($request['fechaF']);
-            } else {
-                $fechaF = $fechaI;
-            }
+            $fechaF = $isAdmin ? Carbon::parse($request['fechaF']) : $fechaI;
 
             $caja = Cajas::getAll($request['sucursal'])->first();
             $egreso = DB::table(MovimientoCaja::$tables)
@@ -330,30 +324,26 @@ class ReporteController extends Controller
                 ->toArray();
             ///recorrer array para llenado de datos del array
             foreach ($ingreso as $key=>$item){
-                switch ($item->tipo) {
-                    case 0:
+                if ($item->tipo == 0) {
+                    $orden = DB::table(OrdenesTrabajo::$tables)
+                        ->where('id', $item->ordenTrabajo)
+                        ->get()
+                        ->first();
+                    $ingreso[$key]->observaciones = "Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
+                } elseif ($item->tipo == 4) {
+                    $recibo = DB::table(Recibo::$tables)
+                        ->where('movimientoCaja', $item->id)
+                        ->get()
+                        ->first();
+                    if ($recibo->codigoVenta) {
                         $orden = DB::table(OrdenesTrabajo::$tables)
-                            ->where('id',$item->ordenTrabajo)
+                            ->where('id', $recibo->codigoVenta)
                             ->get()
                             ->first();
-                        $ingreso[$key]->observaciones = "Orden ".(($orden->tipoOrden == null) ? "#".$orden->correlativo : $orden->codigoServicio);
-                        break;
-                    case 4:
-                        $recibo = DB::table(Recibo::$tables)
-                            ->where('movimientoCaja',$item->id)
-                            ->get()
-                            ->first();
-                        if($recibo->codigoVenta) {
-                            $orden = DB::table(OrdenesTrabajo::$tables)
-                                ->where('id', $recibo->codigoVenta)
-                                ->get()
-                                ->first();
-                            $ingreso[$key]->observaciones = "Pago de deuda de la Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
-                        }
-                        else{
-                            $ingreso[$key]->observaciones = $recibo->detalle;
-                        }
-                        break;
+                        $ingreso[$key]->observaciones = "Pago de deuda de la Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
+                    } else {
+                        $ingreso[$key]->observaciones = $recibo->detalle;
+                    }
                 }
             }
             $movimientos = [
