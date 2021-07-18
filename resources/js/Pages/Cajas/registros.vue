@@ -31,9 +31,8 @@
                                 </template>
                                 <template v-slot:cell(Acciones)="row">
                                     <div class="row-actions">
-                                        <b-button size="sm" class="btn-danger" @click="borrar(row.item.id)" v-if="viewModify(row.item.created_at)">{{
-                                                boton3
-                                            }}
+                                        <b-button size="sm" class="btn-danger" @click="borrar(row.item.id)" v-if="viewModify(row.item.created_at)">
+                                            {{ boton3 }}
                                         </b-button>
                                     </div>
                                 </template>

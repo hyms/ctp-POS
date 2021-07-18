@@ -71,14 +71,19 @@ export default {
                             url: '/cajaDebito',
                             role: 'vendor',
                         },
-                        {
-                            label: 'Arqueo Diario',
-                            url: '/arqueo',
-                            role: 'vendor',
-                        },
+                        // {
+                        //     label: 'Arqueo Diario',
+                        //     url: '/arqueo',
+                        //     role: 'vendor',
+                        // },
                         {
                             label: 'Registro Diario',
                             url: '/reportes/placas',
+                            role: 'vendor',
+                        },
+                        {
+                            label: 'Rendicion Diaria',
+                            url: '/reportes/diario',
                             role: 'vendor',
                         },
                     ]

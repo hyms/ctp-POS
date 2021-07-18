@@ -109,7 +109,7 @@ export default {
                     if (data["status"] == 0) {
                         this.$inertia.reload();
                     }
-                    Object.keys(this.form).forEach(key => {
+                    for(let key in this.form){
                         if (key in data.errors) {
                             this.form[key].state = false;
                             this.form[key].stateText = data.errors[key][0];
@@ -117,7 +117,7 @@ export default {
                             this.form[key].state = true;
                             this.form[key].stateText = "";
                         }
-                    })
+                    }
                 })
                 .catch(error => {
                     // handle error

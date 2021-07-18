@@ -7,6 +7,7 @@ use App\Models\DetallesOrden;
 use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
 use App\Models\TipoProductos;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -242,5 +243,29 @@ class OrdenesController extends Controller
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
         }
+    }
+
+    public function newReposition()
+    {
+        $maxDayReposition = 5;
+        $now = Carbon::now();
+        $initDate = Carbon::now()->subDays($maxDayReposition);
+        $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null, []);
+        $ordenes = $ordenes->whereBetween('updated_at', [$initDate->startOfDay()->toDateTimeString(), $now->endOfDay()->toDateTimeString()]);
+        $ordenes = $ordenes->whereIn('estado', [0, 2, 5]);
+        $ordenes = DetallesOrden::getAll($ordenes->get());
+        $estados = OrdenesTrabajo::estadoCTP();
+        $tiposProductos = TipoProductos::getAll();
+        $productos = ProductoStock::getProducts(Auth::user()['sucursal'], $tiposProductos->toArray());
+        $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
+        $reposiciones = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null, [], 0);
+        return Inertia::render('Ordenes/tablaReposicion', [
+            'ordenes' => $ordenes,
+            'reposiciones' => $reposiciones,
+            'productos' => $productos,
+            'productosAll' => $productosAll,
+            'estados' => $estados,
+            'tiposProductos' => $tiposProductos,
+        ]);
     }
 }

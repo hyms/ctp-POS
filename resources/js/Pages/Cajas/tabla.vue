@@ -99,11 +99,11 @@ export default {
             if (!isNew) {
                 this.itemRow = item.item;
             }
-            Object.keys(this.cajas).forEach(key => {
+            for(let key in this.cajas){
                 if (item == null || item.item.id !== this.cajas[key].id) {
                     cajasP[this.cajas[key].id] = this.cajas[key].nombre;
                 }
-            })
+            }
             this.cajasPadre = cajasP;
         },
         borrar(id) {
@@ -111,11 +111,11 @@ export default {
                 onBefore: () => confirm('Esta seguro?'),
             })
         },
-        getSucursal($id) {
-            return this.sucursales[$id];
+        getSucursal(id) {
+            return this.sucursales[id];
         },
-        getCaja($id) {
-            return this.cajas[$id];
+        getCaja(id) {
+            return this.cajas[id];
         }
     }
 }

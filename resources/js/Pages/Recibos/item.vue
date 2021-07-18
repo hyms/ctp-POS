@@ -147,12 +147,12 @@ export default {
     methods: {
         getProduct(id) {
             let item = {};
-            Object.values(this.productos).forEach((value) => {
+            for(let value of this.productos){
                 if (value.id == id) {
                     item = value;
                     return value;
                 }
-            })
+            }
             if (item) {
                 return item.formato + ' (' + item.dimension + ')';
             }
@@ -172,7 +172,7 @@ export default {
                         this.$bvModal.hide(this.id)
                         this.$inertia.get(data["path"])
                     }
-                    Object.keys(this.form).forEach(key => {
+                    for(let key in this.form){
                         if (key in data.errors) {
                             this.form[key].state = false;
                             this.form[key].stateText = data.errors[key][0];
@@ -180,7 +180,7 @@ export default {
                             this.form[key].state = true;
                             this.form[key].stateText = "";
                         }
-                    })
+                    }
                 })
                 .catch(error => {
                     // handle error
@@ -199,11 +199,11 @@ export default {
         getTotal(detalle) {
             if (detalle) {
                 let total = 0;
-                Object.values(detalle).forEach(value => {
+                for(let value of detalle){
                     if (value) {
                         total += value.costo * value.cantidad;
                     }
-                })
+                }
                 this.total = total;
                 return total;
             }

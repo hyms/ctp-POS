@@ -83,10 +83,10 @@ export default {
             this.form.precioUnidad.value = this.itemRow['precioUnidad']
         },
         limpiar() {
-            Object.keys(this.form).forEach(key => {
+            for(let key in this.form){
                 this.form[key].state = null;
                 this.form[key].stateText = null;
-            })
+            }
             this.errors = [];
         },
         handleOk(bvModalEvt) {
@@ -98,9 +98,9 @@ export default {
             this.sending = true;
             this.limpiar();
             let producto = new FormData();
-            Object.keys(this.form).forEach(key => {
+            for(let key in this.form){
                 producto.append(key, this.form[key].value);
-            })
+            }
             if (this.itemRow['sucursal']) {
                 producto.append('sucursal', this.itemRow['sucursal']);
             }
@@ -117,7 +117,7 @@ export default {
                         this.$bvModal.hide(this.id)
                         this.$inertia.get(data["path"])
                     }
-                    Object.keys(this.form).forEach(key => {
+                    for(let key in this.form){
                         if (key in data.errors) {
                             this.form[key].state = false;
                             this.form[key].stateText = data.errors[key][0];
@@ -125,7 +125,7 @@ export default {
                             this.form[key].state = true;
                             this.form[key].stateText = "";
                         }
-                    })
+                    }
                 })
                 .catch(error => {
                     // handle error

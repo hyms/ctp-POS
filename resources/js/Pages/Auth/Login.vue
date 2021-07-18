@@ -46,13 +46,11 @@
                             </div>
                         </div>
                         <div class="form-group account-btn text-center m-t-10">
-                            <!-- /.col -->
                             <div class="col-12">
                                 <loading-button :loading="sending" class="btn btn-primary shadow-2 mb-4"
                                                 type="submit" :text="'Ingresar'" :textLoad="'Ingresando'">Login
                                 </loading-button>
                             </div>
-                            <!-- /.col -->
                         </div>
                     </form>
 
