@@ -4,7 +4,7 @@
             <li class="nav-item pcoded-menu-caption"><label>{{ value.titulo }}</label></li>
             <template v-for="(link, key) in value.submenu">
                 <template v-if="getPermission(link.role)">
-                    <li :class="'nav-item '+(($page.url === link.url ||$page.url === link.url2)?'active':'')">
+                    <li :class="'nav-item '+((getUrl() === link.url ||getUrl() === link.url2)?'active':'')">
                         <inertia-link
                             :href="link.url"
                             :key="key"
@@ -124,15 +124,18 @@ export default {
     methods: {
         getPermission(role) {
             let value = false;
-            for (const key in this.$page.props.roles) {
+            for (const key in this.$page.props.rolesP) {
                 if (key == role) {
-                    if (this.$page.props.roles[key].includes(this.$page.props.user.role)) {
+                    if (this.$page.props.rolesP[key].includes(this.$page.props.user.role)) {
                         value = true;
                         break;
                     }
                 }
             }
             return value;
+        },
+        getUrl() {
+            return window.location.pathname;
         }
     }
 };
