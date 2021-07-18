@@ -11,4 +11,11 @@ class MovimientoCaja extends Model
     public static $tables = 'movimientoCajas';
     protected $guarded = [];
     use SoftDeletes;
+    //tipo de movimiento
+    // 0 ordenes,
+    // 1
+    // 2 cajaChica
+    // 3
+    // 4 Recibos
+
 }

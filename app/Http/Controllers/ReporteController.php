@@ -329,21 +329,47 @@ class ReporteController extends Controller
                 ->get()
                 ->toArray();
             ///recorrer array para llenado de datos del array
-//            $ordenes = DB::table(OrdenesTrabajo::$tables)
-//                ->whereIn('id', $ingreso->pluck('ordenTrabajo'))
-//                ->get();
+            foreach ($ingreso as $key=>$item){
+                switch ($item->tipo) {
+                    case 0:
+                        $orden = DB::table(OrdenesTrabajo::$tables)
+                            ->where('id',$item->ordenTrabajo)
+                            ->get()
+                            ->first();
+                        $ingreso[$key]->observaciones = "Orden ".(($orden->tipoOrden == null) ? "#".$orden->correlativo : $orden->codigoServicio);
+                        break;
+                    case 4:
+                        $recibo = DB::table(Recibo::$tables)
+                            ->where('movimientoCaja',$item->id)
+                            ->get()
+                            ->first();
+                        if($recibo->codigoVenta) {
+                            $orden = DB::table(OrdenesTrabajo::$tables)
+                                ->where('id', $recibo->codigoVenta)
+                                ->get()
+                                ->first();
+                            $ingreso[$key]->observaciones = "Pago de deuda de la Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
+                        }
+                        else{
+                            $ingreso[$key]->observaciones = $recibo->detalle;
+                        }
+                        break;
+                }
+            }
             $movimientos = [
                 'egreso' => $egreso,
                 'ingreso' => $ingreso
             ];
             $fields = ['observaciones', ['key' => 'created_at', 'label' => 'Fecha'], 'monto'];
         }
+        $sucursales = Sucursal::getAll()->pluck('nombre', 'id');
         $data = ['table' => $movimientos, 'fields' => $fields];
         return Inertia::render('Reportes/rendicionDiaria',
             [
                 'request' => (object)$request,
                 'data' => $data,
-                'admin' => $isAdmin
+                'admin' => $isAdmin,
+                'sucursales'=>$sucursales
             ]);
     }
 

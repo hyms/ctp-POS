@@ -26,7 +26,7 @@ class Recibo extends Model
                 'cajaDestino' => $idcaja,
                 'tipo' => 4,
                 'monto' => $request['monto'],
-                'observaciones' => "venta de insumos",
+                'observaciones' => "Pago de Deuda",
                 'ordenTrabajo' => !empty($ordenTrabajo) ? $ordenTrabajo : "",
                 'user' => Auth::id(),
                 'created_at' => now(),

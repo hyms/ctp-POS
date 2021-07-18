@@ -10,12 +10,31 @@
             <b-card>
                 <b-form @submit.prevent="enviar">
                     <b-row>
-                        <b-col md="5">
+                        <b-col md="4" sm="6" v-if="admin && Object.keys(sucursales).length>0">
+                            <b-form-group
+                                :label="form.sucursal.label"
+                                label-for="sucursal"
+                                :state="form.sucursal.state"
+                            >
+                                <b-form-select
+                                    :placeholder="form.sucursal.label"
+                                    v-model="form.sucursal.value"
+                                    :options="sucursales"
+                                    id="sucursal"
+                                    :state="form.sucursal.state"
+                                >
+                                    <template #first>
+                                        <b-form-select-option value="">-- Seleccione una sucursal --
+                                        </b-form-select-option>
+                                    </template>
+                                </b-form-select>
+                            </b-form-group>
+                        </b-col>
+                        <b-col md="4" sm="6">
                             <b-form-group
                                 :label="form.fechaI.label"
                                 label-for="fechaI"
                                 :state="form.fechaI.state"
-                                label-cols-sm="3"
                             >
                                 <b-input
                                     :type="form.fechaI.type"
@@ -26,12 +45,11 @@
                                 ></b-input>
                             </b-form-group>
                         </b-col>
-                        <b-col md="5" v-if="admin">
+                        <b-col md="4" sm="6" v-if="admin">
                             <b-form-group
                                 :label="form.fechaF.label"
                                 label-for="fechaF"
                                 :state="form.fechaF.state"
-                                label-cols-sm="3"
                             >
                                 <b-input
                                     :type="form.fechaF.type"
@@ -133,6 +151,13 @@ export default {
                     state: null,
                     stateText: null
                 },
+                sucursal: {
+                    label: 'Sucursal',
+                    value: "",
+                    type: "select",
+                    state: null,
+                    stateText: null
+                },
             },
         }
     },
@@ -142,7 +167,7 @@ export default {
             form['fechaI'] = this.form.fechaI.value;
             if (this.admin) {
                 form['fechaF'] = this.form.fechaF.value;
-                // form.append('fechaI',this.form.fechaI.value);
+                form['sucursal'] = this.form.sucursal.value;
             }
             this.$inertia.get(window.location.pathname, form);
         }
