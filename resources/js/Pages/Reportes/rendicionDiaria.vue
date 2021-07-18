@@ -64,11 +64,16 @@
                             <b-button type="submit">Buscar</b-button>
                         </b-col>
                     </b-row>
+                    <b-row>
+                        <b-col>
+                        <h4><span class="badge badge-secondary">Rendicion Total {{totalIngreso - totalEgreso}} Bs</span></h4>
+                        </b-col>
+                    </b-row>
                 </b-form>
             </b-card>
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block v-b-toggle.accordion-1 variant="secondary">INGRESOS DIARIOS</b-button>
+                    <b-button block v-b-toggle.accordion-1 variant="secondary">INGRESOS DIARIOS <span class="badge badge-light">TOTAL {{totalIngreso}} Bs</span></b-button>
                 </b-card-header>
                 <b-collapse id="accordion-1" visible accordion="my-accordion" role="tabpanel">
                     <b-card-body class="table-responsive">
@@ -92,7 +97,7 @@
             </b-card>
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block v-b-toggle.accordion-2 variant="secondary">EGRESOS DIARIOS</b-button>
+                    <b-button block v-b-toggle.accordion-2 variant="secondary">EGRESOS DIARIOS <span class="badge badge-light">TOTAL {{totalEgreso}} Bs</span></b-button>
                 </b-card-header>
                 <b-collapse id="accordion-2" visible accordion="my-accordion" role="tabpanel">
                     <b-card-body class="table-responsive">
@@ -159,6 +164,8 @@ export default {
                     stateText: null
                 },
             },
+            totalIngreso:0,
+            totalEgreso:0,
         }
     },
     methods: {
@@ -170,6 +177,13 @@ export default {
                 form['sucursal'] = this.form.sucursal.value;
             }
             this.$inertia.get(window.location.pathname, form);
+        },
+        getTotal(table){
+            let total = 0;
+            for(const value of table){
+                total += parseFloat(value.monto);
+            }
+            return total;
         }
     },
     mounted() {
@@ -178,6 +192,9 @@ export default {
                 this.form[key].value = this.request[key];
             }
         }
-    }
+        this.totalEgreso=this.getTotal(this.data['table']['egreso']);
+        this.totalIngreso=this.getTotal(this.data['table']['ingreso']);
+    },
+
 }
 </script>
