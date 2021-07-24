@@ -137,7 +137,7 @@ export default {
         productos: Object,
         productosAll: Array,
         estados: Object,
-        report: Array,
+        report: Object,
         isVenta: Boolean,
         typeReport: Number,
         tiposProductos: Array,

@@ -337,7 +337,8 @@ class ReporteController extends Controller
                         ->first();
                     if ($recibo->codigoVenta) {
                         $orden = DB::table(OrdenesTrabajo::$tables)
-                            ->where('id', $recibo->codigoVenta)
+                            ->where('correlativo', $recibo->codigoVenta)
+                            ->where('sucursal', $recibo->sucursal)
                             ->get()
                             ->first();
                         $ingreso[$key]->observaciones = "Pago de deuda de la Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
