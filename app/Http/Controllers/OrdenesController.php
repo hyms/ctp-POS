@@ -41,7 +41,7 @@ class OrdenesController extends Controller
             'productosAll' => $productosAll,
             'estados' => $estados,
             'isVenta' => $venta,
-            'report' => $report,
+            'report' => (object)$report,
             'typeReport' => $typeReport,
             'tiposProductos' => $tiposProductos,
         ]);
