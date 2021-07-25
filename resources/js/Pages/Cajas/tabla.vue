@@ -57,7 +57,7 @@
 <script>
 import Layout from '@/Shared/Layout'
 import FormProducto from './form'
-import Menu from '@/Shared/menu/menuCajas';
+import Menu from './menuCajas';
 
 export default {
     layout: Layout,

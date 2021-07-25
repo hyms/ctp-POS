@@ -66,6 +66,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('listaOrdenesV');
     Route::get('realizados', [OrdenesController::class, 'getListVenta'])
         ->name('reporteOrden');
+    Route::get('reposicion', [OrdenesController::class, 'newReposition'])
+        ->name('reposicion');
     Route::get('arqueo', [CajaController::class, 'arqueo'])
         ->name('arqueo');
     Route::get('cajaDebito', [CajaController::class, 'getDebito'])
@@ -78,7 +80,13 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('credito');
     Route::delete('cajaMovimiento', [CajaController::class, 'borrarMovimiento'])
         ->name('cajaMovimiento');
-    Route::get('recibosIngreso', [ReciboController::class, 'getAll'])
+    Route::delete('recibo/{id}', [ReciboController::class, 'borrar'])
+        ->name('recibosBorrar');
+    Route::post('recibo', [ReciboController::class, 'post'])
+        ->name('guardarRecibo');
+    Route::get('recibosIngreso', [ReciboController::class, 'getIngreso'])
+        ->name('recibosI');
+    Route::get('recibosEgreso', [ReciboController::class, 'getEgreso'])
         ->name('recibosI');
     Route::get('reportes/placas', [ReporteController::class, 'placasV'])
         ->name('listaReportes');
@@ -90,6 +98,8 @@ Route::get('ordenPdf/{id}', [PDFController::class, 'getOrdenDiseño'])
     ->name('pdfOrdenD')->middleware('auth');
 Route::get('ordenPdfV/{id}', [PDFController::class, 'getOrdenVenta'])
     ->name('pdfOrdenV')->middleware('auth');
+Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
+    ->name('pdfRecibo')->middleware('auth');
 //Admin
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     //productos

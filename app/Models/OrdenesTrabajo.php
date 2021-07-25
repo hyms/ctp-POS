@@ -21,7 +21,7 @@ class OrdenesTrabajo extends Model
     {
         $estado = [
             '-1' => 'Anulado',
-            '0' => 'Cancelado',
+            '0' => 'Pagado',
             '1' => 'En Proceso',
             '2' => 'Deuda',
             '5' => 'Quemado'
@@ -151,7 +151,7 @@ class OrdenesTrabajo extends Model
             $item = DB::table(self::$tables)->where('id', '=', $orden['id'])->get()->first();
             $values = [
                 'codigo' => '',
-                'detalle' => 'pago de deuda de orden #' . $item->correlativo,
+                'detalle' => 'pago de deuda de orden ' . (($item->tipoOrden == null) ? "#" . $item->correlativo : $item->codigoServicio),
                 'nombre' => $item->responsable,
                 'ciNit' => '',
                 'codigoVenta' => $item->correlativo,

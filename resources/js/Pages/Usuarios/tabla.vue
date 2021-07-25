@@ -13,7 +13,6 @@
                             <b-button v-b-modal="'userModal'" @click="loadModal()">{{ boton1 }}</b-button>
                             <FormUser :isNew="isNew" id="userModal" :itemRow="itemRow" :sucursales="sucursales"
                                       :roles="roles"></FormUser>
-                            <FormUserE id="userModalE" :itemRow="itemRow"></FormUserE>
                         </div>
                     </div>
 
@@ -42,9 +41,6 @@
                                     <div class="row-actions">
                                         <b-button v-b-modal="'userModal'" @click="loadModal(false,row)">
                                             {{ boton2 }}
-                                        </b-button>
-                                        <b-button v-b-modal="'userModal'" @click="loadModal(false,row)">
-                                            {{ boton4 }}
                                         </b-button>
                                         <b-button class="btn-danger" @click="borrar(row.item.id)">
                                             {{ boton3 }}
@@ -81,7 +77,6 @@ export default {
             boton1: "Nuevo",
             boton2: "Modificar",
             boton3: "Borrar",
-            boton4: "Extras",
             titulo: 'Usuarios',
             textoVacio: 'No existen Usuarios',
             idModal: 'userModal',

@@ -1,8 +1,13 @@
 <template>
     <div class="content-w">
         <div class="content-box">
-            <Menu :active="credito?2:1"></Menu>
-            <div class="tab-content">
+<!--            <Menu :active="credito?2:1"></Menu>-->
+<!--            <div class="tab-content">-->
+            <div class="row">
+                <div class="col-sm-12">
+                    <h4 class="header-title m-t-0 m-b-20">Registro de Caja Chica</h4>
+                </div>
+            </div>
                 <div class="row m-b-20">
                     <div class="col">
                         <b-button v-b-modal="'cajaModal'" @click="loadModal()">{{ boton1 }}</b-button>
@@ -52,13 +57,13 @@
                 </div>
             </div>
         </div>
-    </div>
+<!--    </div>-->
 </template>
 
 <script>
 import Layout from '@/Shared/Layout'
 import Form from './formMovimiento'
-import Menu from '@/Shared/menu/menuRegistroCajas';
+import Menu from './menuRegistroCajas';
 import moment from 'moment';
 
 export default {

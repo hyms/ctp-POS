@@ -13,10 +13,8 @@
                         <i class="feather icon-unlock auth-icon"></i>
                     </div>
                     <h3 class="mb-4">Ingresar</h3>
-                    <b-alert variant="danger" dismissible :show="Object.values(errors).length > 0">
-                        <div v-for="(value,key) in errors">
-                            {{ key }}: {{ value }}
-                        </div>
+                    <b-alert variant="danger" dismissible :show="!!errors.usuario">
+                        {{ errors.usuario }}
                     </b-alert>
                     <form class="form-horizontal m-t-20" @submit.prevent="submit">
                         <div class="input-group mb-3">
@@ -26,6 +24,8 @@
                                 placeholder="Usuario"
                                 trim
                                 type="text"
+                                :state="state(errors.username)"
+                                :invalid-feedback="errors.username"
                             ></b-form-input>
                         </div>
                         <div class="input-group mb-4">
@@ -35,6 +35,8 @@
                                 placeholder="Contraseña"
                                 trim
                                 type="password"
+                                :state="state(errors.password)"
+                                :invalid-feedback="errors.password"
                             ></b-form-input>
                         </div>
                         <div class="form-group text-left">
@@ -82,17 +84,19 @@ export default {
     },
     methods: {
         submit() {
-            const data = {
-                username: this.form.username,
-                password: this.form.password,
-                remember: this.form.remember,
-            }
-
-            this.$inertia.post('/login', data, {
+            this.errors = null;
+            this.$inertia.post('/login', this.form, {
                 onStart: () => this.sending = true,
                 onFinish: () => this.sending = false,
             })
         },
+        state(value){
+            if(value===undefined || Object.keys(this.errors).length===0) {
+                return null;
+            }
+            return !value;
+        }
     },
+
 }
 </script>

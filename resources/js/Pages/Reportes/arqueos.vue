@@ -126,7 +126,7 @@
 
 <script>
 import Layout from '@/Shared/Layout'
-import Menu from "@/Shared/menu/menuReportes";
+import Menu from "./menuReportes";
 
 export default {
     layout: Layout,

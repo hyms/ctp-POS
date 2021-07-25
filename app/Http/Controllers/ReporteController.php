@@ -315,27 +315,33 @@ class ReporteController extends Controller
                 ->get()
                 ->toArray();
             $ingreso = DB::table(MovimientoCaja::$tables)
-                ->whereNull(MovimientoCaja::$tables.'.deleted_at')
-                ->whereBetween(MovimientoCaja::$tables.'.created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()])
+                ->whereNull('deleted_at')
+                ->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()])
                 ->where('cajaDestino', $caja->id)
-//                ->rightJoin(OrdenesTrabajo::$tables,OrdenesTrabajo::$tables.'.id','=','ordenTrabajo')
-//                ->select(MovimientoCaja::$tables.'.created_at as created_at',MovimientoCaja::$tables.'.monto as monto',DB::raw('CONCAT(movimientoCajas.Observaciones,\' Orden \',ordenesTrabajo.codigoServicio  ) as observaciones'))
                 ->get()
                 ->toArray();
             ///recorrer array para llenado de datos del array
-            foreach ($ingreso as $key=>$item){
+            foreach ($ingreso as $key => $item) {
                 if ($item->tipo == 0) {
                     $orden = DB::table(OrdenesTrabajo::$tables)
                         ->where('id', $item->ordenTrabajo)
                         ->get()
                         ->first();
-                    $ingreso[$key]->observaciones = "Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
+                    if ($orden->deleted_at) {
+                        $ingreso[$key]->observaciones = "Eliminado " . $ingreso[$key]->observaciones;
+                        $ingreso[$key]->monto = 0;
+                    } else {
+                        $ingreso[$key]->observaciones = "Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
+                    }
                 } elseif ($item->tipo == 4) {
                     $recibo = DB::table(Recibo::$tables)
                         ->where('movimientoCaja', $item->id)
                         ->get()
                         ->first();
-                    if ($recibo->codigoVenta) {
+                    if ($recibo->deleted_at) {
+                        $ingreso[$key]->observaciones = "Eliminado " . $ingreso[$key]->observaciones;
+                        $ingreso[$key]->monto = 0;
+                    } else if ($recibo->codigoVenta) {
                         $orden = DB::table(OrdenesTrabajo::$tables)
                             ->where('correlativo', $recibo->codigoVenta)
                             ->where('sucursal', $recibo->sucursal)
@@ -347,6 +353,21 @@ class ReporteController extends Controller
                     }
                 }
             }
+            foreach ($egreso as $key => $item) {
+                if ($item->tipo == 4) {
+                    $recibo = DB::table(Recibo::$tables)
+                        ->where('movimientoCaja', $item->id)
+                        ->get()
+                        ->first();
+                    if ($recibo->deleted_at) {
+                        $egreso[$key]->observaciones = "Eliminado " . $egreso[$key]->observaciones;
+                        $egreso[$key]->monto = 0;
+                    } else {
+                        $egreso[$key]->observaciones = $recibo->detalle;
+                    }
+                }
+            }
+
             $movimientos = [
                 'egreso' => $egreso,
                 'ingreso' => $ingreso
@@ -360,7 +381,7 @@ class ReporteController extends Controller
                 'request' => (object)$request,
                 'data' => $data,
                 'admin' => $isAdmin,
-                'sucursales'=>$sucursales
+                'sucursales' => $sucursales
             ]);
     }
 
