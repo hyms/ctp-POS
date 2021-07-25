@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import TopMenu from "./TopMenu";
+import TopMenu from "@/Shared/menu/TopMenu";
 
 export default {
     props: {

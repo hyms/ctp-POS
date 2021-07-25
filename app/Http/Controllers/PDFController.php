@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\DetallesOrden;
 use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
+use App\Models\Recibo;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -93,5 +94,41 @@ class PDFController extends Controller
             $detalle[$key]->stock = $this->getProduct($item->stock, $productos);
         }
         return $detalle;
+    }
+
+    public function getRecibo($id){
+        try {
+            $recibo = Recibo::find($id);
+            if (empty($recibo)) {
+                throw new \UnexpectedValueException("pdf: no data for {$id}");
+            }
+            $mytime = Carbon::parse($recibo->updated_at);
+
+            $data = [
+                'recibo' => $recibo,
+                'fechaOrden' => $mytime->format("d/m/Y H:i"),
+            ];
+
+            $this->mpdf = new Mpdf();
+            $view = View::make('pdfRecibo', $data);
+            $html = $view->render();
+            $this->mpdf->WriteHTML($html);
+            $this->mpdf->page = 0;
+            $this->mpdf->state = 0;
+            unset($this->mpdf->pages[0]);
+            $mpdfView = PDF::loadView('pdfRecibo', $data, [], [
+                'title' => 'Recibo ' . $recibo->secuencia,
+                'margin_top' => 5,
+                'margin_bottom' => 5,
+                'margin_left' => 5,
+                'margin_right' => 5,
+                'format' => array(72.1, $this->mpdf->y + 15),
+                'orientation' => 'P'
+            ]);
+            return $mpdfView->stream($recibo->secuencia . '.pdf');
+        } catch (\Exception $error) {
+            Log::error($error->getMessage());
+            abort(404);
+        }
     }
 }

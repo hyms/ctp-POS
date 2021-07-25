@@ -36,6 +36,7 @@ class Recibo extends Model
             $secuencia = 1;
             $ot = DB::table(self::$tables)
                 ->where('sucursal', '=', $request['sucursal'])
+                ->where('tipo', '=', 0)
                 ->orderBy('secuencia', 'desc')
                 ->limit(1);
             if ($ot->count() > 0) {
@@ -47,13 +48,45 @@ class Recibo extends Model
                 ->insertGetId($request);
         });
     }
+    public static function guardar(array $request, int $idcaja, int $tipo)
+    {
+        $idMovimiento = DB::table(MovimientoCaja::$tables)
+            ->insertGetId([
+                'cajaOrigen' => ($tipo) ? $idcaja : null,
+                'cajaDestino' => ($tipo) ? null : $idcaja,
+                'tipo' => 4,
+                'monto' => $request['monto'],
+                'observaciones'=>$request['detalle'],
+                'user' => Auth::id(),
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        DB::transaction(function () use ($request, $idMovimiento,$tipo) {
+            $secuencia = 1;
+            $ot = DB::table(self::$tables)
+                ->where('sucursal', '=', $request['sucursal'])
+                ->orderBy('secuencia', 'desc')
+                ->where('tipo', '=', $tipo)
+                ->limit(1);
+            if ($ot->count() > 0) {
+                $secuencia = $ot->get()->first()->secuencia + 1;
+            }
+            $request['secuencia'] = $secuencia;
+            $request['movimientoCaja'] = $idMovimiento;
+            DB::table(self::$tables)
+                ->insertGetId($request);
+        });
+    }
 
-    public static function getAll(int $sucursal)
+    public static function getAll(int $sucursal,int $tipo=null)
     {
         $recibos = DB::table(self::$tables)
             ->where('sucursal', '=', $sucursal)
-            ->orderBy('created_at', 'desc');
-
+            ->orderBy('created_at', 'desc')
+            ->whereNull('deleted_at');
+        if($tipo!=null) {
+            $recibos = $recibos->where('tipo', '=', $tipo);
+        }
         return $recibos->get();
     }
 

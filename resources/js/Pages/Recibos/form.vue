@@ -2,7 +2,7 @@
     <div>
         <b-modal
             :id="id"
-            :title="(isNew)?titulo1:titulo2"
+            :title="titulo1 + ((tipo)?' de Egreso':' de Ingreso')"
             @show="reset"
             @hidden="reset"
             @ok="handleOk">
@@ -40,7 +40,7 @@
                 <b-button variant="danger" @click="cancel()">
                     Cancel
                 </b-button>
-                <loading-button :loading="sending" variant="default"
+                <loading-button :loading="sending" variant="dark"
                                 @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
                 </loading-button>
             </template>
@@ -55,9 +55,9 @@ import LoadingButton from '@/Shared/LoadingButton'
 export default {
     name: "recibo",
     props: {
-        isNew: Boolean,
         id: String,
         itemRow: Object,
+        tipo: Number,
     },
     components: {
         LoadingButton
@@ -74,36 +74,22 @@ export default {
                     type: "text",
                     state: null,
                     stateText: null
-                }, descripcion: {
-                    label: 'descripcion',
+                }, ciNit: {
+                    label: 'ciNit',
+                    value: "",
+                    type: "text",
+                    state: null,
+                    stateText: null
+                }, detalle: {
+                    label: 'detalle',
                     value: "",
                     type: "textarea",
                     state: null,
                     stateText: null
-                }, sucursal: {
-                    label: 'sucursal',
-                    value: "",
-                    type: "select",
-                    state: null,
-                    stateText: null,
-                    options: this.sucursales
-                }, dependeDe: {
-                    label: 'Depende de',
-                    value: "",
-                    type: "select",
-                    state: null,
-                    stateText: null,
-                    options: this.cajasPadre
-                }, enable: {
-                    label: 'enable',
-                    value: "",
-                    type: "boolean",
-                    state: null,
-                    stateText: null
                 }, monto: {
-                    label: '',
+                    label: 'Monto',
                     value: "",
-                    type: "hidden",
+                    type: "text",
                     state: null,
                     stateText: null
                 }
@@ -115,29 +101,15 @@ export default {
     methods: {
         reset() {
             this.limpiar();
-
-            if (this.isNew) {
-                if ('id' in this.itemRow) {
-                    this.idForm = null;
-                }
-                for(let key in this.form){
-                    this.form[key].value = "";
-                }
-            } else {
-                if ('id' in this.itemRow) {
-                    this.idForm = this.itemRow['id'];
-                }
-                for(let key in this.form){
-                    if (['enable'].includes(key)) {
-                        this.form[key].value = (this.itemRow[key] === 1)
-                    } else {
-                        this.form[key].value = this.itemRow[key];
-                    }
-                }
+            if ('id' in this.itemRow) {
+                this.idForm = null;
+            }
+            for (let key in this.form) {
+                this.form[key].value = "";
             }
         },
         limpiar() {
-            for(let key in this.form){
+            for (let key in this.form) {
                 this.form[key].state = null;
                 this.form[key].stateText = null;
             }
@@ -151,26 +123,28 @@ export default {
         enviar() {
             this.sending = true;
             this.limpiar();
-            let producto = new FormData();
-            if (this.idForm) {
-                producto.append('id', this.idForm);
+            let recibo = new FormData();
+            for (let key in this.form) {
+                recibo.append(key, this.form[key].value);
             }
-            for(let key in this.form){
-                if (['dependeDe'].includes(key)) {
-                    if (this.form[key].value !== "" && this.form[key].value !== null) {
-                        producto.append(key, this.form[key].value);
-                    }
-                } else if (['enable'].includes(key)) {
-                    producto.append(key, this.form[key].value ? '1' : '0');
-                } else {
-                    producto.append(key, this.form[key].value);
-                }
-            }
+            recibo.append('tipo',this.tipo);
 
-            axios.post('/admin/caja', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            axios.post('/recibo', recibo, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
                         this.$bvModal.hide(this.id)
+                        this.$inertia.get(data["path"])
+                    }
+                    else {
+                        for (let key in this.form) {
+                            if (key in data.errors) {
+                                this.form[key].state = false;
+                                this.form[key].stateText = data.errors[key][0];
+                            } else {
+                                this.form[key].state = true;
+                                this.form[key].stateText = "";
+                            }
+                        }
                     }
                 })
                 .catch(error => {

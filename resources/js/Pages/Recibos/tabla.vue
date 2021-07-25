@@ -1,12 +1,18 @@
 <template>
     <div class="content-w">
         <div class="content-box">
-<!--            <Menu :active="1"></Menu>-->
-            <h3>Recibos</h3>
+            <Menu :active="active"></Menu>
             <div class="tab-content">
-
                 <div class="row m-b-20">
-                    <b-card>
+                    <b-button v-b-modal="'reciboModal'" @click="loadModal()">
+                        {{ boton1 }}
+                    </b-button>
+                    <Form
+                        id="reciboModal"
+                        :tipo="tipo"
+                        :item-row="itemRow"
+                    ></Form>
+                    <b-card class="table-responsive m-t-20">
                         <b-table
                             striped
                             hover
@@ -25,13 +31,7 @@
                             </template>
                             <template v-slot:cell(Acciones)="row">
                                 <div class="row-actions">
-                                    <b-button size="sm" v-b-modal="'cajaModal'" @click="loadModal(false,row)">
-                                        {{ boton2 }}
-                                    </b-button>
-                                    <b-button size="sm" class="btn-danger" @click="borrar(row.item.id)">{{
-                                            boton3
-                                        }}
-                                    </b-button>
+                                    <a class="btn btn-secondary btn-sm" :href="'/reciboPdf/'+row.item.id" target="_blank">Imprimir</a>
                                 </div>
                             </template>
                         </b-table>
@@ -54,25 +54,27 @@
 
 <script>
 import Layout from '@/Shared/Layout'
-// import FormProducto from './form'
-// import Menu from '@/Shared/menu/menuCajas';
+import Form from './form'
+import Menu from './menuRegistro';
+import moment from 'moment';
 
 export default {
     layout: Layout,
     props: {
         recibos: Array,
         errors: Object,
+        active: Number,
+        tipo: Number,
     },
     components: {
-        // FormProducto,
-        // Menu
+        Form,
+        Menu
     },
     data() {
         return {
             isNew: true,
             boton1: "Nuevo",
-            boton2: "Modificar",
-            boton3: "Borrar",
+            boton3: "imprimir",
             titulo: 'Recibos',
             textoVacio: 'No existen recibos',
             fields:
@@ -85,6 +87,7 @@ export default {
                         'key': 'created_at',
                         'label': 'Fecha'
                     },
+                    'Acciones'
                 ],
             itemRow: {},
             totalRows: 1,
@@ -107,6 +110,11 @@ export default {
         },
         getSucursal($id) {
             return this.sucursales[$id];
+        },
+        viewModify(date) {
+            const today = moment();
+            date = moment(date);
+            return moment(today).isSame(date, 'day');
         },
     },
     mounted() {
