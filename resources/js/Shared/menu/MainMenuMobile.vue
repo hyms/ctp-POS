@@ -4,9 +4,9 @@
               -------------------->
     <div class="menu-mobile menu-activated-on-click color-scheme-dark">
         <div class="mm-logo-buttons-w">
-            <inertia-link to="/" class="mm-logo">
+            <Link to="/" class="mm-logo">
                 <img :src="images.logo" alt="logo"/><span>CTP</span>
-            </inertia-link>
+            </Link>
             <div class="mm-buttons">
                 <div class="mobile-menu-trigger" v-b-toggle.my-collapse>
                     <div class="os-icon os-icon-hamburger-menu-1"></div>
@@ -39,6 +39,7 @@
 
 <script>
 import Menu from "./Menu";
+import {Link} from "@inertiajs/inertia-vue";
 
 export default {
     data() {
@@ -51,7 +52,8 @@ export default {
         };
     },
     components: {
-        Menu
+        Menu,
+        Link,
     },
     props: {
         nombre: String,

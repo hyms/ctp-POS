@@ -43,7 +43,7 @@ export default {
         }
     },
     props: {
-        report: Array,
+        report: Object,
     },
     mounted() {
         for (const key in this.report) {

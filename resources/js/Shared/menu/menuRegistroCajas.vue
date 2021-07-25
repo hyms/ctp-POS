@@ -1,20 +1,24 @@
 <template>
     <div>
-        <b-nav tabs class="m-b-20">
+        <ul class="nav nav-tabs m-b-20">
             <li class="nav-item">
-                <inertia-link href="cajaDebito" :class="isActive(1)">Egresos</inertia-link>
+                <Link href="cajaDebito" :class="isActive(1)">Egresos</Link>
             </li>
             <li class="nav-item">
-                <inertia-link href="cajaCredito" :class="isActive(2)">Ingresos</inertia-link>
+                <Link href="cajaCredito" :class="isActive(2)">Ingresos</Link>
             </li>
-        </b-nav>
+        </ul>
     </div>
 </template>
 
 <script>
+import { Link } from '@inertiajs/inertia-vue'
 export default {
     props: {
         active: Number
+    },
+    components: {
+        Link,
     },
     methods: {
         isActive(item) {

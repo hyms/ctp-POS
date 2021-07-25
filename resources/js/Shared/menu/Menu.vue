@@ -5,30 +5,35 @@
             <template v-for="(link, key) in value.submenu">
                 <template v-if="getPermission(link.role)">
                     <li :class="'nav-item '+((getUrl() === link.url ||getUrl() === link.url2)?'active':'')">
-                        <inertia-link
+                        <Link
                             :href="link.url"
                             :key="key"
                             class="nav-link"
                         >
                             <span>{{ link.label }}</span>
-                        </inertia-link>
+                        </Link>
                     </li>
                 </template>
             </template>
         </template>
         <li class="nav-item">
-            <inertia-link href="/logout" method="post" class="nav-link ">
+            <Link href="/logout" method="post" class="nav-link ">
                 <div class="icon-w">
                     <div class=""></div>
                 </div>
                 <span>Salir</span>
-            </inertia-link>
+            </Link>
         </li>
     </ul>
 </template>
 
 <script>
+import {Link} from "@inertiajs/inertia-vue";
+
 export default {
+    components: {
+        Link,
+    },
     data() {
         return {
             menu: [

@@ -2,17 +2,22 @@
     <ul class="nav nav-tabs">
         <template v-for="link in links">
             <li class="nav-item">
-                <inertia-link :href="link.url" :class="isActive(link.active)">{{ link.text }}</inertia-link>
+                <Link :href="link.url" :class="isActive(link.active)">{{ link.text }}</Link>
             </li>
         </template>
     </ul>
 </template>
 
 <script>
+import { Link } from '@inertiajs/inertia-vue'
+
 export default {
     props: {
         active: Number,
         links: Array
+    },
+    components: {
+        Link,
     },
     methods: {
         isActive(item) {

@@ -4,12 +4,12 @@
         <nav class="pcoded-navbar">
             <div class="navbar-wrapper">
                 <div class="navbar-brand header-logo">
-                    <inertia-link href="/" class="b-brand">
+                    <Link href="/" class="b-brand">
                         <div class="b-bg">
                             <i class="feather icon-trending-up"></i>
                         </div>
                         <span class="b-title">XCTP</span>
-                    </inertia-link>
+                    </Link>
                 </div>
                 <div class="navbar-content scroll-div">
                     <MainMenu :nombre="$page.props.auth"/>
@@ -23,12 +23,12 @@
                 <a class="mobile-menu" id="mobile-collapse1" v-b-toggle.sidebar-1>
                     <span></span>
                 </a>
-                <inertia-link href="/" class="b-brand">
+                <Link href="/" class="b-brand">
                     <div class="b-bg">
                         <i class="feather icon-trending-up"></i>
                     </div>
                     <span class="b-title">XCTP</span>
-                </inertia-link>
+                </Link>
             </div>
             <b-sidebar
                 id="sidebar-1"
@@ -67,11 +67,13 @@
 import MainMenuMobile from "./menu/MainMenuMobile";
 import MainMenu from "./menu/MainMenu";
 import axios from "axios";
+import {Link} from "@inertiajs/inertia-vue";
 
 export default {
     components: {
         MainMenu,
-        MainMenuMobile
+        MainMenuMobile,
+        Link,
     },
     data() {
         return {}
