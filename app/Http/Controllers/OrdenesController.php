@@ -23,6 +23,7 @@ class OrdenesController extends Controller
 
     private function get(array $estado, bool $venta = false, array $report = [], int $typeReport = 0)
     {
+        $reposicion = 5;
         $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null, $report);
         $ordenes = $ordenes->whereIn('estado', $estado);
         $ordenes = DetallesOrden::getAll($ordenes->get());
@@ -44,6 +45,7 @@ class OrdenesController extends Controller
             'report' => (object)$report,
             'typeReport' => $typeReport,
             'tiposProductos' => $tiposProductos,
+            'reposicion' => $reposicion
         ]);
     }
 

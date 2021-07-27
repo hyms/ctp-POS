@@ -74,6 +74,10 @@
                                           v-if="row.item.estado==1 && viewModify(row.item.created_at)">
                                     {{ boton3 }}
                                 </b-button>
+                                <b-button variant="info" @click="borrar(row.item.id)" size="sm"
+                                          v-if="[0,2].includes(row.item.estado) && viewReposicion(row.item.created_at)">
+                                    {{ boton5 }}
+                                </b-button>
                             </div>
                         </template>
                     </b-table>
@@ -112,6 +116,7 @@ export default {
             boton2: "Ver",
             boton3: "Anular",
             boton4: "Modificar",
+            boton5: "Reposicion",
             textoVacio: 'No existen Ordenes',
             tipoProductoFiltro: null,
             fields: [
@@ -141,6 +146,7 @@ export default {
         isVenta: Boolean,
         typeReport: Number,
         tiposProductos: Array,
+        reposicion: Number,
     },
     components: {
         formOrden,
@@ -182,6 +188,11 @@ export default {
             date = moment(date);
             return moment(today).isSame(date, 'day');
         },
+        viewReposicion(limitDay) {
+            const today = moment();
+            limitDay = moment(limitDay).add(this.reposicion, 'days');
+            return moment(limitDay).isSameOrAfter(today, 'day');
+        },
         getTipoOrden(value) {
             let text = "";
             for (let tipoProducto of this.tiposProductos) {
@@ -205,9 +216,9 @@ export default {
                 let notification = payload.notification;
                 const alert = new Notification(
                     notification.title, {
-                    body: notification.body,
-                });
-                if(payload.data.orden) {
+                        body: notification.body,
+                    });
+                if (payload.data.orden) {
                     alert.addEventListener('click', () => {
                         window.open('/ordenPdf/' + payload.data.orden, '_blank');
                     });
