@@ -35,6 +35,12 @@
                     :item="itemRow"
                     :productos="productosAll"
                 ></item-orden>
+                <item-reposicion
+                    id="itemRModal"
+                    :isVenta="isVenta"
+                    :item="itemRow"
+                    :productos="productosAll"
+                ></item-reposicion>
                 <div class="table-responsive">
                     <b-table
                         striped
@@ -74,7 +80,8 @@
                                           v-if="row.item.estado==1 && viewModify(row.item.created_at)">
                                     {{ boton3 }}
                                 </b-button>
-                                <b-button variant="info" @click="borrar(row.item.id)" size="sm"
+                                <b-button variant="info" v-b-modal="'itemRModal'"
+                                          @click="loadModal(row.item.tipoOrden,false,row)"
                                           v-if="[0,2].includes(row.item.estado) && viewReposicion(row.item.created_at)">
                                     {{ boton5 }}
                                 </b-button>
@@ -101,6 +108,7 @@
 import Layout from '@/Shared/Layout'
 import formOrden from './form'
 import itemOrden from './item'
+import itemReposicion from './itemReposicion'
 import formSearch from "./formSearch";
 import formClientSearch from "./formClientSearch";
 import moment from 'moment';
@@ -151,6 +159,7 @@ export default {
     components: {
         formOrden,
         itemOrden,
+        itemReposicion,
         formSearch,
         formClientSearch
     },
