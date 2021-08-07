@@ -73,17 +73,26 @@ class OrdenesTrabajo extends Model
         return $ordenes;
     }
 
-    public static function newOrden(array $orden, array $productos, int $id = null)
+    public static function newOrden(array $orden, array $productos, int $id = null,bool $reposicion=false)
     {
         $ordenes = DB::table(self::$tables);
+        if($reposicion){
+            $orden['tipoOrden']="0";
+        }
         $orden['updated_at'] = now();
         if (isset($id)) {
             $ordenes
                 ->where('id', '=', $id)
                 ->update($orden);
         } else {
-            $id = DB::transaction(function () use ($orden) {
-                $tipo = DB::table(TipoProductos::$tables)->where('id', '=', $orden['tipoOrden'])->get()->first();
+            $id = DB::transaction(function () use ($orden,$reposicion) {
+                $tipo = (object)array();
+                if ($reposicion) {
+                    $tipo->codigo = 'R';
+                } else {
+                    $tipo = DB::table(TipoProductos::$tables)->where('id', '=', $orden['tipoOrden'])->get()->first();
+                }
+
                 $correlativo = 1;
                 $ot = DB::table(self::$tables)
                     ->where('sucursal', '=', $orden['sucursal'])
@@ -107,10 +116,10 @@ class OrdenesTrabajo extends Model
 
     public static function getReport(string $fechaI, string $fechaF, string $sucursal, string $tipo = null)
     {
-        $fechaRI = Carbon::parse($fechaI);
-        $fechaRF = Carbon::parse($fechaF);
+        $fechaRI = Carbon::parse($fechaI)->startOfDay();
+        $fechaRF = Carbon::parse($fechaF)->endOfDay();
         $ordenes = DB::table(self::$tables)
-            ->whereBetween('updated_at', [$fechaRI->startOfDay()->toDateTimeString(), $fechaRF->endOfDay()->toDateTimeString()])
+            ->whereBetween('updated_at', [$fechaRI->toDateTimeString(), $fechaRF->toDateTimeString()])
             ->where('sucursal', '=', $sucursal)
             ->whereIn('estado', [0, 2, 5,-1])
             ->whereNull('deleted_at');

@@ -73,8 +73,6 @@ class DetallesOrden extends Model
                     'cantidad' => $item->cantidad,
                     'detalleOrden' => $item->id,
                 ]);
-
-
             }
         }
     }

@@ -231,8 +231,7 @@ class OrdenesController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'orden' => 'required',
-                'detalle' => 'required',
+                'item' => 'required',
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -240,6 +239,14 @@ class OrdenesController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
+            $ordenPost = json_decode($request['item'], true);
+            //armar orden
+            $orden = array();
+            $orden['id'] = $ordenPost['id'];
+            $reposicion = new OrdenesTrabajo();
+
+            $total = DetallesOrden::getTotal($orden['id'], $ordenPost['detallesOrden']);
+
         } catch (\Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
