@@ -31,7 +31,7 @@
             <b-card>
                 <item-orden
                     id="itemModal"
-                    :isVenta="isVenta"
+                    :is-new="isNew"
                     :item="itemRow"
                     :productos="productosAll"
                 ></item-orden>
@@ -60,11 +60,6 @@
                         </template>
                         <template v-slot:cell(Acciones)="row">
                             <div class="row-actions">
-                                <b-button variant="dark" v-b-modal="'ordenModal'"
-                                          @click="loadModal(row.item.tipoOrden,false,row)"
-                                          size="sm" v-if="!isVenta && viewModify(row.item.created_at)">
-                                    {{ boton4 }}
-                                </b-button>
                                 <b-button variant="secondary" v-b-modal="'itemModal'"
                                           @click="loadModal(row.item.tipoOrden,false,row)"
                                           size="sm">
@@ -96,7 +91,7 @@
 <script>
 import Layout from '@/Shared/Layout'
 import formOrden from './form'
-import itemOrden from './item'
+import itemOrden from './itemReposicion'
 import formSearch from "./formSearch";
 import formClientSearch from "./formClientSearch";
 import moment from 'moment';
@@ -106,7 +101,7 @@ export default {
     layout: Layout,
     data() {
         return {
-            isNew: true,
+            isNew: false,
             titulo: 'Ordenes',
             boton1: "Nuevo",
             boton2: "Ver",
@@ -183,6 +178,10 @@ export default {
             return moment(today).isSame(date, 'day');
         },
         getTipoOrden(value) {
+            if(value===0)
+            {
+                return "Reposicion";
+            }
             let text = "";
             for (let tipoProducto of this.tiposProductos) {
                 if (tipoProducto.id === value) {

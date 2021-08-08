@@ -242,10 +242,22 @@ class OrdenesController extends Controller
             $ordenPost = json_decode($request['item'], true);
             //armar orden
             $orden = array();
-            $orden['id'] = $ordenPost['id'];
-            $reposicion = new OrdenesTrabajo();
-
-            $total = DetallesOrden::getTotal($orden['id'], $ordenPost['detallesOrden']);
+            $orden['userDiseñador'] = Auth::id();
+            $orden['responsable'] = $ordenPost['responsable'];
+            $orden['telefono'] = $ordenPost['telefono'];
+            $orden['observaciones'] = !empty($ordenPost['observaciones']) ? $ordenPost['observaciones'] : "";
+            $orden['cliente'] = $ordenPost['cliente'];
+            $orden['reposicion'] = $ordenPost['id'];
+            $orden['montoVenta'] = 0;
+            $orden['sucursal'] = Auth::user()['sucursal'];
+            $orden['estado'] = 10;
+            $detalle = $ordenPost['detallesOrden'];
+            $id = OrdenesTrabajo::newOrden($orden, $detalle, null, true);
+            DetallesOrden::sell($id, true);
+            return response()->json([
+                'status' => 0,
+                'path' => 'reposicion'
+            ]);
 
         } catch (\Exception $error) {
             Log::error($error->getMessage());
@@ -261,7 +273,7 @@ class OrdenesController extends Controller
         $initDate = Carbon::now()->subDays($maxDayReposition);
         $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null, []);
         $ordenes = $ordenes->whereBetween('updated_at', [$initDate->startOfDay()->toDateTimeString(), $now->endOfDay()->toDateTimeString()]);
-        $ordenes = $ordenes->whereIn('estado', [0, 2, 5]);
+        $ordenes = $ordenes->whereIn('estado', [10]);
         $ordenes = DetallesOrden::getAll($ordenes->get());
         $estados = OrdenesTrabajo::estadoCTP();
         $tiposProductos = TipoProductos::getAll();

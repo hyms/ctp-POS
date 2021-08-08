@@ -1,7 +1,7 @@
 <template>
     <b-modal
         :id="id"
-        :title="titulo + ' '+(item.codigoServicio?item.codigoServicio:item.correlativo)">
+        :title="'Reposicion de '+titulo + ' '+(item.codigoServicio?item.codigoServicio:item.correlativo)">
         <div><strong>Cliente:</strong> {{ item.responsable }}</div>
         <div><strong>Telefono:</strong> {{ item.telefono }}</div>
         <br>
@@ -18,8 +18,11 @@
                 <tr v-for="(itemOrden,key) in item.detallesOrden">
                     <td>{{ key + 1 }}</td>
                     <td>{{ getProduct(itemOrden.stock) }}</td>
-                    <td><b-form-spinbutton id="demo-sb" v-model="itemOrden.cantidad" min="0"
-                                           max="100" size="sm" inline></b-form-spinbutton></td>
+                    <td>
+                        <b-form-spinbutton id="demo-sb" v-model="itemOrden.cantidad" min="0"
+                                           max="100" size="sm" inline v-if="isNew"></b-form-spinbutton>
+                        <span v-else>{{ itemOrden.cantidad }}</span>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -34,10 +37,12 @@
             <b-button size="sm" variant="danger" @click="cancel()">
                 Cerrar
             </b-button>
-            <a class="btn btn-secondary btn-sm" :href="getUrlPrint(item.id)" target="_blank">Imprimir</a>
-            <loading-button :loading="sending" :variant="'dark'" :size="'sm'"
-                             @click.native="guardar()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
-            </loading-button>
+            <template>
+                <loading-button :loading="sending" :variant="'dark'" :size="'sm'"
+                                @click.native="guardar()" :text="'Reponer'" :textLoad="'Guardando'" v-if="isNew">Reponer
+                </loading-button>
+                <a class="btn btn-secondary btn-sm" :href="getUrlPrint(item.id)" target="_blank" v-else>Imprimir</a>
+            </template>
         </template>
     </b-modal>
 </template>
@@ -59,7 +64,7 @@ export default {
         productos: Array,
         item: Object,
         id: String,
-        isVenta: Boolean
+        isNew: Boolean
     },
     components: {
         LoadingButton
@@ -114,9 +119,6 @@ export default {
             return "";
         },
         getUrlPrint(id) {
-            if (this.isVenta) {
-                return '/ordenPdfV/' + id
-            }
             return '/ordenPdf/' + id;
         }
     },

@@ -45,11 +45,11 @@ export default {
                             url: '/ordenes',
                             role: 'desing',
                         },
-                        // {
-                        //     label: 'Reposiciones',
-                        //     url: '/diseño/reposicion',
-                        //     role: [0, 1, 3, 4]
-                        // },
+                        {
+                            label: 'Reposiciones',
+                            url: '/reposicion',
+                            role: 'vendor'
+                        },
                         {
                             label: 'Ordenes en Espera',
                             url: '/espera',

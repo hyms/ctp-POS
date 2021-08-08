@@ -68,6 +68,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('reporteOrden');
     Route::get('reposicion', [OrdenesController::class, 'newReposition'])
         ->name('reposicion');
+    Route::post('reposicion', [OrdenesController::class, 'postRepocision'])
+        ->name('reposicionGuardar');
     Route::get('arqueo', [CajaController::class, 'arqueo'])
         ->name('arqueo');
     Route::get('cajaDebito', [CajaController::class, 'getDebito'])

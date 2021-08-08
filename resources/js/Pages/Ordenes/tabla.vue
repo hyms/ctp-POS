@@ -37,7 +37,7 @@
                 ></item-orden>
                 <item-reposicion
                     id="itemRModal"
-                    :isVenta="isVenta"
+                    :is-new="true"
                     :item="itemRow"
                     :productos="productosAll"
                 ></item-reposicion>
