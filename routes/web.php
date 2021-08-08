@@ -68,6 +68,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('reporteOrden');
     Route::get('reposicion', [OrdenesController::class, 'newReposition'])
         ->name('reposicion');
+    Route::post('reposicion', [OrdenesController::class, 'postRepocision'])
+        ->name('reposicionGuardar');
     Route::get('arqueo', [CajaController::class, 'arqueo'])
         ->name('arqueo');
     Route::get('cajaDebito', [CajaController::class, 'getDebito'])
@@ -91,7 +93,9 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::get('reportes/placas', [ReporteController::class, 'placasV'])
         ->name('listaReportes');
     Route::get('reportes/diario', [ReporteController::class, 'rendicionDiaria'])
-        ->name('listaReportes');
+        ->name('diarioReportes');
+    Route::get('reportes/cliente', [ReporteController::class, 'cliente'])
+        ->name('clienteReportes');
 });
 //pdfs
 Route::get('ordenPdf/{id}', [PDFController::class, 'getOrdenDiseño'])

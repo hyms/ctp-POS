@@ -56,7 +56,7 @@ class DetallesOrden extends Model
         return $orden;
     }
 
-    public static function sell(int $idOrden)
+    public static function sell(int $idOrden, bool $reposicion = false)
     {
         $detalle = DB::table(self::$tables)
             ->where('ordenTrabajo', '=', $idOrden)
@@ -72,9 +72,7 @@ class DetallesOrden extends Model
                     'producto' => $item->producto,
                     'cantidad' => $item->cantidad,
                     'detalleOrden' => $item->id,
-                ]);
-
-
+                ], true, $reposicion);
             }
         }
     }

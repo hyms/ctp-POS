@@ -24,7 +24,8 @@ class OrdenesTrabajo extends Model
             '0' => 'Pagado',
             '1' => 'En Proceso',
             '2' => 'Deuda',
-            '5' => 'Quemado'
+            '5' => 'Quemado',
+            '10' => 'Repuesto'
         ];
         if (is_null($id)) {
             return $estado;
@@ -33,7 +34,7 @@ class OrdenesTrabajo extends Model
         return $estado[$id];
     }
 
-    public static function getAll(int $sucursal = null, int $usuario = null, array $report = [],int $tipo=null)
+    public static function getAll(int $sucursal = null, int $usuario = null, array $report = [], int $tipo = null)
     {
         $ordenes = DB::table(self::$tables);
         if (!empty($sucursal)) {
@@ -53,7 +54,7 @@ class OrdenesTrabajo extends Model
                 $fecha = Carbon::parse($report['fecha']);
                 $ordenes = $ordenes->whereBetween('created_at', [$fecha->startOfDay()->toDateTimeString(), $fecha->endOfDay()->toDateTimeString()]);
             }
-            if (isset($report['fechaI'])&&isset($report['fechaF'])) {
+            if (isset($report['fechaI']) && isset($report['fechaF'])) {
                 $fechaI = Carbon::parse($report['fechaI']);
                 $fechaF = Carbon::parse($report['fechaF']);
                 $ordenes = $ordenes->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()]);
@@ -73,17 +74,26 @@ class OrdenesTrabajo extends Model
         return $ordenes;
     }
 
-    public static function newOrden(array $orden, array $productos, int $id = null)
+    public static function newOrden(array $orden, array $productos, int $id = null, bool $reposicion = false)
     {
         $ordenes = DB::table(self::$tables);
+        if ($reposicion) {
+            $orden['tipoOrden'] = "0";
+        }
         $orden['updated_at'] = now();
         if (isset($id)) {
             $ordenes
                 ->where('id', '=', $id)
                 ->update($orden);
         } else {
-            $id = DB::transaction(function () use ($orden) {
-                $tipo = DB::table(TipoProductos::$tables)->where('id', '=', $orden['tipoOrden'])->get()->first();
+            $id = DB::transaction(function () use ($orden, $reposicion) {
+                $tipo = (object)array();
+                if ($reposicion) {
+                    $tipo->codigo = 'R';
+                } else {
+                    $tipo = DB::table(TipoProductos::$tables)->where('id', '=', $orden['tipoOrden'])->get()->first();
+                }
+
                 $correlativo = 1;
                 $ot = DB::table(self::$tables)
                     ->where('sucursal', '=', $orden['sucursal'])
@@ -107,12 +117,12 @@ class OrdenesTrabajo extends Model
 
     public static function getReport(string $fechaI, string $fechaF, string $sucursal, string $tipo = null)
     {
-        $fechaRI = Carbon::parse($fechaI);
-        $fechaRF = Carbon::parse($fechaF);
+        $fechaRI = Carbon::parse($fechaI)->startOfDay();
+        $fechaRF = Carbon::parse($fechaF)->endOfDay();
         $ordenes = DB::table(self::$tables)
-            ->whereBetween('updated_at', [$fechaRI->startOfDay()->toDateTimeString(), $fechaRF->endOfDay()->toDateTimeString()])
+            ->whereBetween('updated_at', [$fechaRI->toDateTimeString(), $fechaRF->toDateTimeString()])
             ->where('sucursal', '=', $sucursal)
-            ->whereIn('estado', [0, 2, 5,-1])
+            ->whereIn('estado', [0, 2, 5, -1])
             ->whereNull('deleted_at');
         if (!empty($tipo)) {
             $ordenes = $ordenes->where('tipoOrden', '=', $tipo);
@@ -212,9 +222,7 @@ class OrdenesTrabajo extends Model
                     'body' => "Orden " . $orden->codigoServicio
                 ],
             ])->send();
-        }
-        catch (\Exception $error )
-        {
+        } catch (\Exception $error) {
             Log::error($error->getMessage());
         }
     }

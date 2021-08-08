@@ -104,7 +104,7 @@ class ProductoStock extends Model
         return $stock;
     }
 
-    public static function sell(array $request, bool $mov = true)
+    public static function sell(array $request, bool $mov = true, bool $reposicion = false)
     {
         $stock = self::get($request['sucursal'], $request['producto']);
         $cantidad = 0;
@@ -124,7 +124,7 @@ class ProductoStock extends Model
                 'stockOrigen' => $stock->get()->first()->id,
                 'stockDestino' => null,
                 'cantidad' => $request['cantidad'],
-                'observaciones' => "venta de insumos",
+                'observaciones' => (($reposicion) ? "reposicion de insumos" : "venta de insumos"),
                 'detalleOrden' => !empty($request['detalleOrden']) ? $request['detalleOrden'] : "",
                 'user' => Auth::id(),
                 'created_at' => now(),
@@ -171,7 +171,7 @@ class ProductoStock extends Model
             $stocks = array();
             foreach ($tiposProductos as $tiposProducto) {
                 $stockTmp = $stock->clone();
-                $stocks[$tiposProducto->id]=$stockTmp->where('productos.tipo', '=', $tiposProducto->id)->get()->toArray();
+                $stocks[$tiposProducto->id] = $stockTmp->where('productos.tipo', '=', $tiposProducto->id)->get()->toArray();
             }
             return $stocks;
         }
@@ -190,6 +190,7 @@ class ProductoStock extends Model
         }
         return null;
     }
+
     public static function getTipos($sucursal)
     {
         $stock = DB::table(self::$tables);
