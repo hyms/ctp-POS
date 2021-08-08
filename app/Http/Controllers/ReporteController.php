@@ -394,4 +394,59 @@ class ReporteController extends Controller
     {
         return $this->rendicion($request, true);
     }
+
+    public function reporteCliente(Request $request, bool $isAdm)
+    {
+        $movimientos = [];
+        $fields = [];
+        if ($isAdm) {
+            $validator = Validator::make($request->all(), [
+                'sucursal' => 'required',
+                'cliente' => 'required',
+                'fechaI' => 'required',
+            ]);
+        } else {
+            $validator = Validator::make($request->all(), [
+                'fechaI' => 'required',
+                'fechaF' => 'required',
+                'cliente' => 'required',
+            ]);
+            $request['sucursal'] = Auth::user()['sucursal'];
+        }
+        if (!$validator->fails()) {
+            $fechaI = Carbon::parse($request['fechaI']);
+            $fechaF = Carbon::parse($request['fechaF']);
+
+            $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, ['cliente' => $request['cliente'], 'fechaI' => $fechaI, 'fechaF' =>$fechaF]);
+            $ordenes->whereIn('estado',[0,1,2]);
+            $ordenes = DetallesOrden::getAll($ordenes->get());
+            $movimientos=$ordenes;
+            $fields=['codigoServicio', ['key' => 'created_at', 'label' => 'Fecha'], 'montoVenta','Acciones'];
+        }
+        $sucursales = Sucursal::getAll()->pluck('nombre', 'id');
+        $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
+        $clientes = Cliente::getAll($request['sucursal'])->pluck('nombreResponsable','id');
+        $data = ['table' => $movimientos, 'fields' => $fields];
+        return Inertia::render('Reportes/clientes',
+            [
+                'request' => (object)$request,
+                'data' => $data,
+                'admin' => $isAdm,
+                'clientes' => $clientes,
+                'sucursales' => $sucursales,
+                'productosAll' => $productosAll
+            ]);
+    }
+
+    public function cliente(Request $request)
+    {
+        return $this->reporteCliente($request, false);
+    }
+
+    public function clienteAdm(Request $request)
+    {
+        return $this->reporteCliente($request, true);
+    }
+
+
 }

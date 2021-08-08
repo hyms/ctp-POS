@@ -93,7 +93,9 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::get('reportes/placas', [ReporteController::class, 'placasV'])
         ->name('listaReportes');
     Route::get('reportes/diario', [ReporteController::class, 'rendicionDiaria'])
-        ->name('listaReportes');
+        ->name('diarioReportes');
+    Route::get('reportes/cliente', [ReporteController::class, 'cliente'])
+        ->name('clienteReportes');
 });
 //pdfs
 Route::get('ordenPdf/{id}', [PDFController::class, 'getOrdenDiseño'])

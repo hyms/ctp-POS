@@ -91,6 +91,11 @@ export default {
                             url: '/reportes/diario',
                             role: 'vendor',
                         },
+                        {
+                            label: 'Reporte por cliente',
+                            url: '/reportes/cliente',
+                            role: 'vendor',
+                        },
                     ]
                 },
                 {
