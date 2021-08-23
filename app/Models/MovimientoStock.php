@@ -22,4 +22,16 @@ class MovimientoStock extends Model
             ->orderBy(self::$tables . '.updated_at', 'DESC');
         return $movimientos->get();
     }
+
+    public static function getAllTable(array $stock, bool $ingreso)
+    {
+        $movimientos = DB::table(self::$tables);
+        if ($ingreso) {
+            $movimientos = $movimientos->whereIn('stockDestino', $stock);
+        } else {
+            $movimientos = $movimientos->whereIn('stockOrigen', $stock);
+        }
+        $movimientos = $movimientos->orderBy(self::$tables . '.updated_at', 'DESC');
+        return $movimientos->get();
+    }
 }
