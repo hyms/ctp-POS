@@ -6,14 +6,12 @@
                     <h4 class="header-title m-t-0 m-b-20">{{ titulo }}</h4>
                 </div>
             </div>
-            <div class="row m-b-20" v-if="typeReport===0">
+            <div class="row m-b-20">
                 <div class="col">
                     <b-button-group>
-                        <b-button v-for="(tipoProducto,key) in tiposProductos"
-                                  :key="key"
-                                  v-b-modal="'ordenModal'"
-                                  @click="loadModal(tipoProducto.id)">
-                            {{ boton1 + ' ' + tipoProducto.nombre }}
+                        <b-button v-b-modal="'ordenModal'"
+                                  @click="loadModal()">
+                            {{ boton1 }}
                         </b-button>
                     </b-button-group>
                     <formOrden
@@ -31,7 +29,7 @@
                     <b-table
                         striped
                         hover
-                        :items="ordenes"
+                        :items="movimientos"
                         :fields="fields"
                         show-empty
                         small
@@ -41,11 +39,14 @@
                         <template #empty="scope">
                             <p>{{ textoVacio }}</p>
                         </template>
-                        <template v-slot:cell(estado)="data">
-                            {{ estados[data.value] }}
+                        <template v-slot:cell(producto)="data">
+                            {{ getProducto(data.value) }}
                         </template>
-                        <template v-slot:cell(tipoOrden)="data">
-                            {{ getTipoOrden(data.value) }}
+                        <template v-slot:cell(stockOrigen)="data">
+                            {{ getStock(data.value) }}
+                        </template>
+                        <template v-slot:cell(stockDestino)="data">
+                            {{ getStock(data.value) }}
                         </template>
                         <template v-slot:cell(created_at)="data">
                             {{ data.value | moment("DD/MM/YYYY HH:mm") }}
@@ -95,18 +96,6 @@ export default {
             boton5: "Reposicion",
             textoVacio: 'No existen Ordenes',
             tipoProductoFiltro: null,
-            fields: [
-                'tipoOrden',
-                'codigoServicio',
-                'estado',
-                'responsable',
-                'telefono',
-                {
-                    'key': 'created_at',
-                    'label': 'Fecha'
-                },
-                'Acciones'
-            ],
             itemRow: {},
             totalRows: 1,
             currentPage: 1,
@@ -114,15 +103,16 @@ export default {
         }
     },
     props: {
-        productos: Object,
-        movimientos: Object,
+        productos: Array,
+        movimientos: Array,
+        stocks: Array,
+        fields: Array,
     },
     components: {
         formOrden,
     },
     methods: {
-        loadModal(tipo, isNew = true, item = null) {
-            this.tipoProductoFiltro = tipo;
+        loadModal(isNew = true, item = null) {
             this.isNew = isNew;
             this.itemRow = {};
             if (!isNew) {
@@ -159,11 +149,21 @@ export default {
             limitDay = moment(limitDay).add(this.reposicion, 'days');
             return moment(limitDay).isSameOrAfter(today, 'day');
         },
-        getTipoOrden(value) {
+        getProducto(value) {
+            let producto = "";
+            for (let val of this.productos) {
+                if (val['producto'] == value) {
+                    producto = val['formato'] + '(' + val['dimension'] + ')';
+                    break;
+                }
+            }
+            return producto;
+        },
+        getStock(value) {
             let text = "";
-            for (let tipoProducto of this.tiposProductos) {
-                if (tipoProducto.id === value) {
-                    text = tipoProducto.nombre;
+            for (let stock of this.stocks) {
+                if (stock['id'] === value) {
+                    text = stock['sucursal'];
                     break;
                 }
             }
@@ -172,7 +172,7 @@ export default {
     },
     mounted() {
         // Set the initial number of items
-        this.totalRows = this.ordenes.length;
+        this.totalRows = this.movimientos.length;
     },
     created() {
         this.$messaging.onMessage((payload) => {

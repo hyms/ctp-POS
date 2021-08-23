@@ -3,6 +3,7 @@
 use App\Http\Controllers\CajaController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrdenesController;
 use App\Http\Controllers\PDFController;
@@ -96,6 +97,11 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('diarioReportes');
     Route::get('reportes/cliente', [ReporteController::class, 'cliente'])
         ->name('clienteReportes');
+    //inventario
+    Route::get('inventario/ingreso', [InventarioController::class, 'getIngreso'])
+        ->name('ingresoInventario');
+    Route::get('inventario/egreso', [InventarioController::class, 'getEgreso'])
+        ->name('egresoInventario');
 });
 //pdfs
 Route::get('ordenPdf/{id}', [PDFController::class, 'getOrdenDiseño'])
