@@ -96,6 +96,11 @@ export default {
                             url: '/reportes/cliente',
                             role: 'vendor',
                         },
+                        {
+                            label: 'Inventario',
+                            url: '/inventario/ingreso',
+                            role: 'vendor'
+                        },
                     ]
                 },
                 {
