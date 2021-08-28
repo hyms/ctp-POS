@@ -2,7 +2,7 @@
     <div>
         <b-modal
             :id="id"
-            :title="(isNew)?titulo1:titulo2"
+            :title="(ingreso)?titulo1:titulo2"
             @show="reset"
             @hidden="reset"
             @ok="handleOk">
@@ -10,6 +10,7 @@
                 <b-alert dismissible :show="errors.length">
                     {{ errors }}
                 </b-alert>
+
                 <div class="table-responsive">
                     <b-table-simple class="table-hover table-small texto-small">
                         <b-thead>
@@ -35,6 +36,31 @@
                         </b-tbody>
                     </b-table-simple>
                 </div>
+                <template v-for="(item,key) in form">
+                    <b-form-group
+                        :label="item.label"
+                        :label-for="key"
+                        :state="item.state"
+                        :invalid-feedback="item.stateText"
+                        v-if="['text','password','date','textarea','select','search'].includes(item.type)"
+                    >
+                        <b-input
+                            :type="item.type"
+                            :placeholder="item.label"
+                            v-model="item.value"
+                            :id="key"
+                            :state="item.state"
+                            v-if="['text','password','date'].includes(item.type)"
+                        ></b-input>
+                        <b-textarea
+                            v-if="item.type==='textarea'"
+                            :placeholder="item.label"
+                            v-model="item.value"
+                            :id="key"
+                            :state="item.state"
+                        ></b-textarea>
+                    </b-form-group>
+                </template>
             </form>
             <template #modal-footer="{ ok, cancel }">
                 <b-button variant="danger" @click="cancel()">
@@ -60,7 +86,7 @@ export default {
         LoadingButton
     },
     props: {
-        isNew: Boolean,
+        ingreso: Boolean,
         isVenta: Boolean,
         id: String,
         itemRow: Object,
@@ -71,23 +97,9 @@ export default {
     data() {
         return {
             sending: false,
-            titulo1: "Nueva Orden",
-            titulo2: "Modificar Orden",
+            titulo1: "Nuevo Ingreso",
+            titulo2: "Nuevo Egreso",
             form: {
-                responsable: {
-                    label: 'Cliente',
-                    value: "",
-                    type: "search",
-                    state: null,
-                    stateText: null
-                },
-                telefono: {
-                    label: 'Telefono',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },
                 observaciones: {
                     label: 'Observaciones',
                     value: "",
@@ -124,13 +136,6 @@ export default {
                         this.responsableValue = this.itemRow[key];
                     } else {
                         this.form[key].value = this.itemRow[key];
-                    }
-                }
-                for (let key in this.productosSell) {
-                    for (let value of this.itemRow.detallesOrden) {
-                        if (this.productosSell[key].id === value.stock) {
-                            this.productosSell[key].cantidad = value.cantidad;
-                        }
                     }
                 }
             }
@@ -173,7 +178,7 @@ export default {
             if (items.length > 0) {
                 producto.append('productos', JSON.stringify(items));
             }
-            axios.post('/orden', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            axios.post('/inventario/' + ((this.ingreso) ? 'ingreso' : 'egreso'), producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {
                         this.$bvModal.hide(this.id)

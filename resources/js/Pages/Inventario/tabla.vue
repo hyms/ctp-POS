@@ -1,78 +1,76 @@
 <template>
     <div class="content-w">
         <div class="content-box">
-            <div class="row">
-                <div class="col-sm-12">
-                    <h4 class="header-title m-t-0 m-b-20">{{ titulo }}</h4>
+            <Menu :active="active"></Menu>
+            <div class="tab-content">
+                <div class="row m-b-20">
+                    <div class="col">
+                        <b-button-group>
+                            <b-button v-b-modal="'ordenModal'"
+                                      @click="loadModal()">
+                                {{ boton1 }}
+                            </b-button>
+                        </b-button-group>
+                        <formOrden
+                            :ingreso="(active===2)"
+                            id="ordenModal"
+                            :itemRow="itemRow"
+                            :productos="productos"
+                            :productosSell="productosSell()"
+                            :tipo="tipoProductoFiltro"
+                        ></formOrden>
+                    </div>
                 </div>
+                <b-card>
+                    <div class="table-responsive">
+                        <b-table
+                            striped
+                            hover
+                            :items="movimientos"
+                            :fields="fields"
+                            show-empty
+                            small
+                            :current-page="currentPage"
+                            :per-page="perPage"
+                        >
+                            <template #empty="scope">
+                                <p>{{ textoVacio }}</p>
+                            </template>
+                            <template v-slot:cell(producto)="data">
+                                {{ getProducto(data.value) }}
+                            </template>
+                            <template v-slot:cell(stockOrigen)="data">
+                                {{ getStock(data.value) }}
+                            </template>
+                            <template v-slot:cell(stockDestino)="data">
+                                {{ getStock(data.value) }}
+                            </template>
+                            <template v-slot:cell(created_at)="data">
+                                {{ data.value | moment("DD/MM/YYYY HH:mm") }}
+                            </template>
+                            <template v-slot:cell(Acciones)="row">
+                                <div class="row-actions">
+                                    <b-button variant="info" v-b-modal="'itemRModal'"
+                                              @click="loadModal(row.item.tipoOrden,false,row)"
+                                              v-if="[0,2].includes(row.item.estado) && viewReposicion(row.item.created_at)">
+                                        {{ boton5 }}
+                                    </b-button>
+                                </div>
+                            </template>
+                        </b-table>
+                    </div>
+                    <b-col>
+                        <b-pagination
+                            v-model="currentPage"
+                            :total-rows="totalRows"
+                            :per-page="perPage"
+                            align="center"
+                            class="my-0"
+                            v-if="totalRows>perPage"
+                        ></b-pagination>
+                    </b-col>
+                </b-card>
             </div>
-            <div class="row m-b-20">
-                <div class="col">
-                    <b-button-group>
-                        <b-button v-b-modal="'ordenModal'"
-                                  @click="loadModal()">
-                            {{ boton1 }}
-                        </b-button>
-                    </b-button-group>
-                    <formOrden
-                        :isNew="isNew"
-                        id="ordenModal"
-                        :itemRow="itemRow"
-                        :productos="productos[tipoProductoFiltro]"
-                        :productosSell="productosSell()"
-                        :tipo="tipoProductoFiltro"
-                    ></formOrden>
-                </div>
-            </div>
-            <b-card>
-                <div class="table-responsive">
-                    <b-table
-                        striped
-                        hover
-                        :items="movimientos"
-                        :fields="fields"
-                        show-empty
-                        small
-                        :current-page="currentPage"
-                        :per-page="perPage"
-                    >
-                        <template #empty="scope">
-                            <p>{{ textoVacio }}</p>
-                        </template>
-                        <template v-slot:cell(producto)="data">
-                            {{ getProducto(data.value) }}
-                        </template>
-                        <template v-slot:cell(stockOrigen)="data">
-                            {{ getStock(data.value) }}
-                        </template>
-                        <template v-slot:cell(stockDestino)="data">
-                            {{ getStock(data.value) }}
-                        </template>
-                        <template v-slot:cell(created_at)="data">
-                            {{ data.value | moment("DD/MM/YYYY HH:mm") }}
-                        </template>
-                        <template v-slot:cell(Acciones)="row">
-                            <div class="row-actions">
-                                <b-button variant="info" v-b-modal="'itemRModal'"
-                                          @click="loadModal(row.item.tipoOrden,false,row)"
-                                          v-if="[0,2].includes(row.item.estado) && viewReposicion(row.item.created_at)">
-                                    {{ boton5 }}
-                                </b-button>
-                            </div>
-                        </template>
-                    </b-table>
-                </div>
-                <b-col>
-                    <b-pagination
-                        v-model="currentPage"
-                        :total-rows="totalRows"
-                        :per-page="perPage"
-                        align="center"
-                        class="my-0"
-                        v-if="totalRows>perPage"
-                    ></b-pagination>
-                </b-col>
-            </b-card>
         </div>
     </div>
 </template>
@@ -80,6 +78,7 @@
 <script>
 import Layout from '@/Shared/Layout'
 import formOrden from './form'
+import Menu from './menuRegistro';
 import moment from 'moment';
 
 export default {
@@ -87,7 +86,6 @@ export default {
     layout: Layout,
     data() {
         return {
-            isNew: true,
             titulo: 'Ordenes',
             boton1: "Nuevo",
             boton2: "Ver",
@@ -107,17 +105,15 @@ export default {
         movimientos: Array,
         stocks: Array,
         fields: Array,
+        active: Number
     },
     components: {
         formOrden,
+        Menu
     },
     methods: {
-        loadModal(isNew = true, item = null) {
-            this.isNew = isNew;
+        loadModal() {
             this.itemRow = {};
-            if (!isNew) {
-                this.itemRow = item.item;
-            }
         },
         borrar(id) {
             this.$inertia.delete(`orden/${id}`, {
@@ -126,17 +122,14 @@ export default {
         },
         productosSell() {
             let sell = [];
-            if (this.tipoProductoFiltro != null) {
-                const tipoProducto = this.tipoProductoFiltro;
-                for (let key in this.productos[tipoProducto]) {
+                for (let key in this.productos) {
                     sell[key] = {
-                        id: this.productos[tipoProducto][key].id,
+                        id: this.productos[key].id,
                         cantidad: 0,
-                        costo: this.productos[tipoProducto][key].precioUnidad,
-                        producto: this.productos[tipoProducto][key].producto
+                        costo: this.productos[key].precioUnidad,
+                        producto: this.productos[key].producto
                     };
                 }
-            }
             return sell;
         },
         viewModify(date) {

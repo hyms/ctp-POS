@@ -6,6 +6,9 @@ use App\Models\MovimientoStock;
 use App\Models\ProductoStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
 class InventarioController extends Controller
@@ -31,6 +34,7 @@ class InventarioController extends Controller
             'movimientos' => $movimientos,
             'fields' => $fields,
             'stocks' => $stocks,
+            'active' => (($ingreso) ? 2 : 1)
         ]);
     }
 
@@ -45,8 +49,46 @@ class InventarioController extends Controller
     }
 
 
-    public function post()
+    public function postIngreso(Request $request)
     {
+        return $this->post($request,true);
+    }
+    public function postEgreso(Request $request)
+    {
+        return $this->post($request,false);
+    }
+    public function post(Request $request,bool $ingreso)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'productos' => 'required'
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => -1,
+                    'errors' => $validator->errors()
+                ]);
+            }
+            $products = json_decode($request['productos'], true);
+            foreach ($products as $item) {
+                $movimiento = DB::table(MovimientoStock::$tables);
+                $movimiento->insert([
+                    'producto' => $item['producto'],
+                    'stockOrigen' =>  (($ingreso)?null:$item['id']),
+                    'stockDestino' =>  (($ingreso)?$item['id']:null),
+                    'cantidad' => $item['cantidad'],
+                    'observaciones' => $request['observaciones'],
+                    'user' => Auth::id(),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+            return response()->json(["status" => 0, 'path' => '/inventario/'.(($ingreso)?'ingreso':'egreso')]);
+        } catch (\Exception $error) {
+            Log::error($error->getMessage());
+            return response()->json(["status" => -1,
+                'error' => $error,], 500);
+        }
     }
 
     public function delete()
