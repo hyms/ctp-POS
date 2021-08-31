@@ -30,6 +30,12 @@ class Cliente extends Model
         $cliente = DB::table(self::$tables);
         if(!empty($responsable) && !empty($telefono))
         {
+            $cliente->where('nombreResponsable','=',$responsable);
+            $cliente->where('sucursal','=',$sucursal);
+            if($cliente->count()>0)
+            {
+                return $cliente->get()->first()->id;
+            }
             return $cliente->insertGetId([
                 'nombreResponsable' => $responsable,
                 'telefono' => $telefono,
