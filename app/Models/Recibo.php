@@ -48,6 +48,7 @@ class Recibo extends Model
                 ->insertGetId($request);
         });
     }
+
     public static function guardar(array $request, int $idcaja, int $tipo)
     {
         $idMovimiento = DB::table(MovimientoCaja::$tables)
@@ -56,12 +57,12 @@ class Recibo extends Model
                 'cajaDestino' => ($tipo) ? null : $idcaja,
                 'tipo' => 4,
                 'monto' => $request['monto'],
-                'observaciones'=>$request['detalle'],
+                'observaciones' => $request['detalle'],
                 'user' => Auth::id(),
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
-        DB::transaction(function () use ($request, $idMovimiento,$tipo) {
+        DB::transaction(function () use ($request, $idMovimiento, $tipo) {
             $secuencia = 1;
             $ot = DB::table(self::$tables)
                 ->where('sucursal', '=', $request['sucursal'])
@@ -78,15 +79,13 @@ class Recibo extends Model
         });
     }
 
-    public static function getAll(int $sucursal,int $tipo=null)
+    public static function getAll(int $sucursal, int $tipo)
     {
         $recibos = DB::table(self::$tables)
             ->where('sucursal', '=', $sucursal)
             ->orderBy('created_at', 'desc')
             ->whereNull('deleted_at');
-        if($tipo!=null) {
-            $recibos = $recibos->where('tipo', '=', $tipo);
-        }
+        $recibos = $recibos->where('tipo', '=', $tipo);
         return $recibos->get();
     }
 

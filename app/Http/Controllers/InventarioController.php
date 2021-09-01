@@ -51,13 +51,15 @@ class InventarioController extends Controller
 
     public function postIngreso(Request $request)
     {
-        return $this->post($request,true);
+        return $this->post($request, true);
     }
+
     public function postEgreso(Request $request)
     {
-        return $this->post($request,false);
+        return $this->post($request, false);
     }
-    public function post(Request $request,bool $ingreso)
+
+    public function post(Request $request, bool $ingreso)
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -71,11 +73,18 @@ class InventarioController extends Controller
             }
             $products = json_decode($request['productos'], true);
             foreach ($products as $item) {
+                $stock = ProductoStock::find($item['id']);
+                if ($ingreso) {
+                    $stock->cantidad = $stock->cantidad + $item['cantidad'];
+                } else {
+                    $stock->cantidad = $stock->cantidad - $item['cantidad'];
+                }
+                $stock->save();
                 $movimiento = DB::table(MovimientoStock::$tables);
                 $movimiento->insert([
                     'producto' => $item['producto'],
-                    'stockOrigen' =>  (($ingreso)?null:$item['id']),
-                    'stockDestino' =>  (($ingreso)?$item['id']:null),
+                    'stockOrigen' => (($ingreso) ? null : $item['id']),
+                    'stockDestino' => (($ingreso) ? $item['id'] : null),
                     'cantidad' => $item['cantidad'],
                     'observaciones' => $request['observaciones'],
                     'user' => Auth::id(),
@@ -83,7 +92,7 @@ class InventarioController extends Controller
                     'updated_at' => now()
                 ]);
             }
-            return response()->json(["status" => 0, 'path' => '/inventario/'.(($ingreso)?'ingreso':'egreso')]);
+            return response()->json(["status" => 0, 'path' => '/inventario/' . (($ingreso) ? 'ingreso' : 'egreso')]);
         } catch (\Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
