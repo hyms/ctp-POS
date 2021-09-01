@@ -164,6 +164,15 @@
                                     {{ row.item.nombreResponsable }}
                                 </b-button>
                             </template>
+                            <template v-slot:cell(desde)="row">
+                                {{ getDesde(row.item) }}
+                            </template>
+                            <template v-slot:cell(hasta)="row">
+                                {{ getHasta(row.item) }}
+                            </template>
+                            <template v-slot:cell(cantidad)="row">
+                                {{ getCantidad(row.item) }}
+                            </template>
                         </b-table>
                     </div>
                 </b-card>
@@ -175,6 +184,7 @@
 <script>
 import Layout from '@/Shared/Layout'
 import Menu from "./menuReportes";
+import moment from 'moment';
 
 export default {
     layout: Layout,
@@ -220,7 +230,7 @@ export default {
     methods: {
         enviar() {
             let form = {};
-            for(let key in this.form){
+            for (let key in this.form) {
                 form[key] = this.form[key].value;
             }
             this.$inertia.get('/admin/reportes/mora', form)
@@ -252,12 +262,34 @@ export default {
             }
             return "";
         },
+        getDesde(item) {
+            let fecha = moment();
+            for (let data of item.ordenes) {
+                if (moment(data.created_at).isBefore(fecha)) {
+                    fecha = moment(data.created_at);
+                }
+            }
+            return fecha.format("DD/MM/YYYY HH:mm");
+        },
+        getHasta(item) {
+            let fecha = moment(0);
+            for (let data of item.ordenes) {
+                if (moment(fecha).isBefore(data.created_at)) {
+                    fecha = moment(data.created_at);
+                }
+            }
+            console.log(fecha);
+            return fecha.format("DD/MM/YYYY HH:mm");
+        },
+        getCantidad(item) {
+            return item.ordenes.length;
+        }
     },
     created() {
-        for(let key in this.request){
+        for (let key in this.request) {
             this.form[key].value = this.request[key];
         }
-        for(let key in this.errors){
+        for (let key in this.errors) {
             this.form[key].state = false;
         }
     }

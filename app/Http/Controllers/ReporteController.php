@@ -274,7 +274,7 @@ class ReporteController extends Controller
                     );
                 }
             }
-            $data = ['table' => $clientes, 'fields' => ['nombreResponsable', 'mora']];
+            $data = ['table' => $clientes, 'fields' => ['nombreResponsable', 'mora','desde','hasta','cantidad']];
         }
         return Inertia::render('Reportes/mora',
             [
