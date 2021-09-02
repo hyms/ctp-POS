@@ -13,9 +13,10 @@ const path = require('path');
 
 mix.js('resources/js/app.js', 'public/js')
     .js('resources/js/firebase-messaging-sw.js', 'public/')
-    // .postCss('resources/css/app.css', 'public/css' ,[ ])
-    .postCss('resources/css/all.css', 'public/css', [])
-    .postCss('resources/css/main.css', 'public/css', [])
+    .postCss('resources/css/bootstrap.min.css', 'public/css', [])
+    .postCss('resources/css/bootstrap-extend.css', 'public/css', [])
+    .postCss('resources/css/master_style.css', 'public/css', [])
+    .postCss('resources/css/skins/_all-skins.css', 'public/css', [])
 
     .webpackConfig({
         output: {chunkFilename: 'js/[name].js?id=[chunkhash]'},
