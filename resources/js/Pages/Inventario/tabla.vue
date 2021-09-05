@@ -1,27 +1,29 @@
 <template>
-    <div class="content-w">
-        <div class="content-box">
-            <Menu :active="active"></Menu>
-            <div class="tab-content">
-                <div class="row m-b-20">
-                    <div class="col">
-                        <b-button-group>
-                            <b-button v-b-modal="'ordenModal'"
-                                      @click="loadModal()">
-                                {{ boton1 }}
-                            </b-button>
-                        </b-button-group>
-                        <formOrden
-                            :ingreso="(active===2)"
-                            id="ordenModal"
-                            :itemRow="itemRow"
-                            :productos="productos"
-                            :productosSell="productosSell()"
-                            :tipo="tipoProductoFiltro"
-                        ></formOrden>
-                    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="row mb-2">
+                <div class="col">
+                    <b-button-group>
+                        <b-button v-b-modal="'ordenModal'" @click="loadModal()" variant="primary">
+                            {{ boton1 }}
+                        </b-button>
+                    </b-button-group>
+                    <formOrden
+                        :ingreso="(active===2)"
+                        id="ordenModal"
+                        :itemRow="itemRow"
+                        :productos="productos"
+                        :productosSell="productosSell()"
+                        :tipo="tipoProductoFiltro"
+                    ></formOrden>
                 </div>
-                <b-card>
+            </div>
+            <form-search :productos="productosSelect" :report="report"></form-search>
+            <b-card no-body>
+                <b-card-header>
+                    <strong>{{ (active === 2) ? "Ingresos" : "Egresos" }}</strong>
+                </b-card-header>
+                <b-card-body>
                     <div class="table-responsive">
                         <b-table
                             striped
@@ -69,8 +71,8 @@
                             v-if="totalRows>perPage"
                         ></b-pagination>
                     </b-col>
-                </b-card>
-            </div>
+                </b-card-body>
+            </b-card>
         </div>
     </div>
 </template>
@@ -78,7 +80,7 @@
 <script>
 import Layout from '@/Shared/Layout'
 import formOrden from './form'
-import Menu from './menuRegistro';
+import formSearch from "./formSearch";
 import moment from 'moment';
 
 export default {
@@ -102,14 +104,16 @@ export default {
     },
     props: {
         productos: Array,
+        productosSelect: Array,
         movimientos: Array,
         stocks: Array,
         fields: Array,
-        active: Number
+        active: Number,
+        report: Object
     },
     components: {
         formOrden,
-        Menu
+        formSearch
     },
     methods: {
         loadModal() {
@@ -122,14 +126,14 @@ export default {
         },
         productosSell() {
             let sell = [];
-                for (let key in this.productos) {
-                    sell[key] = {
-                        id: this.productos[key].id,
-                        cantidad: 0,
-                        costo: this.productos[key].precioUnidad,
-                        producto: this.productos[key].producto
-                    };
-                }
+            for (let key in this.productos) {
+                sell[key] = {
+                    id: this.productos[key].id,
+                    cantidad: 0,
+                    costo: this.productos[key].precioUnidad,
+                    producto: this.productos[key].producto
+                };
+            }
             return sell;
         },
         viewModify(date) {

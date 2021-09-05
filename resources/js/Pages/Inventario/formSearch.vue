@@ -48,51 +48,34 @@
                                 </div>
                                 <div class="col-sm-5">
                                     <b-form-group
-                                        label="Codigo"
-                                        label-for="orden"
-                                        label-cols="4"
-                                        content-cols="8"
-                                    >
-                                        <b-input
-                                            type="text"
-                                            placeholder="Codigo"
-                                            v-model="searchModel.orden"
-                                            id="orden"
-                                            name="orden"
-                                        ></b-input>
-                                    </b-form-group>
-                                </div>
-                                <div class="col-sm-5">
-                                    <b-form-group
-                                        label="Cliente"
-                                        label-for="responsable"
-                                        label-cols="4"
-                                        content-cols="8"
-                                    >
-                                        <b-input
-                                            type="text"
-                                            placeholder="Cliente"
-                                            v-model="searchModel.responsable"
-                                            id="responsable"
-                                            name="responsable"
-                                        ></b-input>
-                                    </b-form-group>
-                                </div>
-                                <div class="col-sm-5">
-                                    <b-form-group
-                                        label="Estado"
-                                        label-for="estado"
+                                        label="Producto"
+                                        label-for="producto"
                                         label-cols="4"
                                         content-cols="8"
                                     >
                                         <b-select
-                                            type="text"
-                                            placeholder="Estado"
-                                            v-model="searchModel.estado"
-                                            id="estado"
-                                            name="estado"
-                                            :options="estados"
+                                            placeholder="Producto"
+                                            v-model="searchModel.producto"
+                                            id="producto"
+                                            name="producto"
+                                            :options="productos"
                                         ></b-select>
+                                    </b-form-group>
+                                </div>
+                                <div class="col-sm-5">
+                                    <b-form-group
+                                        label="Observaciones"
+                                        label-for="observaciones"
+                                        label-cols="4"
+                                        content-cols="8"
+                                    >
+                                        <b-input
+                                            type="text"
+                                            placeholder="Observaciones"
+                                            v-model="searchModel.observaciones"
+                                            id="observaciones"
+                                            name="observaciones"
+                                        ></b-input>
                                     </b-form-group>
                                 </div>
                                 <div class="col-sm-5" v-if="searchModel.total">
@@ -117,10 +100,8 @@ export default {
             searchModel: {
                 fechaI: "",
                 fechaF: "",
-                orden: "",
-                tipoOrden: "",
-                responsable: "",
-                estado: "",
+                producto: "",
+                observaciones: "",
             },
             total: 0,
             cardCollapse: false,
@@ -128,7 +109,7 @@ export default {
     },
     props: {
         report: Object,
-        estados:Object
+        productos:Object
     },
     mounted() {
         for (const key in this.report) {

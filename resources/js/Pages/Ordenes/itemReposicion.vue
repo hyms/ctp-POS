@@ -38,10 +38,10 @@
                 Cerrar
             </b-button>
             <template>
-                <loading-button :loading="sending" :variant="'dark'" :size="'sm'"
+                <loading-button :loading="sending" :variant="'primary'" :size="'sm'"
                                 @click.native="guardar()" :text="'Reponer'" :textLoad="'Guardando'" v-if="isNew">Reponer
                 </loading-button>
-                <a class="btn btn-secondary btn-sm" :href="getUrlPrint(item.id)" target="_blank" v-else>Imprimir</a>
+                <a class="btn btn-outline-primary btn-sm" :href="getUrlPrint(item.id)" target="_blank" v-else>Imprimir</a>
             </template>
         </template>
     </b-modal>

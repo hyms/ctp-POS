@@ -175,7 +175,7 @@ class ProductoStock extends Model
             }
             return $stocks;
         }
-        return $stock->get()->toArray();
+        return $stock->get();
     }
 
     public static function getProduct($sucursal, $id)

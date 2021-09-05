@@ -16,11 +16,10 @@ class InventarioController extends Controller
     public function get(Request $request, bool $ingreso)
     {
         $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
+        $productos = ProductoStock::getProducts(Auth::user()['sucursal'])->pluck('formato', 'producto');
         $stocks = ProductoStock::getAll(Auth::user()['sucursal']);
         $fields = [
             'producto',
-//        'stockOrigen',
-//        'stockDestino',
             'observaciones',
             'cantidad',
             [
@@ -28,13 +27,15 @@ class InventarioController extends Controller
                 'label' => 'Fecha'
             ],
         ];
-        $movimientos = MovimientoStock::getAllTable($stocks->pluck('id')->toArray(), $ingreso);
+        $movimientos = MovimientoStock::getAllTable($stocks->pluck('id')->toArray(), $ingreso,$request->all());
         return Inertia::render('Inventario/tabla', [
             'productos' => $productosAll,
+            'productosSelect' => $productos,
             'movimientos' => $movimientos,
             'fields' => $fields,
             'stocks' => $stocks,
-            'active' => (($ingreso) ? 2 : 1)
+            'active' => (($ingreso) ? 2 : 1),
+            'report'=>$request->all()
         ]);
     }
 
@@ -100,8 +101,12 @@ class InventarioController extends Controller
         }
     }
 
-    public function delete()
+    public function saldo()
     {
+        $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
+        return Inertia::render('Inventario/saldo', [
+            'productos' => $productosAll,
+        ]);
     }
 
 }
