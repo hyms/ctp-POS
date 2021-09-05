@@ -2,11 +2,6 @@
     <div class="content-w">
         <div class="content-box">
             <Menu :active="1" v-if="Object.keys(sucursales).length>0"></Menu>
-            <div class="row" v-else>
-                <div class="col-sm-12">
-                    <h4 class="header-title m-t-0 m-b-20">Registro Placas</h4>
-                </div>
-            </div>
             <div class="tab-content">
                 <b-card>
                     <template #header>
@@ -69,15 +64,15 @@
                                     </b-form-select>
                                 </b-form-group>
                             </b-col>
-                            <b-col>
-                                <b-button type="submit">Buscar</b-button>
+                            <b-col sm="12">
+                                <b-button type="submit" variant="primary">Buscar</b-button>
                             </b-col>
                         </b-row>
                     </form>
                 </b-card>
                 <b-card v-if="data['table'].length>0">
                     <template #header>
-                        <h5 class="mb-0">Resultados</h5>
+                        <h5 class="mb-0">Registro de Placas</h5>
                     </template>
                     <div class="table-responsive">
                         <b-table
@@ -87,6 +82,7 @@
                             :fields="data['fields']"
                             show-empty
                             small
+                            sticky-header
                         >
                             <template #cell(#)="data">
                                 {{ data.index + 1 }}
