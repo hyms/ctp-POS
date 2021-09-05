@@ -63,10 +63,10 @@
                 </template>
             </form>
             <template #modal-footer="{ ok, cancel }">
-                <b-button variant="danger" @click="cancel()">
+                <b-button variant="danger" @click="cancel()" size="sm">
                     Cancel
                 </b-button>
-                <loading-button :loading="sending" :variant="'dark'"
+                <loading-button :loading="sending" :variant="'primary'" size="sm"
                                 @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
                 </loading-button>
             </template>

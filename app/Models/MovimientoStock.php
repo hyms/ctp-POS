@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -23,13 +24,30 @@ class MovimientoStock extends Model
         return $movimientos->get();
     }
 
-    public static function getAllTable(array $stock, bool $ingreso)
+    public static function getAllTable(array $stock, bool $ingreso,array $request=[])
     {
         $movimientos = DB::table(self::$tables);
         if ($ingreso) {
             $movimientos = $movimientos->whereIn('stockDestino', $stock);
         } else {
             $movimientos = $movimientos->whereIn('stockOrigen', $stock);
+        }
+        if(isset($request))
+        {
+            if (isset($request['fechaI']) && isset($request['fechaF'])) {
+                $fechaI = Carbon::parse($request['fechaI']);
+                $fechaF = Carbon::parse($request['fechaF']);
+                $movimientos = $movimientos->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()]);
+            }
+            if (isset($request['producto'])) {
+                $movimientos = $movimientos->where('producto', '=', $request['producto']);
+            }
+            if (isset($request['observaciones'])) {
+                $movimientos = $movimientos->where('observaciones', 'like', "%{$request['observaciones']}%");
+            }
+        }
+        else{
+            $movimientos = $movimientos->limit(500);
         }
         $movimientos = $movimientos->orderBy(self::$tables . '.updated_at', 'DESC');
         return $movimientos->get();

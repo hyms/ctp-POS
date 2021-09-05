@@ -10,12 +10,13 @@
         </CSidebarBrand>
         <CSidebarNav>
             <template v-for="(value) in menu">
-                <CSidebarNavTitle>
+                <CSidebarNavTitle class="text-uppercase">
                     {{ value.titulo }}
                 </CSidebarNavTitle>
                 <template v-for="(link, key) in value.submenu">
                     <template v-if="Object.values(link).length==1">
-                        <CSidebarNavDropdown :name="Object.keys(link)[0]">
+                        <CSidebarNavDropdown :name="Object.keys(link)[0]"
+                                             v-if="getAllPermission(Object.values(link)[0])" class="text-capitalize">
                             <template v-for="(link2, key2) in Object.values(link)[0]">
                                 <template v-if="getPermission(link2.role)">
                                     <li class="c-sidebar-nav-item">
@@ -24,7 +25,7 @@
                                             :key="key2"
                                             :class="'c-sidebar-nav-link '+((getUrl() === link2.url ||getUrl() === link2.url2)?'c-active':'')"
                                         >
-                                            <span>{{ link2.label }}</span>
+                                            <span class="text-capitalize">{{ link2.label }}</span>
                                         </Link>
                                     </li>
                                 </template>
@@ -39,7 +40,7 @@
                                     :key="key"
                                     :class="'c-sidebar-nav-link '+((getUrl() === link.url ||getUrl() === link.url2)?'c-active':'')"
                                 >
-                                    <span>{{ link.label }}</span>
+                                    <span class="text-capitalize">{{ link.label }}</span>
                                 </Link>
                             </li>
                         </template>
@@ -56,6 +57,7 @@
 <script>
 // import nav from './_nav'
 import {Link} from "@inertiajs/inertia-vue";
+
 export default {
     name: 'TheSidebar',
     // nav,
@@ -109,31 +111,46 @@ export default {
                             url: '/cajaDebito',
                             role: 'vendor',
                         },
-                        // {
-                        //     label: 'Arqueo Diario',
-                        //     url: '/arqueo',
-                        //     role: 'vendor',
-                        // },
                         {
-                            label: 'Registro Diario',
-                            url: '/reportes/placas',
-                            role: 'vendor',
+                            Inventario:[
+                                {
+                                    label: 'Ingresos',
+                                    url: '/inventario/ingreso',
+                                    role: 'vendor'
+                                },
+                                {
+                                    label: 'Egresos',
+                                    url: '/inventario/egreso',
+                                    role: 'vendor'
+                                },
+                                {
+                                    label: 'Saldos',
+                                    url: '/inventario/saldos',
+                                    role: 'vendor'
+                                },
+                            ]
                         },
                         {
-                            label: 'Rendicion Diaria',
-                            url: '/reportes/diario',
-                            role: 'vendor',
+                            reportes:[
+                                {
+                                    label: 'Registro Diario',
+                                    url: '/reportes/placas',
+                                    role: 'vendor',
+                                },
+                                {
+                                    label: 'Rendicion Diaria',
+                                    url: '/reportes/diario',
+                                    role: 'vendor',
+                                },
+                                {
+                                    label: 'Reporte cliente',
+                                    url: '/reportes/cliente',
+                                    role: 'vendor',
+                                },
+                            ]
                         },
-                        {
-                            label: 'Reporte por cliente',
-                            url: '/reportes/cliente',
-                            role: 'vendor',
-                        },
-                        {
-                            label: 'Inventario',
-                            url: '/inventario/ingreso',
-                            role: 'vendor'
-                        },
+
+
                     ]
                 },
                 {
@@ -183,6 +200,20 @@ export default {
                     if (this.$page.props.rolesP[key].includes(this.$page.props.user.role)) {
                         value = true;
                         break;
+                    }
+                }
+            }
+            return value;
+        },
+        getAllPermission(data) {
+            let value = false;
+            for (const val of data) {
+                for (const key in this.$page.props.rolesP) {
+                    if (key == val.role) {
+                        if (this.$page.props.rolesP[key].includes(this.$page.props.user.role)) {
+                            value = true;
+                            break;
+                        }
                     }
                 }
             }

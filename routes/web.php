@@ -98,6 +98,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::get('reportes/cliente', [ReporteController::class, 'cliente'])
         ->name('clienteReportes');
     //inventario
+    Route::get('inventario/saldos', [InventarioController::class, 'saldo'])
+        ->name('saldoInventario');
     Route::get('inventario/ingreso', [InventarioController::class, 'getIngreso'])
         ->name('ingresoInventario');
     Route::get('inventario/egreso', [InventarioController::class, 'getEgreso'])

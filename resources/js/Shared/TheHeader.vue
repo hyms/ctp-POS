@@ -16,7 +16,7 @@
       <CHeaderNav class="d-md-down-none mr-auto">
       </CHeaderNav>
       <CHeaderNav class="mr-4">
-          <CHeaderNavItem class="d-md-down-none mx-2">
+          <CHeaderNavItem class="mx-2">
               <Link href="/logout" method="post" class="c-header-nav-link">
                   <i class="mdi mdi-directions"></i>
                   <span>Salir</span>
