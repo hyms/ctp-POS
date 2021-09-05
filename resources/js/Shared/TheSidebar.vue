@@ -18,11 +18,11 @@
                         <CSidebarNavDropdown :name="Object.keys(link)[0]">
                             <template v-for="(link2, key2) in Object.values(link)[0]">
                                 <template v-if="getPermission(link2.role)">
-                                    <li :class="'c-sidebar-nav-item '+((getUrl() === link2.url ||getUrl() === link2.url2)?'active':'')">
+                                    <li class="c-sidebar-nav-item">
                                         <Link
                                             :href="link2.url"
                                             :key="key2"
-                                            class="c-sidebar-nav-link"
+                                            :class="'c-sidebar-nav-link '+((getUrl() === link2.url ||getUrl() === link2.url2)?'c-active':'')"
                                         >
                                             <span>{{ link2.label }}</span>
                                         </Link>
@@ -33,11 +33,11 @@
                     </template>
                     <template v-else>
                         <template v-if="getPermission(link.role)">
-                            <li :class="'c-sidebar-nav-item '+((getUrl() === link.url ||getUrl() === link.url2)?'active':'')">
+                            <li class="c-sidebar-nav-item">
                                 <Link
                                     :href="link.url"
                                     :key="key"
-                                    class="c-sidebar-nav-link"
+                                    :class="'c-sidebar-nav-link '+((getUrl() === link.url ||getUrl() === link.url2)?'c-active':'')"
                                 >
                                     <span>{{ link.label }}</span>
                                 </Link>
