@@ -110,12 +110,12 @@
             <b-button size="sm" variant="danger" @click="cancel()">
                 Cerrar
             </b-button>
-            <a class="btn btn-secondary btn-sm" :href="getUrlPrint(item.id)" target="_blank">Imprimir</a>
-            <loading-button :loading="sending" :variant="'dark'" :size="'sm'"
+            <a class="btn btn-outline-primary btn-sm" :href="getUrlPrint(item.id)" target="_blank">Imprimir</a>
+            <loading-button :loading="sending" :variant="'primary'" :size="'sm'"
                             v-if="isVenta && [1,5].includes(item.estado)"
                             @click.native="guardarVenta()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
             </loading-button>
-            <loading-button :loading="sending" :variant="'dark'" :size="'sm'" v-if="isVenta && item.estado==2"
+            <loading-button :loading="sending" :variant="'primary'" :size="'sm'" v-if="isVenta && item.estado==2"
                             @click.native="guardarDeuda()" :text="'Pagar'" :textLoad="'Pagando'">Pagar
             </loading-button>
         </template>

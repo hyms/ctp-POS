@@ -25,7 +25,7 @@ class OrdenesTrabajo extends Model
             '1' => 'En Proceso',
             '2' => 'Deuda',
             '5' => 'Quemado',
-            '10' => 'Repuesto'
+            '10' => 'Reposicion'
         ];
         if (is_null($id)) {
             return $estado;
@@ -67,6 +67,9 @@ class OrdenesTrabajo extends Model
             }
             if (isset($report['cliente'])) {
                 $ordenes = $ordenes->where('cliente', '=', $report['cliente']);
+            }
+            if (isset($report['estado'])) {
+                $ordenes = $ordenes->where('estado', '=', $report['estado']);
             }
         } else {
             $ordenes->limit(100);
@@ -183,11 +186,14 @@ class OrdenesTrabajo extends Model
         }
     }
 
-    public static function getDeuda(array $ordenes)
+    public static function getTotal(array $ordenes)
     {
         $pagado = 0;
         $total = 0;
         foreach ($ordenes as $orden) {
+            if ($orden->estado == 1) {
+                continue;
+            }
             $detalle = $orden->detallesOrden;
             foreach ($detalle as $item) {
                 $total += $item->total;
@@ -198,6 +204,9 @@ class OrdenesTrabajo extends Model
             foreach ($movimientos as $movimiento) {
                 $pagado += $movimiento->monto;
             }
+        }
+        if (($total - $pagado) == 0) {
+            return $total;
         }
         return $total - $pagado;
     }

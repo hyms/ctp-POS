@@ -32,8 +32,8 @@ class OrdenesController extends Controller
         $productos = ProductoStock::getProducts(Auth::user()['sucursal'], $tiposProductos->toArray());
         $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
 
-        if ($typeReport == 2 && isset($report['responsable'])) {
-            $report['total'] = OrdenesTrabajo::getDeuda($ordenes);
+        if (isset($report['responsable'])) {
+            $report['total'] = OrdenesTrabajo::getTotal($ordenes);
         }
 
         return Inertia::render('Ordenes/tabla', [
@@ -69,9 +69,9 @@ class OrdenesController extends Controller
 
     public function getListVenta(Request $request)
     {
-        return self::get([-1, 0, 1, 2, 5],
+        return self::get([-1, 0, 1, 2, 5,10],
             (Auth::user()->role >= 0 && Auth::user()->role <= 2),
-            (!empty($request->get('orden')) || !empty($request->get('fecha'))) ? $request->all() : [],
+            $request->all(),
             1
         );
     }
@@ -183,7 +183,7 @@ class OrdenesController extends Controller
             $orden['montoVenta'] = $ordenPost['montoVenta'];
             $orden['userVenta'] = Auth::user()['id'];
             $id = OrdenesTrabajo::venta($orden);
-            return response()->json(["status" => 0, 'path' => 'espera', 'id' => $id]);
+            return response()->json(["status" => 0, 'path' => 'realizados', 'id' => $id]);
         } catch (\Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
@@ -256,7 +256,7 @@ class OrdenesController extends Controller
             DetallesOrden::sell($id, true);
             return response()->json([
                 'status' => 0,
-                'path' => 'reposicion'
+                'path' => 'realizados'
             ]);
 
         } catch (\Exception $error) {
