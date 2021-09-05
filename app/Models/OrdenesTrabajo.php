@@ -72,7 +72,7 @@ class OrdenesTrabajo extends Model
                 $ordenes = $ordenes->where('estado', '=', $report['estado']);
             }
         } else {
-            $ordenes->limit(100);
+            $ordenes->limit(500);
         }
         return $ordenes;
     }

@@ -12,22 +12,22 @@ use Inertia\Inertia;
 
 class ReciboController extends Controller
 {
-    public function getAll(int $tipo)
+    public function getAll(int $tipo,Request $request)
     {
-        $recibos = Recibo::getAll(Auth::user()['sucursal'],$tipo);
+        $recibos = Recibo::getAll(Auth::user()['sucursal'],$tipo,$request->all());
         return Inertia::render('Recibos/tabla', [
             'recibos' => $recibos,
-            'active' => ($tipo) ? 1 : 2,
-            'tipo'=>$tipo
+            'tipo'=>$tipo,
+            'report'=>(object)$request->all()
         ]);
     }
-    public function getIngreso()
+    public function getIngreso(Request $request)
     {
-        return $this->getAll(0);
+        return $this->getAll(0,$request);
     }
-    public function getEgreso()
+    public function getEgreso(Request $request)
     {
-        return $this->getAll(1);
+        return $this->getAll(1,$request);
     }
     public function post(Request $request)
     {

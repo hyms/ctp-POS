@@ -2,7 +2,7 @@
     <div class="c-app flex-row align-items-center">
         <CContainer>
             <CRow class="justify-content-center">
-                <CCol md="6">
+                <CCol md="4">
                         <CCard>
                             <CCardBody>
                                 <b-alert variant="danger" dismissible :show="!!errors.usuario">

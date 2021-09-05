@@ -81,23 +81,8 @@ export default {
                                 {
                                     label: 'Nuevas Ordenes',
                                     url: '/ordenes',
-                                    role: 'desing',
+                                    role: 'all',
                                 },
-                                // {
-                                //     label: 'Reposiciones',
-                                //     url: '/reposicion',
-                                //     role: 'vendor'
-                                // },
-                                // {
-                                //     label: 'Ordenes en Espera',
-                                //     url: '/espera',
-                                //     role: 'vendor',
-                                // },
-                                // {
-                                //     label: 'Ordenes en Mora',
-                                //     url: '/mora',
-                                //     role: 'vendor',
-                                // },
                                 {
                                     label: 'Buscar Ordenes',
                                     url: '/realizados',
@@ -106,10 +91,18 @@ export default {
                             ]
                         },
                         {
-                            label: 'Recibos',
-                            url: '/recibosIngreso',
-                            url2: '/recibosEgreso',
-                            role: 'vendor',
+                            Recibos: [
+                                {
+                                    label: 'Egresos',
+                                    url: '/recibosEgreso',
+                                    role: 'vendor',
+                                },
+                                {
+                                    label: 'Ingresos',
+                                    url: '/recibosIngreso',
+                                    role: 'vendor',
+                                },
+                            ]
                         },
                         {
                             label: 'Registro de Caja',
