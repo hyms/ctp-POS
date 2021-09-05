@@ -70,27 +70,21 @@ class CajaController extends Controller
         return back()->withInput();
     }
 
-    public function getMovimientos()
-    {
-
-    }
-
     public function arqueo(Request $request)
     {
         $sucursal = Auth::user()['sucursal'];
         $arqueo = new MovimientoCaja();
         $caja = Cajas::getOne($sucursal);
-        if($request->has('fecha')){
-            $fecha=Carbon::parse($request['fecha']);
+        if ($request->has('fecha')) {
+            $fecha = Carbon::parse($request['fecha']);
             $day = $fecha->day;
             $endDate = $fecha->toDateTimeString();
-        }
-        else{
+        } else {
             $day = Carbon::now()->day;
             $endDate = Carbon::now()->toDateTimeString();
         }
 
-        $variables = Cajas::getSaldo($caja->first()->id, $endDate, $endDate,false, false);
+        $variables = Cajas::getSaldo($caja->first()->id, $endDate, $endDate, false, false);
 
         return Inertia::render('Cajas/registroDiario',
             [
@@ -106,17 +100,17 @@ class CajaController extends Controller
             ]);
     }
 
-    public function getDebito()
+    public function getDebito(Request $request)
     {
-        return self::getCreditoDebito(false);
+        return self::getCreditoDebito(false, $request->all());
     }
 
-    public function getCredito()
+    public function getCredito(Request $request)
     {
-        return self::getCreditoDebito(true);
+        return self::getCreditoDebito(true, $request->all());
     }
 
-    private function getCreditoDebito(bool $credito)
+    private function getCreditoDebito(bool $credito, array $request)
     {
         $sucursal = Auth::user()['sucursal'];
         $registros = DB::table(MovimientoCaja::$tables);
@@ -124,11 +118,29 @@ class CajaController extends Controller
         $registros = $registros
             ->where('tipo', '=', 2)
             ->where($credito ? 'cajaDestino' : 'cajaOrigen', '=', $caja->id)
-//            ->limit(20)
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->orderBy('created_at', 'desc');
+        if(isset($request))
+        {
+            if (isset($request['fechaI']) && isset($request['fechaF'])) {
+                $fechaI = Carbon::parse($request['fechaI']);
+                $fechaF = Carbon::parse($request['fechaF']);
+                $registros = $registros->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()]);
+            }
+            if (isset($request['observaciones'])) {
+                $registros = $registros->where('observaciones', 'like', "%{$request['observaciones']}%");
+            }
+        }
+        else{
+            $registros = $registros->limit(500);
+        }
+        $registros = $registros->get();
 
-        return Inertia::render('Cajas/registros', ['registros' => $registros, 'credito' => $credito]);
+        return Inertia::render('Cajas/cajaChica',
+            [
+                'registros' => $registros,
+                'credito' => $credito,
+                'report'=>$request
+            ]);
     }
 
     public function debito(Request $request)

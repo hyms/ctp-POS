@@ -105,7 +105,7 @@ export default {
                             ]
                         },
                         {
-                            label: 'Registro de Caja',
+                            label: 'Caja Chica',
                             url: '/cajaDebito',
                             role: 'vendor',
                         },
