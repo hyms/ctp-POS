@@ -123,7 +123,7 @@ class ReporteController extends Controller
             $row = [
                 'fecha' => $orden->created_at,
                 'cliente' => $orden->responsable,
-                'orden' => ($orden->tipoOrden == null) ? $orden->correlativo : $orden->codigoServicio,
+                'orden' => ($orden->tipoOrden == null && $orden->estado != 10) ? $orden->correlativo : $orden->codigoServicio,
                 'tipo' => $orden->tipoOrden,
                 'estado' => $orden->estado,
 //                    'monto' => $orden->montoVenta,
@@ -152,6 +152,9 @@ class ReporteController extends Controller
                     break;
                 case -1:
                     $row['observaciones'] = "<span class=\"text-danger\">Anulado</span>";
+                    break;
+                case 10:
+                    $row['observaciones'] = "<span class=\"text-info\">Reposicion</span>";
                     break;
             }
             if ($orden->tipoOrden == 0) {
