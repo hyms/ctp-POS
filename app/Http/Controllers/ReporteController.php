@@ -133,7 +133,8 @@ class ReporteController extends Controller
                 $row[$placa->formato] = 0;
             }
             $row['observaciones'] = "";
-            if ($orden->estado == 0 || $orden->estado == 2 || $orden->estado == 5) {
+            $i = $orden->estado;
+            if ($i == 0 || $i == 2 || $i == 5 || $i == 10) {
                 $orden = DetallesOrden::getOne($orden);
                 foreach ($orden->detallesOrden as $detalle) {
                     $productoTmp = ProductoStock::getProduct($request['sucursal'], $detalle->stock);
@@ -141,8 +142,8 @@ class ReporteController extends Controller
                         $row[$productoTmp->formato] += $detalle->cantidad;
                     }
                 }
-
             }
+
             switch ($orden->estado) {
                 case 2:
                     $row['observaciones'] = "<span class=\"text-primary\">Deuda</span>";
@@ -165,7 +166,7 @@ class ReporteController extends Controller
 //                    $row['observaciones'] = $row['observaciones'] . "- <span class=\"text-info\">Orden ".((empty($orden->fk_idParent))?$orden->codDependiente:$orden->fkIdParent->correlativo). "</span>";
 //                }
                 if (!empty($row['observaciones'])) {
-                    $row['observaciones'] .= "-";
+                    $row['observaciones'] .= " - ";
                 }
                 $row['observaciones'] .= $orden->observaciones;
             }
