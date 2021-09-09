@@ -125,7 +125,7 @@ class OrdenesTrabajo extends Model
         $ordenes = DB::table(self::$tables)
             ->whereBetween('updated_at', [$fechaRI->toDateTimeString(), $fechaRF->toDateTimeString()])
             ->where('sucursal', '=', $sucursal)
-            ->whereIn('estado', [0, 2, 5, -1])
+            ->whereIn('estado', [0, 2, 5, -1, 10])
             ->whereNull('deleted_at');
         if (!empty($tipo)) {
             $ordenes = $ordenes->where('tipoOrden', '=', $tipo);
