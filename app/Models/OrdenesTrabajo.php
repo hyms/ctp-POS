@@ -168,6 +168,7 @@ class OrdenesTrabajo extends Model
                 'nombre' => $item->responsable,
                 'ciNit' => '',
                 'codigoVenta' => $item->correlativo,
+                'orden' => $item->id,
                 'saldo' => $saldo,
                 'monto' => $monto,
                 'acuenta' => $saldo - $monto,
@@ -182,7 +183,7 @@ class OrdenesTrabajo extends Model
                 'montoVenta' => $item->montoVenta,
                 'ordenTrabajo' => $item->id,
             ], false);
-            Recibo::guardarDeuda($values, $caja->get()->first()->id, $item->correlativo);
+            Recibo::guardarDeuda($values, $caja->get()->first()->id, $item->id);
         }
     }
 

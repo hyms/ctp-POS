@@ -114,7 +114,7 @@ class Recibo extends Model
         if (count($ordenes) > 0) {
             foreach ($ordenes as $key => $item) {
                 $detalle = DB::table(self::$tables)
-                    ->where('codigoVenta', '=', $item->id)
+                    ->where('orden', '=', $item->id)
                     ->get()->toArray();
                 $ordenes[$key]->recibos = $detalle;
             }

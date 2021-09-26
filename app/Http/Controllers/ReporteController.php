@@ -252,7 +252,7 @@ class ReporteController extends Controller
                         $totalVenta += $detalle->total;
                     }
                     foreach ($orden->recibos as $recibo) {
-                        $totalVenta += $recibo->monto;
+                        $totalPagado += $recibo->monto;
                     }
                     $totalCliente += $totalVenta - $totalPagado;
                     $ordenes[$keyO]->totalDeuda = $totalVenta - $totalPagado;
