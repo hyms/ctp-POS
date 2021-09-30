@@ -29,6 +29,7 @@ class OrdenesController extends Controller
         $ordenes = DetallesOrden::getAll($ordenes->get());
         $estados = OrdenesTrabajo::estadoCTP();
         $tiposProductos = TipoProductos::getAll();
+        $tiposSelect = TipoProductos::getAll()->pluck('nombre','id');
         $productos = ProductoStock::getProducts(Auth::user()['sucursal'], $tiposProductos->toArray());
         $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
 
@@ -45,6 +46,7 @@ class OrdenesController extends Controller
             'report' => (object)$report,
             'typeReport' => $typeReport,
             'tiposProductos' => $tiposProductos,
+            'tiposSelect' => $tiposSelect,
             'reposicion' => $reposicion
         ]);
     }

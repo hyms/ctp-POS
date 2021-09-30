@@ -75,7 +75,7 @@ class ReporteController extends Controller
                     'data' => ['table' => [], 'fields' => []]
                 ]);
         }
-        return $this->placas($request->all(), $sucursales);
+        return $this->placas($request->all(), $sucursales,$tipo);
     }
 
     public function placasV(Request $request)
@@ -104,9 +104,12 @@ class ReporteController extends Controller
         if (!isset($request['tipoOrden'])) {
             $request['tipoOrden'] = null;
         }
+        if(empty($request['fechahasta'])){
+            $request['fechahasta']=$request['fecha'];
+        }
         $ordenes = OrdenesTrabajo::getReport(
             $request['fecha'],
-            $request['fecha'],
+            $request['fechahasta'],
             $request['sucursal'],
             $request['tipoOrden']);
         if (!empty($request['tipoOrden'])) {
@@ -121,7 +124,8 @@ class ReporteController extends Controller
 
         foreach ($ordenes as $orden) {
             $row = [
-                'fecha' => $orden->created_at,
+                'fechaOrden' => $orden->created_at,
+                'fechaTrabajo' => $orden->updated_at,
                 'cliente' => $orden->responsable,
                 'orden' => ($orden->tipoOrden == null && $orden->estado != 10) ? $orden->correlativo : $orden->codigoServicio,
                 'tipo' => $orden->tipoOrden,
@@ -174,7 +178,8 @@ class ReporteController extends Controller
         }
         $data['fields'] = [
             '#',
-            'fecha',
+            'fechaOrden',
+            'fechaTrabajo',
             'cliente',
             'orden',
 //                'monto'
@@ -185,8 +190,8 @@ class ReporteController extends Controller
         array_push($data['fields'], 'observaciones');
         return Inertia::render('Reportes/placas',
             [
-                'sucursales' => $sucursales,
-                'forms' => (object)$request,
+                'sucursales' => (object)$sucursales,
+                'forms' => (array)$request,
                 'tipoPlacas' => $tipo->pluck('nombre', 'id'),
                 'errors' => (object)[],
                 'data' => $data,

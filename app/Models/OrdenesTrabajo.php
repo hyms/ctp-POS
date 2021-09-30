@@ -71,6 +71,9 @@ class OrdenesTrabajo extends Model
             if (isset($report['estado'])) {
                 $ordenes = $ordenes->where('estado', '=', $report['estado']);
             }
+            if (isset($report['tipo'])) {
+                $ordenes = $ordenes->where('tipoOrden', '=', $report['tipo']);
+            }
         } else {
             $ordenes->limit(500);
         }

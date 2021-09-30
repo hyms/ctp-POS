@@ -44,6 +44,21 @@
                                     ></b-input>
                                 </b-form-group>
                             </b-col>
+                            <b-col md="4" sm="6" v-if="Object.keys(sucursales).length>0">
+                                <b-form-group
+                                    :label="form.fechahasta.label"
+                                    label-for="hasta"
+                                    :state="form.fechahasta.state"
+                                >
+                                    <b-input
+                                        :type="form.fechahasta.type"
+                                        :placeholder="form.fechahasta.label"
+                                        v-model="form.fechahasta.value"
+                                        id="hasta"
+                                        :state="form.fechahasta.state"
+                                    ></b-input>
+                                </b-form-group>
+                            </b-col>
                             <b-col md="4" sm="6">
                                 <b-form-group
                                     :label="form.tipoOrden.label"
@@ -65,7 +80,7 @@
                                 </b-form-group>
                             </b-col>
                             <b-col sm="12">
-                                <b-button type="submit" variant="primary">Buscar</b-button>
+                                <b-button @click="enviar()" variant="primary">Buscar</b-button>
                             </b-col>
                         </b-row>
                     </form>
@@ -92,9 +107,9 @@
                             </template>
                             <template #custom-foot="data">
                                 <b-tr>
-                                    <b-th colspan="4" class="text-right"><strong>Total</strong></b-th>
+                                    <b-th colspan="5" class="text-right"><strong>Total</strong></b-th>
                                     <template v-for="(item,key) in data['fields']">
-                                        <b-th v-if="(key>=4) && (key<=data['fields'].length-2)"> {{ getTotal(item) }}
+                                        <b-th v-if="(key>=5) && (key<=data['fields'].length-2)"> {{ getTotal(item) }}
                                         </b-th>
                                     </template>
                                     <b-th></b-th>
@@ -142,6 +157,13 @@ export default {
                     state: null,
                     stateText: null
                 },
+                fechahasta: {
+                    label: 'hasta',
+                    value: "",
+                    type: "date",
+                    state: null,
+                    stateText: null
+                },
                 tipoOrden: {
                     label: 'TipoOrden',
                     value: "",
@@ -159,7 +181,7 @@ export default {
                 form[key] = this.form[key].value;
             }
             let url = '/reportes/placas';
-            if (this.sucursales.length > 0) {
+            if (Object.keys(this.sucursales).length > 0) {
                 url = '/admin/reportes/placas';
             }
             this.$inertia.get(url, form)
@@ -179,7 +201,7 @@ export default {
             //     this.form[key].state = false;
             // }
         }
-        for (let key in this.errors()) {
+        for (let key in this.errors) {
             this.form[key].state = false;
         }
     }
