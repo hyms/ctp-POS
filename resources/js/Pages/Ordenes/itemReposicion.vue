@@ -15,15 +15,16 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(itemOrden,key) in item.detallesOrden">
-                    <td>{{ key + 1 }}</td>
-                    <td>{{ getProduct(itemOrden.stock) }}</td>
-                    <td>
-                        <b-form-spinbutton id="demo-sb" v-model="itemOrden.cantidad" min="0"
-                                           max="100" size="sm" inline v-if="isNew"></b-form-spinbutton>
-                        <span v-else>{{ itemOrden.cantidad }}</span>
-                    </td>
-                </tr>
+                <template v-for="(product,key) in productos">
+                    <b-tr>
+                        <b-td>{{ product.formato }}</b-td>
+                        <b-td>{{ product.dimension }}</b-td>
+                        <b-td>
+                            <b-form-spinbutton id="demo-sb" v-model="productosSell[key].cantidad" min="0"
+                                               max="100" size="sm" inline></b-form-spinbutton>
+                        </b-td>
+                    </b-tr>
+                </template>
                 </tbody>
             </table>
         </div>
@@ -64,7 +65,8 @@ export default {
         productos: Array,
         item: Object,
         id: String,
-        isNew: Boolean
+        isNew: Boolean,
+        productosSell: Array,
     },
     components: {
         LoadingButton
@@ -87,6 +89,15 @@ export default {
             this.sending = true;
             let producto = new FormData();
             producto.append('item', JSON.stringify(this.item));
+            let items = [];
+            for (let value of this.productosSell) {
+                if (value.cantidad > 0) {
+                    items = [...items, value];
+                }
+            }
+            if (items.length > 0) {
+                producto.append('productos', JSON.stringify(items));
+            }
             axios.post('/reposicion', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] == 0) {

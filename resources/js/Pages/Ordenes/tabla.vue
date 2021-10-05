@@ -39,7 +39,8 @@
                         id="itemRModal"
                         :is-new="true"
                         :item="itemRow"
-                        :productos="productosAll"
+                        :productos="productos[tipoProductoFiltro]"
+                        :productosSell="productosSell()"
                     ></item-reposicion>
                     <div class="table-responsive">
                         <b-table
