@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cajas;
 use App\Models\Cliente;
 use App\Models\DetallesOrden;
+use App\Models\Export;
 use App\Models\MovimientoCaja;
 use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReporteController extends Controller
 {
@@ -75,7 +77,7 @@ class ReporteController extends Controller
                     'data' => ['table' => [], 'fields' => []]
                 ]);
         }
-        return $this->placas($request->all(), $sucursales);
+        return $this->placas($request->all(), $sucursales, $tipo);
     }
 
     public function placasV(Request $request)
@@ -100,13 +102,29 @@ class ReporteController extends Controller
 
     private function placas($request, $sucursales, $tipo)
     {
+        $data = $this->getTablePlacas($request);
+        return Inertia::render('Reportes/placas',
+            [
+                'sucursales' => (object)$sucursales,
+                'forms' => (array)$request,
+                'tipoPlacas' => $tipo->pluck('nombre', 'id'),
+                'errors' => (object)[],
+                'data' => $data,
+            ]);
+    }
+
+    public function getTablePlacas($request)
+    {
         $data = ['table' => [], 'fields' => []];
         if (!isset($request['tipoOrden'])) {
             $request['tipoOrden'] = null;
         }
+        if (empty($request['fechahasta'])) {
+            $request['fechahasta'] = $request['fecha'];
+        }
         $ordenes = OrdenesTrabajo::getReport(
             $request['fecha'],
-            $request['fecha'],
+            $request['fechahasta'],
             $request['sucursal'],
             $request['tipoOrden']);
         if (!empty($request['tipoOrden'])) {
@@ -118,12 +136,12 @@ class ReporteController extends Controller
         if (!empty($request['tipoOrden'])) {
             $placas = $placas[$request['tipoOrden']];
         }
-
         foreach ($ordenes as $orden) {
             $row = [
-                'fecha' => $orden->created_at,
+                'fechaOrden' => $orden->created_at,
+                'fechaTrabajo' => $orden->updated_at,
                 'cliente' => $orden->responsable,
-                'orden' => ($orden->tipoOrden == null) ? $orden->correlativo : $orden->codigoServicio,
+                'orden' => ($orden->tipoOrden == null && $orden->estado != 10) ? $orden->correlativo : $orden->codigoServicio,
                 'tipo' => $orden->tipoOrden,
                 'estado' => $orden->estado,
 //                    'monto' => $orden->montoVenta,
@@ -133,7 +151,8 @@ class ReporteController extends Controller
                 $row[$placa->formato] = 0;
             }
             $row['observaciones'] = "";
-            if ($orden->estado == 0 || $orden->estado == 2 || $orden->estado == 5) {
+            $i = $orden->estado;
+            if ($i == 0 || $i == 2 || $i == 5 || $i == 10) {
                 $orden = DetallesOrden::getOne($orden);
                 foreach ($orden->detallesOrden as $detalle) {
                     $productoTmp = ProductoStock::getProduct($request['sucursal'], $detalle->stock);
@@ -153,6 +172,9 @@ class ReporteController extends Controller
                 case -1:
                     $row['observaciones'] = "<span class=\"text-danger\">Anulado</span>";
                     break;
+                case 10:
+                    $row['observaciones'] = "<span class=\"text-info\">Reposicion</span>";
+                    break;
             }
             if ($orden->tipoOrden == 0) {
 //                if ($orden->tipoOrden == 2) {
@@ -162,7 +184,7 @@ class ReporteController extends Controller
 //                    $row['observaciones'] = $row['observaciones'] . "- <span class=\"text-info\">Orden ".((empty($orden->fk_idParent))?$orden->codDependiente:$orden->fkIdParent->correlativo). "</span>";
 //                }
                 if (!empty($row['observaciones'])) {
-                    $row['observaciones'] .= "-";
+                    $row['observaciones'] .= " - ";
                 }
                 $row['observaciones'] .= $orden->observaciones;
             }
@@ -170,7 +192,8 @@ class ReporteController extends Controller
         }
         $data['fields'] = [
             '#',
-            'fecha',
+            'fechaOrden',
+            'fechaTrabajo',
             'cliente',
             'orden',
 //                'monto'
@@ -179,14 +202,14 @@ class ReporteController extends Controller
             array_push($data['fields'], $row->formato);
         }
         array_push($data['fields'], 'observaciones');
-        return Inertia::render('Reportes/placas',
-            [
-                'sucursales' => $sucursales,
-                'forms' => (object)$request,
-                'tipoPlacas' => $tipo->pluck('nombre', 'id'),
-                'errors' => (object)[],
-                'data' => $data,
-            ]);
+        return $data;
+    }
+
+    public function exportPlacas(Request $request)
+    {
+        $data = $this->getTablePlacas($request->all());
+        $export = new Export($data['table']);
+        return Excel::download($export, 'regsitroPlacas.xlsx');
     }
 
     public function arqueos(Request $request)
@@ -248,7 +271,7 @@ class ReporteController extends Controller
                         $totalVenta += $detalle->total;
                     }
                     foreach ($orden->recibos as $recibo) {
-                        $totalVenta += $recibo->monto;
+                        $totalPagado += $recibo->monto;
                     }
                     $totalCliente += $totalVenta - $totalPagado;
                     $ordenes[$keyO]->totalDeuda = $totalVenta - $totalPagado;
@@ -274,7 +297,7 @@ class ReporteController extends Controller
                     );
                 }
             }
-            $data = ['table' => $clientes, 'fields' => ['nombreResponsable', 'mora','desde','hasta','cantidad']];
+            $data = ['table' => $clientes, 'fields' => ['nombreResponsable', 'mora', 'desde', 'hasta', 'cantidad']];
         }
         return Inertia::render('Reportes/mora',
             [
@@ -417,15 +440,15 @@ class ReporteController extends Controller
             $fechaI = Carbon::parse($request['fechaI']);
             $fechaF = Carbon::parse($request['fechaF']);
 
-            $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, ['cliente' => $request['cliente'], 'fechaI' => $fechaI, 'fechaF' =>$fechaF]);
-            $ordenes->whereIn('estado',[0,1,2]);
+            $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, ['cliente' => $request['cliente'], 'fechaI' => $fechaI, 'fechaF' => $fechaF]);
+            $ordenes->whereIn('estado', [0, 1, 2]);
             $ordenes = DetallesOrden::getAll($ordenes->get());
-            $movimientos=$ordenes;
-            $fields=['codigoServicio', ['key' => 'created_at', 'label' => 'Fecha'], 'montoVenta','Acciones'];
+            $movimientos = $ordenes;
+            $fields = ['codigoServicio', ['key' => 'created_at', 'label' => 'Fecha'], 'montoVenta', 'Acciones'];
         }
         $sucursales = Sucursal::getAll()->pluck('nombre', 'id');
         $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
-        $clientes = Cliente::getAll($request['sucursal'])->pluck('nombreResponsable','id');
+        $clientes = Cliente::getAll($request['sucursal'])->pluck('nombreResponsable', 'id');
         $data = ['table' => $movimientos, 'fields' => $fields];
         return Inertia::render('Reportes/clientes',
             [

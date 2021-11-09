@@ -179,6 +179,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('listaReportes');
     Route::get('reportes/placas', [ReporteController::class, 'placasA'])
         ->name('listaReportes');
+    Route::get('reportes/placasE', [ReporteController::class, 'exportPlacas'])
+        ->name('listaReportesE');
     Route::get('reportes/arqueos', [ReporteController::class, 'arqueos'])
         ->name('listaArqueos');
     Route::get('reportes/cajas', [ReporteController::class, 'cajas'])
