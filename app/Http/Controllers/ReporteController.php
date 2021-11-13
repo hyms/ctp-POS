@@ -208,8 +208,20 @@ class ReporteController extends Controller
     public function exportPlacas(Request $request)
     {
         $data = $this->getTablePlacas($request->all());
-        $export = new Export($data['table']);
-        return Excel::download($export, 'regsitroPlacas.xlsx');
+//        return Excel::create('regsitroPlacas', function($excel) use($data) {
+//
+//            $excel->sheet('Sheetname', function($sheet) use($data) {
+//
+//                $sheet->fromArray($data['table']);
+//
+//            });
+//
+//        })->download('xls');
+        $export = new Export();
+        $export->data = $data['table'];
+        array_shift($data['fields']);
+        $export->dataHeading = $data['fields'];
+        return Excel::download($export, 'registroPlacas.xlsx');
     }
 
     public function arqueos(Request $request)

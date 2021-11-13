@@ -73,7 +73,7 @@
                 <b-card v-if="data['table'].length>0">
                     <template #header>
                         <h5 class="mb-0">Registro de Placas</h5>
-<!--                        <b-button v-if="Object.keys(sucursales).length>0" @click="exportar()" variant="link">exportar</b-button>-->
+                        <b-button v-if="Object.keys(sucursales).length>0" @click="exportar()" variant="link">exportar</b-button>
                     </template>
                     <div class="table-responsive">
                         <b-table
@@ -93,9 +93,9 @@
                             </template>
                             <template #custom-foot="data">
                                 <b-tr>
-                                    <b-th colspan="4" class="text-right"><strong>Total</strong></b-th>
+                                    <b-th colspan="5" class="text-right"><strong>Total</strong></b-th>
                                     <template v-for="(item,key) in data['fields']">
-                                        <b-th v-if="(key>=4) && (key<=data['fields'].length-2)"> {{ getTotal(item) }}
+                                        <b-th v-if="(key>=5) && (key<=data['fields'].length-2)"> {{ getTotal(item) }}
                                         </b-th>
                                     </template>
                                     <b-th></b-th>
@@ -114,12 +114,13 @@
 import Layout from '@/Shared/Layout'
 import Menu from "./menuReportes";
 import axios from "axios";
+import FileDownload from 'js-file-download';
 
 export default {
     layout: Layout,
     props: {
         sucursales: Object,
-        forms: Array,
+        forms: Object,
         tipoPlacas: Object,
         errors: Object,
         data: Object
@@ -161,7 +162,7 @@ export default {
                 form[key] = this.form[key].value;
             }
             let url = '/reportes/placas';
-            if (this.sucursales.length > 0) {
+            if (Object.keys(this.sucursales).length > 0) {
                 url = '/admin/reportes/placas';
             }
             this.$inertia.get(url, form)
@@ -179,7 +180,8 @@ export default {
                 form[key] = this.form[key].value;
             }
             let url = '/admin/reportes/placasE';
-            axios.get(url, {params:form})
+            location.href=url+window.location.search;
+            // "bootstrap": "^4.6.0",
         }
     },
     created() {
@@ -189,7 +191,7 @@ export default {
             //     this.form[key].state = false;
             // }
         }
-        for (let key in this.errors()) {
+        for (let key in this.errors) {
             this.form[key].state = false;
         }
     }

@@ -2,19 +2,25 @@
 
 namespace App\Models;
 
-use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\Exportable;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class Export implements FromArray
+class Export implements FromCollection, WithHeadings
 {
-    protected $invoices;
+    use Exportable;
 
-    public function __construct(array $invoices)
+    public array $data;
+    public array $dataHeading;
+
+    public function collection(): \Illuminate\Support\Collection
     {
-        $this->invoices = $invoices;
+        return collect($this->data);
     }
 
-    public function array(): array
+    public function headings(): array
     {
-        return $this->invoices;
+        return $this->dataHeading;
     }
+
 }
