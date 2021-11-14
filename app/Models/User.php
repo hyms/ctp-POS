@@ -15,7 +15,7 @@ class User extends Model implements AuthenticatableContract
     use Authenticatable;
 
     protected $table = 'users';
-    public static $tables = 'users';
+    public static string $tables = 'users';
     protected $guarded = [];
 
     public function getNameAttribute()
@@ -63,7 +63,7 @@ class User extends Model implements AuthenticatableContract
         $fcmTokens = DB::table(self::$tables)
             ->where('id', '!=', Auth::id())
             ->pluck('tokenpush')->toArray();
-        $data = Larafirebase::fromRaw([
+        Larafirebase::fromRaw([
             'registration_ids' => $fcmTokens,
             'data' => [
                 'newOrden' => true,

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class TipoProductos extends Model
 {
     protected $table='tipoProducto';
-    static public $tables='tipoProducto';
+    static public string $tables='tipoProducto';
     protected $guarded=[];
 
     public static function getAll()

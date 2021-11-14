@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 class Cajas extends Model
 {
     protected $table = 'cajas';
-    protected static $tables = 'cajas';
+    protected static string $tables = 'cajas';
     protected $guarded = [];
 
     public static function getAll(int $sucursal = null, int $caja_padre = null)
@@ -66,30 +66,11 @@ class Cajas extends Model
 
     static public function getSaldo($idCaja, $fechaMovimientosInicio, $fechaMovimientosFin, $array = false, $get = null, $admin = false)
     {
-        if ($array || isset($get['deudas']))
-            $deudas = array();
-        else
-            $deudas = 0;
-
-        if ($array || isset($get['ventas']))
-            $ventas = array();
-        else
-            $ventas = 0;
-
-        if ($array || isset($get['recibos']))
-            $recibos = array();
-        else
-            $recibos = [0, 0];
-
-        if ($array || isset($get['cajas']))
-            $cajas = array();
-        else
-            $cajas = [0, 0];
-
-        if (isset($get['movimientos']))
-            $movimientosAll = array();
-        else
-            $movimientosAll = null;
+        $deudas = $array || isset($get['deudas']) ? array() : 0;
+        $ventas = $array || isset($get['ventas']) ? array() : 0;
+        $recibos = $array || isset($get['recibos']) ? array() : [0, 0];
+        $cajas = $array || isset($get['cajas']) ? array() : [0, 0];
+        $movimientosAll = isset($get['movimientos']) ? array() : null;
 
         $arqueos = array();
         $movimientos = DB::table(MovimientoCaja::$tables)
@@ -197,8 +178,7 @@ class Cajas extends Model
             $saldo = $saldos->first()->cierre;
         }
 
-        $datos = array('ventas' => $ventas, 'deudas' => $deudas, 'recibos' => $recibos, 'cajas' => $cajas, 'saldo' => $saldo, 'movimientos' => $movimientosAll, 'arqueos' => $arqueos);
-        return $datos;
+        return array('ventas' => $ventas, 'deudas' => $deudas, 'recibos' => $recibos, 'cajas' => $cajas, 'saldo' => $saldo, 'movimientos' => $movimientosAll, 'arqueos' => $arqueos);
     }
 
 }
