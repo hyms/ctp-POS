@@ -49,7 +49,7 @@
                 <b-button variant="danger" @click="cancel()">
                     Cancel
                 </b-button>
-                <loading-button :loading="sending" variant="default"
+                <loading-button :loading="sending" variant="primary"
                                 @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
                 </loading-button>
             </template>
@@ -156,21 +156,25 @@ export default {
                 if ('id' in this.itemRow) {
                     this.idForm = null;
                 }
-                for(let key in this.form){
+                for (let key in this.form) {
                     this.form[key].value = "";
                 }
             } else {
                 if ('id' in this.itemRow) {
                     this.idForm = this.itemRow['id'];
-                    this.titulo2=this.titulo2 +' '+this.itemRow['correlativo']
+                    this.titulo2 = this.titulo2 + ' ' + this.itemRow['correlativo']
                 }
-                for(let key in this.form){
-                    this.form[key].value = this.itemRow[key];
+                for (let key in this.form) {
+                    if (['enable'].includes(key)) {
+                        this.form[key].value = (this.itemRow[key]===1);
+                    } else {
+                        this.form[key].value = this.itemRow[key];
+                    }
                 }
             }
         },
         limpiar() {
-            for(let key in this.form){
+            for (let key in this.form) {
                 this.form[key].state = null;
                 this.form[key].stateText = null;
             }
@@ -188,7 +192,7 @@ export default {
             if (this.idForm) {
                 user.append('id', this.idForm);
             }
-            for(let key in this.form){
+            for (let key in this.form) {
                 if (this.form[key].value != null) {
                     if (['enable'].includes(key)) {
                         user.append(key, this.form[key].value ? '1' : '0');
@@ -197,21 +201,14 @@ export default {
                     }
                 }
             }
-            /* this.$inertia.post('/admin/producto',producto, {
-                 onSuccess: (page) => {
-                     console.log(page);
-                 },
-                 onError: (errors) => {
-                     console.log(errors);
-                 }
-             });*/
+
             axios.post('/admin/user', user, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
                         this.$bvModal.hide(this.id)
                         this.$inertia.get(data["path"])
                     }
-                    for(let key in this.form){
+                    for (let key in this.form) {
                         if (key in data.errors) {
                             this.form[key].state = false;
                             this.form[key].stateText = data.errors[key][0];
