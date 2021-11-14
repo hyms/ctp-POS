@@ -71,6 +71,9 @@ class OrdenesTrabajo extends Model
             if (isset($report['estado'])) {
                 $ordenes = $ordenes->where('estado', '=', $report['estado']);
             }
+            if (isset($report['tipo'])) {
+                $ordenes = $ordenes->where('tipoOrden', '=', $report['tipo']);
+            }
         } else {
             $ordenes->limit(500);
         }
@@ -125,7 +128,7 @@ class OrdenesTrabajo extends Model
         $ordenes = DB::table(self::$tables)
             ->whereBetween('updated_at', [$fechaRI->toDateTimeString(), $fechaRF->toDateTimeString()])
             ->where('sucursal', '=', $sucursal)
-            ->whereIn('estado', [0, 2, 5, -1])
+            ->whereIn('estado', [0, 2, 5, -1, 10])
             ->whereNull('deleted_at');
         if (!empty($tipo)) {
             $ordenes = $ordenes->where('tipoOrden', '=', $tipo);
@@ -168,6 +171,7 @@ class OrdenesTrabajo extends Model
                 'nombre' => $item->responsable,
                 'ciNit' => '',
                 'codigoVenta' => $item->correlativo,
+                'orden' => $item->id,
                 'saldo' => $saldo,
                 'monto' => $monto,
                 'acuenta' => $saldo - $monto,
@@ -182,7 +186,7 @@ class OrdenesTrabajo extends Model
                 'montoVenta' => $item->montoVenta,
                 'ordenTrabajo' => $item->id,
             ], false);
-            Recibo::guardarDeuda($values, $caja->get()->first()->id, $item->correlativo);
+            Recibo::guardarDeuda($values, $caja->get()->first()->id, $item->id);
         }
     }
 

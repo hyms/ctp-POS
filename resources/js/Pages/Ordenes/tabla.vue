@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div class="col-12">
-            <formSearch :report="report" :estados="estados" v-if="typeReport===1"></formSearch>
+            <formSearch :report="report" :estados="estados" v-if="typeReport===1" :tiposSelect="tiposSelect"></formSearch>
             <div class="row mb-2" v-if="typeReport===0">
                 <div class="col">
                     <b-button-group>
@@ -39,7 +39,8 @@
                         id="itemRModal"
                         :is-new="true"
                         :item="itemRow"
-                        :productos="productosAll"
+                        :productos="productos[tipoProductoFiltro]"
+                        :productosSell="productosSell()"
                     ></item-reposicion>
                     <div class="table-responsive">
                         <b-table
@@ -158,6 +159,7 @@ export default {
         isVenta: Boolean,
         typeReport: Number,
         tiposProductos: Array,
+        tiposSelect: Object,
         reposicion: Number,
     },
     components: {

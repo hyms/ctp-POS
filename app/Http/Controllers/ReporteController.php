@@ -160,8 +160,8 @@ class ReporteController extends Controller
                         $row[$productoTmp->formato] += $detalle->cantidad;
                     }
                 }
-
             }
+
             switch ($orden->estado) {
                 case 2:
                     $row['observaciones'] = "<span class=\"text-primary\">Deuda</span>";

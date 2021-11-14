@@ -44,6 +44,21 @@
                                     ></b-input>
                                 </b-form-group>
                             </b-col>
+                            <b-col md="4" sm="6" v-if="Object.keys(sucursales).length>0">
+                                <b-form-group
+                                    :label="form.fechahasta.label"
+                                    label-for="hasta"
+                                    :state="form.fechahasta.state"
+                                >
+                                    <b-input
+                                        :type="form.fechahasta.type"
+                                        :placeholder="form.fechahasta.label"
+                                        v-model="form.fechahasta.value"
+                                        id="hasta"
+                                        :state="form.fechahasta.state"
+                                    ></b-input>
+                                </b-form-group>
+                            </b-col>
                             <b-col md="4" sm="6">
                                 <b-form-group
                                     :label="form.tipoOrden.label"
@@ -65,7 +80,7 @@
                                 </b-form-group>
                             </b-col>
                             <b-col sm="12">
-                                <b-button type="submit" variant="primary">Buscar</b-button>
+                                <b-button @click="enviar()" variant="primary">Buscar</b-button>
                             </b-col>
                         </b-row>
                     </form>
@@ -140,6 +155,13 @@ export default {
                 },
                 fecha: {
                     label: 'Fecha',
+                    value: "",
+                    type: "date",
+                    state: null,
+                    stateText: null
+                },
+                fechahasta: {
+                    label: 'hasta',
                     value: "",
                     type: "date",
                     state: null,

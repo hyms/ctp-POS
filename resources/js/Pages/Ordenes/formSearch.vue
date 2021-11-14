@@ -86,12 +86,27 @@
                                         content-cols="8"
                                     >
                                         <b-select
-                                            type="text"
                                             placeholder="Estado"
                                             v-model="searchModel.estado"
                                             id="estado"
                                             name="estado"
                                             :options="estados"
+                                        ></b-select>
+                                    </b-form-group>
+                                </div>
+                                <div class="col-sm-5">
+                                    <b-form-group
+                                        label="Tipo"
+                                        label-for="tipo"
+                                        label-cols="4"
+                                        content-cols="8"
+                                    >
+                                        <b-select
+                                            placeholder="Tipo"
+                                            v-model="searchModel.tipo"
+                                            id="tipo"
+                                            name="tipo"
+                                            :options="tiposSelect"
                                         ></b-select>
                                     </b-form-group>
                                 </div>
@@ -118,7 +133,7 @@ export default {
                 fechaI: "",
                 fechaF: "",
                 orden: "",
-                tipoOrden: "",
+                tipo: "",
                 responsable: "",
                 estado: "",
             },
@@ -128,7 +143,8 @@ export default {
     },
     props: {
         report: Object,
-        estados:Object
+        estados:Object,
+        tiposSelect: Object,
     },
     mounted() {
         for (const key in this.report) {

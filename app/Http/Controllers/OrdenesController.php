@@ -29,6 +29,7 @@ class OrdenesController extends Controller
         $ordenes = DetallesOrden::getAll($ordenes->get());
         $estados = OrdenesTrabajo::estadoCTP();
         $tiposProductos = TipoProductos::getAll();
+        $tiposSelect = TipoProductos::getAll()->pluck('nombre','id');
         $productos = ProductoStock::getProducts(Auth::user()['sucursal'], $tiposProductos->toArray());
         $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
 
@@ -45,6 +46,7 @@ class OrdenesController extends Controller
             'report' => (object)$report,
             'typeReport' => $typeReport,
             'tiposProductos' => $tiposProductos,
+            'tiposSelect' => $tiposSelect,
             'reposicion' => $reposicion
         ]);
     }
@@ -232,6 +234,7 @@ class OrdenesController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'item' => 'required',
+                'productos'=>'required'
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -251,7 +254,19 @@ class OrdenesController extends Controller
             $orden['montoVenta'] = 0;
             $orden['sucursal'] = Auth::user()['sucursal'];
             $orden['estado'] = 10;
-            $detalle = $ordenPost['detallesOrden'];
+            $detalle = [];
+            $products = json_decode($request['productos'], true);
+            foreach ($products as $item) {
+                $tmp = array();
+                $tmp['sucursal'] = Auth::user()['sucursal'];
+                $tmp['producto'] = $item['producto'];
+                $tmp['stock'] = $item['id'];
+                $tmp['cantidad'] = $item['cantidad'];
+                $tmp['costo'] = !empty($item['costo']) ? $item['costo'] : 0;
+                $tmp['total'] = $tmp['cantidad'] * $tmp['costo'];
+                $orden['montoVenta'] += $tmp['total'];
+                array_push($detalle, $tmp);
+            }
             $id = OrdenesTrabajo::newOrden($orden, $detalle, null, true);
             DetallesOrden::sell($id, true);
             return response()->json([

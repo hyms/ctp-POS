@@ -179,7 +179,7 @@ export default {
             this.$inertia.get(window.location.pathname, form);
         },
         getTotal(table){
-            let total = 0;
+            let total = 0.0;
             for(const value of table){
                 total += parseFloat(value.monto);
             }
