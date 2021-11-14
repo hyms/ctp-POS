@@ -164,6 +164,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('eliminarStock');
     Route::post('stockEnable', [StockController::class, 'enableStock'])
         ->name('enablestock');
+    Route::post('stockPrice', [StockController::class, 'priceStock'])
+        ->name('priceStock');
     Route::get('movimientosStock', [StockController::class, 'movimientos'])
         ->name('movimientosStock');
 

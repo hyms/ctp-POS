@@ -59,10 +59,10 @@ export default {
             titulo1: "Añadir",
             titulo2: "Quitar",
             form: {
-                cantidad: {
-                    label: 'Cantidad',
+                precioUnidad: {
+                    label: 'Precio X unidad',
                     value: "",
-                    type: "number",
+                    type: "text",
                     state: null,
                     stateText: null
                 },
@@ -73,9 +73,10 @@ export default {
     methods: {
         reset() {
             this.limpiar();
+            this.form.precioUnidad.value = this.itemRow['precioUnidad']
         },
         limpiar() {
-            for (let key in this.form) {
+            for(let key in this.form){
                 this.form[key].state = null;
                 this.form[key].stateText = null;
             }
@@ -90,8 +91,11 @@ export default {
             this.sending = true;
             this.limpiar();
             let producto = new FormData();
-            for (let key in this.form) {
+            for(let key in this.form){
                 producto.append(key, this.form[key].value);
+            }
+            if (this.itemRow['id']) {
+                producto.append('id', this.itemRow['id']);
             }
             if (this.itemRow['sucursal']) {
                 producto.append('sucursal', this.itemRow['sucursal']);
@@ -99,17 +103,14 @@ export default {
             if (this.itemRow['producto']) {
                 producto.append('producto', this.itemRow['producto']);
             }
-            let url = '/admin/stockLess';
-            if (this.isNew) {
-                url = '/admin/stockMore';
-            }
+            let url = '/admin/stockPrice';
             axios.post(url, producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
                         this.$bvModal.hide(this.id);
                         this.$inertia.reload();
                     }
-                    for (let key in this.form) {
+                    for(let key in this.form){
                         if (key in data.errors) {
                             this.form[key].state = false;
                             this.form[key].stateText = data.errors[key][0];

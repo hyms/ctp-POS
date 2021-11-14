@@ -2,7 +2,7 @@
     <div>
         <b-modal
             :id="id"
-            :title="(isNew)?titulo1:titulo2"
+            :title="((isNew)?titulo1:titulo2)"
             @show="reset"
             @hidden="reset"
             @ok="handleOk">
@@ -162,7 +162,6 @@ export default {
             } else {
                 if ('id' in this.itemRow) {
                     this.idForm = this.itemRow['id'];
-                    this.titulo2 = this.titulo2 + ' ' + this.itemRow['correlativo']
                 }
                 for (let key in this.form) {
                     if (['enable'].includes(key)) {
@@ -206,7 +205,7 @@ export default {
                 .then(({data}) => {
                     if (data["status"] === 0) {
                         this.$bvModal.hide(this.id)
-                        this.$inertia.get(data["path"])
+                        this.$inertia.reload();
                     }
                     for (let key in this.form) {
                         if (key in data.errors) {

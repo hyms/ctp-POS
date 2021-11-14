@@ -105,7 +105,7 @@ export default {
         getRoles(id) {
             let rol = '';
             for (let key in this.roles) {
-                if (this.roles[key].value == id) {
+                if (this.roles[key].value === id) {
                     rol = this.roles[key].text;
                 }
             }
