@@ -41,7 +41,7 @@
                 <b-button variant="danger" @click="cancel()">
                     Cancel
                 </b-button>
-                <loading-button :loading="sending" variant="secondary"
+                <loading-button :loading="sending" variant="primary"
                                 @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
                 </loading-button>
             </template>
@@ -147,17 +147,9 @@ export default {
             for(let key in this.form){
                 producto.append(key, this.form[key].value);
             }
-            /* this.$inertia.post('/admin/producto',producto, {
-                 onSuccess: (page) => {
-                     console.log(page);
-                 },
-                 onError: (errors) => {
-                     console.log(errors);
-                 }
-             });*/
             axios.post('/admin/producto', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
-                    if (data["status"] == 0) {
+                    if (data["status"] === 0) {
                         this.$bvModal.hide(this.id)
                         this.$inertia.get(data["path"])
                     }

@@ -109,7 +109,7 @@ export default {
                             role: 'vendor',
                         },
                         {
-                            Inventario:[
+                            Inventario: [
                                 {
                                     label: 'Ingresos',
                                     url: '/inventario/ingreso',
@@ -128,7 +128,7 @@ export default {
                             ]
                         },
                         {
-                            reportes:[
+                            reportes: [
                                 {
                                     label: 'Registro Diario',
                                     url: '/reportes/placas',
@@ -164,12 +164,31 @@ export default {
                             role: 'all',
                         },
                         {
-                            Configuracion: [
+                            Productos:[
                                 {
                                     label: 'Productos',
                                     url: '/admin/productos',
                                     role: 'admin',
                                 },
+                                {
+                                    url: '/admin/tipoProductos',
+                                    label: 'Tipo Productos',
+                                    role: 'admin',
+                                },
+                                {
+                                    url: '/admin/stocks',
+                                    label: 'Stocks',
+                                    role: 'admin',
+                                },
+                                // {
+                                //     url: 'movimientosStock',
+                                //     label: 'Movimientos',
+                                //     role: 'admin',
+                                // },
+                            ]
+                        },
+                        {
+                            Configuracion: [
                                 {
                                     label: 'Sucursales',
                                     url: '/admin/sucursales',

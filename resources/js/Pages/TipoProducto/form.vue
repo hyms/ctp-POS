@@ -31,7 +31,7 @@
                 <b-button variant="danger" @click="cancel()">
                     Cancel
                 </b-button>
-                <loading-button :loading="sending" variant="secundary"
+                <loading-button :loading="sending" variant="primary"
                                 @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
                 </loading-button>
             </template>
@@ -125,7 +125,7 @@ export default {
             }
             axios.post('/admin/tipoProductos', producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
-                    if (data["status"] == 0) {
+                    if (data["status"] === 0) {
                         this.$bvModal.hide(this.id)
                         this.$inertia.get(data["path"])
                     }
