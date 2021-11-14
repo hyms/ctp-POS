@@ -44,11 +44,11 @@ import axios from "axios";
 import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
-    name: "Usuarios",
+    name: "Producto",
     props: {
-        isNew: Boolean,
         id: String,
-        itemRow: Object
+        itemRow: Object,
+        isNew: Boolean,
     },
     components: {
         LoadingButton
@@ -56,50 +56,24 @@ export default {
     data() {
         return {
             sending: false,
-
-            boton1: "Nuevo",
-            boton2: "Modificar",
-            titulo1: "Nuevo Tipo Producto",
-            titulo2: "Modificar Tipo Producto",
+            titulo1: "Añadir",
+            titulo2: "Quitar",
             form: {
-                nombre: {
-                    label: 'Nombre',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },
-                codigo: {
-                    label: 'Codigo',
+                precioUnidad: {
+                    label: 'Precio X unidad',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
                 },
             },
-            idForm: null,
             errors: Array
         }
     },
     methods: {
         reset() {
             this.limpiar();
-
-            if (this.isNew) {
-                if ('id' in this.itemRow) {
-                    this.idForm = null;
-                }
-                for(let key in this.form){
-                    this.form[key].value = "";
-                }
-            } else {
-                if ('id' in this.itemRow) {
-                    this.idForm = this.itemRow['id'];
-                }
-                for(let key in this.form){
-                    this.form[key].value = this.itemRow[key];
-                }
-            }
+            this.form.precioUnidad.value = this.itemRow['precioUnidad']
         },
         limpiar() {
             for(let key in this.form){
@@ -117,17 +91,24 @@ export default {
             this.sending = true;
             this.limpiar();
             let producto = new FormData();
-            if (this.idForm) {
-                producto.append('id', this.idForm);
-            }
             for(let key in this.form){
                 producto.append(key, this.form[key].value);
             }
-            axios.post('/admin/tipoProductos', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            if (this.itemRow['id']) {
+                producto.append('id', this.itemRow['id']);
+            }
+            if (this.itemRow['sucursal']) {
+                producto.append('sucursal', this.itemRow['sucursal']);
+            }
+            if (this.itemRow['producto']) {
+                producto.append('producto', this.itemRow['producto']);
+            }
+            let url = '/admin/stockPrice';
+            axios.post(url, producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
-                        this.$bvModal.hide(this.id)
-                        this.$inertia.get(data["path"])
+                        this.$bvModal.hide(this.id);
+                        this.$inertia.reload();
                     }
                     for(let key in this.form){
                         if (key in data.errors) {

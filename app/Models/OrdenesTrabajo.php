@@ -13,7 +13,7 @@ use Kutia\Larafirebase\Facades\Larafirebase;
 class OrdenesTrabajo extends Model
 {
     protected $table = 'ordenesTrabajo';
-    public static $tables = 'ordenesTrabajo';
+    public static string $tables = 'ordenesTrabajo';
     protected $guarded = [];
     use SoftDeletes;
 
@@ -27,7 +27,7 @@ class OrdenesTrabajo extends Model
             '5' => 'Quemado',
             '10' => 'Reposicion'
         ];
-        if (is_null($id)) {
+        if (empty($id)) {
             return $estado;
         }
 
@@ -37,15 +37,15 @@ class OrdenesTrabajo extends Model
     public static function getAll(int $sucursal = null, int $usuario = null, array $report = [], int $tipo = null)
     {
         $ordenes = DB::table(self::$tables);
+        $ordenes = $ordenes
+            ->whereNull('deleted_at')
+            ->orderBy('created_at', 'desc');
         if (!empty($sucursal)) {
             $ordenes = $ordenes->where('sucursal', '=', $sucursal);
         }
         if (!empty($usuario)) {
             $ordenes = $ordenes->where('userDiseñador', '=', $usuario);
         }
-        $ordenes = $ordenes
-            ->whereNull('deleted_at')
-            ->orderBy('created_at', 'desc');
         if (!empty($tipo)) {
             $ordenes = $ordenes->where('tipoOrden', '=', $tipo);
         }
@@ -224,7 +224,7 @@ class OrdenesTrabajo extends Model
                 ->select('tokenpush')
                 ->groupBy('tokenpush')
                 ->pluck('tokenpush')->toArray();
-            $data = Larafirebase::fromRaw([
+            Larafirebase::fromRaw([
                 'registration_ids' => $fcmTokens,
                 'data' => [
                     'newOrden' => true,

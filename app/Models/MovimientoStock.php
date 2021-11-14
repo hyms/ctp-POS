@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class MovimientoStock extends Model
 {
     protected $table = 'movimientosStock';
-    public static $tables = 'movimientosStock';
+    public static string $tables = 'movimientosStock';
     protected $guarded = [];
 
     public static function gelAll()
@@ -27,11 +27,9 @@ class MovimientoStock extends Model
     public static function getAllTable(array $stock, bool $ingreso,array $request=[])
     {
         $movimientos = DB::table(self::$tables);
-        if ($ingreso) {
-            $movimientos = $movimientos->whereIn('stockDestino', $stock);
-        } else {
-            $movimientos = $movimientos->whereIn('stockOrigen', $stock);
-        }
+        $movimientos = $ingreso
+            ? $movimientos->whereIn('stockDestino', $stock)
+            : $movimientos->whereIn('stockOrigen', $stock);
         if(isset($request))
         {
             if (isset($request['fechaI']) && isset($request['fechaF'])) {

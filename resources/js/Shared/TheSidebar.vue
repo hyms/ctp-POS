@@ -14,7 +14,7 @@
                     {{ value.titulo }}
                 </CSidebarNavTitle>
                 <template v-for="(link, key) in value.submenu">
-                    <template v-if="Object.values(link).length==1">
+                    <template v-if="Object.values(link).length===1">
                         <CSidebarNavDropdown :name="Object.keys(link)[0]"
                                              v-if="getAllPermission(Object.values(link)[0])" class="text-capitalize">
                             <template v-for="(link2, key2) in Object.values(link)[0]">
@@ -49,13 +49,10 @@
                 </template>
             </template>
         </CSidebarNav>
-        <!--        <CRenderFunction flat :content-to-render="$options.nav"/>-->
-
     </CSidebar>
 </template>
 
 <script>
-// import nav from './_nav'
 import {Link} from "@inertiajs/inertia-vue";
 
 export default {
@@ -112,7 +109,7 @@ export default {
                             role: 'vendor',
                         },
                         {
-                            Inventario:[
+                            Inventario: [
                                 {
                                     label: 'Ingresos',
                                     url: '/inventario/ingreso',
@@ -131,7 +128,7 @@ export default {
                             ]
                         },
                         {
-                            reportes:[
+                            reportes: [
                                 {
                                     label: 'Registro Diario',
                                     url: '/reportes/placas',
@@ -162,30 +159,55 @@ export default {
                             role: 'admin',
                         },
                         {
-                            label: 'Productos',
-                            url: '/admin/productos',
-                            role: 'admin',
-                        },
-                        {
-                            label: 'Sucursales',
-                            url: '/admin/sucursales',
-                            role: 'admin',
-                        },
-                        {
                             label: 'Clientes',
                             url: '/admin/clientes',
                             role: 'all',
                         },
                         {
-                            label: 'Cajas',
-                            url: '/admin/cajas',
-                            role: 'admin',
+                            Productos:[
+                                {
+                                    label: 'Productos',
+                                    url: '/admin/productos',
+                                    role: 'admin',
+                                },
+                                {
+                                    url: '/admin/tipoProductos',
+                                    label: 'Tipo Productos',
+                                    role: 'admin',
+                                },
+                                {
+                                    url: '/admin/stocks',
+                                    label: 'Stocks',
+                                    role: 'admin',
+                                },
+                                // {
+                                //     url: 'movimientosStock',
+                                //     label: 'Movimientos',
+                                //     role: 'admin',
+                                // },
+                            ]
                         },
                         {
-                            label: 'Usuarios',
-                            url: '/admin/users',
-                            role: 'admin',
-                        }
+                            Configuracion: [
+                                {
+                                    label: 'Sucursales',
+                                    url: '/admin/sucursales',
+                                    role: 'admin',
+                                },
+                                {
+                                    label: 'Cajas',
+                                    url: '/admin/cajas',
+                                    role: 'admin',
+                                },
+                                {
+                                    label: 'Usuarios',
+                                    url: '/admin/users',
+                                    role: 'admin',
+                                }
+                            ]
+                        },
+
+
                     ]
                 }
             ],
@@ -196,7 +218,7 @@ export default {
         getPermission(role) {
             let value = false;
             for (const key in this.$page.props.rolesP) {
-                if (key == role) {
+                if (key === role) {
                     if (this.$page.props.rolesP[key].includes(this.$page.props.user.role)) {
                         value = true;
                         break;
@@ -209,7 +231,7 @@ export default {
             let value = false;
             for (const val of data) {
                 for (const key in this.$page.props.rolesP) {
-                    if (key == val.role) {
+                    if (key === val.role) {
                         if (this.$page.props.rolesP[key].includes(this.$page.props.user.role)) {
                             value = true;
                             break;

@@ -14,7 +14,7 @@ class Recibo extends Model
     use HasFactory;
 
     protected $table = 'recibos';
-    public static $tables = 'recibos';
+    public static string $tables = 'recibos';
     protected $guarded = [];
     use SoftDeletes;
 
@@ -111,7 +111,7 @@ class Recibo extends Model
 
     public static function getAllOrdenes(array $ordenes)
     {
-        if (count($ordenes) > 0) {
+        if (!empty($ordenes)) {
             foreach ($ordenes as $key => $item) {
                 $detalle = DB::table(self::$tables)
                     ->where('orden', '=', $item->id)

@@ -3,14 +3,12 @@
         <div class="col-12">
             <div class="row mb-2">
                 <div class="col">
-                    <div class="col">
-                        <b-button v-b-modal="'clienteModal'" variant="primary" @click="loadModal()">{{
-                                boton1
-                            }}
-                        </b-button>
-                        <FormProducto :isNew="isNew" id="clienteModal" :itemRow="itemRow"
-                                      :sucursales="sucursales"></FormProducto>
-                    </div>
+                    <b-button v-b-modal="'clienteModal'" variant="primary" @click="loadModal()">{{
+                        boton1
+                        }}
+                    </b-button>
+                    <FormProducto :isNew="isNew" id="clienteModal" :itemRow="itemRow"
+                                  :sucursales="sucursales"></FormProducto>
                 </div>
             </div>
 
@@ -24,7 +22,6 @@
                             label-cols-sm="3"
                             label-align-sm="right"
                             label-size="sm"
-                            class="mb-0"
                         >
                             <b-input-group size="sm">
                                 <b-form-input
@@ -58,11 +55,12 @@
 
                         <template v-slot:cell(Acciones)="row">
                             <div class="row-actions">
-                                <b-button size="sm" v-b-modal="'clienteModal'" variant="primary" @click="loadModal(false,row)">
+                                <b-button size="sm" v-b-modal="'clienteModal'" variant="primary"
+                                          @click="loadModal(false,row)">
                                     {{ boton2 }}
                                 </b-button>
                                 <b-button size="sm" class="btn-danger" @click="borrar(row.item.id)">{{
-                                        boton3
+                                    boton3
                                     }}
                                 </b-button>
                             </div>
@@ -119,7 +117,7 @@ export default {
             totalRows: 1,
             currentPage: 1,
             perPage: 20,
-            filter:'',
+            filter: '',
         }
     },
     methods: {

@@ -56,7 +56,7 @@
                 <b-button variant="danger" @click="cancel()">
                     Cancel
                 </b-button>
-                <loading-button :loading="sending" variant="default"
+                <loading-button :loading="sending" variant="primary"
                                 @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
                 </loading-button>
             </template>

@@ -88,6 +88,7 @@
                 <b-card v-if="data['table'].length>0">
                     <template #header>
                         <h5 class="mb-0">Registro de Placas</h5>
+                        <b-button v-if="Object.keys(sucursales).length>0" @click="exportar()" variant="link">exportar</b-button>
                     </template>
                     <div class="table-responsive">
                         <b-table
@@ -127,12 +128,14 @@
 <script>
 import Layout from '@/Shared/Layout'
 import Menu from "./menuReportes";
+import axios from "axios";
+import FileDownload from 'js-file-download';
 
 export default {
     layout: Layout,
     props: {
         sucursales: Object,
-        forms: Array,
+        forms: Object,
         tipoPlacas: Object,
         errors: Object,
         data: Object
@@ -192,6 +195,15 @@ export default {
                 total += (value[key['key']] * 1);
             }
             return total;
+        },
+        exportar(){
+            let form = {};
+            for (let key in this.form) {
+                form[key] = this.form[key].value;
+            }
+            let url = '/admin/reportes/placasE';
+            location.href=url+window.location.search;
+            // "bootstrap": "^4.6.0",
         }
     },
     created() {

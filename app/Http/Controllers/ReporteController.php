@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cajas;
 use App\Models\Cliente;
 use App\Models\DetallesOrden;
+use App\Models\Export;
 use App\Models\MovimientoCaja;
 use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReporteController extends Controller
 {
@@ -75,7 +77,7 @@ class ReporteController extends Controller
                     'data' => ['table' => [], 'fields' => []]
                 ]);
         }
-        return $this->placas($request->all(), $sucursales,$tipo);
+        return $this->placas($request->all(), $sucursales, $tipo);
     }
 
     public function placasV(Request $request)
@@ -100,12 +102,25 @@ class ReporteController extends Controller
 
     private function placas($request, $sucursales, $tipo)
     {
+        $data = $this->getTablePlacas($request);
+        return Inertia::render('Reportes/placas',
+            [
+                'sucursales' => (object)$sucursales,
+                'forms' => (array)$request,
+                'tipoPlacas' => $tipo->pluck('nombre', 'id'),
+                'errors' => (object)[],
+                'data' => $data,
+            ]);
+    }
+
+    public function getTablePlacas($request)
+    {
         $data = ['table' => [], 'fields' => []];
         if (!isset($request['tipoOrden'])) {
             $request['tipoOrden'] = null;
         }
-        if(empty($request['fechahasta'])){
-            $request['fechahasta']=$request['fecha'];
+        if (empty($request['fechahasta'])) {
+            $request['fechahasta'] = $request['fecha'];
         }
         $ordenes = OrdenesTrabajo::getReport(
             $request['fecha'],
@@ -121,7 +136,6 @@ class ReporteController extends Controller
         if (!empty($request['tipoOrden'])) {
             $placas = $placas[$request['tipoOrden']];
         }
-
         foreach ($ordenes as $orden) {
             $row = [
                 'fechaOrden' => $orden->created_at,
@@ -188,14 +202,26 @@ class ReporteController extends Controller
             array_push($data['fields'], $row->formato);
         }
         array_push($data['fields'], 'observaciones');
-        return Inertia::render('Reportes/placas',
-            [
-                'sucursales' => (object)$sucursales,
-                'forms' => (array)$request,
-                'tipoPlacas' => $tipo->pluck('nombre', 'id'),
-                'errors' => (object)[],
-                'data' => $data,
-            ]);
+        return $data;
+    }
+
+    public function exportPlacas(Request $request)
+    {
+        $data = $this->getTablePlacas($request->all());
+//        return Excel::create('regsitroPlacas', function($excel) use($data) {
+//
+//            $excel->sheet('Sheetname', function($sheet) use($data) {
+//
+//                $sheet->fromArray($data['table']);
+//
+//            });
+//
+//        })->download('xls');
+        $export = new Export();
+        $export->data = $data['table'];
+        array_shift($data['fields']);
+        $export->dataHeading = $data['fields'];
+        return Excel::download($export, 'registroPlacas.xlsx');
     }
 
     public function arqueos(Request $request)
@@ -283,7 +309,7 @@ class ReporteController extends Controller
                     );
                 }
             }
-            $data = ['table' => $clientes, 'fields' => ['nombreResponsable', 'mora','desde','hasta','cantidad']];
+            $data = ['table' => $clientes, 'fields' => ['nombreResponsable', 'mora', 'desde', 'hasta', 'cantidad']];
         }
         return Inertia::render('Reportes/mora',
             [
@@ -426,15 +452,15 @@ class ReporteController extends Controller
             $fechaI = Carbon::parse($request['fechaI']);
             $fechaF = Carbon::parse($request['fechaF']);
 
-            $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, ['cliente' => $request['cliente'], 'fechaI' => $fechaI, 'fechaF' =>$fechaF]);
-            $ordenes->whereIn('estado',[0,1,2]);
+            $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, ['cliente' => $request['cliente'], 'fechaI' => $fechaI, 'fechaF' => $fechaF]);
+            $ordenes->whereIn('estado', [0, 1, 2]);
             $ordenes = DetallesOrden::getAll($ordenes->get());
-            $movimientos=$ordenes;
-            $fields=['codigoServicio', ['key' => 'created_at', 'label' => 'Fecha'], 'montoVenta','Acciones'];
+            $movimientos = $ordenes;
+            $fields = ['codigoServicio', ['key' => 'created_at', 'label' => 'Fecha'], 'montoVenta', 'Acciones'];
         }
         $sucursales = Sucursal::getAll()->pluck('nombre', 'id');
         $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
-        $clientes = Cliente::getAll($request['sucursal'])->pluck('nombreResponsable','id');
+        $clientes = Cliente::getAll($request['sucursal'])->pluck('nombreResponsable', 'id');
         $data = ['table' => $movimientos, 'fields' => $fields];
         return Inertia::render('Reportes/clientes',
             [
