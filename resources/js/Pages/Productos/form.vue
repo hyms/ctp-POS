@@ -25,7 +25,7 @@
                             :id="key"
                             :state="item.state"
                         ></b-input>
-                        <b-form-select
+<!--                        <b-form-select
                             v-if="item.type==='select'"
                             v-model="item.value"
                             :options="tipoProducto"
@@ -33,7 +33,15 @@
                             <template #first>
                                 <b-form-select-option :value="null">Seleccione una opcion</b-form-select-option>
                             </template>
-                        </b-form-select>
+                        </b-form-select>-->
+                        <b-form-checkbox-group
+                            v-if="item.type==='select'"
+                            id="checkbox-group-1"
+                            v-model="item.value"
+                            :options="tipoProducto"
+                            value-field="id"
+                            text-field="nombre"
+                        ></b-form-checkbox-group>
                     </b-form-group>
                 </template>
             </form>
@@ -52,7 +60,6 @@
 <script>
 import axios from "axios";
 import LoadingButton from '@/Shared/LoadingButton'
-
 export default {
     props: {
         isNew: Boolean,
@@ -93,7 +100,7 @@ export default {
                     state: null,
                     stateText: null
                 },
-                tipo:{
+                productoTipo:{
                     label: 'Tipo Producto',
                     value: "",
                     type: "select",
@@ -170,6 +177,15 @@ export default {
                 }).finally(() => {
                 this.sending = false;
             })
+        },
+        toArray(object)
+        {
+            var arr=[];
+            for(var k in object)
+            {
+                arr.push(object[k]);
+            }
+            return arr;
         }
     },
 }

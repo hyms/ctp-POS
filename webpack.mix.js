@@ -25,5 +25,5 @@ mix.js('resources/js/app.js', 'public/js')
         },
     })
     .version()
-    .vue();
+    .vue({ version: 2 });
 

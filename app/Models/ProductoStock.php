@@ -162,7 +162,10 @@ class ProductoStock extends Model
             $stocks = array();
             foreach ($tiposProductos as $tiposProducto) {
                 $stockTmp = $stock->clone();
-                $stocks[$tiposProducto->id] = $stockTmp->where('productos.tipo', '=', $tiposProducto->id)->get()->toArray();
+                $productosTipos = DB::table('productoTipo')
+                    ->where('tipoProducto', '=', $tiposProducto->id);
+                $productosTipos = $productosTipos->pluck('producto');
+                $stocks[$tiposProducto->id] = $stockTmp->whereIn('productos.id', $productosTipos)->get()->toArray();
             }
             return $stocks;
         }

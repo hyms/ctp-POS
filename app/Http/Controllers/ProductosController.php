@@ -16,6 +16,7 @@ class ProductosController extends Controller
     public function getAll()
     {
         $productos = Producto::getAll();
+        $productos = TipoProductos::setTiposProducto($productos);
         $tipoProducto = TipoProductos::getAll();
         $tipoProducto = $tipoProducto->pluck('nombre', 'id');
         return Inertia::render('Productos/tabla',
@@ -45,8 +46,12 @@ class ProductosController extends Controller
             if (!empty($request['id'])) {
                 $producto = Producto::find($request['id']);
             }
-            $producto->fill($request->all());
+            $producto->fill($request->except('productoTipo'));
             $producto->save();
+            if(isset($request['productoTipo']))
+            {
+                TipoProductos::saveTiposProducto($producto->id, explode(',', $request['productoTipo']));
+            }
             return response()->json(["status" => 0, 'path' => 'productos']);
         } catch (\Exception $error) {
             Log::error($error->getMessage());

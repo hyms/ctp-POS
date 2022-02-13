@@ -28,6 +28,9 @@
                         <template v-slot:cell(tipo)="data">
                             <p>{{ getTipo(data.value) }}</p>
                         </template>
+                        <template v-slot:cell(productoTipo)="data">
+                            <p>{{ getTipos(data.value) }}</p>
+                        </template>
                         <template v-slot:cell(Acciones)="row">
                             <div class="row-actions">
                                 <b-button size="sm" variant="primary" v-b-modal="'productoModal'" @click="loadModal(false,row)">
@@ -83,7 +86,7 @@ export default {
                         label: 'detalle'
                     },
                     {
-                        key: 'tipo',
+                        key: 'productoTipo',
                         label: 'Tipo Producto'
                     },
                     'Acciones'
@@ -101,6 +104,20 @@ export default {
         },
         getTipo(tipo) {
             return this.tipoProducto[tipo];
+        },
+        getTipos(tipos) {
+            let resultado = ""
+            let count=0;
+            for(let tipo of tipos)
+            {
+                resultado +=this.tipoProducto[tipo];
+                ++count;
+                if(count<tipos.length)
+                {
+                    resultado+=", ";
+                }
+            }
+            return resultado;
         },
         borrar(id) {
             this.$inertia.delete(`producto/${id}`, {
