@@ -2,7 +2,7 @@
 /public/hot
 /public/storage
 /public/css
-/public/js
+#/public/js
 /public/fonts
 /public/webfonts
 /public/images
