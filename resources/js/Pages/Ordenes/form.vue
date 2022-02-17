@@ -71,8 +71,10 @@
                                     <b-td>{{ product.dimension }}</b-td>
                                     <b-td>{{ product.cantidad }}</b-td>
                                     <b-td>
-                                        <b-form-spinbutton id="demo-sb" v-model="productosSell[key].cantidad" min="0"
-                                                           max="100" size="sm" inline></b-form-spinbutton>
+<!--                                        <b-form-spinbutton id="demo-sb" v-model="productosSell[key].cantidad" min="0"-->
+<!--                                                           max="100" size="sm" inline></b-form-spinbutton>-->
+                                        <b-input type="number" id="demo-sb" v-model="productosSell[key].cantidad"
+                                                size="sm" min="0"></b-input>
                                     </b-td>
                                 </b-tr>
                             </template>

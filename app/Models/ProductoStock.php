@@ -69,8 +69,8 @@ class ProductoStock extends Model
                 'cantidad' => $request['cantidad']
             );
             $stockOrigen = $more
-                ? self::more($moreLess, false)
-                : self::less($moreLess, false);
+                ? self::less($moreLess, false)
+                : self::more($moreLess, false);
         }
 
         if ($mov) {
