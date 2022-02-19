@@ -1,57 +1,49 @@
 <template>
-    <div class="content-w">
-        <div class="content-box">
-            <div class="row">
+    <div class="row">
+        <div class="col-12">
+            <div class="row mb-2">
                 <div class="col">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <h4 class="header-title m-t-0 m-b-20">{{ titulo }}</h4>
-                        </div>
-                    </div>
-                    <div class="row m-b-20 m-t-10">
-                        <div class="col">
-                            <b-button v-b-modal="'userModal'" @click="loadModal()">{{ boton1 }}</b-button>
-                            <FormUser :isNew="isNew" id="userModal" :itemRow="itemRow" :sucursales="sucursales"
-                                      :roles="roles"></FormUser>
-                        </div>
-                    </div>
-
-                    <div class="row m-b-20">
-                        <div class="col">
-                            <b-table
-                                striped
-                                hover
-                                responsive
-                                :items="userss"
-                                :fields="fields"
-                                show-empty
-                                small
-                            >
-
-                                <template v-slot:cell(sucursal)="data">
-                                    {{ getSucursal(data.value) }}
-                                </template>
-                                <template v-slot:cell(role)="data">
-                                    {{ getRoles(data.value) }}
-                                </template>
-                                <template v-slot:cell(enable)="data">
-                                    {{ (data.value === 1) ? "Si" : "No" }}
-                                </template>
-                                <template v-slot:cell(Acciones)="row">
-                                    <div class="row-actions">
-                                        <b-button v-b-modal="'userModal'" @click="loadModal(false,row)">
-                                            {{ boton2 }}
-                                        </b-button>
-                                        <b-button class="btn-danger" @click="borrar(row.item.id)">
-                                            {{ boton3 }}
-                                        </b-button>
-                                    </div>
-                                </template>
-                            </b-table>
-                        </div>
-                    </div>
+                    <b-button v-b-modal="'userModal'" @click="loadModal()" variant="primary">{{ boton1 }}</b-button>
+                    <FormUser :isNew="isNew" id="userModal" :itemRow="itemRow" :sucursales="sucursales"
+                              :roles="roles"></FormUser>
                 </div>
             </div>
+            <b-card no-body>
+                <b-card-header>
+                    <strong>{{ titulo }}</strong>
+                </b-card-header>
+                <b-card-body>
+                    <b-table
+                        striped
+                        hover
+                        responsive
+                        :items="userss"
+                        :fields="fields"
+                        show-empty
+                        small
+                    >
+                        <template v-slot:cell(sucursal)="data">
+                            {{ getSucursal(data.value) }}
+                        </template>
+                        <template v-slot:cell(role)="data">
+                            {{ getRoles(data.value) }}
+                        </template>
+                        <template v-slot:cell(enable)="data">
+                            {{ (data.value === 1) ? "Si" : "No" }}
+                        </template>
+                        <template v-slot:cell(Acciones)="row">
+                            <div class="row-actions">
+                                <b-button v-b-modal="'userModal'" @click="loadModal(false,row)" variant="primary">
+                                    {{ boton2 }}
+                                </b-button>
+                                <b-button class="btn-danger" @click="borrar(row.item.id)">
+                                    {{ boton3 }}
+                                </b-button>
+                            </div>
+                        </template>
+                    </b-table>
+                </b-card-body>
+            </b-card>
         </div>
     </div>
 </template>
@@ -113,7 +105,7 @@ export default {
         getRoles(id) {
             let rol = '';
             for (let key in this.roles) {
-                if (this.roles[key].value == id) {
+                if (this.roles[key].value === id) {
                     rol = this.roles[key].text;
                 }
             }

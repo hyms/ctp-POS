@@ -37,10 +37,10 @@
                 </template>
             </form>
             <template #modal-footer="{ ok, cancel }">
-                <b-button variant="danger" @click="cancel()">
+                <b-button variant="danger" @click="cancel()" size="sm">
                     Cancel
                 </b-button>
-                <loading-button :loading="sending" variant="default"
+                <loading-button :loading="sending" variant="primary" size="sm"
                                 @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
                 </loading-button>
             </template>
@@ -68,8 +68,8 @@ export default {
             sending: false,
             urlDebito: "cajaDebito",
             urlCredito: "cajaCredito",
-            titulo1: "Nuevo Cliente",
-            titulo2: "Modificar Cliente",
+            titulo1: "Nuevo Registro",
+            titulo2: "Modificar Registro",
             form: {
                 observaciones: {
                     label: 'Descripcion',

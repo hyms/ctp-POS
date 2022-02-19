@@ -1,20 +1,17 @@
 <template>
-    <div class="content-w">
-        <div class="content-box">
-            <div class="row">
-                <div class="col-sm-12">
-                    <h4 class="header-title m-t-0 m-b-20">{{ titulo }}</h4>
+    <div class="row">
+        <div class="col-12">
+            <div class="row mb-2">
+                <div class="col">
+                    <b-button v-b-modal="'sucursalModal'" variant="primary" @click="loadModal()">{{ boton1 }}</b-button>
+                    <FormSucursal :isNew="isNew" id="sucursalModal" :itemRow="itemRow" :sucursalPadre="sucursalPadre"></FormSucursal>
                 </div>
             </div>
-            <div class="row m-b-20">
-                <div class="col">
-                    <b-button v-b-modal="'sucursalModal'" @click="loadModal()">{{ boton1 }}</b-button>
-                    <FormProducto :isNew="isNew" id="sucursalModal" :itemRow="itemRow" :sucursalPadre="sucursalPadre"></FormProducto>
-                </div>
-            </div>
-
-            <div class="row m-b-20">
-                <div class="col">
+            <b-card no-body>
+                <b-card-header>
+                    <strong>{{ titulo }}</strong>
+                </b-card-header>
+                <b-card-body>
                     <b-table
                         striped
                         hover
@@ -35,22 +32,22 @@
                         </template>
                         <template v-slot:cell(Acciones)="row">
                             <div class="row-actions">
-                                <b-button v-b-modal="'sucursalModal'" @click="loadModal(false,row)">
+                                <b-button variant="primary" v-b-modal="'sucursalModal'" @click="loadModal(false,row)">
                                     {{ boton2 }}
                                 </b-button>
-                                <b-button class="btn-danger" @click="borrar(row.item.id)">{{ boton3 }}</b-button>
+                                <b-button variant="danger" @click="borrar(row.item.id)">{{ boton3 }}</b-button>
                             </div>
                         </template>
                     </b-table>
-                </div>
-            </div>
+                </b-card-body>
+            </b-card>
         </div>
     </div>
 </template>
 
 <script>
 import Layout from '@/Shared/Layout'
-import FormProducto from './form'
+import FormSucursal from './form'
 
 export default {
     layout: Layout,
@@ -59,7 +56,7 @@ export default {
         errors: Object,
     },
     components: {
-        FormProducto
+        FormSucursal
     },
     data() {
         return {

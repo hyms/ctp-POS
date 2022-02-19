@@ -98,6 +98,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::get('reportes/cliente', [ReporteController::class, 'cliente'])
         ->name('clienteReportes');
     //inventario
+    Route::get('inventario/saldos', [InventarioController::class, 'saldo'])
+        ->name('saldoInventario');
     Route::get('inventario/ingreso', [InventarioController::class, 'getIngreso'])
         ->name('ingresoInventario');
     Route::get('inventario/egreso', [InventarioController::class, 'getEgreso'])
@@ -162,6 +164,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('eliminarStock');
     Route::post('stockEnable', [StockController::class, 'enableStock'])
         ->name('enablestock');
+    Route::post('stockPrice', [StockController::class, 'priceStock'])
+        ->name('priceStock');
     Route::get('movimientosStock', [StockController::class, 'movimientos'])
         ->name('movimientosStock');
 
@@ -177,6 +181,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('listaReportes');
     Route::get('reportes/placas', [ReporteController::class, 'placasA'])
         ->name('listaReportes');
+    Route::get('reportes/placasE', [ReporteController::class, 'exportPlacas'])
+        ->name('listaReportesE');
     Route::get('reportes/arqueos', [ReporteController::class, 'arqueos'])
         ->name('listaArqueos');
     Route::get('reportes/cajas', [ReporteController::class, 'cajas'])

@@ -2,11 +2,6 @@
     <div class="content-w">
         <div class="content-box">
             <Menu :active="1" v-if="Object.keys(sucursales).length>0"></Menu>
-            <div class="row" v-else>
-                <div class="col-sm-12">
-                    <h4 class="header-title m-t-0 m-b-20">Registro Placas</h4>
-                </div>
-            </div>
             <div class="tab-content">
                 <b-card>
                     <template #header>
@@ -49,6 +44,21 @@
                                     ></b-input>
                                 </b-form-group>
                             </b-col>
+                            <b-col md="4" sm="6" v-if="Object.keys(sucursales).length>0">
+                                <b-form-group
+                                    :label="form.fechahasta.label"
+                                    label-for="hasta"
+                                    :state="form.fechahasta.state"
+                                >
+                                    <b-input
+                                        :type="form.fechahasta.type"
+                                        :placeholder="form.fechahasta.label"
+                                        v-model="form.fechahasta.value"
+                                        id="hasta"
+                                        :state="form.fechahasta.state"
+                                    ></b-input>
+                                </b-form-group>
+                            </b-col>
                             <b-col md="4" sm="6">
                                 <b-form-group
                                     :label="form.tipoOrden.label"
@@ -69,15 +79,16 @@
                                     </b-form-select>
                                 </b-form-group>
                             </b-col>
-                            <b-col>
-                                <b-button type="submit">Buscar</b-button>
+                            <b-col sm="12">
+                                <b-button @click="enviar()" variant="primary">Buscar</b-button>
                             </b-col>
                         </b-row>
                     </form>
                 </b-card>
                 <b-card v-if="data['table'].length>0">
                     <template #header>
-                        <h5 class="mb-0">Resultados</h5>
+                        <h5 class="mb-0">Registro de Placas</h5>
+                        <b-button v-if="Object.keys(sucursales).length>0" @click="exportar()" variant="link">exportar</b-button>
                     </template>
                     <div class="table-responsive">
                         <b-table
@@ -87,6 +98,7 @@
                             :fields="data['fields']"
                             show-empty
                             small
+                            sticky-header
                         >
                             <template #cell(#)="data">
                                 {{ data.index + 1 }}
@@ -96,9 +108,9 @@
                             </template>
                             <template #custom-foot="data">
                                 <b-tr>
-                                    <b-th colspan="4" class="text-right"><strong>Total</strong></b-th>
+                                    <b-th colspan="5" class="text-right"><strong>Total</strong></b-th>
                                     <template v-for="(item,key) in data['fields']">
-                                        <b-th v-if="(key>=4) && (key<=data['fields'].length-2)"> {{ getTotal(item) }}
+                                        <b-th v-if="(key>=5) && (key<=data['fields'].length-2)"> {{ getTotal(item) }}
                                         </b-th>
                                     </template>
                                     <b-th></b-th>
@@ -116,12 +128,14 @@
 <script>
 import Layout from '@/Shared/Layout'
 import Menu from "./menuReportes";
+import axios from "axios";
+import FileDownload from 'js-file-download';
 
 export default {
     layout: Layout,
     props: {
         sucursales: Object,
-        forms: Array,
+        forms: Object,
         tipoPlacas: Object,
         errors: Object,
         data: Object
@@ -146,6 +160,13 @@ export default {
                     state: null,
                     stateText: null
                 },
+                fechahasta: {
+                    label: 'hasta',
+                    value: "",
+                    type: "date",
+                    state: null,
+                    stateText: null
+                },
                 tipoOrden: {
                     label: 'TipoOrden',
                     value: "",
@@ -163,7 +184,7 @@ export default {
                 form[key] = this.form[key].value;
             }
             let url = '/reportes/placas';
-            if (this.sucursales.length > 0) {
+            if (Object.keys(this.sucursales).length > 0) {
                 url = '/admin/reportes/placas';
             }
             this.$inertia.get(url, form)
@@ -174,6 +195,15 @@ export default {
                 total += (value[key['key']] * 1);
             }
             return total;
+        },
+        exportar(){
+            let form = {};
+            for (let key in this.form) {
+                form[key] = this.form[key].value;
+            }
+            let url = '/admin/reportes/placasE';
+            location.href=url+window.location.search;
+            // "bootstrap": "^4.6.0",
         }
     },
     created() {
@@ -183,7 +213,7 @@ export default {
             //     this.form[key].state = false;
             // }
         }
-        for (let key in this.errors()) {
+        for (let key in this.errors) {
             this.form[key].state = false;
         }
     }

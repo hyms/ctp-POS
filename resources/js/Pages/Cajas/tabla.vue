@@ -1,62 +1,61 @@
 <template>
-    <div class="content-w">
-        <div class="content-box">
-            <Menu :active="1"></Menu>
-            <div class="tab-content">
-                <div class="row m-b-20">
-                    <div class="col">
-                        <b-button v-b-modal="'cajaModal'" @click="loadModal()">{{ boton1 }}</b-button>
-                        <FormProducto :isNew="isNew" id="cajaModal" :itemRow="itemRow"
-                                      :sucursales="sucursales" :cajasPadre="cajasPadre"></FormProducto>
-                    </div>
-                </div>
-
-                <div class="row m-b-20">
-                    <b-card>
-                        <b-table
-                            striped
-                            hover
-                            responsive
-                            :items="cajas"
-                            :fields="fields"
-                            show-empty
-                            small
-                        >
-                            <template #empty="scope">
-                                <p>{{ textoVacio }}</p>
-                            </template>
-                            <template v-slot:cell(sucursal)="data">
-                                {{ getSucursal(data.value) }}
-                            </template>
-                            <template v-slot:cell(dependeDe)="data">
-                                {{ getCaja(data.value.nombre) }}
-                            </template>
-                            <template v-slot:cell(enable)="data">
-                                {{ (data.value === 1) ? "Si" : "No" }}
-                            </template>
-
-                            <template v-slot:cell(Acciones)="row">
-                                <div class="row-actions">
-                                    <b-button size="sm" v-b-modal="'cajaModal'" @click="loadModal(false,row)">
-                                        {{ boton2 }}
-                                    </b-button>
-                                    <b-button size="sm" class="btn-danger" @click="borrar(row.item.id)">{{
-                                            boton3
-                                        }}
-                                    </b-button>
-                                </div>
-                            </template>
-                        </b-table>
-                    </b-card>
+    <div class="row">
+        <div class="col-12">
+            <div class="row mb-2">
+                <div class="col">
+                    <b-button v-b-modal="'cajaModal'" variant="primary" @click="loadModal()">{{ boton1 }}</b-button>
+                    <FormCaja :isNew="isNew" id="cajaModal" :itemRow="itemRow"
+                              :sucursales="sucursales" :cajasPadre="cajasPadre"></FormCaja>
                 </div>
             </div>
+            <b-card no-body>
+                <b-card-header>
+                    <strong>{{ titulo }}</strong>
+                </b-card-header>
+                <b-card-body>
+                    <b-table
+                        striped
+                        hover
+                        responsive
+                        :items="cajas"
+                        :fields="fields"
+                        show-empty
+                        small
+                    >
+                        <template #empty="scope">
+                            <p>{{ textoVacio }}</p>
+                        </template>
+                        <template v-slot:cell(sucursal)="data">
+                            {{ getSucursal(data.value) }}
+                        </template>
+                        <template v-slot:cell(dependeDe)="data">
+                            {{ getCaja(data.value.nombre) }}
+                        </template>
+                        <template v-slot:cell(enable)="data">
+                            {{ (data.value === 1) ? "Si" : "No" }}
+                        </template>
+
+                        <template v-slot:cell(Acciones)="row">
+                            <div class="row-actions">
+                                <b-button size="sm" variant="primary" v-b-modal="'cajaModal'"
+                                          @click="loadModal(false,row)">
+                                    {{ boton2 }}
+                                </b-button>
+                                <b-button size="sm" variant="danger" @click="borrar(row.item.id)">
+                                    {{ boton3 }}
+                                </b-button>
+                            </div>
+                        </template>
+                    </b-table>
+                </b-card-body>
+            </b-card>
         </div>
     </div>
 </template>
 
 <script>
 import Layout from '@/Shared/Layout'
-import FormProducto from './form'
+import FormCaja from './form'
 import Menu from './menuCajas';
 
 export default {
@@ -67,7 +66,7 @@ export default {
         errors: Object,
     },
     components: {
-        FormProducto,
+        FormCaja,
         Menu
     },
     data() {
@@ -99,7 +98,7 @@ export default {
             if (!isNew) {
                 this.itemRow = item.item;
             }
-            for(let key in this.cajas){
+            for (let key in this.cajas) {
                 if (item == null || item.item.id !== this.cajas[key].id) {
                     cajasP[this.cajas[key].id] = this.cajas[key].nombre;
                 }

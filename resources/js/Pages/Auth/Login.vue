@@ -1,15 +1,16 @@
 <template>
-    <div class="hold-transition bg-img">
-        <div class="container h-p100">
-            <div class="row align-items-center justify-content-md-center h-p100">
-                <div class="col-12">
-                    <div class="row no-gutters justify-content-md-center">
-                        <div class="col-lg-5 col-md-5 col-12">
-                            <div class="p-40 bg-white content-bottom h-p100">
+    <div class="c-app flex-row align-items-center">
+        <CContainer>
+            <CRow class="justify-content-center">
+                <CCol md="6" lg="4" sm="8">
+                        <CCard>
+                            <CCardBody>
                                 <b-alert variant="danger" dismissible :show="!!errors.usuario">
                                     {{ errors.usuario }}
                                 </b-alert>
                                 <form class="form-element" @submit.prevent="submit">
+                                    <h1>Login</h1>
+
                                     <div class="input-group mb-3">
                                         <b-form-input
                                             id="username"
@@ -51,12 +52,11 @@
                                     </div>
                                 </form>
 
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                            </CCardBody>
+                        </CCard>
+                </CCol>
+            </CRow>
+        </CContainer>
     </div>
 </template>
 

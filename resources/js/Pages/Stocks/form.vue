@@ -31,7 +31,7 @@
                 <b-button variant="danger" @click="cancel()">
                     Cancel
                 </b-button>
-                <loading-button :loading="sending" variant="default"
+                <loading-button :loading="sending" variant="primary"
                                 @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
                 </loading-button>
             </template>
@@ -66,13 +66,6 @@ export default {
                     state: null,
                     stateText: null
                 },
-                precioUnidad: {
-                    label: 'Precio X unidad',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },
             },
             errors: Array
         }
@@ -80,10 +73,9 @@ export default {
     methods: {
         reset() {
             this.limpiar();
-            this.form.precioUnidad.value = this.itemRow['precioUnidad']
         },
         limpiar() {
-            for(let key in this.form){
+            for (let key in this.form) {
                 this.form[key].state = null;
                 this.form[key].stateText = null;
             }
@@ -98,7 +90,7 @@ export default {
             this.sending = true;
             this.limpiar();
             let producto = new FormData();
-            for(let key in this.form){
+            for (let key in this.form) {
                 producto.append(key, this.form[key].value);
             }
             if (this.itemRow['sucursal']) {
@@ -113,11 +105,11 @@ export default {
             }
             axios.post(url, producto, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
-                    if (data["status"] == 0) {
-                        this.$bvModal.hide(this.id)
-                        this.$inertia.get(data["path"])
+                    if (data["status"] === 0) {
+                        this.$bvModal.hide(this.id);
+                        this.$inertia.reload();
                     }
-                    for(let key in this.form){
+                    for (let key in this.form) {
                         if (key in data.errors) {
                             this.form[key].state = false;
                             this.form[key].stateText = data.errors[key][0];

@@ -1,10 +1,9 @@
 <template>
-    <div class="content-w">
-        <div class="content-box">
-            <Menu :active="active"></Menu>
-            <div class="tab-content">
-                <div class="row m-b-20">
-                    <b-button v-b-modal="'reciboModal'" @click="loadModal()">
+    <div class="row">
+        <div class="col-12">
+            <div class="row mb-2">
+                <div class="col">
+                    <b-button v-b-modal="'reciboModal'" @click="loadModal()" variant="primary">
                         {{ boton1 }}
                     </b-button>
                     <Form
@@ -12,42 +11,49 @@
                         :tipo="tipo"
                         :item-row="itemRow"
                     ></Form>
-                    <b-card class="table-responsive m-t-20">
-                        <b-table
-                            striped
-                            hover
-                            :items="recibos"
-                            :fields="fields"
-                            show-empty
-                            small
-                            :current-page="currentPage"
-                            :per-page="perPage"
-                        >
-                            <template #empty="scope">
-                                <p>{{ textoVacio }}</p>
-                            </template>
-                            <template v-slot:cell(created_at)="data">
-                                {{ data.value | moment("DD/MM/YYYY HH:mm") }}
-                            </template>
-                            <template v-slot:cell(Acciones)="row">
-                                <div class="row-actions">
-                                    <a class="btn btn-secondary btn-sm" :href="'/reciboPdf/'+row.item.id" target="_blank">Imprimir</a>
-                                </div>
-                            </template>
-                        </b-table>
-                    </b-card>
                 </div>
-                <b-col>
-                    <b-pagination
-                        v-model="currentPage"
-                        :total-rows="totalRows"
-                        :per-page="perPage"
-                        align="center"
-                        class="my-0"
-                        v-if="totalRows>perPage"
-                    ></b-pagination>
-                </b-col>
             </div>
+            <FormSearch :report="report"></FormSearch>
+            <b-card no-body>
+                <b-card-header>
+                    <strong>{{ titulo + ((tipo) ? ' de Egreso' : ' de Ingreso') }}</strong>
+                </b-card-header>
+                <b-card-body>
+                    <b-table
+                        striped
+                        hover
+                        :items="recibos"
+                        :fields="fields"
+                        show-empty
+                        small
+                        :current-page="currentPage"
+                        :per-page="perPage"
+                        sticky-header
+                    >
+                        <template #empty="scope">
+                            <p>{{ textoVacio }}</p>
+                        </template>
+                        <template v-slot:cell(created_at)="data">
+                            {{ data.value | moment("DD/MM/YYYY HH:mm") }}
+                        </template>
+                        <template v-slot:cell(Acciones)="row">
+                            <div class="row-actions">
+                                <a class="btn btn-primary btn-sm" :href="'/reciboPdf/'+row.item.id" target="_blank">Imprimir</a>
+                            </div>
+                        </template>
+                    </b-table>
+                    <b-col>
+                        <b-pagination
+                            v-model="currentPage"
+                            :total-rows="totalRows"
+                            :per-page="perPage"
+                            align="center"
+                            class="my-0"
+                            v-if="totalRows>perPage"
+                        ></b-pagination>
+                    </b-col>
+                </b-card-body>
+            </b-card>
         </div>
     </div>
 </template>
@@ -55,7 +61,7 @@
 <script>
 import Layout from '@/Shared/Layout'
 import Form from './form'
-import Menu from './menuRegistro';
+import FormSearch from './formSearch'
 import moment from 'moment';
 
 export default {
@@ -63,12 +69,12 @@ export default {
     props: {
         recibos: Array,
         errors: Object,
-        active: Number,
         tipo: Number,
+        report: Object,
     },
     components: {
         Form,
-        Menu
+        FormSearch
     },
     data() {
         return {

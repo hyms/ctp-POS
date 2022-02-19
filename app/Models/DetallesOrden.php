@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class DetallesOrden extends Model
 {
     protected $table = 'detallesOrden';
-    public static $tables = 'detallesOrden';
+    public static string $tables = 'detallesOrden';
     protected $guarded = [];
 
     public static function newOrdenDetalle(array $detalle, int $ordenTrabajo)
@@ -19,7 +19,7 @@ class DetallesOrden extends Model
             $detalles->delete();
         }
         foreach ($detalle as $item) {
-            $id = DB::table(self::$tables)
+            DB::table(self::$tables)
                 ->insertGetId([
                     'stock' => $item['stock'],
                     'cantidad' => $item['cantidad'],
@@ -36,7 +36,7 @@ class DetallesOrden extends Model
     public static function getAll(Collection $ordenes)
     {
         $ordenes = $ordenes->toArray();
-        if (count($ordenes) > 0) {
+        if (!empty($ordenes)) {
             foreach ($ordenes as $key => $item) {
                 $detalle = DB::table(self::$tables)
                     ->where('ordenTrabajo', '=', $item->id)

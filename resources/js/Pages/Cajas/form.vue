@@ -62,7 +62,7 @@
                 <b-button variant="danger" @click="cancel()">
                     Cancel
                 </b-button>
-                <loading-button :loading="sending" variant="default"
+                <loading-button :loading="sending" variant="primary"
                                 @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
                 </loading-button>
             </template>
@@ -75,7 +75,7 @@ import axios from "axios";
 import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
-    name: "cliente",
+    name: "Caja",
     props: {
         isNew: Boolean,
         id: String,
@@ -89,8 +89,8 @@ export default {
     data() {
         return {
             sending: false,
-            titulo1: "Nuevo Cliente",
-            titulo2: "Modificar Cliente",
+            titulo1: "Nueva Caja",
+            titulo2: "Modificar Caja",
             form: {
                 nombre: {
                     label: 'nombre',

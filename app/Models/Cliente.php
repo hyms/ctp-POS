@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class Cliente extends Model
 {
     protected $table = 'clientes';
-    public static $tables = 'clientes';
+    public static string $tables = 'clientes';
     protected $guarded = [];
     use SoftDeletes;
 

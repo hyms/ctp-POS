@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,7 +14,7 @@ class Recibo extends Model
     use HasFactory;
 
     protected $table = 'recibos';
-    public static $tables = 'recibos';
+    public static string $tables = 'recibos';
     protected $guarded = [];
     use SoftDeletes;
 
@@ -79,22 +80,41 @@ class Recibo extends Model
         });
     }
 
-    public static function getAll(int $sucursal, int $tipo)
+    public static function getAll(int $sucursal, int $tipo, array $report = [])
     {
         $recibos = DB::table(self::$tables)
             ->where('sucursal', '=', $sucursal)
             ->orderBy('created_at', 'desc')
             ->whereNull('deleted_at');
+        if(isset($report)) {
+            if (isset($report['fechaI']) && isset($report['fechaF'])) {
+                $fechaI = Carbon::parse($report['fechaI']);
+                $fechaF = Carbon::parse($report['fechaF']);
+                $recibos = $recibos->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()]);
+            }
+            if (isset($report['detalle'])) {
+                $recibos = $recibos->where('detalle', 'like', "%{$report['detalle']}%");
+            }
+            if (isset($report['secuencia'])) {
+                $recibos = $recibos->where('secuencia', '=', $report['secuencia']);
+            }
+            if (isset($report['nombre'])) {
+                $recibos = $recibos->where('nombre', '=', $report['nombre']);
+            }
+        }
+        else{
+            $recibos = $recibos->limit(500);
+        }
         $recibos = $recibos->where('tipo', '=', $tipo);
         return $recibos->get();
     }
 
     public static function getAllOrdenes(array $ordenes)
     {
-        if (count($ordenes) > 0) {
+        if (!empty($ordenes)) {
             foreach ($ordenes as $key => $item) {
                 $detalle = DB::table(self::$tables)
-                    ->where('codigoVenta', '=', $item->id)
+                    ->where('orden', '=', $item->id)
                     ->get()->toArray();
                 $ordenes[$key]->recibos = $detalle;
             }

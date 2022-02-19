@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class MovimientoCaja extends Model
 {
     protected $table = 'movimientoCajas';
-    public static $tables = 'movimientoCajas';
+    public static string $tables = 'movimientoCajas';
     protected $guarded = [];
     use SoftDeletes;
     //tipo de movimiento
@@ -17,5 +17,8 @@ class MovimientoCaja extends Model
     // 2 cajaChica
     // 3
     // 4 Recibos
+    public static function getAllOrdenes(array $ordenes)
+    {
 
+    }
 }

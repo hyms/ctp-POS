@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use phpDocumentor\Reflection\Types\This;
 
 class ProductoStock extends Model
 {
     protected $table = 'stock';
-    public static $tables = 'stock';
+    public static string $tables = 'stock';
     protected $guarded = [];
 
     public static function getAll(int $sucursal = null)
@@ -19,13 +20,6 @@ class ProductoStock extends Model
             $stock = $stock->where('sucursal', '=', $sucursal);
         }
         return $stock->get();
-    }
-
-    public static function get(int $sucursal, int $producto)
-    {
-        return DB::table(self::$tables)
-            ->where('sucursal', '=', $sucursal)
-            ->where('producto', '=', $producto);
     }
 
     public static function more(array $request, bool $mov = true)
@@ -40,11 +34,12 @@ class ProductoStock extends Model
 
     private static function moreLess(array $request, bool $mov, bool $more)
     {
-        $stock = self::get($request['sucursal'], $request['producto']);
+        $stock = DB::table(self::$tables)
+            ->where('sucursal', '=', $request['sucursal'])
+            ->where('producto', '=', $request['producto']);
         $cantidad = 0;
         if ($stock->count() > 0) {
             $cantidad = $stock->get()->first()->cantidad;
-
         }
         $cantidad = $more
             ? $cantidad + $request['cantidad']
@@ -74,8 +69,8 @@ class ProductoStock extends Model
                 'cantidad' => $request['cantidad']
             );
             $stockOrigen = $more
-                ? self::more($moreLess, false)
-                : self::less($moreLess, false);
+                ? self::less($moreLess, false)
+                : self::more($moreLess, false);
         }
 
         if ($mov) {
@@ -106,7 +101,9 @@ class ProductoStock extends Model
 
     public static function sell(array $request, bool $mov = true, bool $reposicion = false)
     {
-        $stock = self::get($request['sucursal'], $request['producto']);
+        $stock = DB::table(self::$tables)
+            ->where('sucursal', '=', $request['sucursal'])
+            ->where('producto', '=', $request['producto']);
         $cantidad = 0;
         if ($stock->count() > 0) {
             $cantidad = $stock->get()->first()->cantidad;
@@ -157,13 +154,7 @@ class ProductoStock extends Model
 
     public static function getProducts($sucursal = null, array $tiposProductos = [])
     {
-        $stock = DB::table(self::$tables);
-        if (!empty($sucursal)) {
-            $stock->where('sucursal', '=', $sucursal);
-        }
-        $stock->leftJoin(Producto::$tables, 'producto', '=', 'productos.id');
-        $stock->whereNull('productos.deleted_at');
-        $stock->where('enable', '=', true);
+        $stock = self::product($sucursal);
         $stock->orderBy('productos.formato', 'asc');
         $stock->select(self::$tables . '.*', Producto::$tables . '.codigo', Producto::$tables . '.formato', Producto::$tables . '.dimension');
 
@@ -171,20 +162,19 @@ class ProductoStock extends Model
             $stocks = array();
             foreach ($tiposProductos as $tiposProducto) {
                 $stockTmp = $stock->clone();
-                $stocks[$tiposProducto->id] = $stockTmp->where('productos.tipo', '=', $tiposProducto->id)->get()->toArray();
+                $productosTipos = DB::table('productoTipo')
+                    ->where('tipoProducto', '=', $tiposProducto->id);
+                $productosTipos = $productosTipos->pluck('producto');
+                $stocks[$tiposProducto->id] = $stockTmp->whereIn('productos.id', $productosTipos)->get()->toArray();
             }
             return $stocks;
         }
-        return $stock->get()->toArray();
+        return $stock->get();
     }
 
     public static function getProduct($sucursal, $id)
     {
-        $stock = DB::table(self::$tables);
-        $stock->where('sucursal', '=', $sucursal);
-        $stock->where(self::$tables . '.id', '=', $id);
-        $stock->leftJoin(Producto::$tables, 'producto', '=', 'productos.id');
-        $stock->whereNull('productos.deleted_at');
+        $stock = self::product($sucursal, $id);
         if ($stock->count() > 0) {
             return $stock->get()->first();
         }
@@ -193,11 +183,22 @@ class ProductoStock extends Model
 
     public static function getTipos($sucursal)
     {
+        $stock = self::product($sucursal);
+        return $stock->get('tipo');
+    }
+
+    private static function product($sucursal, $id = null)
+    {
         $stock = DB::table(self::$tables);
-        $stock->where('sucursal', '=', $sucursal);
+        if (!empty($sucursal)) {
+            $stock->where('sucursal', '=', $sucursal);
+        }
         $stock->where('enable', '=', true);
+        if (!empty($id)) {
+            $stock->where(self::$tables . '.id', '=', $id);
+        }
         $stock->leftJoin(Producto::$tables, 'producto', '=', 'productos.id');
         $stock->whereNull('productos.deleted_at');
-        return $stock->get('tipo');
+        return $stock;
     }
 }

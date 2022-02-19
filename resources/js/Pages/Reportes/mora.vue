@@ -278,7 +278,6 @@ export default {
                     fecha = moment(data.created_at);
                 }
             }
-            console.log(fecha);
             return fecha.format("DD/MM/YYYY HH:mm");
         },
         getCantidad(item) {

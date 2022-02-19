@@ -13,7 +13,7 @@ use Kutia\Larafirebase\Facades\Larafirebase;
 class OrdenesTrabajo extends Model
 {
     protected $table = 'ordenesTrabajo';
-    public static $tables = 'ordenesTrabajo';
+    public static string $tables = 'ordenesTrabajo';
     protected $guarded = [];
     use SoftDeletes;
 
@@ -25,9 +25,9 @@ class OrdenesTrabajo extends Model
             '1' => 'En Proceso',
             '2' => 'Deuda',
             '5' => 'Quemado',
-            '10' => 'Repuesto'
+            '10' => 'Reposicion'
         ];
-        if (is_null($id)) {
+        if (empty($id)) {
             return $estado;
         }
 
@@ -37,15 +37,15 @@ class OrdenesTrabajo extends Model
     public static function getAll(int $sucursal = null, int $usuario = null, array $report = [], int $tipo = null)
     {
         $ordenes = DB::table(self::$tables);
+        $ordenes = $ordenes
+            ->whereNull('deleted_at')
+            ->orderBy('created_at', 'desc');
         if (!empty($sucursal)) {
             $ordenes = $ordenes->where('sucursal', '=', $sucursal);
         }
         if (!empty($usuario)) {
             $ordenes = $ordenes->where('userDiseñador', '=', $usuario);
         }
-        $ordenes = $ordenes
-            ->whereNull('deleted_at')
-            ->orderBy('created_at', 'desc');
         if (!empty($tipo)) {
             $ordenes = $ordenes->where('tipoOrden', '=', $tipo);
         }
@@ -68,8 +68,14 @@ class OrdenesTrabajo extends Model
             if (isset($report['cliente'])) {
                 $ordenes = $ordenes->where('cliente', '=', $report['cliente']);
             }
+            if (isset($report['estado'])) {
+                $ordenes = $ordenes->where('estado', '=', $report['estado']);
+            }
+            if (isset($report['tipo'])) {
+                $ordenes = $ordenes->where('tipoOrden', '=', $report['tipo']);
+            }
         } else {
-            $ordenes->limit(100);
+            $ordenes->limit(500);
         }
         return $ordenes;
     }
@@ -122,7 +128,7 @@ class OrdenesTrabajo extends Model
         $ordenes = DB::table(self::$tables)
             ->whereBetween('updated_at', [$fechaRI->toDateTimeString(), $fechaRF->toDateTimeString()])
             ->where('sucursal', '=', $sucursal)
-            ->whereIn('estado', [0, 2, 5, -1])
+            ->whereIn('estado', [0, 2, 5, -1, 10])
             ->whereNull('deleted_at');
         if (!empty($tipo)) {
             $ordenes = $ordenes->where('tipoOrden', '=', $tipo);
@@ -165,6 +171,7 @@ class OrdenesTrabajo extends Model
                 'nombre' => $item->responsable,
                 'ciNit' => '',
                 'codigoVenta' => $item->correlativo,
+                'orden' => $item->id,
                 'saldo' => $saldo,
                 'monto' => $monto,
                 'acuenta' => $saldo - $monto,
@@ -179,15 +186,18 @@ class OrdenesTrabajo extends Model
                 'montoVenta' => $item->montoVenta,
                 'ordenTrabajo' => $item->id,
             ], false);
-            Recibo::guardarDeuda($values, $caja->get()->first()->id, $item->correlativo);
+            Recibo::guardarDeuda($values, $caja->get()->first()->id, $item->id);
         }
     }
 
-    public static function getDeuda(array $ordenes)
+    public static function getTotal(array $ordenes)
     {
         $pagado = 0;
         $total = 0;
         foreach ($ordenes as $orden) {
+            if ($orden->estado == 1) {
+                continue;
+            }
             $detalle = $orden->detallesOrden;
             foreach ($detalle as $item) {
                 $total += $item->total;
@@ -198,6 +208,9 @@ class OrdenesTrabajo extends Model
             foreach ($movimientos as $movimiento) {
                 $pagado += $movimiento->monto;
             }
+        }
+        if (($total - $pagado) == 0) {
+            return $total;
         }
         return $total - $pagado;
     }
@@ -211,7 +224,7 @@ class OrdenesTrabajo extends Model
                 ->select('tokenpush')
                 ->groupBy('tokenpush')
                 ->pluck('tokenpush')->toArray();
-            $data = Larafirebase::fromRaw([
+            Larafirebase::fromRaw([
                 'registration_ids' => $fcmTokens,
                 'data' => [
                     'newOrden' => true,

@@ -63,6 +63,7 @@ class ClienteController extends Controller
     public function buscar($id){
         $clientes = DB::table(Cliente::$tables)
             ->where('nombreResponsable','like',"%{$id}%")
+            ->whereNull('deleted_at')
             ->select(['nombreResponsable','id','telefono'])
             ->get();
         return response()->json(["items"=>$clientes]);

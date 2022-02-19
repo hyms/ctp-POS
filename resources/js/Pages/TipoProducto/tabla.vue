@@ -1,44 +1,42 @@
 <template>
-    <div class="content-w">
-        <div class="content-box">
-            <Menu :active="3"></Menu>
-            <div class="tab-content">
-                <div class="row m-b-20 m-t-10">
-                    <div class="col">
-                        <b-button v-b-modal="'productoModal'" @click="loadModal()">{{ boton1 }}</b-button>
-                        <FormProducto :isNew="isNew" id="productoModal" :itemRow="itemRow"></FormProducto>
-                    </div>
-                </div>
-
-                <div class="row m-b-20">
-                    <b-card>
-                        <b-table
-                            striped
-                            hover
-                            responsive
-                            :items="tipos"
-                            :fields="fields"
-                            show-empty
-                            small
-                        >
-                            <template #empty="scope">
-                                <p>{{ textoVacio }}</p>
-                            </template>
-                            <template v-slot:cell(Acciones)="row">
-                                <div class="row-actions">
-                                    <b-button size="sm" v-b-modal="'productoModal'" @click="loadModal(false,row)">
-                                        {{ boton2 }}
-                                    </b-button>
-                                    <b-button size="sm" class="btn-danger" @click="borrar(row.item.id)">{{
-                                            boton3
-                                        }}
-                                    </b-button>
-                                </div>
-                            </template>
-                        </b-table>
-                    </b-card>
+    <div class="row">
+        <div class="col-12">
+            <div class="row mb-2">
+                <div class="col">
+                    <b-button variant="primary" v-b-modal="'productoModal'" @click="loadModal()">{{ boton1 }}</b-button>
+                    <FormProducto :isNew="isNew" id="productoModal" :itemRow="itemRow"></FormProducto>
                 </div>
             </div>
+            <b-card no-body>
+                <b-card-header>
+                    <strong>{{ titulo }}</strong>
+                </b-card-header>
+                <b-card-body>
+                    <b-table
+                        striped
+                        hover
+                        responsive
+                        :items="tipos"
+                        :fields="fields"
+                        show-empty
+                        small
+                    >
+                        <template #empty="scope">
+                            <p>{{ textoVacio }}</p>
+                        </template>
+                        <template v-slot:cell(Acciones)="row">
+                            <div class="row-actions">
+                                <b-button size="sm" variant="primary" v-b-modal="'productoModal'" @click="loadModal(false,row)">
+                                    {{ boton2 }}
+                                </b-button>
+                                <b-button size="sm" variant="danger" @click="borrar(row.item.id)">
+                                    {{ boton3 }}
+                                </b-button>
+                            </div>
+                        </template>
+                    </b-table>
+                </b-card-body>
+            </b-card>
         </div>
     </div>
 </template>
@@ -64,8 +62,8 @@ export default {
             boton1: "Nuevo",
             boton2: "Modificar",
             boton3: "Borrar",
-            titulo: 'Productos',
-            textoVacio: 'No existen Productos',
+            titulo: 'Tipo de Productos',
+            textoVacio: 'No existen datos para mostrar',
             idModal: 'productoModal',
             fields:
                 [

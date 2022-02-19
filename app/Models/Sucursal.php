@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class Sucursal extends Model
 {
     protected $table = 'sucursales';
-    public static $tables = 'sucursales';
+    public static string $tables = 'sucursales';
     protected $guarded = [];
 
     public static function getAll(bool $isAdm = False)

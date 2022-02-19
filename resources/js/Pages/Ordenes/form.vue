@@ -34,6 +34,7 @@
                             :state="item.state"
                         ></b-textarea>
                         <vue-bootstrap-typeahead
+                            size="sm"
                             :placeholder="item.label"
                             :data="options"
                             v-model="responsableValue"
@@ -41,6 +42,7 @@
                             :serializer="s => s.nombreResponsable"
                             @hit="cliente = $event"
                             ref="typeahead"
+                            backgroundVariant="light"
                         >
                         </vue-bootstrap-typeahead>
                     </b-form-group>
@@ -69,8 +71,10 @@
                                     <b-td>{{ product.dimension }}</b-td>
                                     <b-td>{{ product.cantidad }}</b-td>
                                     <b-td>
-                                        <b-form-spinbutton id="demo-sb" v-model="productosSell[key].cantidad" min="0"
-                                                           max="100" size="sm" inline></b-form-spinbutton>
+<!--                                        <b-form-spinbutton id="demo-sb" v-model="productosSell[key].cantidad" min="0"-->
+<!--                                                           max="100" size="sm" inline></b-form-spinbutton>-->
+                                        <b-input type="number" id="demo-sb" v-model="productosSell[key].cantidad"
+                                                size="sm" min="0"></b-input>
                                     </b-td>
                                 </b-tr>
                             </template>
@@ -79,10 +83,10 @@
                 </div>
             </form>
             <template #modal-footer="{ ok, cancel }">
-                <b-button variant="danger" @click="cancel()">
+                <b-button variant="danger" @click="cancel()" :size="'sm'">
                     Cancel
                 </b-button>
-                <loading-button :loading="sending" :variant="'dark'"
+                <loading-button :loading="sending" :variant="'primary'" :size="'sm'"
                                 @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
                 </loading-button>
             </template>
