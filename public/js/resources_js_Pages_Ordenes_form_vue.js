@@ -5599,10 +5599,7 @@ var render = function () {
                 [
                   _c(
                     "b-table-simple",
-                    {
-                      staticClass:
-                        "table-hover table-small texto-small table-compress",
-                    },
+                    { staticClass: "table-hover table-small texto-small" },
                     [
                       _c(
                         "b-thead",

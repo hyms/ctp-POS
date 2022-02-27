@@ -132,15 +132,7 @@ export default {
             boton5: "Reposicion",
             textoVacio: 'No existen Ordenes',
             tipoProductoFiltro: null,
-            fields: [
-                { key: 'tipoOrden', label: 'Tipo Orden', sortable: true },
-                { key: 'codigoServicio', label: 'Codigo', sortable: true },
-                { key: 'estado', label: 'Estado', sortable: true },
-                { key: 'responsable', label: 'Cliente', sortable: true },
-                { key: 'telefono', label: 'Telefono', sortable: true },
-                { key: 'created_at', label: 'Fecha', sortable: true },
-                'Acciones'
-            ],
+            fields: [],
             itemRow: {},
             totalRows: 1,
             currentPage: 1,
@@ -244,6 +236,29 @@ export default {
                 }
             }
         });
+        if(this.isVenta)
+        {
+            this.fields=[
+                { key: 'tipoOrden', label: 'Tipo Orden', sortable: true },
+                { key: 'codigoServicio', label: 'Codigo', sortable: true },
+                { key: 'estado', label: 'Estado', sortable: true },
+                { key: 'responsable', label: 'Cliente', sortable: true },
+                { key: 'montoVenta', label: 'Monto', sortable: true },
+                { key: 'created_at', label: 'Fecha', sortable: true },
+                'Acciones'
+            ];
+        }
+        else {
+            this.fields=[
+                { key: 'tipoOrden', label: 'Tipo Orden', sortable: true },
+                { key: 'codigoServicio', label: 'Codigo', sortable: true },
+                { key: 'estado', label: 'Estado', sortable: true },
+                { key: 'responsable', label: 'Cliente', sortable: true },
+                { key: 'telefono', label: 'Telefono', sortable: true },
+                { key: 'created_at', label: 'Fecha', sortable: true },
+                'Acciones'
+            ];
+        }
     },
     computed: {
         sortOptions() {

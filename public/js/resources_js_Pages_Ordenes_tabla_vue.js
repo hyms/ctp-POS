@@ -3340,31 +3340,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       boton5: "Reposicion",
       textoVacio: 'No existen Ordenes',
       tipoProductoFiltro: null,
-      fields: [{
-        key: 'tipoOrden',
-        label: 'Tipo Orden',
-        sortable: true
-      }, {
-        key: 'codigoServicio',
-        label: 'Codigo',
-        sortable: true
-      }, {
-        key: 'estado',
-        label: 'Estado',
-        sortable: true
-      }, {
-        key: 'responsable',
-        label: 'Cliente',
-        sortable: true
-      }, {
-        key: 'telefono',
-        label: 'Telefono',
-        sortable: true
-      }, {
-        key: 'created_at',
-        label: 'Fecha',
-        sortable: true
-      }, 'Acciones'],
+      fields: [],
       itemRow: {},
       totalRows: 1,
       currentPage: 1,
@@ -3492,6 +3468,60 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         }
       }
     });
+
+    if (this.isVenta) {
+      this.fields = [{
+        key: 'tipoOrden',
+        label: 'Tipo Orden',
+        sortable: true
+      }, {
+        key: 'codigoServicio',
+        label: 'Codigo',
+        sortable: true
+      }, {
+        key: 'estado',
+        label: 'Estado',
+        sortable: true
+      }, {
+        key: 'responsable',
+        label: 'Cliente',
+        sortable: true
+      }, {
+        key: 'montoVenta',
+        label: 'Monto',
+        sortable: true
+      }, {
+        key: 'created_at',
+        label: 'Fecha',
+        sortable: true
+      }, 'Acciones'];
+    } else {
+      this.fields = [{
+        key: 'tipoOrden',
+        label: 'Tipo Orden',
+        sortable: true
+      }, {
+        key: 'codigoServicio',
+        label: 'Codigo',
+        sortable: true
+      }, {
+        key: 'estado',
+        label: 'Estado',
+        sortable: true
+      }, {
+        key: 'responsable',
+        label: 'Cliente',
+        sortable: true
+      }, {
+        key: 'telefono',
+        label: 'Telefono',
+        sortable: true
+      }, {
+        key: 'created_at',
+        label: 'Fecha',
+        sortable: true
+      }, 'Acciones'];
+    }
   },
   computed: {
     sortOptions: function sortOptions() {
@@ -28882,10 +28912,7 @@ var render = function () {
                 [
                   _c(
                     "b-table-simple",
-                    {
-                      staticClass:
-                        "table-hover table-small texto-small table-compress",
-                    },
+                    { staticClass: "table-hover table-small texto-small" },
                     [
                       _c(
                         "b-thead",
