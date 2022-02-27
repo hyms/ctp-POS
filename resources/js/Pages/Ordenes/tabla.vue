@@ -69,6 +69,9 @@
                             <template v-slot:cell(created_at)="data">
                                 {{ data.value | moment("DD/MM/YYYY HH:mm") }}
                             </template>
+                            <<template v-slot:cell(updated_at)="data">
+                                {{ data.value | moment("DD/MM/YYYY HH:mm") }}
+                            </template>
                             <template v-slot:cell(Acciones)="row">
                                 <div class="row-actions">
                                     <b-button variant="dark" v-b-modal="'ordenModal'"
@@ -244,7 +247,8 @@ export default {
                 { key: 'estado', label: 'Estado', sortable: true },
                 { key: 'responsable', label: 'Cliente', sortable: true },
                 { key: 'montoVenta', label: 'Monto', sortable: true },
-                { key: 'created_at', label: 'Fecha', sortable: true },
+                { key: 'created_at', label: 'Fecha Nueva Orden', sortable: true },
+                { key: 'updated_at', label: 'Fecha Pago/Deuda', sortable: true },
                 'Acciones'
             ];
         }

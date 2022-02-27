@@ -3320,6 +3320,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
 
 
 
@@ -3492,7 +3495,11 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         sortable: true
       }, {
         key: 'created_at',
-        label: 'Fecha',
+        label: 'Fecha Nueva Orden',
+        sortable: true
+      }, {
+        key: 'updated_at',
+        label: 'Fecha Pago/Deuda',
         sortable: true
       }, 'Acciones'];
     } else {
@@ -30008,225 +30015,254 @@ var render = function () {
                   "div",
                   { staticClass: "table-responsive" },
                   [
-                    _c("b-table", {
-                      attrs: {
-                        striped: "",
-                        hover: "",
-                        items: _vm.ordenes,
-                        fields: _vm.fields,
-                        "show-empty": "",
-                        small: "",
-                        "current-page": _vm.currentPage,
-                        "per-page": _vm.perPage,
-                        "sort-by": _vm.sortBy,
-                        "sort-desc": _vm.sortDesc,
-                        "sort-direction": _vm.sortDirection,
-                        "sticky-header": "",
-                      },
-                      on: {
-                        "update:sortBy": function ($event) {
-                          _vm.sortBy = $event
+                    _c(
+                      "b-table",
+                      {
+                        attrs: {
+                          striped: "",
+                          hover: "",
+                          items: _vm.ordenes,
+                          fields: _vm.fields,
+                          "show-empty": "",
+                          small: "",
+                          "current-page": _vm.currentPage,
+                          "per-page": _vm.perPage,
+                          "sort-by": _vm.sortBy,
+                          "sort-desc": _vm.sortDesc,
+                          "sort-direction": _vm.sortDirection,
+                          "sticky-header": "",
                         },
-                        "update:sort-by": function ($event) {
-                          _vm.sortBy = $event
-                        },
-                        "update:sortDesc": function ($event) {
-                          _vm.sortDesc = $event
-                        },
-                        "update:sort-desc": function ($event) {
-                          _vm.sortDesc = $event
-                        },
-                      },
-                      scopedSlots: _vm._u([
-                        {
-                          key: "empty",
-                          fn: function (scope) {
-                            return [_c("p", [_vm._v(_vm._s(_vm.textoVacio))])]
+                        on: {
+                          "update:sortBy": function ($event) {
+                            _vm.sortBy = $event
+                          },
+                          "update:sort-by": function ($event) {
+                            _vm.sortBy = $event
+                          },
+                          "update:sortDesc": function ($event) {
+                            _vm.sortDesc = $event
+                          },
+                          "update:sort-desc": function ($event) {
+                            _vm.sortDesc = $event
                           },
                         },
-                        {
-                          key: "cell(estado)",
-                          fn: function (data) {
-                            return [
-                              _vm._v(
-                                "\n                            " +
-                                  _vm._s(_vm.estados[data.value]) +
-                                  "\n                        "
-                              ),
-                            ]
+                        scopedSlots: _vm._u([
+                          {
+                            key: "empty",
+                            fn: function (scope) {
+                              return [_c("p", [_vm._v(_vm._s(_vm.textoVacio))])]
+                            },
                           },
-                        },
-                        {
-                          key: "cell(tipoOrden)",
-                          fn: function (data) {
-                            return [
-                              _vm._v(
-                                "\n                            " +
-                                  _vm._s(_vm.getTipoOrden(data.value)) +
-                                  "\n                        "
-                              ),
-                            ]
+                          {
+                            key: "cell(estado)",
+                            fn: function (data) {
+                              return [
+                                _vm._v(
+                                  "\n                            " +
+                                    _vm._s(_vm.estados[data.value]) +
+                                    "\n                        "
+                                ),
+                              ]
+                            },
                           },
-                        },
-                        {
-                          key: "cell(created_at)",
-                          fn: function (data) {
-                            return [
-                              _vm._v(
-                                "\n                            " +
-                                  _vm._s(
-                                    _vm._f("moment")(
-                                      data.value,
-                                      "DD/MM/YYYY HH:mm"
-                                    )
-                                  ) +
-                                  "\n                        "
-                              ),
-                            ]
+                          {
+                            key: "cell(tipoOrden)",
+                            fn: function (data) {
+                              return [
+                                _vm._v(
+                                  "\n                            " +
+                                    _vm._s(_vm.getTipoOrden(data.value)) +
+                                    "\n                        "
+                                ),
+                              ]
+                            },
                           },
-                        },
-                        {
-                          key: "cell(Acciones)",
-                          fn: function (row) {
-                            return [
-                              _c(
-                                "div",
-                                { staticClass: "row-actions" },
-                                [
-                                  !_vm.isVenta &&
-                                  _vm.viewModify(row.item.created_at)
-                                    ? _c(
-                                        "b-button",
-                                        {
-                                          directives: [
-                                            {
-                                              name: "b-modal",
-                                              rawName: "v-b-modal",
-                                              value: "ordenModal",
-                                              expression: "'ordenModal'",
-                                            },
-                                          ],
-                                          attrs: {
-                                            variant: "dark",
-                                            size: "sm",
-                                          },
-                                          on: {
-                                            click: function ($event) {
-                                              return _vm.loadModal(
-                                                row.item.tipoOrden,
-                                                false,
-                                                row
-                                              )
-                                            },
-                                          },
-                                        },
-                                        [
-                                          _vm._v(
-                                            "\n                                    " +
-                                              _vm._s(_vm.boton4) +
-                                              "\n                                "
-                                          ),
-                                        ]
+                          {
+                            key: "cell(created_at)",
+                            fn: function (data) {
+                              return [
+                                _vm._v(
+                                  "\n                            " +
+                                    _vm._s(
+                                      _vm._f("moment")(
+                                        data.value,
+                                        "DD/MM/YYYY HH:mm"
                                       )
-                                    : _vm._e(),
-                                  _vm._v(" "),
-                                  _c(
-                                    "b-button",
-                                    {
-                                      directives: [
-                                        {
-                                          name: "b-modal",
-                                          rawName: "v-b-modal",
-                                          value: "itemModal",
-                                          expression: "'itemModal'",
+                                    ) +
+                                    "\n                        "
+                                ),
+                              ]
+                            },
+                          },
+                          {
+                            key: "cell(updated_at)",
+                            fn: function (data) {
+                              return [
+                                _vm._v(
+                                  "\n                            " +
+                                    _vm._s(
+                                      _vm._f("moment")(
+                                        data.value,
+                                        "DD/MM/YYYY HH:mm"
+                                      )
+                                    ) +
+                                    "\n                        "
+                                ),
+                              ]
+                            },
+                          },
+                          {
+                            key: "cell(Acciones)",
+                            fn: function (row) {
+                              return [
+                                _c(
+                                  "div",
+                                  { staticClass: "row-actions" },
+                                  [
+                                    !_vm.isVenta &&
+                                    _vm.viewModify(row.item.created_at)
+                                      ? _c(
+                                          "b-button",
+                                          {
+                                            directives: [
+                                              {
+                                                name: "b-modal",
+                                                rawName: "v-b-modal",
+                                                value: "ordenModal",
+                                                expression: "'ordenModal'",
+                                              },
+                                            ],
+                                            attrs: {
+                                              variant: "dark",
+                                              size: "sm",
+                                            },
+                                            on: {
+                                              click: function ($event) {
+                                                return _vm.loadModal(
+                                                  row.item.tipoOrden,
+                                                  false,
+                                                  row
+                                                )
+                                              },
+                                            },
+                                          },
+                                          [
+                                            _vm._v(
+                                              "\n                                    " +
+                                                _vm._s(_vm.boton4) +
+                                                "\n                                "
+                                            ),
+                                          ]
+                                        )
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    _c(
+                                      "b-button",
+                                      {
+                                        directives: [
+                                          {
+                                            name: "b-modal",
+                                            rawName: "v-b-modal",
+                                            value: "itemModal",
+                                            expression: "'itemModal'",
+                                          },
+                                        ],
+                                        attrs: {
+                                          variant: "primary",
+                                          size: "sm",
                                         },
-                                      ],
-                                      attrs: { variant: "primary", size: "sm" },
-                                      on: {
-                                        click: function ($event) {
-                                          return _vm.loadModal(
-                                            row.item.tipoOrden,
-                                            false,
-                                            row
-                                          )
+                                        on: {
+                                          click: function ($event) {
+                                            return _vm.loadModal(
+                                              row.item.tipoOrden,
+                                              false,
+                                              row
+                                            )
+                                          },
                                         },
                                       },
-                                    },
-                                    [
-                                      _vm._v(
-                                        "\n                                    " +
-                                          _vm._s(_vm.boton2) +
-                                          "\n                                "
-                                      ),
-                                    ]
-                                  ),
-                                  _vm._v(" "),
-                                  row.item.estado == 1 &&
-                                  _vm.viewModify(row.item.created_at)
-                                    ? _c(
-                                        "b-button",
-                                        {
-                                          attrs: {
-                                            variant: "danger",
-                                            size: "sm",
-                                          },
-                                          on: {
-                                            click: function ($event) {
-                                              return _vm.borrar(row.item.id)
+                                      [
+                                        _vm._v(
+                                          "\n                                    " +
+                                            _vm._s(_vm.boton2) +
+                                            "\n                                "
+                                        ),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    row.item.estado == 1 &&
+                                    _vm.viewModify(row.item.created_at)
+                                      ? _c(
+                                          "b-button",
+                                          {
+                                            attrs: {
+                                              variant: "danger",
+                                              size: "sm",
+                                            },
+                                            on: {
+                                              click: function ($event) {
+                                                return _vm.borrar(row.item.id)
+                                              },
                                             },
                                           },
-                                        },
-                                        [
-                                          _vm._v(
-                                            "\n                                    " +
-                                              _vm._s(_vm.boton3) +
-                                              "\n                                "
-                                          ),
-                                        ]
-                                      )
-                                    : _vm._e(),
-                                  _vm._v(" "),
-                                  [0, 2].includes(row.item.estado) &&
-                                  _vm.viewReposicion(row.item.created_at)
-                                    ? _c(
-                                        "b-button",
-                                        {
-                                          directives: [
-                                            {
-                                              name: "b-modal",
-                                              rawName: "v-b-modal",
-                                              value: "itemRModal",
-                                              expression: "'itemRModal'",
-                                            },
-                                          ],
-                                          attrs: { variant: "info" },
-                                          on: {
-                                            click: function ($event) {
-                                              return _vm.loadModal(
-                                                row.item.tipoOrden,
-                                                false,
-                                                row
-                                              )
+                                          [
+                                            _vm._v(
+                                              "\n                                    " +
+                                                _vm._s(_vm.boton3) +
+                                                "\n                                "
+                                            ),
+                                          ]
+                                        )
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    [0, 2].includes(row.item.estado) &&
+                                    _vm.viewReposicion(row.item.created_at)
+                                      ? _c(
+                                          "b-button",
+                                          {
+                                            directives: [
+                                              {
+                                                name: "b-modal",
+                                                rawName: "v-b-modal",
+                                                value: "itemRModal",
+                                                expression: "'itemRModal'",
+                                              },
+                                            ],
+                                            attrs: { variant: "info" },
+                                            on: {
+                                              click: function ($event) {
+                                                return _vm.loadModal(
+                                                  row.item.tipoOrden,
+                                                  false,
+                                                  row
+                                                )
+                                              },
                                             },
                                           },
-                                        },
-                                        [
-                                          _vm._v(
-                                            "\n                                    " +
-                                              _vm._s(_vm.boton5) +
-                                              "\n                                "
-                                          ),
-                                        ]
-                                      )
-                                    : _vm._e(),
-                                ],
-                                1
-                              ),
-                            ]
+                                          [
+                                            _vm._v(
+                                              "\n                                    " +
+                                                _vm._s(_vm.boton5) +
+                                                "\n                                "
+                                            ),
+                                          ]
+                                        )
+                                      : _vm._e(),
+                                  ],
+                                  1
+                                ),
+                              ]
+                            },
                           },
-                        },
-                      ]),
-                    }),
+                        ]),
+                      },
+                      [
+                        _vm._v(" "),
+                        _vm._v(" "),
+                        _vm._v(" "),
+                        _vm._v("\n                        <"),
+                      ]
+                    ),
                   ],
                   1
                 ),
