@@ -38,14 +38,14 @@ class Cajas extends Model
     public static function sell(array $request, bool $mov = true)
     {
         $caja = self::getOne($request['sucursal']);
-        $monto = 0;
-        if ($caja->count() > 0) {
-            $monto = $caja->get()[0]->monto;
-        }
-        $monto += $request['montoVenta'];
-        $caja->updateOrInsert([
-            'sucursal' => $request['sucursal']
-        ], ['monto' => $monto]);
+//        $monto = 0;
+//        if ($caja->count() > 0) {
+//            $monto = $caja->get()[0]->monto;
+//        }
+//        $monto += $request['montoVenta'];
+//        $caja->updateOrInsert([
+//            'sucursal' => $request['sucursal']
+//        ], ['monto' => $monto]);
 
         if ($mov) {
             $movimiento = DB::table(MovimientoCaja::$tables);
