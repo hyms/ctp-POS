@@ -40,7 +40,7 @@ class Cajas extends Model
         $caja = self::getOne($request['sucursal']);
 //        $monto = 0;
 //        if ($caja->count() > 0) {
-//            $monto = $caja->get()[0]->monto;
+//            $monto = $caja->get()->fisrt()->monto;
 //        }
 //        $monto += $request['montoVenta'];
 //        $caja->updateOrInsert([
@@ -51,7 +51,7 @@ class Cajas extends Model
             $movimiento = DB::table(MovimientoCaja::$tables);
             $movimiento->insertGetId([
                 'cajaOrigen' => null,
-                'cajaDestino' => $caja->get()[0]->id,
+                'cajaDestino' => $caja->get()->first()->id,
                 'tipo' => 0,
                 'monto' => $request['montoVenta'],
                 'observaciones' => "venta de insumos",
