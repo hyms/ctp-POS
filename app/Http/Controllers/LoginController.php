@@ -6,6 +6,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class LoginController extends Controller
 {
@@ -32,7 +33,7 @@ class LoginController extends Controller
     /**
      * Show the application's login form.
      *
-     * @return \Inertia\Response
+     * @return Response
      */
     public function showLoginForm()
     {

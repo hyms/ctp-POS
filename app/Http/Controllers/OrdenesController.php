@@ -8,6 +8,7 @@ use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
 use App\Models\TipoProductos;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -127,7 +128,7 @@ class OrdenesController extends Controller
             $id = OrdenesTrabajo::newOrden($orden, $detalle, $id);
             OrdenesTrabajo::notifyNewOrden($id);
             return response()->json(["status" => 0, 'path' => 'ordenes', 'id' => $id]);
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
@@ -186,7 +187,7 @@ class OrdenesController extends Controller
             $orden['userVenta'] = Auth::user()['id'];
             $id = OrdenesTrabajo::venta($orden);
             return response()->json(["status" => 0, 'path' => 'realizados', 'id' => $id]);
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
@@ -222,7 +223,7 @@ class OrdenesController extends Controller
             $orden['userVenta'] = Auth::user()['id'];
             OrdenesTrabajo::deuda($orden, $saldo, $request['monto']);
             return response()->json(["status" => 0, 'path' => 'recibosIngreso']);
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
@@ -274,7 +275,7 @@ class OrdenesController extends Controller
                 'path' => 'realizados'
             ]);
 
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);

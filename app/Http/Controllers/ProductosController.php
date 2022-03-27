@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Producto;
 use App\Models\TipoProductos;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -53,7 +54,7 @@ class ProductosController extends Controller
                 TipoProductos::saveTiposProducto($producto->id, explode(',', $request['productoTipo']));
             }
             return response()->json(["status" => 0, 'path' => 'productos']);
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
@@ -70,7 +71,7 @@ class ProductosController extends Controller
     public function tipos()
     {
         $tipos = TipoProductos::all();
-        return Inertia::render('TipoProducto/tabla', ['tipos' => $tipos]);
+        return Inertia::render('TipoProducto', ['tipos' => $tipos]);
     }
 
     public function tiposPost(Request $request)
@@ -92,10 +93,16 @@ class ProductosController extends Controller
             $producto->fill($request->all());
             $producto->save();
             return response()->json(["status" => 0, 'path' => ' tipoProductos']);
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
         }
+    }
+    public function borrarTipo($id)
+    {
+        $tipos = TipoProductos::find($id);
+        $tipos->delete();
+        return back()->withInput();
     }
 }

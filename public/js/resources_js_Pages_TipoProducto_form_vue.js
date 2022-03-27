@@ -2222,22 +2222,6 @@ __webpack_require__.r(__webpack_exports__);
       boton2: "Modificar",
       titulo1: "Nuevo Tipo Producto",
       titulo2: "Modificar Tipo Producto",
-      form: {
-        nombre: {
-          label: 'Nombre',
-          value: "",
-          type: "text",
-          state: null,
-          stateText: null
-        },
-        codigo: {
-          label: 'Codigo',
-          value: "",
-          type: "text",
-          state: null,
-          stateText: null
-        }
-      },
       idForm: null,
       errors: Array
     };

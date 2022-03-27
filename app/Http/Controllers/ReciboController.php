@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cajas;
 use App\Models\Recibo;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -65,7 +66,7 @@ class ReciboController extends Controller
                 'status' => 0,
                 'path'=>($request['tipo'])?'recibosEgreso':'recibosIngreso'
             ]);
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);

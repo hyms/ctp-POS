@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sucursal;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -37,7 +38,7 @@ class SucursalController extends Controller
             $sucursal->fill($request->all());
             $sucursal->save();
             return response()->json(["status" => 0, 'path' => 'sucursales']);
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);

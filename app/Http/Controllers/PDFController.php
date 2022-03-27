@@ -9,11 +9,13 @@ use App\Models\OrdenesTrabajo;
 use App\Models\ProductoStock;
 use App\Models\Recibo;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Mpdf\Mpdf;
 use PDF;
+use UnexpectedValueException;
 
 
 class PDFController extends Controller
@@ -35,7 +37,7 @@ class PDFController extends Controller
         try {
             $orden = OrdenesTrabajo::find($id);
             if (empty($orden)) {
-                throw new \UnexpectedValueException("pdf: no data for {$id}");
+                throw new UnexpectedValueException("pdf: no data for {$id}");
             }
             $detalle = DetallesOrden::where('ordenTrabajo', $id)->get();
             $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
@@ -67,7 +69,7 @@ class PDFController extends Controller
                 'orientation' => 'P'
             ]);
             return $mpdfView->stream($orden->codigoServicio . '.pdf');
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             abort(404);
         }
@@ -100,7 +102,7 @@ class PDFController extends Controller
         try {
             $recibo = Recibo::find($id);
             if (empty($recibo)) {
-                throw new \UnexpectedValueException("pdf: no data for {$id}");
+                throw new UnexpectedValueException("pdf: no data for {$id}");
             }
             $mytime = Carbon::parse($recibo->updated_at);
 
@@ -126,7 +128,7 @@ class PDFController extends Controller
                 'orientation' => 'P'
             ]);
             return $mpdfView->stream($recibo->secuencia . '.pdf');
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             abort(404);
         }

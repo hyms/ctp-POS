@@ -6,6 +6,7 @@ use App\Models\MovimientoStock;
 use App\Models\Producto;
 use App\Models\ProductoStock;
 use App\Models\Sucursal;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -44,7 +45,7 @@ class StockController extends Controller
                 $request->all()
             );
             return response()->json(["status" => 0, 'path' => 'stocks']);
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
@@ -69,7 +70,7 @@ class StockController extends Controller
                 $request->all()
             );
             return response()->json(["status" => 0, 'path' => 'stocks']);
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
@@ -112,7 +113,7 @@ class StockController extends Controller
             $stock->enable = !$stock->enable;
             $stock->save();
             return response()->json(["status" => 0]);
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
@@ -136,7 +137,7 @@ class StockController extends Controller
             $stock->precioUnidad = $request['precioUnidad'];
             $stock->save();
             return response()->json(["status" => 0]);
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);

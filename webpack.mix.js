@@ -16,7 +16,9 @@ mix.js('resources/js/app.js', 'public/js')
     .postCss('resources/css/main.css', 'public/css', [])
 
     .webpackConfig({
-        output: {chunkFilename: 'js/[name].js?id=[chunkhash]'},
+        output: {
+            chunkFilename: 'js/[name].js?id=[chunkhash]',
+        },
         resolve: {
             alias: {
                 //vue$: 'vue/dist/vue.esm.js',

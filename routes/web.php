@@ -129,6 +129,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('tipoProductos');
     Route::post('tipoProductos', [ProductosController::class, 'tiposPost'])
         ->name('tipoProductos');
+    Route::delete('tipoProductos/{id}', [ProductosController::class, 'borrarTipo'])
+        ->name('tipoProductos');
     //sucursales
     Route::get('sucursales', [SucursalController::class, 'getAll'])
         ->name('listaSucursales');

@@ -6,6 +6,7 @@ use App\Models\Cajas;
 use App\Models\MovimientoCaja;
 use App\Models\Sucursal;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -49,7 +50,7 @@ class CajaController extends Controller
 
             $Cajas->save();
             return response()->json(["status" => 0, 'path' => 'cajas']);
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
@@ -160,7 +161,7 @@ class CajaController extends Controller
                 ? ["status" => 0, 'path' => 'cajaDebito']
                 : ['status' => -1, 'errors' => ['no se logro registrar la transaccion']]
             );
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
@@ -185,7 +186,7 @@ class CajaController extends Controller
                 : ['status' => -1, 'errors' => ['no se logro registrar la transaccion']]
             );
         } catch
-        (\Exception $error) {
+        (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);

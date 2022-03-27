@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MovimientoStock;
 use App\Models\ProductoStock;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -94,7 +95,7 @@ class InventarioController extends Controller
                 ]);
             }
             return response()->json(["status" => 0, 'path' => '/inventario/' . (($ingreso) ? 'ingreso' : 'egreso')]);
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
                 'error' => $error,], 500);

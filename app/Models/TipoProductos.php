@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 class TipoProductos extends Model
@@ -10,6 +11,7 @@ class TipoProductos extends Model
     protected $table = 'tipoProducto';
     static public string $tables = 'tipoProducto';
     protected $guarded = [];
+    use SoftDeletes;
 
     public static function getAll()
     {
