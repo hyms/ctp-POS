@@ -483,5 +483,8 @@ class ReporteController extends Controller
         return $this->reporteCliente($request, true);
     }
 
-
+    public function ordenes(Request $request)
+    {
+        return null;
+    }
 }

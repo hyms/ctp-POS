@@ -86,8 +86,11 @@
                                 </b-form-select>
                             </b-form-group>
                         </b-col>
+
+                    </b-row>
+                    <b-row>
                         <b-col>
-                            <b-button type="submit">Buscar</b-button>
+                            <b-button type="submit" size="sm" variant="primary">Buscar</b-button>
                         </b-col>
                     </b-row>
                 </b-form>
@@ -110,7 +113,7 @@
                         </template>
                         <template v-slot:cell(Acciones)="row">
                             <div class="row-actions">
-                                <b-button variant="secondary" v-b-modal="'itemModal'"
+                                <b-button variant="primary" v-b-modal="'itemModal'"
                                           @click="loadModal(row.item.tipoOrden,row)"
                                           size="sm">
                                     Ver

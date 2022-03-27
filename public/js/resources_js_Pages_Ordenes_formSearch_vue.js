@@ -502,7 +502,7 @@ var render = function () {
                     ),
                     _vm._v(" "),
                     _vm.searchModel.total
-                      ? _c("div", { staticClass: "col-sm-5" }, [
+                      ? _c("div", { staticClass: "col-12 text-center mt-1" }, [
                           _c("h5", [
                             _c("strong", [_vm._v("Total:")]),
                             _vm._v(" " + _vm._s(_vm.searchModel.total)),
@@ -512,7 +512,7 @@ var render = function () {
                     _vm._v(" "),
                     _c(
                       "div",
-                      { staticClass: "col-12 text-center" },
+                      { staticClass: "col-12 text-center mt-1" },
                       [
                         _c(
                           "b-button",

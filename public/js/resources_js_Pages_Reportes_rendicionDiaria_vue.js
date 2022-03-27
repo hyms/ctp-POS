@@ -2345,6 +2345,19 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -3475,16 +3488,6 @@ var render = function () {
                           1
                         )
                       : _vm._e(),
-                    _vm._v(" "),
-                    _c(
-                      "b-col",
-                      [
-                        _c("b-button", { attrs: { type: "submit" } }, [
-                          _vm._v("Buscar"),
-                        ]),
-                      ],
-                      1
-                    ),
                   ],
                   1
                 ),
@@ -3492,17 +3495,23 @@ var render = function () {
                 _c(
                   "b-row",
                   [
-                    _c("b-col", [
-                      _c("h4", [
-                        _c("span", { staticClass: "badge badge-secondary" }, [
-                          _vm._v(
-                            "Rendicion Total " +
-                              _vm._s(_vm.totalIngreso - _vm.totalEgreso) +
-                              " Bs"
-                          ),
-                        ]),
-                      ]),
-                    ]),
+                    _c(
+                      "b-col",
+                      [
+                        _c(
+                          "b-button",
+                          {
+                            attrs: {
+                              type: "submit",
+                              size: "sm",
+                              variant: "primary",
+                            },
+                          },
+                          [_vm._v("Buscar")]
+                        ),
+                      ],
+                      1
+                    ),
                   ],
                   1
                 ),
@@ -3514,92 +3523,26 @@ var render = function () {
         ),
         _vm._v(" "),
         _c(
-          "b-card",
-          { staticClass: "mb-1", attrs: { "no-body": "" } },
+          "b-row",
+          { staticClass: "mt-2" },
           [
             _c(
-              "b-card-header",
-              {
-                staticClass: "p-1",
-                attrs: { "header-tag": "header", role: "tab" },
-              },
+              "b-col",
               [
-                _c(
-                  "b-button",
-                  {
-                    directives: [
-                      {
-                        name: "b-toggle",
-                        rawName: "v-b-toggle.accordion-1",
-                        modifiers: { "accordion-1": true },
-                      },
-                    ],
-                    attrs: { block: "", variant: "secondary" },
-                  },
-                  [
-                    _vm._v("INGRESOS DIARIOS "),
-                    _c("span", { staticClass: "badge badge-light" }, [
-                      _vm._v("TOTAL " + _vm._s(_vm.totalIngreso) + " Bs"),
-                    ]),
-                  ]
-                ),
-              ],
-              1
-            ),
-            _vm._v(" "),
-            _c(
-              "b-collapse",
-              {
-                attrs: {
-                  id: "accordion-1",
-                  visible: "",
-                  accordion: "my-accordion",
-                  role: "tabpanel",
-                },
-              },
-              [
-                _c(
-                  "b-card-body",
-                  { staticClass: "table-responsive" },
-                  [
-                    _c("b-table", {
-                      attrs: {
-                        striped: "",
-                        hover: "",
-                        items: _vm.data["table"]["ingreso"],
-                        fields: _vm.data["fields"],
-                        "show-empty": "",
-                        small: "",
-                      },
-                      scopedSlots: _vm._u([
-                        {
-                          key: "cell(created_at)",
-                          fn: function (data) {
-                            return [
-                              _vm._v(
-                                "\n                            " +
-                                  _vm._s(
-                                    _vm._f("moment")(
-                                      data.value,
-                                      "DD/MM/YYYY HH:mm"
-                                    )
-                                  ) +
-                                  "\n                        "
-                              ),
-                            ]
-                          },
-                        },
-                        {
-                          key: "empty",
-                          fn: function (scope) {
-                            return [_c("p", [_vm._v("No existen Datos")])]
-                          },
-                        },
-                      ]),
-                    }),
-                  ],
-                  1
-                ),
+                _c("b-card", [
+                  _c("span", { staticClass: "h4" }, [
+                    _vm._v("Rendicion Total "),
+                    _c(
+                      "span",
+                      { staticClass: "badge badge-primary text-bold" },
+                      [
+                        _vm._v(
+                          _vm._s(_vm.totalIngreso - _vm.totalEgreso) + " Bs"
+                        ),
+                      ]
+                    ),
+                  ]),
+                ]),
               ],
               1
             ),
@@ -3608,89 +3551,139 @@ var render = function () {
         ),
         _vm._v(" "),
         _c(
-          "b-card",
-          { staticClass: "mb-1", attrs: { "no-body": "" } },
+          "b-row",
           [
             _c(
-              "b-card-header",
-              {
-                staticClass: "p-1",
-                attrs: { "header-tag": "header", role: "tab" },
-              },
+              "b-col",
+              { attrs: { sm: "6" } },
               [
                 _c(
-                  "b-button",
-                  {
-                    directives: [
-                      {
-                        name: "b-toggle",
-                        rawName: "v-b-toggle.accordion-2",
-                        modifiers: { "accordion-2": true },
-                      },
-                    ],
-                    attrs: { block: "", variant: "secondary" },
-                  },
+                  "b-card",
+                  { attrs: { "no-body": "" } },
                   [
-                    _vm._v("EGRESOS DIARIOS "),
-                    _c("span", { staticClass: "badge badge-light" }, [
-                      _vm._v("TOTAL " + _vm._s(_vm.totalEgreso) + " Bs"),
+                    _c("b-card-header", { attrs: { "header-tag": "div" } }, [
+                      _c("span", { staticClass: "h4" }, [
+                        _vm._v("\n                   INGRESOS DIARIOS "),
+                        _c(
+                          "span",
+                          { staticClass: "badge badge-primary text-bold" },
+                          [_vm._v("TOTAL " + _vm._s(_vm.totalIngreso) + " Bs")]
+                        ),
+                      ]),
                     ]),
-                  ]
+                    _vm._v(" "),
+                    _c(
+                      "b-card-body",
+                      { staticClass: "table-responsive" },
+                      [
+                        _c("b-table", {
+                          attrs: {
+                            striped: "",
+                            hover: "",
+                            items: _vm.data["table"]["ingreso"],
+                            fields: _vm.data["fields"],
+                            "show-empty": "",
+                            small: "",
+                            "sticky-header": "",
+                          },
+                          scopedSlots: _vm._u([
+                            {
+                              key: "cell(created_at)",
+                              fn: function (data) {
+                                return [
+                                  _vm._v(
+                                    "\n                                " +
+                                      _vm._s(
+                                        _vm._f("moment")(
+                                          data.value,
+                                          "DD/MM/YYYY HH:mm"
+                                        )
+                                      ) +
+                                      "\n                            "
+                                  ),
+                                ]
+                              },
+                            },
+                            {
+                              key: "empty",
+                              fn: function (scope) {
+                                return [_c("p", [_vm._v("No existen Datos")])]
+                              },
+                            },
+                          ]),
+                        }),
+                      ],
+                      1
+                    ),
+                  ],
+                  1
                 ),
               ],
               1
             ),
             _vm._v(" "),
             _c(
-              "b-collapse",
-              {
-                attrs: {
-                  id: "accordion-2",
-                  visible: "",
-                  accordion: "my-accordion",
-                  role: "tabpanel",
-                },
-              },
+              "b-col",
+              { attrs: { sm: "6" } },
               [
                 _c(
-                  "b-card-body",
-                  { staticClass: "table-responsive" },
+                  "b-card",
+                  { attrs: { "no-body": "" } },
                   [
-                    _c("b-table", {
-                      attrs: {
-                        striped: "",
-                        hover: "",
-                        items: _vm.data["table"]["egreso"],
-                        fields: _vm.data["fields"],
-                        "show-empty": "",
-                        small: "",
-                      },
-                      scopedSlots: _vm._u([
-                        {
-                          key: "cell(created_at)",
-                          fn: function (data) {
-                            return [
-                              _vm._v(
-                                "\n                            " +
-                                  _vm._s(
-                                    _vm._f("moment")(
-                                      data.value,
-                                      "DD/MM/YYYY HH:mm"
-                                    )
-                                  ) +
-                                  "\n                        "
-                              ),
-                            ]
-                          },
-                        },
-                        {
-                          key: "empty",
-                          fn: function (scope) {
-                            return [_c("p", [_vm._v("No existen Datos")])]
-                          },
-                        },
+                    _c("b-card-header", { attrs: { "header-tag": "header" } }, [
+                      _c("span", { staticClass: "h4" }, [
+                        _vm._v("EGRESOS DIARIOS "),
+                        _c(
+                          "span",
+                          { staticClass: "badge badge-primary text-bold" },
+                          [_vm._v("TOTAL " + _vm._s(_vm.totalEgreso) + " Bs")]
+                        ),
                       ]),
-                    }),
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "b-card-body",
+                      { staticClass: "table-responsive" },
+                      [
+                        _c("b-table", {
+                          attrs: {
+                            striped: "",
+                            hover: "",
+                            items: _vm.data["table"]["egreso"],
+                            fields: _vm.data["fields"],
+                            "show-empty": "",
+                            small: "",
+                            "sticky-header": "",
+                          },
+                          scopedSlots: _vm._u([
+                            {
+                              key: "cell(created_at)",
+                              fn: function (data) {
+                                return [
+                                  _vm._v(
+                                    "\n                                " +
+                                      _vm._s(
+                                        _vm._f("moment")(
+                                          data.value,
+                                          "DD/MM/YYYY HH:mm"
+                                        )
+                                      ) +
+                                      "\n                            "
+                                  ),
+                                ]
+                              },
+                            },
+                            {
+                              key: "empty",
+                              fn: function (scope) {
+                                return [_c("p", [_vm._v("No existen Datos")])]
+                              },
+                            },
+                          ]),
+                        }),
+                      ],
+                      1
+                    ),
                   ],
                   1
                 ),

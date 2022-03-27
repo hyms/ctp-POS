@@ -7,7 +7,7 @@
                 </b-card-header>
                 <b-card-body>
                     <div class="table-responsive">
-                        <b-table-simple class="table-hover table-small">
+                        <b-table-simple class="table-hover table-sm">
                             <b-thead>
                                 <b-tr>
                                     <b-th>Formato</b-th>

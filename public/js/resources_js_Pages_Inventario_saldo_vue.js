@@ -2909,7 +2909,7 @@ var render = function () {
                 [
                   _c(
                     "b-table-simple",
-                    { staticClass: "table-hover table-small" },
+                    { staticClass: "table-hover table-sm" },
                     [
                       _c(
                         "b-thead",

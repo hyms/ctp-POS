@@ -28,7 +28,6 @@
                         small
                         :current-page="currentPage"
                         :per-page="perPage"
-                        sticky-header
                     >
                         <template #empty="scope">
                             <p>{{ textoVacio }}</p>

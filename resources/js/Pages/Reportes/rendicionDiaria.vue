@@ -60,65 +60,78 @@
                                 ></b-input>
                             </b-form-group>
                         </b-col>
-                        <b-col>
-                            <b-button type="submit">Buscar</b-button>
-                        </b-col>
                     </b-row>
                     <b-row>
                         <b-col>
-                        <h4><span class="badge badge-secondary">Rendicion Total {{totalIngreso - totalEgreso}} Bs</span></h4>
+                            <b-button type="submit" size="sm" variant="primary">Buscar</b-button>
                         </b-col>
                     </b-row>
+
                 </b-form>
             </b-card>
-            <b-card no-body class="mb-1">
-                <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block v-b-toggle.accordion-1 variant="secondary">INGRESOS DIARIOS <span class="badge badge-light">TOTAL {{totalIngreso}} Bs</span></b-button>
-                </b-card-header>
-                <b-collapse id="accordion-1" visible accordion="my-accordion" role="tabpanel">
-                    <b-card-body class="table-responsive">
-                        <b-table
-                            striped
-                            hover
-                            :items="data['table']['ingreso']"
-                            :fields="data['fields']"
-                            show-empty
-                            small
-                        >
-                            <template v-slot:cell(created_at)="data">
-                                {{ data.value | moment("DD/MM/YYYY HH:mm") }}
-                            </template>
-                            <template #empty="scope">
-                                <p>No existen Datos</p>
-                            </template>
-                        </b-table>
-                    </b-card-body>
-                </b-collapse>
-            </b-card>
-            <b-card no-body class="mb-1">
-                <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block v-b-toggle.accordion-2 variant="secondary">EGRESOS DIARIOS <span class="badge badge-light">TOTAL {{totalEgreso}} Bs</span></b-button>
-                </b-card-header>
-                <b-collapse id="accordion-2" visible accordion="my-accordion" role="tabpanel">
-                    <b-card-body class="table-responsive">
-                        <b-table
-                            striped
-                            hover
-                            :items="data['table']['egreso']"
-                            :fields="data['fields']"
-                            show-empty
-                            small
-                        >
-                            <template v-slot:cell(created_at)="data">
-                                {{ data.value | moment("DD/MM/YYYY HH:mm") }}
-                            </template>
-                            <template #empty="scope">
-                                <p>No existen Datos</p>
-                            </template>
-                        </b-table>
-                    </b-card-body>
-                </b-collapse>
-            </b-card>
+            <b-row class="mt-2">
+                <b-col>
+                    <b-card>
+                    <span class="h4">Rendicion Total <span class="badge badge-primary text-bold">{{ totalIngreso - totalEgreso }} Bs</span> </span>
+                    </b-card>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col sm="6">
+                    <b-card no-body>
+                        <b-card-header header-tag="div">
+                        <span class="h4">
+                       INGRESOS DIARIOS <span class="badge badge-primary text-bold">TOTAL {{ totalIngreso }} Bs</span>
+                        </span>
+                        </b-card-header>
+                        <b-card-body class="table-responsive">
+                            <b-table
+                                striped
+                                hover
+                                :items="data['table']['ingreso']"
+                                :fields="data['fields']"
+                                show-empty
+                                small
+                                sticky-header
+                            >
+                                <template v-slot:cell(created_at)="data">
+                                    {{ data.value | moment("DD/MM/YYYY HH:mm") }}
+                                </template>
+                                <template #empty="scope">
+                                    <p>No existen Datos</p>
+                                </template>
+                            </b-table>
+                        </b-card-body>
+                    </b-card>
+                </b-col>
+                <b-col sm="6">
+                    <b-card no-body>
+                        <b-card-header header-tag="header">
+                            <span class="h4">EGRESOS DIARIOS <span
+                                class="badge badge-primary text-bold">TOTAL {{ totalEgreso }} Bs</span></span>
+                        </b-card-header>
+                        <b-card-body class="table-responsive">
+                            <b-table
+                                striped
+                                hover
+                                :items="data['table']['egreso']"
+                                :fields="data['fields']"
+                                show-empty
+                                small
+                                sticky-header
+                            >
+                                <template v-slot:cell(created_at)="data">
+                                    {{ data.value | moment("DD/MM/YYYY HH:mm") }}
+                                </template>
+                                <template #empty="scope">
+                                    <p>No existen Datos</p>
+                                </template>
+                            </b-table>
+                        </b-card-body>
+                    </b-card>
+                </b-col>
+            </b-row>
+
         </div>
     </div>
 </template>
@@ -164,8 +177,8 @@ export default {
                     stateText: null
                 },
             },
-            totalIngreso:0,
-            totalEgreso:0,
+            totalIngreso: 0,
+            totalEgreso: 0,
         }
     },
     methods: {
@@ -178,22 +191,22 @@ export default {
             }
             this.$inertia.get(window.location.pathname, form);
         },
-        getTotal(table){
+        getTotal(table) {
             let total = 0.0;
-            for(const value of table){
+            for (const value of table) {
                 total += parseFloat(value.monto);
             }
             return total;
         }
     },
     mounted() {
-        for(const key in this.form) {
+        for (const key in this.form) {
             if (this.request[key] !== undefined && this.request[key] !== '') {
                 this.form[key].value = this.request[key];
             }
         }
-        this.totalEgreso=this.getTotal(this.data['table']['egreso']);
-        this.totalIngreso=this.getTotal(this.data['table']['ingreso']);
+        this.totalEgreso = this.getTotal(this.data['table']['egreso']);
+        this.totalIngreso = this.getTotal(this.data['table']['ingreso']);
     },
 
 }

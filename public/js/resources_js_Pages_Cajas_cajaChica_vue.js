@@ -2223,7 +2223,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 
 
@@ -25239,7 +25238,6 @@ var render = function () {
                         small: "",
                         "current-page": _vm.currentPage,
                         "per-page": _vm.perPage,
-                        "sticky-header": "",
                       },
                       scopedSlots: _vm._u([
                         {

@@ -110,10 +110,10 @@
                                         ></b-select>
                                     </b-form-group>
                                 </div>
-                                <div class="col-sm-5" v-if="searchModel.total">
+                                <div class="col-12 text-center mt-1" v-if="searchModel.total">
                                     <h5><strong>Total:</strong> {{ searchModel.total }}</h5>
                                 </div>
-                                <div class="col-12 text-center">
+                                <div class="col-12 text-center mt-1">
                                     <b-button size="sm" type="submit" variant="primary">Buscar</b-button>
                                 </div>
                             </form>

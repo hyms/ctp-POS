@@ -55,7 +55,6 @@
                             :sort-by.sync="sortBy"
                             :sort-desc.sync="sortDesc"
                             :sort-direction="sortDirection"
-                            sticky-header
                         >
                             <template #empty="scope">
                                 <p>{{ textoVacio }}</p>

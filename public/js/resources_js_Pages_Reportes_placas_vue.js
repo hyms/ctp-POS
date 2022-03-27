@@ -2351,6 +2351,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
 
 
 
@@ -3623,15 +3626,20 @@ var render = function () {
                           ],
                           1
                         ),
-                        _vm._v(" "),
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "b-row",
+                      [
                         _c(
                           "b-col",
-                          { attrs: { sm: "12" } },
                           [
                             _c(
                               "b-button",
                               {
-                                attrs: { variant: "primary" },
+                                attrs: { variant: "primary", size: "sm" },
                                 on: {
                                   click: function ($event) {
                                     return _vm.enviar()

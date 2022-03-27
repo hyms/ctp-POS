@@ -79,8 +79,11 @@
                                     </b-form-select>
                                 </b-form-group>
                             </b-col>
-                            <b-col sm="12">
-                                <b-button @click="enviar()" variant="primary">Buscar</b-button>
+
+                        </b-row>
+                        <b-row>
+                            <b-col>
+                                <b-button @click="enviar()" variant="primary" size="sm">Buscar</b-button>
                             </b-col>
                         </b-row>
                     </form>

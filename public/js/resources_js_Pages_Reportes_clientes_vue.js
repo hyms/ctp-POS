@@ -2581,6 +2581,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 
 
@@ -4352,13 +4355,27 @@ var render = function () {
                       ],
                       1
                     ),
-                    _vm._v(" "),
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "b-row",
+                  [
                     _c(
                       "b-col",
                       [
-                        _c("b-button", { attrs: { type: "submit" } }, [
-                          _vm._v("Buscar"),
-                        ]),
+                        _c(
+                          "b-button",
+                          {
+                            attrs: {
+                              type: "submit",
+                              size: "sm",
+                              variant: "primary",
+                            },
+                          },
+                          [_vm._v("Buscar")]
+                        ),
                       ],
                       1
                     ),
@@ -4429,7 +4446,7 @@ var render = function () {
                                       expression: "'itemModal'",
                                     },
                                   ],
-                                  attrs: { variant: "secondary", size: "sm" },
+                                  attrs: { variant: "primary", size: "sm" },
                                   on: {
                                     click: function ($event) {
                                       return _vm.loadModal(
