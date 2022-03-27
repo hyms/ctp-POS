@@ -2,7 +2,7 @@
     <div>
         <b-modal
             :id="id"
-            :title="(isNew ? newText : modifyText) + titleForm"
+            :title="`${(isNew ? newText : modifyText)} ${titleForm}`"
             @show="reset"
             @hidden="reset"
             @ok="handleOk">
@@ -51,6 +51,14 @@
                         :state="item.state"
                     >{{ item.label }}
                     </b-checkbox>
+                    <b-form-checkbox-group
+                        v-if="item.type==='group-check'"
+                        id="checkbox-group-1"
+                        v-model="item.value"
+                        :options="item.options"
+                        value-field="id"
+                        text-field="nombre"
+                    ></b-form-checkbox-group>
                 </template>
             </form>
             <template #modal-footer="{ ok, cancel }">

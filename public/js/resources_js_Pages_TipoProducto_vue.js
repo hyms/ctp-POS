@@ -2781,6 +2781,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -4169,7 +4177,8 @@ var render = function () {
         {
           attrs: {
             id: _vm.id,
-            title: (_vm.isNew ? _vm.newText : _vm.modifyText) + _vm.titleForm,
+            title:
+              (_vm.isNew ? _vm.newText : _vm.modifyText) + " " + _vm.titleForm,
           },
           on: { show: _vm.reset, hidden: _vm.reset, ok: _vm.handleOk },
           scopedSlots: _vm._u([
@@ -4347,6 +4356,24 @@ var render = function () {
                         },
                         [_vm._v(_vm._s(item.label) + "\n                ")]
                       )
+                    : _vm._e(),
+                  _vm._v(" "),
+                  item.type === "group-check"
+                    ? _c("b-form-checkbox-group", {
+                        attrs: {
+                          id: "checkbox-group-1",
+                          options: item.options,
+                          "value-field": "id",
+                          "text-field": "nombre",
+                        },
+                        model: {
+                          value: item.value,
+                          callback: function ($$v) {
+                            _vm.$set(item, "value", $$v)
+                          },
+                          expression: "item.value",
+                        },
+                      })
                     : _vm._e(),
                 ]
               }),

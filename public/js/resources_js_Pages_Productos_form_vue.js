@@ -2240,36 +2240,6 @@ __webpack_require__.r(__webpack_exports__);
       boton2: "Modificar",
       titulo1: "Nuevo Producto",
       titulo2: "Modificar Producto",
-      form: {
-        codigo: {
-          label: 'Codigo',
-          value: "",
-          type: "text",
-          state: null,
-          stateText: null
-        },
-        formato: {
-          label: 'Nombre',
-          value: "",
-          type: "text",
-          state: null,
-          stateText: null
-        },
-        dimension: {
-          label: 'Detalle',
-          value: "",
-          type: "text",
-          state: null,
-          stateText: null
-        },
-        productoTipo: {
-          label: 'Tipo Producto',
-          value: "",
-          type: "select",
-          state: null,
-          stateText: null
-        }
-      },
       idForm: null,
       errors: Array
     };

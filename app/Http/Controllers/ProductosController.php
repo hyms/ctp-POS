@@ -20,7 +20,7 @@ class ProductosController extends Controller
         $productos = TipoProductos::setTiposProducto($productos);
         $tipoProducto = TipoProductos::getAll();
         $tipoProducto = $tipoProducto->pluck('nombre', 'id');
-        return Inertia::render('Productos/tabla',
+        return Inertia::render('Productos',
             [
                 'productos' => $productos,
                 'tipoProducto' => $tipoProducto

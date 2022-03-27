@@ -25,7 +25,14 @@ class TipoProductos extends Model
         foreach ($productos as $key => $producto) {
             $productos[$key]->productoTipo = DB::table('productoTipo')
                 ->where('producto', '=', $producto->id)
-                ->get()->pluck('tipoProducto');
+                ->get()
+                ->pluck('tipoProducto');
+
+            $productos[$key]->productoTipoView = DB::table('tipoProducto')
+                ->whereIn('id', $productos[$key]->productoTipo)
+                ->whereNull('deleted_at')
+                ->get()
+                ->implode('nombre', ', ');
         }
         return $productos;
     }
