@@ -2910,6 +2910,21 @@ __webpack_require__.r(__webpack_exports__);
       })["finally"](function () {
         _this.sending = false;
       });
+    },
+    getOptions: function getOptions(options, isPadre, id) {
+      if (!isPadre) {
+        return options;
+      }
+
+      var newOptions = {};
+
+      for (var key in options) {
+        if (id !== options[key].id) {
+          newOptions[options[key].id] = options[key].nombre;
+        }
+      }
+
+      return newOptions;
     }
   }
 });
@@ -2929,6 +2944,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _Layout__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Layout */ "./resources/js/Shared/Layout.vue");
 /* harmony import */ var _standarForm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./standarForm */ "./resources/js/Shared/standarForm.vue");
+//
+//
+//
 //
 //
 //
@@ -4307,7 +4325,13 @@ var render = function () {
                           _vm._v(" "),
                           item.type === "select"
                             ? _c("b-form-select", {
-                                attrs: { options: item.options },
+                                attrs: {
+                                  options: _vm.getOptions(
+                                    item.options,
+                                    item.isPadre === 1,
+                                    _vm.itemRow.id
+                                  ),
+                                },
                                 scopedSlots: _vm._u(
                                   [
                                     {
@@ -4479,6 +4503,18 @@ var render = function () {
                       key: "empty",
                       fn: function (scope) {
                         return [_c("p", [_vm._v(_vm._s(_vm.emptyText))])]
+                      },
+                    },
+                    {
+                      key: "cell(central)",
+                      fn: function (data) {
+                        return [
+                          _vm._v(
+                            "\n                        " +
+                              _vm._s(data.value === 1 ? "Si" : "No") +
+                              "\n                    "
+                          ),
+                        ]
                       },
                     },
                     {

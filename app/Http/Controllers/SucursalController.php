@@ -14,7 +14,7 @@ class SucursalController extends Controller
     public function getAll()
     {
         $sucursal = Sucursal::getAll(true);
-        return Inertia::render('Sucursales/tabla', ['sucursales' => $sucursal]);
+        return Inertia::render('Sucursales', ['sucursales' => $sucursal]);
     }
 
     public function post(Request $request)

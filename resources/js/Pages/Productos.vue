@@ -32,7 +32,6 @@ export default {
     },
     data() {
         return {
-            isNew: true,
             fields:
                 [
                     'codigo',
@@ -83,25 +82,6 @@ export default {
             },
         }
     },
-    methods: {
-        getTipo(tipo) {
-            return this.tipoProducto[tipo];
-        },
-        getTipos(tipos) {
-            let resultado = ""
-            let count = 0;
-            for (let tipo of tipos) {
-                ++count;
-                if (this.tipoProducto[tipo]) {
-                    resultado += this.tipoProducto[tipo];
-                    if (count < tipos.length) {
-                        resultado += ", ";
-                    }
-                }
-            }
-            return resultado;
-        },
-    }
 }
 </script>
 

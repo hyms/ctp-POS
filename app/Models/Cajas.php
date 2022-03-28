@@ -15,18 +15,22 @@ class Cajas extends Model
 
     public static function getAll(int $sucursal = null, int $caja_padre = null)
     {
-        $sucursales = DB::table(self::$tables);
+        $cajas = DB::table(self::$tables);
         if (!empty($sucursal)) {
-            $sucursales = $sucursales->where('enable', '=', '1');
-            $sucursales = $sucursales->where('sucursal', '=', $sucursal);
+            $cajas = $cajas->where(self::$tables.'.enable', '=', '1');
+            $cajas = $cajas->where(self::$tables.'.sucursal', '=', $sucursal);
         }
         if (!empty($caja_padre)) {
-            $sucursales = $sucursales->where('dependeDe', '=', $caja_padre);
+            $cajas = $cajas->where(self::$tables.'.dependeDe', '=', $caja_padre);
         }
-        $sucursales = $sucursales
-            ->whereNull('deleted_at')
-            ->orderBy('updated_at', 'desc');
-        return $sucursales->get();
+        $cajas = $cajas
+            ->orderBy(self::$tables.'.updated_at', 'desc')
+        ->whereNull(self::$tables.'.deleted_at')
+        ->select(self::$tables.'.*', Sucursal::$tables.'.nombre as nombreSucursal')
+        ->leftJoin(Sucursal::$tables,Sucursal::$tables.'.id','=',self::$tables.'.sucursal');
+        $cajas = $cajas->get();
+
+        return $cajas;
     }
 
     public static function getOne(int $sucursal)

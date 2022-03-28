@@ -2253,52 +2253,6 @@ __webpack_require__.r(__webpack_exports__);
       sending: false,
       titulo1: "Nueva Caja",
       titulo2: "Modificar Caja",
-      form: {
-        nombre: {
-          label: 'nombre',
-          value: "",
-          type: "text",
-          state: null,
-          stateText: null
-        },
-        descripcion: {
-          label: 'descripcion',
-          value: "",
-          type: "textarea",
-          state: null,
-          stateText: null
-        },
-        sucursal: {
-          label: 'sucursal',
-          value: "",
-          type: "select",
-          state: null,
-          stateText: null,
-          options: this.sucursales
-        },
-        dependeDe: {
-          label: 'Depende de',
-          value: "",
-          type: "select",
-          state: null,
-          stateText: null,
-          options: this.cajasPadre
-        },
-        enable: {
-          label: 'enable',
-          value: "",
-          type: "boolean",
-          state: null,
-          stateText: null
-        },
-        monto: {
-          label: '',
-          value: "",
-          type: "hidden",
-          state: null,
-          stateText: null
-        }
-      },
       idForm: null,
       errors: Array
     };

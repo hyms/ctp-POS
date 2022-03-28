@@ -30,9 +30,15 @@ class User extends Model implements AuthenticatableContract
 
     public static function getAll()
     {
-        $users = DB::table(self::$tables);
-        $users = $users->whereNull('deleted_at');
-        return $users->get();
+        $users = DB::table(self::$tables)
+            ->whereNull(self::$tables.'.deleted_at')
+            ->select(self::$tables.'.*', Sucursal::$tables.'.nombre as nombreSucursal')
+            ->leftJoin(Sucursal::$tables,Sucursal::$tables.'.id','=',self::$tables.'.sucursal');
+        $users=$users->get();
+        foreach ($users as $key=>$user) {
+            $users[$key]->nombreRol = self::getRole($user->role);
+        }
+        return $users;
     }
 
     public static function getRole($int = null)
@@ -45,7 +51,7 @@ class User extends Model implements AuthenticatableContract
             '4' => 'diseño',
             '5' => 'auxVenta'
         );
-        if (empty($int)) {
+        if ($int===null) {
             return array(
                 ['value' => '0', 'text' => 'sadmin'],
                 ['value' => '1', 'text' => 'admin'],

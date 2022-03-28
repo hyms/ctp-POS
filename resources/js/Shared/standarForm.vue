@@ -37,7 +37,7 @@
                         <b-form-select
                             v-if="item.type==='select'"
                             v-model="item.value"
-                            :options="item.options"
+                            :options="getOptions(item.options,item.isPadre===1,itemRow.id)"
                         >
                             <template #first>
                                 <b-form-select-option :value="null">Seleccione una opcion</b-form-select-option>
@@ -183,6 +183,19 @@ export default {
                 this.sending = false;
             })
 
+        },
+        getOptions(options, isPadre, id) {
+            if (!isPadre) {
+                return options;
+            }
+            let newOptions = {};
+            for (let key in options) {
+                if (id !== options[key].id) {
+                    newOptions[options[key].id] = options[key].nombre;
+                }
+
+            }
+            return newOptions;
         }
     },
 }

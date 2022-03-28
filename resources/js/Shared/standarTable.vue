@@ -32,6 +32,9 @@
                         <template #empty="scope">
                             <p>{{ emptyText }}</p>
                         </template>
+                        <template v-slot:cell(central)="data">
+                            {{ (data.value === 1) ? "Si" : "No" }}
+                        </template>
                         <template v-slot:cell(enable)="data">
                             {{ (data.value === 1) ? "Si" : "No" }}
                         </template>

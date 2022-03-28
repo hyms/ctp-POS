@@ -21,7 +21,7 @@ class CajaController extends Controller
         $cajas = Cajas::getAll();
         $sucursales = Sucursal::getAll();
         $sucursales = $sucursales->pluck('nombre', 'id');
-        return Inertia::render('Cajas/tabla', [
+        return Inertia::render('Cajas', [
             'cajas' => $cajas,
             'sucursales' => $sucursales
         ]);

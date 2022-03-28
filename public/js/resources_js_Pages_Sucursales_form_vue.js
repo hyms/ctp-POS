@@ -2246,65 +2246,6 @@ __webpack_require__.r(__webpack_exports__);
       sending: false,
       titulo1: "Nuevo Sucursal",
       titulo2: "Modificar Sucursal",
-      form: {
-        codigo: {
-          label: 'Codigo',
-          value: "",
-          type: "text",
-          state: null,
-          stateText: null
-        },
-        nombre: {
-          label: 'Nombre',
-          value: "",
-          type: "text",
-          state: null,
-          stateText: null
-        },
-        descripcion: {
-          label: 'Descripcion',
-          value: "",
-          type: "textarea",
-          state: null,
-          stateText: null
-        },
-        telefono: {
-          label: 'Telefono',
-          value: "",
-          type: "text",
-          state: null,
-          stateText: null
-        },
-        gmap: {
-          label: 'Coordenadas Gmap',
-          value: "",
-          type: "text",
-          state: null,
-          stateText: null
-        },
-        dependeDe: {
-          label: 'Depende de',
-          value: "",
-          type: "select",
-          state: null,
-          stateText: null,
-          options: this.sucursalPadre
-        },
-        central: {
-          label: 'Central',
-          value: "",
-          type: "boolean",
-          state: null,
-          stateText: null
-        },
-        enable: {
-          label: 'Habilitado',
-          value: "",
-          type: "boolean",
-          state: null,
-          stateText: null
-        }
-      },
       idForm: null,
       errors: Array
     };

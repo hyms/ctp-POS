@@ -2162,12 +2162,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Shared_Layout__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/Shared/Layout */ "./resources/js/Shared/Layout.vue");
 /* harmony import */ var _Shared_menu_menuProductos__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/Shared/menu/menuProductos */ "./resources/js/Shared/menu/menuProductos.vue");
 /* harmony import */ var _Shared_standarTable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/Shared/standarTable */ "./resources/js/Shared/standarTable.vue");
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
 //
 //
 //
@@ -2200,7 +2194,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
   },
   data: function data() {
     return {
-      isNew: true,
       fields: ['codigo', {
         key: 'formato',
         label: 'Nombre'
@@ -2243,39 +2236,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         }
       }
     };
-  },
-  methods: {
-    getTipo: function getTipo(tipo) {
-      return this.tipoProducto[tipo];
-    },
-    getTipos: function getTipos(tipos) {
-      var resultado = "";
-      var count = 0;
-
-      var _iterator = _createForOfIteratorHelper(tipos),
-          _step;
-
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var tipo = _step.value;
-          ++count;
-
-          if (this.tipoProducto[tipo]) {
-            resultado += this.tipoProducto[tipo];
-
-            if (count < tipos.length) {
-              resultado += ", ";
-            }
-          }
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
-      }
-
-      return resultado;
-    }
   }
 });
 
@@ -2976,6 +2936,21 @@ __webpack_require__.r(__webpack_exports__);
       })["finally"](function () {
         _this.sending = false;
       });
+    },
+    getOptions: function getOptions(options, isPadre, id) {
+      if (!isPadre) {
+        return options;
+      }
+
+      var newOptions = {};
+
+      for (var key in options) {
+        if (id !== options[key].id) {
+          newOptions[options[key].id] = options[key].nombre;
+        }
+      }
+
+      return newOptions;
     }
   }
 });
@@ -2995,6 +2970,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _Layout__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Layout */ "./resources/js/Shared/Layout.vue");
 /* harmony import */ var _standarForm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./standarForm */ "./resources/js/Shared/standarForm.vue");
+//
+//
+//
 //
 //
 //
@@ -4373,7 +4351,13 @@ var render = function () {
                           _vm._v(" "),
                           item.type === "select"
                             ? _c("b-form-select", {
-                                attrs: { options: item.options },
+                                attrs: {
+                                  options: _vm.getOptions(
+                                    item.options,
+                                    item.isPadre === 1,
+                                    _vm.itemRow.id
+                                  ),
+                                },
                                 scopedSlots: _vm._u(
                                   [
                                     {
@@ -4545,6 +4529,18 @@ var render = function () {
                       key: "empty",
                       fn: function (scope) {
                         return [_c("p", [_vm._v(_vm._s(_vm.emptyText))])]
+                      },
+                    },
+                    {
+                      key: "cell(central)",
+                      fn: function (data) {
+                        return [
+                          _vm._v(
+                            "\n                        " +
+                              _vm._s(data.value === 1 ? "Si" : "No") +
+                              "\n                    "
+                          ),
+                        ]
                       },
                     },
                     {
