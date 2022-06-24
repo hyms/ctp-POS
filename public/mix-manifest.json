@@ -1,5 +1,4 @@
 {
-    "/js/app.js": "/js/app.js?id=525f1afdc97ab88c2ce52891018fe7c8",
-    "/firebase-messaging-sw.js": "/firebase-messaging-sw.js?id=376a66e72b1f6f833da7d1f0694538c6",
-    "/css/main.css": "/css/main.css?id=b3e76d1af0fbb5fcebdc1c3a78375411"
+    "/js/app.js": "/js/app.js",
+    "/css/app.css": "/css/app.css"
 }

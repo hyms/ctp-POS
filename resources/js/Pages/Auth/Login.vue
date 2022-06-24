@@ -1,100 +1,67 @@
-<template>
-    <div class="c-app flex-row align-items-center">
-        <CContainer>
-            <CRow class="justify-content-center">
-                <CCol md="6" lg="4" sm="8">
-                        <CCard>
-                            <CCardBody>
-                                <b-alert variant="danger" dismissible :show="!!errors.usuario">
-                                    {{ errors.usuario }}
-                                </b-alert>
-                                <form class="form-element" @submit.prevent="submit">
-                                    <h1>Login</h1>
+<script setup>
+import BreezeButton from '@/Components/Button.vue';
+import BreezeCheckbox from '@/Components/Checkbox.vue';
+import BreezeGuestLayout from '@/Layouts/Guest.vue';
+import BreezeInput from '@/Components/Input.vue';
+import BreezeLabel from '@/Components/Label.vue';
+import BreezeValidationErrors from '@/Components/ValidationErrors.vue';
+import { Head, Link, useForm } from '@inertiajs/inertia-vue3';
 
-                                    <div class="input-group mb-3">
-                                        <b-form-input
-                                            id="username"
-                                            v-model="form.username"
-                                            placeholder="Usuario"
-                                            trim
-                                            type="text"
-                                            :state="state(errors.username)"
-                                            :invalid-feedback="errors.username"
-                                        ></b-form-input>
-                                    </div>
-                                    <div class="input-group mb-4">
-                                        <b-form-input
-                                            id="password"
-                                            v-model="form.password"
-                                            placeholder="Contraseña"
-                                            trim
-                                            type="password"
-                                            :state="state(errors.password)"
-                                            :invalid-feedback="errors.password"
-                                        ></b-form-input>
-                                    </div>
-                                    <div class="form-group text-left">
-                                        <div class="checkbox checkbox-fill d-inline">
-                                            <input id="remember" v-model="form.remember" type="checkbox">
-                                            <label for="remember" class="cr">
-                                                Remember Me
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="form-group account-btn text-center m-t-10">
-                                        <div class="col-12">
-                                            <loading-button :loading="sending"
-                                                            class="btn btn-block btn-info shadow-2 mb-4"
-                                                            type="submit" :text="'Ingresar'" :textLoad="'Ingresando'">
-                                                Login
-                                            </loading-button>
-                                        </div>
-                                    </div>
-                                </form>
+defineProps({
+    canResetPassword: Boolean,
+    status: String,
+});
 
-                            </CCardBody>
-                        </CCard>
-                </CCol>
-            </CRow>
-        </CContainer>
-    </div>
-</template>
+const form = useForm({
+    username: '',
+    password: '',
+    remember: false
+});
 
-<script>
-import LoadingButton from '@/Shared/LoadingButton'
-
-export default {
-    components: {
-        LoadingButton,
-    },
-    props: {
-        errors: Object,
-    },
-    data() {
-        return {
-            sending: false,
-            form: {
-                username: '',
-                password: '',
-                remember: null,
-            },
-        }
-    },
-    methods: {
-        submit() {
-            this.errors = [];
-            this.sending = true
-            this.$inertia.post('/login', this.form, {
-                onFinish: () => this.sending = false,
-            })
-        },
-        state(value) {
-            if (value === undefined || Object.keys(this.errors).length === 0) {
-                return null;
-            }
-            return !value;
-        }
-    },
-
-}
+const submit = () => {
+    form.post(route('login'), {
+        onFinish: () => form.reset('password'),
+    });
+};
 </script>
+
+<template>
+    <BreezeGuestLayout>
+        <Head title="Log in" />
+
+        <BreezeValidationErrors class="mb-4" />
+
+        <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
+            {{ status }}
+        </div>
+
+        <form @submit.prevent="submit">
+            <div>
+                <BreezeLabel for="username" value="Username" />
+                <BreezeInput id="username" class="mt-1 block w-full" v-model="form.username" required autofocus autocomplete="username" />
+            </div>
+
+            <div class="mt-4">
+                <BreezeLabel for="password" value="Password" />
+                <BreezeInput id="password" type="password" class="mt-1 block w-full" v-model="form.password" required autocomplete="current-password" />
+            </div>
+
+            <div class="block mt-4">
+                <label class="flex items-center">
+                    <BreezeCheckbox name="remember" v-model:checked="form.remember" />
+                    <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                </label>
+            </div>
+
+            <div class="flex items-center justify-end mt-4">
+                <Link v-if="canResetPassword" :href="route('password.request')" class="underline text-sm text-gray-600 hover:text-gray-900">
+                    Forgot your password?
+                </Link>
+
+                <BreezeButton class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                    Log in
+                </BreezeButton>
+            </div>
+        </form>
+    </BreezeGuestLayout>
+</template>

@@ -1,5 +1,5 @@
-let mix = require('laravel-mix');
-const path = require('path');
+const mix = require('laravel-mix');
+
 /*
  |--------------------------------------------------------------------------
  | Mix Asset Management
@@ -12,20 +12,12 @@ const path = require('path');
  */
 
 mix.js('resources/js/app.js', 'public/js')
-    .js('resources/js/firebase-messaging-sw.js', 'public/')
-    .postCss('resources/css/main.css', 'public/css', [])
+    .vue()
+    .postCss('resources/css/app.css', 'public/css', [require('tailwindcss'), require('autoprefixer')])
+    .alias({
+        '@': 'resources/js',
+    });
 
-    .webpackConfig({
-        output: {
-            chunkFilename: 'js/[name].js?id=[chunkhash]',
-        },
-        resolve: {
-            alias: {
-                //vue$: 'vue/dist/vue.esm.js',
-                '@': path.resolve('resources/js'),
-            },
-        },
-    })
-    .version()
-    .vue({ version: 2 });
-
+if (mix.inProduction()) {
+    mix.version();
+}
