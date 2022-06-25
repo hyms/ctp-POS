@@ -1,20 +1,39 @@
 import './bootstrap';
 
-import { createApp, h } from 'vue';
-import { createInertiaApp } from '@inertiajs/inertia-vue3';
-import { InertiaProgress } from '@inertiajs/progress';
-
-const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
+import Vue from 'vue';
+import Vuetify from 'vuetify'
+import {createInertiaApp} from '@inertiajs/inertia-vue';
+import {InertiaProgress} from '@inertiajs/progress';
 
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
-    resolve: (name) => require(`./Pages/${name}.vue`),
-    setup({ el, app, props, plugin }) {
-        return createApp({ render: () => h(app, props) })
-            .use(plugin)
-            .mixin({ methods: { route } })
-            .mount(el);
+    resolve: name => require(`./Pages/${name}`),
+    setup({el, App, props, plugin}) {
+        Vue.use(plugin)
+        Vue.use(Vuetify)
+        Vue.mixin({methods: {route}})
+        new Vue({
+            render: h => h(App, props),
+            vuetify: new Vuetify({
+                icons: {
+                    iconfont: 'mdiSvg',
+                },
+                // lang:'es',
+                theme: {
+                    themes: {
+                        light: {
+                            primary: '#007b89',
+                            secondary: '#5e8592',
+                            accent: '#2C384A',
+                            error: '#e55353',
+                            info: '#39f',
+                            success: '#2eb85c',
+                            warning: '#f9b115',
+                        },
+                    },
+                },
+            }),
+        }).$mount(el)
     },
-});
+})
 
-InertiaProgress.init({ color: '#4B5563' });
+InertiaProgress.init({color: '#4B5563'});

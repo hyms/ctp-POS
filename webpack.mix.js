@@ -12,8 +12,10 @@ const mix = require('laravel-mix');
  */
 
 mix.js('resources/js/app.js', 'public/js')
-    .vue()
-    .postCss('resources/css/app.css', 'public/css', [require('tailwindcss'), require('autoprefixer')])
+    .vue({ version: 2 })
+    .css('resources/css/app.css', 'public/css')
+    // .sass('resources/css/preset/pages/auth.scss','public/css')
+    // .sass('resources/css/styles/main.sass','public/css')
     .alias({
         '@': 'resources/js',
     });
