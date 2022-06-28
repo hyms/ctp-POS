@@ -79,7 +79,7 @@
       <!-- Logout -->
       <v-list-item link>
         <v-list-item-content>
-          <v-list-item-title>Logout</v-list-item-title>
+          <v-list-item-title :href="route('logout')" method="post">Logout</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </v-list>
