@@ -2,10 +2,10 @@
     <v-app>
         <Menu>
         </Menu>
-        <v-main>
-            <div class="app-content-container boxed-container pa-6">
+        <v-main >
+            <v-container fluid>
                 <slot></slot>
-            </div>
+            </v-container>
         </v-main>
 
         <v-footer
@@ -19,12 +19,11 @@
             <div class="boxed-container w-full">
                 <div class="mx-6 d-flex justify-space-between">
           <span>
-            &copy; 2021 <a
-              href="https://themeselection.com"
+            &copy; 2021
+              <a
               class="text-decoration-none"
-              target="_blank"
-          >ThemeSelection</a></span>
-
+          >copito</a>
+          </span>
                 </div>
             </div>
         </v-footer>

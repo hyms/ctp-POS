@@ -3728,7 +3728,7 @@ progress {
 
 .v-application .blockquote {
     padding: 16px 0 16px 24px;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 300;
 }
 
@@ -3764,7 +3764,7 @@ progress {
 }
 
 html {
-    font-size: 16px;
+    font-size: 14px;
     overflow-x: hidden;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -20376,7 +20376,7 @@ html.overflow-y-hidden {
     color: rgba(255, 255, 255, 0.5);
 }
 .theme--dark.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
-    color: #FFFFFF;
+    color: #FFFFFFCC;
 }
 .theme--dark.v-list-item .v-list-item__mask {
     color: rgba(255, 255, 255, 0.5);

@@ -2,6 +2,9 @@ import './bootstrap';
 
 import Vue from 'vue';
 import Vuetify from 'vuetify'
+
+// import 'vuetify/dist/vuetify.min.css'
+
 import {createInertiaApp} from '@inertiajs/inertia-vue';
 import {InertiaProgress} from '@inertiajs/progress';
 

@@ -1,131 +1,295 @@
 <template>
     <div>
-        <v-navigation-drawer
-            v-model="isDrawerOpen"
-            app
-            temporary
-            class="app-navigation-menu"
-        >
-            <!-- Navigation Header -->
-            <div class="vertical-nav-header d-flex items-center ps-6 pe-5 pt-5 pb-2">
-                <Link
-                    href="/"
-                    class="d-flex align-center text-decoration-none"
-                >
-                    <v-img
-                        src=""
-                        max-height="30px"
-                        max-width="30px"
-                        alt="logo"
-                        contain
-                        eager
-                        class="app-logo me-3"
-                    ></v-img>
-                    <v-slide-x-transition>
-                        <h2 class="app-title text--primary">
-                            MATERIO
-                        </h2>
-                    </v-slide-x-transition>
-                </Link>
-            </div>
-
-            <!-- Navigation Items -->
-            <v-list
-                expand
-                shaped
-                class="vertical-nav-menu-items pr-5"
-            >
-                <v-list-item
-                    class="vertical-nav-menu-link"
-                    active-class="bg-gradient-primary white--text"
-                >
-                    <v-list-item-title>
-                        Dashboard
-                    </v-list-item-title>
-                </v-list-item>
-
-
-                <v-list-group
-                    ref="refVListGroup"
-                    class="vertical-nav-menu-group text--primary"
-                >
-                    <template #activator>
-                        <v-list-item-title>
-                            group
-                        </v-list-item-title>
-                    </template>
-
-                    <v-list-item
-                        class="vertical-nav-menu-link"
-                        active-class="bg-gradient-primary white--text"
-                    >
-                        <v-list-item-title>
-                            Account Settings
-                        </v-list-item-title>
-                    </v-list-item>
-                </v-list-group>
-                <v-subheader>
-    <span
-        class="title-wrapper"
-    >
-      <span>USER INTERFACE</span>
-    </span>
-                </v-subheader>
-                <v-list-item
-                    class="vertical-nav-menu-link"
-                    active-class="bg-gradient-primary white--text"
-                >
-                    <v-list-item-title>
-                        Typography
-                    </v-list-item-title>
-                </v-list-item>
-            </v-list>
-        </v-navigation-drawer>
-
         <v-app-bar
             app
             flat
             absolute
-            color="transparent"
+            color="white"
         >
-            <div class="boxed-container w-full">
-                <div class="d-flex align-center mx-6">
-                    <!-- Left Content -->
-                    <v-app-bar-nav-icon
-                        class="d-block d-lg-none me-2"
-                        @click="isDrawerOpen = !isDrawerOpen"
-                    ></v-app-bar-nav-icon>
-                    <v-text-field
-                        rounded
-                        dense
-                        outlined
-                        class="app-bar-search flex-grow-0"
-                        hide-details
-                    ></v-text-field>
+            <v-app-bar-nav-icon @click="isDrawerOpen = !isDrawerOpen"></v-app-bar-nav-icon>
 
-                    <v-spacer></v-spacer>
-
-                    <!-- Right Content -->
-                    <app-bar-user-menu></app-bar-user-menu>
-                </div>
-            </div>
+            <v-toolbar-title>{{ title }}</v-toolbar-title>
         </v-app-bar>
+        <v-navigation-drawer
+            v-model="isDrawerOpen"
+            app
+            class="app-navigation-menu"
+            mobile-breakpoint="961"
+            dark
+            color="#3c4b64"
+        >
+            <!-- Navigation Header -->
+            <div class="vertical-nav-header d-flex text-center justify-center">
+                <h2 class="d-flex align-center app-title white--text">
+                    xCTP
+                </h2>
+            </div>
+
+
+            <template v-for="(value) in menu">
+                <v-subheader>
+                    <span class="title-wrapper text-uppercase">{{ value.titulo }}</span>
+                </v-subheader>
+                <v-list
+                    nav
+                >
+                    <v-list-item-group>
+                    <!-- Navigation Items -->
+                    <template v-for="(link, key) in value.submenu">
+                        <template v-if="Object.values(link).length===1">
+                            <v-list-group
+                                v-if="getAllPermission(Object.values(link)[0])" class="text-capitalize"
+                            >
+                                <template #activator>
+                                    <v-list-item-content>
+                                        <v-list-item-title>
+                                            {{ Object.keys(link)[0] }}
+                                        </v-list-item-title>
+                                    </v-list-item-content>
+                                </template>
+                                        <template v-for="(link2, key2) in Object.values(link)[0]">
+                                            <template v-if="getPermission(link2.role)">
+
+                                                <Link
+                                                    :href="link2.url"
+                                                    :key="key2"
+                                                    class="v-list-item v-list-item--link theme--dark"
+                                                >
+                                                    <v-list-item-icon>
+                                                        <v-icon></v-icon>
+                                                    </v-list-item-icon>
+                                                        <v-list-item-title>
+                                                            {{ link2.label }}
+                                                        </v-list-item-title>
+                                                </Link>
+
+                                            </template>
+
+                                        </template>
+
+                            </v-list-group>
+                        </template>
+                        <template v-else>
+                            <template v-if="getPermission(link.role)">
+                                <Link
+                                    :href="link.url"
+                                    :key="key"
+                                    class="v-list-item v-list-item--link theme--dark"
+                                >
+                                    <v-list-item-content>
+                                        <v-list-item-title>
+                                            <span class="text-capitalize">{{ link.label }}</span>
+                                        </v-list-item-title>
+                                    </v-list-item-content>
+
+                                </Link>
+                            </template>
+                        </template>
+                    </template>
+                    </v-list-item-group>
+                </v-list>
+            </template>
+            <template v-slot:append>
+                <div class="pa-2">
+                    <Link :href="route('logout')" method="post" class="v-list-item theme--light">
+                        <v-btn block color="primary">
+                            Salir
+                        </v-btn>
+                    </Link>
+                </div>
+            </template>
+        </v-navigation-drawer>
     </div>
 </template>
 
 <script>
 // eslint-disable-next-line object-curly-newline
-import AppBarUserMenu from './AppBarUserMenu.vue'
+import {Link} from '@inertiajs/inertia-vue'
 
 export default {
-    components:{
-        AppBarUserMenu,
+    components: {
+        Link
+    },
+    props: {
+        title: {
+            type: String,
+            default: "xCTP",
+        },
     },
     data() {
         return {
             isDrawerOpen: null,
+            menu: [
+                {
+                    titulo: 'Agencia',
+                    submenu: [
+                        {
+                            Ordenes: [
+                                {
+                                    label: 'Nuevas Ordenes',
+                                    url: '/ordenes',
+                                    role: 'all',
+                                },
+                                {
+                                    label: 'Buscar Ordenes',
+                                    url: '/realizados',
+                                    role: 'all',
+                                },
+                            ]
+                        },
+                        {
+                            Recibos: [
+                                {
+                                    label: 'Egresos',
+                                    url: '/recibosEgreso',
+                                    role: 'vendor',
+                                },
+                                {
+                                    label: 'Ingresos',
+                                    url: '/recibosIngreso',
+                                    role: 'vendor',
+                                },
+                            ]
+                        },
+                        {
+                            label: 'Caja Chica',
+                            url: '/cajaDebito',
+                            role: 'vendor',
+                        },
+                        {
+                            Inventario: [
+                                {
+                                    label: 'Ingresos',
+                                    url: '/inventario/ingreso',
+                                    role: 'vendor'
+                                },
+                                {
+                                    label: 'Egresos',
+                                    url: '/inventario/egreso',
+                                    role: 'vendor'
+                                },
+                                {
+                                    label: 'Saldos',
+                                    url: '/inventario/saldos',
+                                    role: 'vendor'
+                                },
+                            ]
+                        },
+                        {
+                            reportes: [
+                                {
+                                    label: 'Registro Diario',
+                                    url: '/reportes/placas',
+                                    role: 'vendor',
+                                },
+                                {
+                                    label: 'Rendicion Diaria',
+                                    url: '/reportes/diario',
+                                    role: 'vendor',
+                                },
+                                {
+                                    label: 'Reporte cliente',
+                                    url: '/reportes/cliente',
+                                    role: 'vendor',
+                                },
+                            ]
+                        },
+
+
+                    ]
+                },
+                {
+                    titulo: 'Administracion',
+                    submenu: [
+                        {
+                            label: 'Reportes',
+                            url: '/admin/reportes/placas',
+                            role: 'admin',
+                        },
+                        {
+                            label: 'Clientes',
+                            url: '/admin/clientes',
+                            role: 'all',
+                        },
+                        {
+                            Productos: [
+                                {
+                                    label: 'Productos',
+                                    url: '/admin/productos',
+                                    role: 'admin',
+                                },
+                                {
+                                    url: '/admin/tipoProductos',
+                                    label: 'Tipo Productos',
+                                    role: 'admin',
+                                },
+                                {
+                                    url: '/admin/stocks',
+                                    label: 'Stocks',
+                                    role: 'admin',
+                                },
+                                // {
+                                //     url: 'movimientosStock',
+                                //     label: 'Movimientos',
+                                //     role: 'admin',
+                                // },
+                            ]
+                        },
+                        {
+                            Configuracion: [
+                                {
+                                    label: 'Sucursales',
+                                    url: '/admin/sucursales',
+                                    role: 'admin',
+                                },
+                                {
+                                    label: 'Cajas',
+                                    url: '/admin/cajas',
+                                    role: 'admin',
+                                },
+                                {
+                                    label: 'Usuarios',
+                                    url: '/admin/users',
+                                    role: 'admin',
+                                }
+                            ]
+                        },
+                    ]
+                }
+            ],
         }
     },
+    methods: {
+        getPermission(role) {
+            let value = false;
+            for (const key in this.$page.props.rolesP) {
+                if (key === role) {
+                    if (this.$page.props.rolesP[key].includes(this.$page.props.user.role)) {
+                        value = true;
+                        break;
+                    }
+                }
+            }
+            return value;
+        },
+        getAllPermission(data) {
+            let value = false;
+            for (const val of data) {
+                for (const key in this.$page.props.rolesP) {
+                    if (key === val.role) {
+                        if (this.$page.props.rolesP[key].includes(this.$page.props.user.role)) {
+                            value = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            return value;
+        },
+        getUrl() {
+            return window.location.pathname;
+        }
+    }
 }
 </script>
 
@@ -133,59 +297,24 @@ export default {
 .app-title {
     font-size: 1.25rem;
     font-weight: 700;
-    font-stretch: normal;
+    font-stretch: expanded;
     font-style: normal;
     line-height: normal;
     letter-spacing: 0.3px;
 }
 
-// ? Adjust this `translateX` value to keep logo in center when vertical nav menu is collapsed (Value depends on your logo)
-.app-logo {
-    transition: all 0.18s ease-in-out;
+.vertical-nav-header {
+    background: rgba(0, 0, 21, .2);
+    height: 64px;
+}
 
-    .v-navigation-drawer--mini-variant & {
-        transform: translateX(-4px);
+.vertical-nav-menu-link {
+    &.v-list-item--active {
+        box-shadow: 0 5px 10px -4px rgba(94, 86, 105, 0.42);
     }
 }
 
-.app-navigation-menu {
-    .v-list-item {
-        &.vertical-nav-menu-link {
-            ::v-deep .v-list-item__icon {
-                .v-icon {
-                    transition: none !important;
-                }
-            }
-        }
-    }
+.vertical-nav-menu-group {
+
 }
-
-// You can remove below style
-// Upgrade Banner
-.app-navigation-menu {
-    .upgrade-banner {
-        position: absolute;
-        bottom: 13px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-}
-
-.v-app-bar ::v-deep {
-    .v-toolbar__content {
-        padding: 0;
-
-        .app-bar-search {
-            .v-input__slot {
-                padding-left: 18px;
-            }
-        }
-    }
-}
-
-//.boxed-container {
-//    max-width: 1440px;
-//    margin-left: auto;
-//    margin-right: auto;
-//}
 </style>
