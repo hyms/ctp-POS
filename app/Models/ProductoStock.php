@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -12,13 +14,13 @@ class ProductoStock extends Model
     public static string $tables = 'stock';
     protected $guarded = [];
 
-    public static function getAll(int $sucursal = null)
+    public static function getAll(int $sucursal = null): Collection
     {
-        $stock = DB::table(self::$tables);
+        $stock = new Generic(self::$tables);
         if (!empty($sucursal)) {
-            $stock = $stock->where('sucursal', '=', $sucursal);
+            return $stock->getAll(['sucursal' => $sucursal]);
         }
-        return $stock->get();
+        return $stock->getAll();
     }
 
     public static function more(array $request, bool $mov = true)
@@ -34,8 +36,8 @@ class ProductoStock extends Model
     private static function moreLess(array $request, bool $mov, bool $more)
     {
         $stock = DB::table(self::$tables)
-            ->where('sucursal', '=', $request['sucursal'])
-            ->where('producto', '=', $request['producto']);
+            ->where('sucursal', $request['sucursal'])
+            ->where('producto', $request['producto']);
         $cantidad = 0;
         if ($stock->count() > 0) {
             $cantidad = $stock->get()->first()->cantidad;
@@ -45,7 +47,7 @@ class ProductoStock extends Model
             : $cantidad - $request['cantidad'];
 
         $sucursalPadre = DB::table(Sucursal::$tables)
-            ->where('id', '=', $request['sucursal'])
+            ->where('id', $request['sucursal'])
             ->get('dependeDe')->first()->dependeDe;
         $values = array(
             'cantidad' => $cantidad,
@@ -91,8 +93,8 @@ class ProductoStock extends Model
                 'cantidad' => $request['cantidad'],
                 'observaciones' => $observaciones,
                 'user' => Auth::id(),
-                'created_at' => now(),
-                'updated_at' => now()
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
             ]);
         }
         return $stock;
@@ -123,8 +125,8 @@ class ProductoStock extends Model
                 'observaciones' => (($reposicion) ? "reposicion de insumos" : "venta de insumos"),
                 'detalleOrden' => !empty($request['detalleOrden']) ? $request['detalleOrden'] : "",
                 'user' => Auth::id(),
-                'created_at' => now(),
-                'updated_at' => now()
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
             ]);
         }
         return $stock;

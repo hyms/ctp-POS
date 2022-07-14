@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -13,7 +15,7 @@ class Cajas extends Model
     protected static string $tables = 'cajas';
     protected $guarded = [];
 
-    public static function getAll(int $sucursal = null, int $caja_padre = null): \Illuminate\Support\Collection
+    public static function getAll(int $sucursal = null, int $caja_padre = null): Collection
     {
         $cajas = DB::table(self::$tables);
         if (!empty($sucursal)) {
@@ -31,13 +33,8 @@ class Cajas extends Model
         return $cajas->get();
     }
 
-    public static function getOne(int $sucursal): \Illuminate\Database\Query\Builder
-    {
-        return DB::table(self::$tables)
-            ->where('sucursal', $sucursal);
-    }
 
-    public static function sell(array $request, bool $mov = true): \Illuminate\Database\Query\Builder
+    public static function sell(array $request, bool $mov = true): Builder
     {
         $caja = DB::table(self::$tables)
             ->where('sucursal', $request['sucursal']);

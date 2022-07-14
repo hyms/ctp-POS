@@ -59,32 +59,26 @@ class User extends Authenticatable
             ->select(self::$tables . '.*', Sucursal::$tables . '.nombre as nombreSucursal')
             ->leftJoin(Sucursal::$tables, Sucursal::$tables . '.id', '=', self::$tables . '.sucursal');
         $users = $users->get();
-        foreach ($users as $key => $user) {
-            $users[$key]->nombreRol = self::getRole($user->role);
-        }
+        $users->transform(function ($item, $key) {
+            $item->nombreRol = self::getRole($item->role);
+            return $item;
+        });
         return $users;
     }
 
-    public static function getRole($int = null)
+    public static function getRole($id = null): array|string
     {
-        $roles = array(
-            '0' => 'sadmin',
-            '1' => 'admin',
-            '2' => 'venta',
-            '3' => 'operario',
-            '4' => 'diseño',
-            '5' => 'auxVenta'
-        );
-        if ($int === null) {
-            return array(
-                ['value' => '0', 'text' => 'sadmin'],
-                ['value' => '1', 'text' => 'admin'],
-                ['value' => '2', 'text' => 'venta'],
-                ['value' => '3', 'text' => 'operario'],
-                ['value' => '4', 'text' => 'diseño'],
-                ['value' => '5', 'text' => 'auxVenta'],
-            );
+        $roles = collect([
+            ['value' => '0', 'text' => 'sadmin'],
+            ['value' => '1', 'text' => 'admin'],
+            ['value' => '2', 'text' => 'venta'],
+            ['value' => '3', 'text' => 'operario']
+        ]);
+
+        if ($id === null) {
+            return $roles->all();
         }
-        return $roles[$int];
+
+        return $roles->firstWhere('value', '=', $id)->value('text');
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 
 class Recibo extends Model
 {
@@ -25,25 +26,16 @@ class Recibo extends Model
             ->insertGetId([
                 'cajaOrigen' => null,
                 'cajaDestino' => $idcaja,
-                'tipo' => 4,
+                'tipo' => MovimientoCaja::$tipoMoviminto->recibos,
                 'monto' => $request['monto'],
                 'observaciones' => "Pago de Deuda",
                 'ordenTrabajo' => !empty($ordenTrabajo) ? $ordenTrabajo : "",
                 'user' => Auth::id(),
-                'created_at' => now(),
-                'updated_at' => now()
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]);
         DB::transaction(function () use ($request, $idMovimiento) {
-            $secuencia = 1;
-            $ot = DB::table(self::$tables)
-                ->where('sucursal', '=', $request['sucursal'])
-                ->where('tipo', '=', 0)
-                ->orderBy('secuencia', 'desc')
-                ->limit(1);
-            if ($ot->count() > 0) {
-                $secuencia = $ot->get()->first()->secuencia + 1;
-            }
-            $request['secuencia'] = $secuencia;
+            $request['secuencia'] = self::getSecuencia($request['sucursal'], 0);
             $request['movimientoCaja'] = $idMovimiento;
             DB::table(self::$tables)
                 ->insertGetId($request);
@@ -56,24 +48,15 @@ class Recibo extends Model
             ->insertGetId([
                 'cajaOrigen' => ($tipo) ? $idcaja : null,
                 'cajaDestino' => ($tipo) ? null : $idcaja,
-                'tipo' => 4,
+                'tipo' => MovimientoCaja::$tipoMoviminto->recibos,
                 'monto' => $request['monto'],
                 'observaciones' => $request['detalle'],
                 'user' => Auth::id(),
-                'created_at' => now(),
-                'updated_at' => now()
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]);
         DB::transaction(function () use ($request, $idMovimiento, $tipo) {
-            $secuencia = 1;
-            $ot = DB::table(self::$tables)
-                ->where('sucursal', '=', $request['sucursal'])
-                ->orderBy('secuencia', 'desc')
-                ->where('tipo', '=', $tipo)
-                ->limit(1);
-            if ($ot->count() > 0) {
-                $secuencia = $ot->get()->first()->secuencia + 1;
-            }
-            $request['secuencia'] = $secuencia;
+            $request['secuencia'] = self::getSecuencia($request['sucursal'], $tipo);
             $request['movimientoCaja'] = $idMovimiento;
             DB::table(self::$tables)
                 ->insertGetId($request);
@@ -82,42 +65,38 @@ class Recibo extends Model
 
     public static function getAll(int $sucursal, int $tipo, array $report = [])
     {
-        $recibos = DB::table(self::$tables)
-            ->where('sucursal', '=', $sucursal)
-            ->orderBy('created_at', 'desc')
-            ->whereNull('deleted_at');
-        if (isset($report)) {
-            if (isset($report['fechaI']) && isset($report['fechaF'])) {
-                $fechaI = Carbon::parse($report['fechaI']);
-                $fechaF = Carbon::parse($report['fechaF']);
-                $recibos = $recibos->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()]);
-            }
-            if (isset($report['detalle'])) {
-                $recibos = $recibos->where('detalle', 'like', "%{$report['detalle']}%");
-            }
-            if (isset($report['secuencia'])) {
-                $recibos = $recibos->where('secuencia', '=', $report['secuencia']);
-            }
-            if (isset($report['nombre'])) {
-                $recibos = $recibos->where('nombre', '=', $report['nombre']);
-            }
-        } else {
-            $recibos = $recibos->limit(500);
+        $recibos = new Generic(self::$tables);
+        if (!empty($report)) {
+            $report['sucursal'] = $sucursal;
+            $report['tipo'] = $tipo;
+            return $recibos->getAll($report);
         }
-        $recibos = $recibos->where('tipo', '=', $tipo);
-        return $recibos->get();
+        return $recibos->getAll(['sucursal' => $sucursal, 'tipo' => $tipo], false, 500);
     }
 
-    public static function getAllOrdenes(array $ordenes): array
+    public static function setRecibos(Collection $ordenes): Collection
     {
-        if (!empty($ordenes)) {
-            foreach ($ordenes as $key => $item) {
-                $detalle = DB::table(self::$tables)
-                    ->where('orden', '=', $item->id)
-                    ->get()->toArray();
-                $ordenes[$key]->recibos = $detalle;
-            }
-        }
+        $ordenes->transform(function ($item, $key) {
+            $item->recibos = DB::table(self::$tables)
+                ->where('orden', $item->id)
+                ->get()->toArray();
+            return $item;
+        });
+
         return $ordenes;
+    }
+
+    private static function getSecuencia($sucursal, $tipo): int
+    {
+        $secuencia = 1;
+        $ot = DB::table(self::$tables)
+            ->where('sucursal', '=', $sucursal)
+            ->orderBy('secuencia', 'desc')
+            ->where('tipo', '=', $tipo)
+            ->limit(1);
+        if ($ot->count() > 0) {
+            $secuencia = $ot->get()->first()->secuencia + 1;
+        }
+        return $secuencia;
     }
 }

@@ -18,6 +18,15 @@ class MovimientoCaja extends Model
     // 2 cajaChica
     // 3
     // 4 Recibos
+
+    public static object $tipoMoviminto=(object)[
+        'ordenes'=>0,
+        'ordenesV'=>1,
+        'cajaChica'=>2,
+        'cajaChicaV'=>3,
+        'recibos'=>4,
+    ];
+
     public static function getAllOrdenes(array $ordenes)
     {
 

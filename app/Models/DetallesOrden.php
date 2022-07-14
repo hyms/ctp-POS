@@ -38,15 +38,6 @@ class DetallesOrden extends Model
 
     public static function setAllDetalles(Collection $ordenes): Collection
     {
-//        $ordenes = $ordenes;
-//        if (!$ordenes->isEmpty()) {
-//            foreach ($ordenes as $key => $item) {
-//                $detalle = DB::table(self::$tables)
-//                    ->where('ordenTrabajo',  $item->id)
-//                    ->get()->toArray();
-//                $ordenes[$key]->detallesOrden = $detalle;
-//            }
-//        }
         $ordenes->transform(function ($item, $key) {
             $item->detallesOrden = DB::table(self::$tables)
                 ->where('ordenTrabajo', $item->id)

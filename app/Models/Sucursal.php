@@ -14,14 +14,11 @@ class Sucursal extends Model
 
     public static function getAll(bool $isAdm = False): Collection
     {
-        $sucursales = DB::table(self::$tables);
+        $sucursales = new Generic(self::$tables);
         if (!$isAdm) {
-            $sucursales = $sucursales->where('enable', '=', '1');
+            return $sucursales->getAll(['enable' => '1']);
         }
-        $sucursales = $sucursales
-            ->whereNull('deleted_at')
-            ->orderBy('updated_at', 'desc');
-        return $sucursales->get();
+        return $sucursales->getAll();
     }
 
 }
