@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class Producto extends Model
@@ -11,13 +12,9 @@ class Producto extends Model
     public static string $tables = 'productos';
     protected $guarded = [];
 
-    public static function getAll()
+    public static function getAll(): Collection
     {
-        $productos = DB::table(self::$tables);
-        $productos = $productos
-            ->whereNull('deleted_at')
-            ->orderBy('updated_at', 'desc');
-        return $productos->get();
-
+        $productos = new Generic(self::$tables);
+        return $productos->getAll();
     }
 }

@@ -38,48 +38,14 @@ class OrdenesTrabajo extends Model
 
     public static function getAll(int $sucursal = null, int $usuario = null, array $report = [], int $tipo = null): Collection
     {
-        $ordenes = DB::table(self::$tables);
-        $ordenes = $ordenes
-            ->whereNull('deleted_at')
-            ->orderBy('created_at', 'desc');
-        if (!empty($sucursal)) {
-            $ordenes = $ordenes->where('sucursal', $sucursal);
-        }
-        if (!empty($usuario)) {
-            $ordenes = $ordenes->where('userDiseñador', $usuario);
-        }
-        if (!empty($tipo)) {
-            $ordenes = $ordenes->where('tipoOrden', $tipo);
-        }
+        $ordenes = new Generic(self::$tables);
         if (!empty($report)) {
-            if (isset($report['fecha'])) {
-                $fecha = Carbon::parse($report['fecha']);
-                $ordenes = $ordenes->whereBetween('created_at', [$fecha->startOfDay()->toDateTimeString(), $fecha->endOfDay()->toDateTimeString()]);
-            }
-            if (isset($report['fechaI']) && isset($report['fechaF'])) {
-                $fechaI = Carbon::parse($report['fechaI']);
-                $fechaF = Carbon::parse($report['fechaF']);
-                $ordenes = $ordenes->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()]);
-            }
-            if (isset($report['orden'])) {
-                $ordenes = $ordenes->where('correlativo', $report['orden']);
-            }
-            if (isset($report['responsable'])) {
-                $ordenes = $ordenes->where('responsable', $report['responsable']);
-            }
-            if (isset($report['cliente'])) {
-                $ordenes = $ordenes->where('cliente', $report['cliente']);
-            }
-            if (isset($report['estado'])) {
-                $ordenes = $ordenes->where('estado', $report['estado']);
-            }
-            if (isset($report['tipo'])) {
-                $ordenes = $ordenes->where('tipoOrden', $report['tipo']);
-            }
-        } else {
-            $ordenes->limit(500);
+            $report['sucursal'] = $sucursal;
+            $report['userDiseñador'] = $usuario;
+            $report['tipoOrden'] = $tipo;
+            return $ordenes->getAll($report);
         }
-        return $ordenes->get();
+        return $ordenes->getAll(['sucursal' => $sucursal, 'userDiseñador' => $usuario, 'tipoOrden', $tipo], false, 500);
     }
 
     public static function newOrden(array $orden, array $productos, int $id = null, bool $reposicion = false)

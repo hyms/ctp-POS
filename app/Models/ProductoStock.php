@@ -83,7 +83,7 @@ class ProductoStock extends Model
             } else {
                 $origen = $stock->get()->first()->id;
                 $destino = ((!empty($stockOrigen) && $stockOrigen->count() > 0) ? $stockOrigen->get()->first()->id : null);
-                $observaciones = ((!empty($stockOrigen) && $stockOrigen->count() > 0) ? "Devolucion de insumos" : "devolucion de compra");
+                $observaciones = ((!empty($stockOrigen) && $stockOrigen->count() > 0) ? "Devolucion de insumos" : "Devolucion de compra");
             }
 
             $movimiento->insert([
@@ -153,20 +153,23 @@ class ProductoStock extends Model
         return $stock;
     }
 
-    public static function getProducts($sucursal = null, array $tiposProductos = [])
+    public static function getProducts($sucursal = null, array $tiposProductos = []): Collection
     {
         $stock = self::product($sucursal);
         $stock->orderBy('productos.formato', 'asc');
         $stock->select(self::$tables . '.*', Producto::$tables . '.codigo', Producto::$tables . '.formato', Producto::$tables . '.dimension');
 
         if ($tiposProductos) {
-            $stocks = array();
+            $stocks = Collection::empty();
             foreach ($tiposProductos as $tiposProducto) {
                 $stockTmp = $stock->clone();
-                $productosTipos = DB::table('productoTipo')
-                    ->where('tipoProducto', '=', $tiposProducto->id);
-                $productosTipos = $productosTipos->pluck('producto');
-                $stocks[$tiposProducto->id] = $stockTmp->whereIn('productos.id', $productosTipos)->get()->toArray();
+                $productosTipos = DB::table(TipoProductos::$tablesAlter)
+                    ->where('tipoProducto', '=', $tiposProducto->id)
+                    ->pluck('producto');
+                $stocks[$tiposProducto->id] = $stockTmp
+                    ->whereIn(  Producto::$tables.'.id', $productosTipos)
+                    ->get()
+                    ->toArray();
             }
             return $stocks;
         }
@@ -192,14 +195,14 @@ class ProductoStock extends Model
     {
         $stock = DB::table(self::$tables);
         if (!empty($sucursal)) {
-            $stock->where('sucursal', '=', $sucursal);
+            $stock->where(self::$tables.'.sucursal', '=', $sucursal);
         }
-        $stock->where('enable', '=', true);
+        $stock->where(self::$tables.'.enable', '=', true);
         if (!empty($id)) {
             $stock->where(self::$tables . '.id', '=', $id);
         }
-        $stock->leftJoin(Producto::$tables, 'producto', '=', 'productos.id');
-        $stock->whereNull('productos.deleted_at');
+        $stock->leftJoin(Producto::$tables, self::$tables . 'producto', '=', Producto::$tables.'.id');
+        $stock->whereNull(Producto::$tables.'.deleted_at');
         return $stock;
     }
 }

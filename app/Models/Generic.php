@@ -28,6 +28,10 @@ class Generic
         if (isset($filters['tipo'])) {
             $collection = $collection->where('tipo', $filters['tipo']);
         }
+        if (isset($filters['fecha'])) {
+            $fecha = Carbon::parse($filters['fecha']);
+            $collection = $collection->whereBetween('created_at', [$fecha->startOfDay()->toDateTimeString(), $fecha->endOfDay()->toDateTimeString()]);
+        }
         if (isset($filters['fechaI']) && isset($filters['fechaF'])) {
             $fechaI = Carbon::parse($filters['fechaI']);
             $fechaF = Carbon::parse($filters['fechaF']);
@@ -42,6 +46,22 @@ class Generic
         if (isset($filters['nombre'])) {
             $collection = $collection->where('nombre', '=', $filters['nombre']);
         }
+        if (isset($report['orden'])) {
+            $collection = $collection->where('correlativo', $report['orden']);
+        }
+        if (isset($report['responsable'])) {
+            $collection = $collection->where('responsable', $report['responsable']);
+        }
+        if (isset($report['cliente'])) {
+            $collection = $collection->where('cliente', $report['cliente']);
+        }
+        if (isset($report['estado'])) {
+            $collection = $collection->where('estado', $report['estado']);
+        }
+        if (isset($report['tipoOrden'])) {
+            $collection = $collection->where('tipoOrden', $report['tipoOrden']);
+        }
+
         if (!empty($limit)) {
             $collection = $collection->limit($limit);
         }
