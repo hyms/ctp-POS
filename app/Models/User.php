@@ -2,16 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected $table = 'users';
+    public static string $tables = 'users';
+    protected $guarded = [];
     /**
      * The attributes that are mass assignable.
      *
@@ -19,6 +23,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
     ];
@@ -41,4 +46,45 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getNameAttribute(): string
+    {
+        return $this->nombre . ' ' . $this->apellido;
+    }
+
+    public static function getAll(): Collection
+    {
+        $users = DB::table(self::$tables)
+            ->whereNull(self::$tables . '.deleted_at')
+            ->select(self::$tables . '.*', Sucursal::$tables . '.nombre as nombreSucursal')
+            ->leftJoin(Sucursal::$tables, Sucursal::$tables . '.id', '=', self::$tables . '.sucursal');
+        $users = $users->get();
+        foreach ($users as $key => $user) {
+            $users[$key]->nombreRol = self::getRole($user->role);
+        }
+        return $users;
+    }
+
+    public static function getRole($int = null)
+    {
+        $roles = array(
+            '0' => 'sadmin',
+            '1' => 'admin',
+            '2' => 'venta',
+            '3' => 'operario',
+            '4' => 'diseño',
+            '5' => 'auxVenta'
+        );
+        if ($int === null) {
+            return array(
+                ['value' => '0', 'text' => 'sadmin'],
+                ['value' => '1', 'text' => 'admin'],
+                ['value' => '2', 'text' => 'venta'],
+                ['value' => '3', 'text' => 'operario'],
+                ['value' => '4', 'text' => 'diseño'],
+                ['value' => '5', 'text' => 'auxVenta'],
+            );
+        }
+        return $roles[$int];
+    }
 }
