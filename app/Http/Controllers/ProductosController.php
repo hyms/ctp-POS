@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Producto;
 use App\Models\TipoProductos;
 use Exception;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -43,10 +42,10 @@ class ProductosController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            $producto = new Producto();
-            if (!empty($request['id'])) {
-                $producto = Producto::find($request['id']);
-            }
+
+            $producto = !empty($request['id'])
+                ? Producto::find($request['id'])
+                : new Producto();
             $producto->fill($request->except('productoTipo'));
             $producto->save();
             if(isset($request['productoTipo']))
@@ -86,10 +85,10 @@ class ProductosController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            $producto = new TipoProductos();
-            if (!empty($request['id'])) {
-                $producto = TipoProductos::find($request['id']);
-            }
+
+            $producto = !empty($request['id'])
+                ? TipoProductos::find($request['id'])
+                : new TipoProductos();
             $producto->fill($request->all());
             $producto->save();
             return response()->json(["status" => 0, 'path' => ' tipoProductos']);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Sucursal;
 use App\Models\User;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -38,10 +39,10 @@ class UserController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            $usuarios = new User();
-            if (!empty($request['id'])) {
-                $usuarios = User::find($request['id']);
-            }
+
+            $usuarios = !empty($request['id'])
+                ? User::find($request['id'])
+                : new User();
             if (!empty($request['password']) && (strcmp($usuarios->password, $request['password']) !== 0)) {
                 $usuarios->password = Hash::make($request['password']);
             }

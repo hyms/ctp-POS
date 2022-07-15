@@ -13,23 +13,26 @@ use Inertia\Inertia;
 
 class ReciboController extends Controller
 {
-    public function getAll(int $tipo,Request $request)
+    public function getAll(int $tipo, Request $request)
     {
-        $recibos = Recibo::getAll(Auth::user()['sucursal'],$tipo,$request->all());
+        $recibos = Recibo::getAll(Auth::user()['sucursal'], $tipo, $request->all());
         return Inertia::render('Recibos/tabla', [
             'recibos' => $recibos,
-            'tipo'=>$tipo,
-            'report'=>(object)$request->all()
+            'tipo' => $tipo,
+            'report' => (object)$request->all()
         ]);
     }
+
     public function getIngreso(Request $request)
     {
-        return $this->getAll(0,$request);
+        return $this->getAll(0, $request);
     }
+
     public function getEgreso(Request $request)
     {
-        return $this->getAll(1,$request);
+        return $this->getAll(1, $request);
     }
+
     public function post(Request $request)
     {
         try {
@@ -61,10 +64,10 @@ class ReciboController extends Controller
                 'userVenta' => Auth::id(),
             ];
             $caja = Cajas::getOne(Auth::user()['sucursal']);
-            Recibo::guardar($values, $caja->get()->first()->id,$request['tipo']);
+            Recibo::guardar($values, $caja->get()->first()->id, $request['tipo']);
             return response()->json([
                 'status' => 0,
-                'path'=>($request['tipo'])?'recibosEgreso':'recibosIngreso'
+                'path' => ($request['tipo']) ? 'recibosEgreso' : 'recibosIngreso'
             ]);
         } catch (Exception $error) {
             Log::error($error->getMessage());

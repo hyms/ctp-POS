@@ -39,10 +39,10 @@ class ClienteController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            $Cliente = new Cliente();
-            if (!empty($request['id'])) {
-                $Cliente = Cliente::find($request['id']);
-            }
+
+            $Cliente = !empty($request['id'])
+                ? Cliente::find($request['id'])
+                : new Cliente();
             $Cliente->fill($request->all());
 
             $Cliente->save();
@@ -56,8 +56,8 @@ class ClienteController extends Controller
 
     public function borrar($id)
     {
-        $Cliente = Cliente::find($id);
-        $Cliente->delete();
+        Cliente::find($id)
+            ->delete();
         return back()->withInput();
     }
 

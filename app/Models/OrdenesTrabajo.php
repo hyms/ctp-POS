@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -41,20 +42,22 @@ class OrdenesTrabajo extends Model
 
     }
 
-    public static function getAll(int $sucursal, int $usuario, int $tipo, array $report = []): Collection
+    public static function getAll(int $sucursal, int $usuario = null, int $tipo = null, Collection $report = null): Builder
     {
+        $isEmpty = (empty($report));
         $ordenes = new Generic(self::$tables);
-        if (!empty($report)) {
-            $report['sucursal'] = $sucursal;
-            $report['userDiseñador'] = $usuario;
-            $report['tipoOrden'] = $tipo;
-            return $ordenes->getAll($report);
+        $ordenes->onlyBuild = true;
+        if ($isEmpty) {
+            $report = Collection::empty();
         }
-        return $ordenes->getAll([
-            'sucursal' => $sucursal,
-            'userDiseñador' => $usuario,
-            'tipoOrden', $tipo
-        ], false, 500);
+        $report->push(['sucursal' => $sucursal]);
+        if ($usuario != null) {
+            $report->push(['userDiseñador' => $usuario]);
+        }
+        if ($usuario != null) {
+            $report->push(['tipoOrden' => $tipo]);
+        }
+        return $ordenes->getAll($report->all(), false, ($isEmpty) ? 500 : null);
     }
 
     public static function newOrden(array $orden, array $productos, int $id = null, bool $reposicion = false)

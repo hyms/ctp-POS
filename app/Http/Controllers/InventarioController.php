@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MovimientoStock;
 use App\Models\ProductoStock;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -76,25 +77,23 @@ class InventarioController extends Controller
             $products = json_decode($request['productos'], true);
             foreach ($products as $item) {
                 $stock = ProductoStock::find($item['id']);
-                if ($ingreso) {
-                    $stock->cantidad = $stock->cantidad + $item['cantidad'];
-                } else {
-                    $stock->cantidad = $stock->cantidad - $item['cantidad'];
-                }
+                $stock->cantidad = $ingreso
+                    ? ($stock->cantidad + $item['cantidad'])
+                    : ($stock->cantidad - $item['cantidad']);
                 $stock->save();
                 $movimiento = DB::table(MovimientoStock::$tables);
                 $movimiento->insert([
                     'producto' => $item['producto'],
-                    'stockOrigen' => (($ingreso) ? null : $item['id']),
-                    'stockDestino' => (($ingreso) ? $item['id'] : null),
+                    'stockOrigen' => ($ingreso ? null : $item['id']),
+                    'stockDestino' => ($ingreso ? $item['id'] : null),
                     'cantidad' => $item['cantidad'],
                     'observaciones' => $request['observaciones'],
                     'user' => Auth::id(),
-                    'created_at' => now(),
-                    'updated_at' => now()
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
                 ]);
             }
-            return response()->json(["status" => 0, 'path' => '/inventario/' . (($ingreso) ? 'ingreso' : 'egreso')]);
+            return response()->json(["status" => 0, 'path' => '/inventario/' . ($ingreso ? 'ingreso' : 'egreso')]);
         } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,

@@ -85,7 +85,7 @@ class PDFController extends Controller
             }
         }
         if ($item) {
-            return $item->formato . ' (' . $item->dimension . ')';
+            return "{$item->formato} ({$item->dimension})";
         }
         return "";
     }

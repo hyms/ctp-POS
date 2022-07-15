@@ -66,13 +66,13 @@ class Cajas extends Model
 
     static public function getSaldo($idCaja, $fechaMovimientosInicio, $fechaMovimientosFin, $array = false, $get = null, $admin = false): array
     {
-        $deudas = $array || isset($get['deudas']) ? array() : 0;
-        $ventas = $array || isset($get['ventas']) ? array() : 0;
-        $recibos = $array || isset($get['recibos']) ? array() : [0, 0];
-        $cajas = $array || isset($get['cajas']) ? array() : [0, 0];
-        $movimientosAll = isset($get['movimientos']) ? array() : null;
+        $deudas = $array || isset($get['deudas']) ? Collection::empty() : 0;
+        $ventas = $array || isset($get['ventas']) ? Collection::empty() : 0;
+        $recibos = $array || isset($get['recibos']) ? Collection::empty() : [0, 0];
+        $cajas = $array || isset($get['cajas']) ? Collection::empty() : [0, 0];
+        $movimientosAll = isset($get['movimientos']) ? Collection::empty() : null;
 
-        $arqueos = array();
+        $arqueos = Collection::empty();
         $movimientos = DB::table(MovimientoCaja::$tables)
             ->where(function ($query) use ($idCaja) {
                 $query->where('cajaOrigen', '=', $idCaja)
@@ -98,14 +98,10 @@ class Cajas extends Model
             switch ($movimiento->tipo) {
                 case 0:
                     if (isset($get['movimientos'])) {
-                        array_push($movimientosAll, $movimiento);
+                        $movimientosAll->add($movimiento);
                     }
                     if ($array || isset($get['deudas'])) {
-                        if (isset($movimiento->idParent0)) {
-                            if (isset($movimiento->idParent0->ordenCTPs[0]))
-                                $orden = $movimiento->idParent0->ordenCTPs[0];
-                            array_push($deudas, $orden);
-                        }
+                        $deudas->add( OrdenesTrabajo::find($movimiento->ordenTrabajo));
                     } else {
                         $deudas += $movimiento->monto;
                     }
@@ -114,22 +110,22 @@ class Cajas extends Model
                 case 1:
                     if (!empty($movimiento->ordenTrabajo)) {
                         if (isset($get['movimientos'])) {
-                            array_push($movimientosAll, $movimiento);
+                            $movimientosAll->add($movimiento);
                         }
                         if ($array || isset($get['ventas'])) {
-                            array_push($ventas, OrdenesTrabajo::getOne($movimiento->ordenTrabajo));
+                            $ventas->add( OrdenesTrabajo::find($movimiento->ordenTrabajo));
                         } else {
                             $ventas += $movimiento->monto;
                         }
+                        $total += $movimiento->monto;
                     }
-                    $total += $movimiento->monto;
                     break;
                 case 2:
                     if (isset($get['movimientos'])) {
-                        array_push($movimientosAll, $movimiento);
+                        $movimientosAll->add($movimiento);
                     }
                     if ($array || isset($get['cajas'])) {
-                        array_push($cajas, $movimiento);
+                        $cajas->add($movimiento);
                     } else {
                         if (isset($movimiento->cajaDestino)) {
                             $cajas[0] += $movimiento->monto;
@@ -140,19 +136,18 @@ class Cajas extends Model
                     $total += $movimiento->monto;
                     break;
                 case 3:
-                    array_push($arqueos, $movimiento);
+                    $arqueos->add($movimiento);
                     $total += $movimiento->monto;
                     break;
                 case 4:
                     $movimientoRecibo = DB::table(Recibo::$tables)
-                        ->where('movimientoCaja', '=', $movimiento->id);
+                        ->where('movimientoCaja', $movimiento->id);
                     if ($movimientoRecibo->count() > 0) {
                         if (isset($get['movimientos'])) {
-                            array_push($movimientosAll, $movimiento);
+                            $movimientosAll->add($movimiento);
                         }
                         if ($array || isset($get['recibos'])) {
-                            $tmp = $movimiento->recibos;
-                            array_push($recibos, $movimiento->recibos[0]);
+                            $recibos->add($movimientoRecibo->get()->first());
                         } else {
                             if ($movimientoRecibo->get()->first()->tipo) {
                                 $recibos[0] += $movimiento->monto;
