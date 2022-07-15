@@ -1,5 +1,16 @@
 <?php
 
+use App\Http\Controllers\CajaController;
+use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\InventarioController;
+use App\Http\Controllers\OrdenesController;
+use App\Http\Controllers\PDFController;
+use App\Http\Controllers\ProductosController;
+use App\Http\Controllers\ReciboController;
+use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\StockController;
+use App\Http\Controllers\SucursalController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
