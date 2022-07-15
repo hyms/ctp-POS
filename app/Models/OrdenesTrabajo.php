@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+
 //use Kutia\Larafirebase\Facades\Larafirebase;
 
 class OrdenesTrabajo extends Model
@@ -21,22 +22,26 @@ class OrdenesTrabajo extends Model
 
     static public function estadoCTP($id = null)
     {
-        $estado = [
+        $estado = collect([
             '-1' => 'Anulado',
             '0' => 'Pagado',
             '1' => 'En Proceso',
             '2' => 'Deuda',
             '5' => 'Quemado',
             '10' => 'Reposicion'
-        ];
-        if (empty($id)) {
-            return $estado;
+        ]);
+
+        if ($id === null) {
+            return $estado->all();
         }
 
-        return $estado[$id];
+        return $estado->first(function ($value, $key) use ($id) {
+            return $key > $id;
+        });
+
     }
 
-    public static function getAll(int $sucursal = null, int $usuario = null, array $report = [], int $tipo = null): Collection
+    public static function getAll(int $sucursal, int $usuario, int $tipo, array $report = []): Collection
     {
         $ordenes = new Generic(self::$tables);
         if (!empty($report)) {
@@ -45,7 +50,11 @@ class OrdenesTrabajo extends Model
             $report['tipoOrden'] = $tipo;
             return $ordenes->getAll($report);
         }
-        return $ordenes->getAll(['sucursal' => $sucursal, 'userDiseñador' => $usuario, 'tipoOrden', $tipo], false, 500);
+        return $ordenes->getAll([
+            'sucursal' => $sucursal,
+            'userDiseñador' => $usuario,
+            'tipoOrden', $tipo
+        ], false, 500);
     }
 
     public static function newOrden(array $orden, array $productos, int $id = null, bool $reposicion = false)
@@ -91,17 +100,21 @@ class OrdenesTrabajo extends Model
 
     public static function getReport(string $fechaI, string $fechaF, string $sucursal, string $tipo = null)
     {
-        $fechaRI = Carbon::parse($fechaI)->startOfDay();
-        $fechaRF = Carbon::parse($fechaF)->endOfDay();
-        $ordenes = DB::table(self::$tables)
-            ->whereBetween('updated_at', [$fechaRI->toDateTimeString(), $fechaRF->toDateTimeString()])
-            ->where('sucursal', $sucursal)
-            ->whereIn('estado', [0, 2, 5, -1, 10])
-            ->whereNull('deleted_at');
+        $ordenes = new Generic(self::$tables);
+        $ordenes->filterDate = 'updated_at';
+        $ordenes->onlyBuild = true;
+        $ordenes->orderBy = 'created_at';
+        $filter = collect([
+            'fechaI' => $fechaI,
+            'fechaF' => $fechaF,
+            'sucursal' => $sucursal
+        ]);
         if (!empty($tipo)) {
-            $ordenes = $ordenes->where('tipoOrden', $tipo);
+            $filter->add(['tipoOrden' => $tipo]);
         }
-        $ordenes = $ordenes->orderBy('created_at');
+        $ordenes = $ordenes->getAll($filter->all())
+            ->whereIn('estado', [0, 2, 5, -1, 10]);
+
         return $ordenes->get();
     }
 
@@ -122,12 +135,13 @@ class OrdenesTrabajo extends Model
             ]);
             return $orden['id'];
         }
-        return 0;
+        return null;
     }
 
     public static function deuda(array $orden, float $saldo, float $monto)
     {
         $ordenes = DB::table(self::$tables);
+        $orden['updated_at'] = Carbon::now();
         $realized = $ordenes
             ->where('id', $orden['id'])
             ->update($orden);
@@ -135,14 +149,14 @@ class OrdenesTrabajo extends Model
             $item = DB::table(self::$tables)->where('id', $orden['id'])->get()->first();
             $values = [
                 'codigo' => '',
-                'detalle' => 'pago de deuda de orden ' . (($item->tipoOrden == null) ? "#" . $item->correlativo : $item->codigoServicio),
+                'detalle' => 'pago de deuda de orden ' . (($item->tipoOrden == null) ? "#{$item->correlativo}" : $item->codigoServicio),
                 'nombre' => $item->responsable,
                 'ciNit' => '',
                 'codigoVenta' => $item->correlativo,
                 'orden' => $item->id,
                 'saldo' => $saldo,
                 'monto' => $monto,
-                'acuenta' => $saldo - $monto,
+                'acuenta' => ($saldo - $monto),
                 'tipo' => 0,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
@@ -177,10 +191,9 @@ class OrdenesTrabajo extends Model
                 $pagado += $movimiento->monto;
             }
         }
-        if (($total - $pagado) == 0) {
-            return $total;
-        }
-        return $total - $pagado;
+        return ($total - $pagado) == 0
+            ? $total
+            : ($total - $pagado);
     }
 
 //    public static function notifyNewOrden($idOrden)

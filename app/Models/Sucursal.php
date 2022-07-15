@@ -15,10 +15,9 @@ class Sucursal extends Model
     public static function getAll(bool $isAdm = False): Collection
     {
         $sucursales = new Generic(self::$tables);
-        if (!$isAdm) {
-            return $sucursales->getAll(['enable' => '1']);
-        }
-        return $sucursales->getAll();
+        return !$isAdm
+            ? $sucursales->getAll(['enable' => '1'])
+            : $sucursales->getAll();
     }
 
 }

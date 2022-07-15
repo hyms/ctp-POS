@@ -17,10 +17,9 @@ class ProductoStock extends Model
     public static function getAll(int $sucursal = null): Collection
     {
         $stock = new Generic(self::$tables);
-        if (!empty($sucursal)) {
-            return $stock->getAll(['sucursal' => $sucursal]);
-        }
-        return $stock->getAll();
+        return !empty($sucursal)
+            ? $stock->getAll(['sucursal' => $sucursal])
+            : $stock->getAll();
     }
 
     public static function more(array $request, bool $mov = true)

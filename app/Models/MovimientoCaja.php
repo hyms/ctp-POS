@@ -22,8 +22,8 @@ class MovimientoCaja extends Model
     public static object $tipoMovimiento=(object)[
         'ordenesVenta'=>0,
         'ordenesDevolucion'=>1,
-        'cajaChicaI'=>2,
-        'cajaChicaE'=>3,
+        'cajaChicaIngreso'=>2,
+        'cajaChicaEgreso'=>3,
         'recibos'=>4,
     ];
 

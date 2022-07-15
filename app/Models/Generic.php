@@ -11,7 +11,9 @@ class Generic
 {
     public function __construct(
         public string $table,
-        public bool $onlyBuild=false,
+        public bool $onlyBuild = false,
+        public string $orderBy = 'updated_at',
+        public string $filterDate = 'created_at',
     )
     {
     }
@@ -28,18 +30,6 @@ class Generic
         }
         if (isset($filters['tipo'])) {
             $collection = $collection->where('tipo', $filters['tipo']);
-        }
-        if (isset($filters['fecha'])) {
-            $fecha = Carbon::parse($filters['fecha']);
-            $collection = $collection->whereBetween('created_at', [$fecha->startOfDay()->toDateTimeString(), $fecha->endOfDay()->toDateTimeString()]);
-        }
-        if (isset($filters['fechaI']) && isset($filters['fechaF'])) {
-            $fechaI = Carbon::parse($filters['fechaI']);
-            $fechaF = Carbon::parse($filters['fechaF']);
-            $collection = $collection->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()]);
-        }
-        if (isset($filters['detalle'])) {
-            $collection = $collection->where('detalle', 'like', "%{$filters['detalle']}%");
         }
         if (isset($filters['secuencia'])) {
             $collection = $collection->where('secuencia', '=', $filters['secuencia']);
@@ -63,16 +53,28 @@ class Generic
             $collection = $collection->where('tipoOrden', $filters['tipoOrden']);
         }
         if (isset($filters['producto'])) {
-            $collection = $collection->where('producto',  $filters['producto']);
+            $collection = $collection->where('producto', $filters['producto']);
         }
         if (isset($filters['observaciones'])) {
             $collection = $collection->where('observaciones', 'like', "%{$filters['observaciones']}%");
         }
+        if (isset($filters['detalle'])) {
+            $collection = $collection->where('detalle', 'like', "%{$filters['detalle']}%");
+        }
         if (!empty($limit)) {
             $collection = $collection->limit($limit);
         }
+        if (isset($filters['fecha'])) {
+            $fecha = Carbon::parse($filters['fecha']);
+            $collection = $collection->whereBetween($this->filterDate, [$fecha->startOfDay()->toDateTimeString(), $fecha->endOfDay()->toDateTimeString()]);
+        }
+        if (isset($filters['fechaI']) && isset($filters['fechaF'])) {
+            $fechaI = Carbon::parse($filters['fechaI']);
+            $fechaF = Carbon::parse($filters['fechaF']);
+            $collection = $collection->whereBetween($this->filterDate, [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()]);
+        }
         $collection = $collection->whereNull('deleted_at');
-        $collection = $collection->orderBy('updated_at', ($asc) ? 'asc' : 'desc');
+        $collection = $collection->orderBy($this->orderBy, ($asc) ? 'asc' : 'desc');
 
         return $this->onlyBuild ? $collection : $collection->get();
     }

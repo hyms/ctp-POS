@@ -91,8 +91,8 @@ class Recibo extends Model
         $secuencia = 1;
         $ot = DB::table(self::$tables)
             ->where('sucursal', '=', $sucursal)
-            ->orderBy('secuencia', 'desc')
             ->where('tipo', '=', $tipo)
+            ->orderBy('secuencia', 'desc')
             ->limit(1);
         if ($ot->count() > 0) {
             $secuencia = $ot->get()->first()->secuencia + 1;

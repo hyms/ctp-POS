@@ -16,8 +16,8 @@ class MovimientoStock extends Model
     public static function gelAll(): Collection
     {
         $movimientos = DB::table(self::$tables)
-            ->leftJoin(User::$tables, 'user',  User::$tables . '.id')
-            ->leftJoin(ProductoStock::$tables . ' as so', 'stockOrigen',  '=','so.id')
+            ->leftJoin(User::$tables, 'user', User::$tables . '.id')
+            ->leftJoin(ProductoStock::$tables . ' as so', 'stockOrigen', '=', 'so.id')
             ->leftJoin(ProductoStock::$tables . ' as sd', 'stockDestino', '=', 'sd.id')
             ->select(self::$tables . '.*', 'so.sucursal as soSucursal', 'sd.sucursal as sdSucursal', User::$tables . '.nombre', User::$tables . '.apellido')
             ->orderBy(self::$tables . '.updated_at', 'DESC');
@@ -27,10 +27,10 @@ class MovimientoStock extends Model
     public static function getAllTable(array $stock, bool $ingreso, array $request = []): Collection
     {
         $movimientos = new Generic(self::$tables);
-        $movimientos->onlyBuild=true;
+        $movimientos->onlyBuild = true;
         $movimientos = isset($request)
             ? $movimientos->getAll($request)
-            : $movimientos->getAll([], false, 500);
+            : $movimientos->getAll(limit: 500);
 
         $movimientos = $ingreso
             ? $movimientos->whereIn('stockDestino', $stock)

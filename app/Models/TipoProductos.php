@@ -17,9 +17,8 @@ class TipoProductos extends Model
 
     public static function getAll(): Collection
     {
-        return DB::table(self::$tables)
-            ->whereNull('deleted_at')
-            ->get();
+        $tiposProductos = new Generic(self::$tables);
+        return $tiposProductos->getAll();
     }
 
     public static function getTipoProductoxProducto(Collection $productos): Collection
