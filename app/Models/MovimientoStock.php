@@ -26,26 +26,16 @@ class MovimientoStock extends Model
 
     public static function getAllTable(array $stock, bool $ingreso, array $request = []): Collection
     {
-        $movimientos = DB::table(self::$tables);
+        $movimientos = new Generic(self::$tables);
+        $movimientos->onlyBuild=true;
+        $movimientos = isset($request)
+            ? $movimientos->getAll($request)
+            : $movimientos->getAll([], false, 500);
+
         $movimientos = $ingreso
             ? $movimientos->whereIn('stockDestino', $stock)
             : $movimientos->whereIn('stockOrigen', $stock);
-        if (isset($request)) {
-            if (isset($request['fechaI']) && isset($request['fechaF'])) {
-                $fechaI = Carbon::parse($request['fechaI']);
-                $fechaF = Carbon::parse($request['fechaF']);
-                $movimientos = $movimientos->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()]);
-            }
-            if (isset($request['producto'])) {
-                $movimientos = $movimientos->where('producto',  $request['producto']);
-            }
-            if (isset($request['observaciones'])) {
-                $movimientos = $movimientos->where('observaciones', 'like', "%{$request['observaciones']}%");
-            }
-        } else {
-            $movimientos = $movimientos->limit(500);
-        }
-        $movimientos = $movimientos->orderBy(self::$tables . '.updated_at', 'DESC');
+
         return $movimientos->get();
     }
 }

@@ -19,11 +19,11 @@ class MovimientoCaja extends Model
     // 3
     // 4 Recibos
 
-    public static object $tipoMoviminto=(object)[
-        'ordenes'=>0,
-        'ordenesV'=>1,
-        'cajaChica'=>2,
-        'cajaChicaV'=>3,
+    public static object $tipoMovimiento=(object)[
+        'ordenesVenta'=>0,
+        'ordenesDevolucion'=>1,
+        'cajaChicaI'=>2,
+        'cajaChicaE'=>3,
         'recibos'=>4,
     ];
 

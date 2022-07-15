@@ -36,7 +36,7 @@ class DetallesOrden extends Model
             ->insert($detalles->toArray());
     }
 
-    public static function setAllDetalles(Collection $ordenes): Collection
+    public static function setAllDetalle(Collection $ordenes): Collection
     {
         $ordenes->transform(function ($item, $key) {
             $item->detallesOrden = DB::table(self::$tables)

@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Kutia\Larafirebase\Facades\Larafirebase;
+//use Kutia\Larafirebase\Facades\Larafirebase;
 
 class OrdenesTrabajo extends Model
 {

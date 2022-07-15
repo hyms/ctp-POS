@@ -19,7 +19,7 @@ class Cajas extends Model
     {
         $cajas = DB::table(self::$tables);
         if (!empty($sucursal)) {
-            $cajas = $cajas->where(self::$tables . '.enable', '1')
+            $cajas = $cajas->where(self::$tables . ".enable", '1')
                 ->where(self::$tables . '.sucursal', $sucursal);
         }
         if (!empty($caja_padre)) {
@@ -52,7 +52,7 @@ class Cajas extends Model
                 ->insertGetId([
                     'cajaOrigen' => null,
                     'cajaDestino' => $caja->get()->first()->id,
-                    'tipo' => 0,
+                    'tipo' => MovimientoCaja::$tipoMovimiento->ordenesVenta,
                     'monto' => $request['montoVenta'],
                     'observaciones' => "venta de insumos",
                     'ordenTrabajo' => !empty($request['ordenTrabajo']) ? $request['ordenTrabajo'] : "",

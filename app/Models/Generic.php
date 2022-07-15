@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -15,7 +16,7 @@ class Generic
     {
     }
 
-    public function getAll(array $filters = [], bool $asc = false, $limit = null): Collection
+    public function getAll(array $filters = [], bool $asc = false, $limit = null): Collection|Builder
     {
         $collection = DB::table($this->table);
 
@@ -46,30 +47,33 @@ class Generic
         if (isset($filters['nombre'])) {
             $collection = $collection->where('nombre', '=', $filters['nombre']);
         }
-        if (isset($report['orden'])) {
-            $collection = $collection->where('correlativo', $report['orden']);
+        if (isset($filters['orden'])) {
+            $collection = $collection->where('correlativo', $filters['orden']);
         }
-        if (isset($report['responsable'])) {
-            $collection = $collection->where('responsable', $report['responsable']);
+        if (isset($filters['responsable'])) {
+            $collection = $collection->where('responsable', $filters['responsable']);
         }
-        if (isset($report['cliente'])) {
-            $collection = $collection->where('cliente', $report['cliente']);
+        if (isset($filters['cliente'])) {
+            $collection = $collection->where('cliente', $filters['cliente']);
         }
-        if (isset($report['estado'])) {
-            $collection = $collection->where('estado', $report['estado']);
+        if (isset($filters['estado'])) {
+            $collection = $collection->where('estado', $filters['estado']);
         }
-        if (isset($report['tipoOrden'])) {
-            $collection = $collection->where('tipoOrden', $report['tipoOrden']);
+        if (isset($filters['tipoOrden'])) {
+            $collection = $collection->where('tipoOrden', $filters['tipoOrden']);
         }
-
+        if (isset($filters['producto'])) {
+            $collection = $collection->where('producto',  $filters['producto']);
+        }
+        if (isset($filters['observaciones'])) {
+            $collection = $collection->where('observaciones', 'like', "%{$filters['observaciones']}%");
+        }
         if (!empty($limit)) {
             $collection = $collection->limit($limit);
         }
         $collection = $collection->whereNull('deleted_at');
         $collection = $collection->orderBy('updated_at', ($asc) ? 'asc' : 'desc');
-        if($this->onlyBuild){
-            return $collection;
-        }
-        return $collection->get();
+
+        return $this->onlyBuild ? $collection : $collection->get();
     }
 }
