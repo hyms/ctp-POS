@@ -262,27 +262,19 @@ export default {
     methods: {
         getPermission(role) {
             let value = false;
-            for (const key in this.$page.props.rolesP) {
-                if (key === role) {
-                    if (this.$page.props.rolesP[key].includes(this.$page.props.user.role)) {
-                        value = true;
-                        break;
-                    }
+            this.$page.props.rolesP.forEach ((item, key)=>{
+                if(key === role && item.includes(this.$page.props.user.role))
+                {
+                    value = true;
+                    return;
                 }
-            }
+            })
             return value;
         },
         getAllPermission(data) {
             let value = false;
             for (const val of data) {
-                for (const key in this.$page.props.rolesP) {
-                    if (key === val.role) {
-                        if (this.$page.props.rolesP[key].includes(this.$page.props.user.role)) {
-                            value = true;
-                            break;
-                        }
-                    }
-                }
+                value = this.getPermission(val.role);
             }
             return value;
         },

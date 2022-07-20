@@ -7,7 +7,7 @@
                         <!-- title -->
                         <v-card-text>
                             <p class="text-2xl font-weight-semibold text--primary mb-2">
-                                Bienvenido a xCTP 👋🏻
+                                Bienvenido a xCTP
                             </p>
                             <p class="mb-2">
                                 Por favor ingresa tu usuario y contraseña
@@ -84,8 +84,7 @@
         </v-main>
     </v-app>
 </template>
-<script setup>
-
+<script>
 export default {
     props: {
         canResetPassword: Boolean,
