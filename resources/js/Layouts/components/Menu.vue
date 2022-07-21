@@ -9,6 +9,12 @@
             <v-app-bar-nav-icon @click="isDrawerOpen = !isDrawerOpen"></v-app-bar-nav-icon>
 
             <v-toolbar-title>{{ title }}</v-toolbar-title>
+
+            <v-spacer></v-spacer>
+                <Link :href="route('logout')" method="post" class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default primary theme--light">
+                    Salir
+                </Link>
+
         </v-app-bar>
         <v-navigation-drawer
             v-model="isDrawerOpen"
@@ -34,70 +40,60 @@
                     nav
                 >
                     <v-list-item-group>
-                    <!-- Navigation Items -->
-                    <template v-for="(link, key) in value.submenu">
-                        <template v-if="Object.values(link).length===1">
-                            <v-list-group
-                                v-if="getAllPermission(Object.values(link)[0])" class="text-capitalize"
-                            >
-                                <template #activator>
-                                    <v-list-item-content>
-                                        <v-list-item-title>
-                                            {{ Object.keys(link)[0] }}
-                                        </v-list-item-title>
-                                    </v-list-item-content>
-                                </template>
-                                        <template v-for="(link2, key2) in Object.values(link)[0]">
-                                            <template v-if="getPermission(link2.role)">
+                        <!-- Navigation Items -->
+                        <template v-for="(link, key) in value.submenu">
+                            <template v-if="Object.values(link).length===1">
+                                <v-list-group
+                                    v-if="getAllPermission(Object.values(link)[0])" class="text-capitalize"
+                                >
+                                    <template #activator>
+                                        <v-list-item-content>
+                                            <v-list-item-title>
+                                                {{ Object.keys(link)[0] }}
+                                            </v-list-item-title>
+                                        </v-list-item-content>
+                                    </template>
+                                    <template v-for="(link2, key2) in Object.values(link)[0]">
+                                        <template v-if="getPermission(link2.role)">
 
-                                                <Link
-                                                    :href="link2.url"
-                                                    :key="key2"
-                                                    class="v-list-item v-list-item--link theme--dark"
-                                                >
-                                                    <v-list-item-icon>
-                                                        <v-icon></v-icon>
-                                                    </v-list-item-icon>
-                                                        <v-list-item-title>
-                                                            {{ link2.label }}
-                                                        </v-list-item-title>
-                                                </Link>
+                                            <Link
+                                                :href="link2.url"
+                                                :key="key2"
+                                                class="v-list-item v-list-item--link theme--dark"
+                                            >
 
-                                            </template>
+                                                <v-list-item-title>
+                                                    {{ link2.label }}
+                                                </v-list-item-title>
+                                            </Link>
 
                                         </template>
 
-                            </v-list-group>
-                        </template>
-                        <template v-else>
-                            <template v-if="getPermission(link.role)">
-                                <Link
-                                    :href="link.url"
-                                    :key="key"
-                                    class="v-list-item v-list-item--link theme--dark"
-                                >
-                                    <v-list-item-content>
-                                        <v-list-item-title>
-                                            <span class="text-capitalize">{{ link.label }}</span>
-                                        </v-list-item-title>
-                                    </v-list-item-content>
+                                    </template>
 
-                                </Link>
+                                </v-list-group>
+                            </template>
+                            <template v-else>
+                                <template v-if="getPermission(link.role)">
+                                    <Link
+                                        :href="link.url"
+                                        :key="key"
+                                        class="v-list-item v-list-item--link theme--dark"
+                                    >
+                                        <v-list-item-content>
+                                            <v-list-item-title>
+                                                <span class="text-capitalize">{{ link.label }}</span>
+                                            </v-list-item-title>
+                                        </v-list-item-content>
+
+                                    </Link>
+                                </template>
                             </template>
                         </template>
-                    </template>
                     </v-list-item-group>
                 </v-list>
             </template>
-            <template v-slot:append>
-                <div class="pa-2">
-                    <Link :href="route('logout')" method="post" class="v-list-item theme--light">
-                        <v-btn block color="primary">
-                            Salir
-                        </v-btn>
-                    </Link>
-                </div>
-            </template>
+
         </v-navigation-drawer>
     </div>
 </template>
@@ -262,13 +258,15 @@ export default {
     methods: {
         getPermission(role) {
             let value = false;
-            this.$page.props.rolesP.forEach ((item, key)=>{
-                if(key === role && item.includes(this.$page.props.user.role))
-                {
-                    value = true;
-                    return;
+            //for (const key in this.$page.props.rolesP) {
+            for (const [key, item] of Object.entries(this.$page.props.rolesP)) {
+                if (key === role) {
+                    if (item.includes(this.$page.props.user.role)) {
+                        value = true;
+                        break;
+                    }
                 }
-            })
+            }
             return value;
         },
         getAllPermission(data) {
@@ -279,7 +277,7 @@ export default {
             return value;
         },
         getUrl() {
-            return window.location.pathname;
+            return this.$page.url;
         }
     }
 }

@@ -20171,7 +20171,8 @@ html.overflow-y-hidden {
 
 .v-list--nav .v-list-item:not(:last-child):not(:only-child),
 .v-list--rounded .v-list-item:not(:last-child):not(:only-child) {
-    margin-bottom: 8px;
+    /*margin-bottom: 8px;*/
+
 }
 .v-list--nav.v-list--dense .v-list-item:not(:last-child):not(:only-child),
 .v-list--nav .v-list-item--dense:not(:last-child):not(:only-child),
@@ -20267,6 +20268,7 @@ html.overflow-y-hidden {
 
 .v-list-group__items {
     flex: 1 1 auto;
+    background-color: rgba(0, 0, 21, 0.2);
 }
 .v-list-group__items .v-list-item,
 .v-list-group__items .v-list-group__items {

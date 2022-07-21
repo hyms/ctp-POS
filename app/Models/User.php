@@ -79,6 +79,7 @@ class User extends Authenticatable
             return $roles->all();
         }
 
-        return $roles->firstWhere('value', '=', $id)->value('text');
+        $first = $roles->firstWhere('value', '=', $id);
+        return $first['text'];
     }
 }

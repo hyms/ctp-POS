@@ -56,12 +56,12 @@
 </template>
 
 <script>
-import Layout from './Layout'
+import Authenticated from '../Layouts/Authenticated'
 import ModalForm from './standarForm'
 
 export default {
     name: "standarTable",
-    layout: Layout,
+    layout: Authenticated,
     props: {
         errors: Object,
 //table
