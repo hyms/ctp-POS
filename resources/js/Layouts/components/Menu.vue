@@ -13,6 +13,9 @@
             <v-spacer></v-spacer>
                 <Link :href="route('logout')" method="post" class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default primary theme--light">
                     Salir
+                    <v-icon right color="white">
+                        mdi-exit-to-app
+                    </v-icon>
                 </Link>
 
         </v-app-bar>

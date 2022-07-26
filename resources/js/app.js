@@ -1,5 +1,6 @@
 import './bootstrap';
 
+import '@mdi/font/css/materialdesignicons.css'
 import Vue from 'vue';
 import Vuetify from 'vuetify'
 
@@ -18,7 +19,7 @@ createInertiaApp({
             render: h => h(App, props),
             vuetify: new Vuetify({
                 icons: {
-                    iconfont: 'mdiSvg',
+                    iconfont: 'mdi',
                 },
                 // lang:'es',
                 theme: {

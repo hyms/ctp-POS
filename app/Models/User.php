@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
@@ -11,22 +12,11 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable,SoftDeletes;
 
     protected $table = 'users';
     public static string $tables = 'users';
     protected $guarded = [];
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'username',
-        'email',
-        'password',
-    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -66,13 +56,13 @@ class User extends Authenticatable
         return $users;
     }
 
-    public static function getRole($id = null): array|string
+    public static function getRole(int $id = null): array|string
     {
         $roles = collect([
-            ['value' => '0', 'text' => 'sadmin'],
-            ['value' => '1', 'text' => 'admin'],
-            ['value' => '2', 'text' => 'venta'],
-            ['value' => '3', 'text' => 'operario']
+            ['value' => 0, 'text' => 'sadmin'],
+            ['value' => 1, 'text' => 'admin'],
+            ['value' => 2, 'text' => 'venta'],
+            ['value' => 3, 'text' => 'operario']
         ]);
 
         if ($id === null) {

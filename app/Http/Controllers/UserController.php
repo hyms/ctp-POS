@@ -19,9 +19,9 @@ class UserController extends Controller
     {
         $users = User::getAll();
         $sucursales = Sucursal::getAll();
-        $sucursales = $sucursales->pluck('nombre', 'id');
+        $sucursales = $sucursales->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});
         $roles = User::getRole();
-        return Inertia::render('Usuarios', ['userss' => $users, 'sucursales' => $sucursales, 'roles' => $roles]);
+        return Inertia::render('Usuarios', ['users' => $users, 'sucursales' => $sucursales, 'roles' => $roles]);
     }
 
     public function post(Request $request)

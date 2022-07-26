@@ -70,6 +70,7 @@
                                     block
                                     color="primary"
                                     type="submit"
+                                    :loading="form.processing"
                                     :disabled="form.processing">
                                     Ingresar
                                     <template v-slot:loader>

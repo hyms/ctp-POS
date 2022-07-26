@@ -1,6 +1,6 @@
 <template>
-    <standar-table
-        :items="userss"
+    <generic-table
+        :items="users"
         :errors="errors"
         :basePath="'user'"
         :fields="fields"
@@ -11,42 +11,60 @@
         :urlPost="'/admin/user'"
 
     >
-    </standar-table>
+    </generic-table>
 </template>
 
 <script>
 import Authenticated from '@/Layouts/Authenticated'
-import StandarTable from '@/Shared/standarTable';
+import GenericTable from '@/Layouts/components/genericTable';
 
 export default {
     layout: Authenticated,
     props: {
-        userss: Array,
-        sucursales: Object,
+        users: Array,
+        sucursales: Array,
         roles: Array,
         errors: Object,
     },
     components: {
-        StandarTable,
+        GenericTable,
     },
     data() {
         return {
             fields:
                 [
-                    'username',
-                    'enable',
                     {
-                        key: 'nombreSucursal',
-                        label: 'sucursal'
+                        text: 'usuario',
+                        value: 'username'
                     },
                     {
-                        key: 'nombreRol',
-                        label: 'role'
+                        text: 'habilitado',
+                        value: 'enable'
                     },
-                    'apellido',
-                    'nombre',
-                    'ultimoAcceso',
-                    'Acciones'
+                    {
+                        text: 'sucursal',
+                        value: 'nombreSucursal'
+                    },
+                    {
+                        text: 'role',
+                        value: 'nombreRol'
+                    },
+                    {
+                        text: 'apellido',
+                        value: 'apellido'
+                    },
+                    {
+                        text: 'nombre',
+                        value: 'nombre'
+                    },
+                    {
+                        text: 'ultimo Acceso',
+                        value: 'ultimoAcceso'
+                    },
+                    {
+                        text: 'Acciones',
+                        value: 'Acciones'
+                    },
                 ],
             form: {
                 username: {

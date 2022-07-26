@@ -11,7 +11,6 @@
     },
     "dependencies": {
         "@babel/plugin-syntax-dynamic-import": "^7.8.3",
-        "@mdi/font": "5.9.55",
         "js-file-download": "^0.4.12",
         "roboto-fontface": "*",
         "vue-moment": "^4.1.0",
@@ -22,6 +21,7 @@
         "@inertiajs/inertia": "^0.11.0",
         "@inertiajs/inertia-vue": "^0.8.0",
         "@inertiajs/progress": "^0.2.7",
+        "@mdi/font": "^7.0.96",
         "@vue/compiler-sfc": "^3.2.31",
         "autoprefixer": "^10.4.2",
         "axios": "^0.26",
