@@ -16,7 +16,7 @@
 
 <script>
 import Authenticated from '@/Layouts/Authenticated'
-import StandarTable from '@/Shared/standarTable';
+import GenericTable from '@/Layouts/components/genericTable';
 
 export default {
     layout: Authenticated,
@@ -26,20 +26,32 @@ export default {
         errors: Object,
     },
     components: {
-        StandarTable,
+        GenericTable,
     },
     data() {
         return {
             fields:
                 [
-                    'nombre',
-                    'monto',
-                    'enable',
                     {
-                        key: 'nombreSucursal',
-                        label: 'Sucursal'
+                        text: 'Nombre',
+                        value: 'nombre'
                     },
-                    'Acciones'
+                    {
+                        text: 'Monto',
+                        value: 'monto'
+                    },
+                    {
+                        text: 'Habiitado',
+                        value: 'enable'
+                    },
+                    {
+                        text: 'Sucursal'
+                        value: 'nombreSucursal',
+                    },
+                    {
+                        text: 'Acciones',
+                        value: 'Acciones'
+                    },
                 ],
             form: {
                 nombre: {

@@ -1,5 +1,5 @@
 <template>
-    <standarTable
+    <generic-table
         :items="tipos"
         :errors="errors"
         :basePath="'tipoProductos'"
@@ -10,13 +10,12 @@
         :form="form"
         :urlPost="'/admin/tipoProductos'"
     >
-    </standarTable>
+    </generic-table>
 </template>
 
 <script>
 import Authenticated from '@/Layouts/Authenticated'
-import Menu from '@/Shared/menu/menuProductos';
-import StandarTable from '@/Shared/standarTable';
+import GenericTable from '@/Layouts/components/genericTable';
 
 export default {
     layout: Authenticated,
@@ -25,16 +24,24 @@ export default {
         errors: Object,
     },
     components: {
-        StandarTable,
-        Menu
+        GenericTable,
     },
     data() {
         return {
             fields:
                 [
-                    'nombre',
-                    'codigo',
-                    'Acciones'
+                    {
+                        text: 'Nombre',
+                        value: 'nombre'
+                    },
+                    {
+                        text: 'Codigo',
+                        value: 'codigo'
+                    },
+                    {
+                        text: 'Acciones',
+                        value: 'Acciones'
+                    },
                 ],
             form: {
                 nombre: {

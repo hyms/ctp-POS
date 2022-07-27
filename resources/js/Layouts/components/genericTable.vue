@@ -39,67 +39,63 @@
                                             <form @submit.stop.prevent="sendForm">
                                                 <v-alert dismissible type="error" col v-model="alert">
                                                     <ul>
-                                                       <li v-for="(value,key) in errors">
-                                                           {{value}}
-                                                       </li>
+                                                        <li v-for="(value,key) in errors">
+                                                            {{ value }}
+                                                        </li>
                                                     </ul>
                                                 </v-alert>
                                                 <template v-for="(item,key) in form">
                                                     <v-text-field
-                                                        :type="item.type"
-                                                        :label="item.label"
+                                                        v-if="['text','password','date','email'].includes(item.type)"
+                                                        :id="key"
+                                                        v-model="item.value"
                                                         outlined
                                                         dense
-                                                        v-model="item.value"
+                                                        :type="item.type"
+                                                        :label="item.label"
                                                         :error="item.state"
-                                                        :id="key"
-                                                        :hint="item.stateText"
-                                                        v-if="['text','password','date','email'].includes(item.type)"
+                                                        :error-messages="item.stateText"
                                                     ></v-text-field>
                                                     <v-textarea
                                                         v-if="item.type==='textarea'"
-                                                        v-model="item.value"
                                                         :id="key"
+                                                        v-model="item.value"
                                                         auto-grow
                                                         outlined
                                                         dense
-                                                        :error="item.state"
                                                         :label="item.label"
-                                                        :hint="item.stateText"
+                                                        :error="item.state"
+                                                        :error-messages="item.stateText"
                                                     ></v-textarea>
                                                     <v-select
                                                         v-if="item.type==='select'"
+                                                        :id="key"
                                                         v-model="item.value"
                                                         item-text="text"
                                                         item-value="value"
                                                         outlined
                                                         dense
-                                                        :error="item.state"
                                                         :items="getOptions(item.options,item.isPadre===1,editedItem.id)"
                                                         :label="item.label"
+                                                        :error="item.state"
+                                                        :error-messages="item.stateText"
                                                     ></v-select>
                                                     <v-checkbox
                                                         v-if="item.type==='bool'"
                                                         v-model="item.value"
                                                         :id="key"
-                                                        :hint="item.stateText"
+                                                        :error-messages="item.stateText"
                                                         :label="item.label"
                                                     ></v-checkbox>
-                                                    <!--                                                <b-form-checkbox-group
-                                                                                                        v-if="item.type==='group-check'"
-                                                                                                        id="checkbox-group-1"
-                                                                                                        v-model="item.value"
-                                                                                                        :options="item.options"
-                                                                                                        value-field="id"
-                                                                                                        text-field="nombre"
-                                                                                                    ></b-form-checkbox-group>
-                                                                                                    <template v-for="(valueOption,keyOption) in item.options">
-                                                                                                        <v-checkbox
-                                                                                                            v-model="item.value"
-                                                                                                            label="John"
-                                                                                                            :value="valueOption"
-                                                                                                        ></v-checkbox>
-                                                                                                    </template>-->
+                                                    <template v-if="item.type==='group-check'">
+                                                        <template v-for="(valueOption,keyOption) in item.options">
+                                                            <v-checkbox
+                                                                v-model="item.value"
+                                                                :label="valueOption['nombre']"
+                                                                :value="valueOption['id']"
+                                                            ></v-checkbox>
+                                                        </template>
+                                                    </template>
                                                 </template>
                                             </form>
                                         </v-col>
@@ -186,10 +182,9 @@ export default {
     },
     computed: {
         formTitle() {
-            return (this.editedIndex === -1 ? 'Nuevo ' : 'Modificar ') + this.titleForm;
+            return `${this.editedIndex === -1 ? this.newText : this.modifyText} ${this.titleForm}`;
         },
     },
-    components: {},
     data() {
         return {
             dialog: false,

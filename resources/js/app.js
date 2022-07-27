@@ -3,7 +3,7 @@ import './bootstrap';
 import '@mdi/font/css/materialdesignicons.css'
 import Vue from 'vue';
 import Vuetify from 'vuetify'
-
+import es from 'vuetify/src/locale/es'
 // import 'vuetify/dist/vuetify.min.css'
 
 import {createInertiaApp} from '@inertiajs/inertia-vue';
@@ -21,7 +21,7 @@ createInertiaApp({
                 icons: {
                     iconfont: 'mdi',
                 },
-                // lang:'es',
+                lang: {locales: {es}, current: 'es'},
                 theme: {
                     themes: {
                         light: {

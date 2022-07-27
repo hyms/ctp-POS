@@ -1,5 +1,5 @@
 <template>
-    <standar-table
+    <generic-table
         :items="sucursales"
         :errors="errors"
         :basePath="'sucursal'"
@@ -11,12 +11,12 @@
         :urlPost="'/admin/sucursal'"
 
     >
-    </standar-table>
+    </generic-table>
 </template>
 
 <script>
 import Authenticated from '@/Layouts/Authenticated'
-import StandarTable from '@/Shared/standarTable';
+import genericTable from '@/Layouts/components/genericTable';
 
 export default {
     layout: Authenticated,
@@ -25,22 +25,32 @@ export default {
         errors: Object,
     },
     components: {
-        StandarTable
+        genericTable
     },
     data() {
         return {
             fields:
                 [
-                    'nombre',
-                    'telefono',
-                    'gmap',
-                    'central',
                     {
-                        key: 'enable',
-                        label:
-                            'Habilitado',
+                        value: 'nombre',
+                        text: 'Nombre',
                     },
-                    'Acciones'
+                    {
+                        value: 'telefono',
+                        text: 'Telefono',
+                    },
+                    {
+                        value: 'central',
+                        text: 'Central',
+                    },
+                    {
+                        value: 'enable',
+                        text: 'Habilitado',
+                    },
+                    {
+                        value: 'Acciones',
+                        text: 'Acciones',
+                    },
                 ],
             form: {
                 codigo: {
