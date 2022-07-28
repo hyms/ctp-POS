@@ -1,5 +1,5 @@
 <template>
-    <standar-table
+    <generic-table
         :items="cajas"
         :errors="errors"
         :basePath="'caja'"
@@ -11,7 +11,7 @@
         :urlPost="'/admin/caja'"
 
     >
-    </standar-table>
+    </generic-table>
 </template>
 
 <script>
@@ -45,7 +45,7 @@ export default {
                         value: 'enable'
                     },
                     {
-                        text: 'Sucursal'
+                        text: 'Sucursal',
                         value: 'nombreSucursal',
                     },
                     {

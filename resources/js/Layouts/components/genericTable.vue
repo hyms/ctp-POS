@@ -51,10 +51,12 @@
                                                         v-model="item.value"
                                                         outlined
                                                         dense
+                                                        hide-details="auto"
                                                         :type="item.type"
                                                         :label="item.label"
                                                         :error="item.state"
                                                         :error-messages="item.stateText"
+                                                        class="mb-2"
                                                     ></v-text-field>
                                                     <v-textarea
                                                         v-if="item.type==='textarea'"
@@ -63,9 +65,11 @@
                                                         auto-grow
                                                         outlined
                                                         dense
+                                                        hide-details="auto"
                                                         :label="item.label"
                                                         :error="item.state"
                                                         :error-messages="item.stateText"
+                                                        class="mb-2"
                                                     ></v-textarea>
                                                     <v-select
                                                         v-if="item.type==='select'"
@@ -75,15 +79,18 @@
                                                         item-value="value"
                                                         outlined
                                                         dense
-                                                        :items="getOptions(item.options,item.isPadre===1,editedItem.id)"
+                                                        hide-details="auto"
+                                                        :items="getOptions(item.options,item.isPadre===1,editedIndex)"
                                                         :label="item.label"
                                                         :error="item.state"
                                                         :error-messages="item.stateText"
+                                                        class="mb-2"
                                                     ></v-select>
                                                     <v-checkbox
                                                         v-if="item.type==='bool'"
                                                         v-model="item.value"
                                                         :id="key"
+                                                        hide-details="auto"
                                                         :error-messages="item.stateText"
                                                         :label="item.label"
                                                     ></v-checkbox>
@@ -229,6 +236,7 @@ export default {
             this.removeValues();
             this.$nextTick(() => {
                 this.editedIndex = -1
+                this.editedItem = Object.assign({}, {})
             })
         },
 
@@ -245,9 +253,9 @@ export default {
                 return options;
             }
             let newOptions = [];
-            for (let value of options) {
-                if (id !== value.value) {
-                    newOptions.push(value);
+            for (let key in options) {
+                if (id !== options[key].value) {
+                    newOptions.push(options[key]);
                 }
             }
             return newOptions;
@@ -266,7 +274,7 @@ export default {
         },
         setValues() {
             for (let key in this.form) {
-                this.form[key].value = ['enable'].includes(key)
+                this.form[key].value = ['enable', 'central'].includes(key)
                     ? (this.editedItem[key] === 1)
                     : this.editedItem[key];
             }
@@ -291,7 +299,7 @@ export default {
             }
             for (let key in this.form) {
                 if (this.form[key].value != null) {
-                    if (['enable'].includes(key)) {
+                    if (['enable', 'central'].includes(key)) {
                         formData.append(key, this.form[key].value ? '1' : '0');
                     } else {
                         formData.append(key, this.form[key].value);

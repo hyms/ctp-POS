@@ -22,6 +22,7 @@ export default {
     layout: Authenticated,
     props: {
         sucursales: Array,
+        sucursalOptions: Array,
         errors: Object,
     },
     components: {
@@ -94,20 +95,20 @@ export default {
                     type: "select",
                     state: null,
                     stateText: null,
-                    options: this.sucursales,
+                    options: this.sucursalOptions,
                     isPadre: 1
                 },
                 central: {
                     label: 'Central',
                     value: "",
-                    type: "boolean",
+                    type: "bool",
                     state: null,
                     stateText: null
                 },
                 enable: {
                     label: 'Habilitado',
                     value: "",
-                    type: "boolean",
+                    type: "bool",
                     state: null,
                     stateText: null
                 },

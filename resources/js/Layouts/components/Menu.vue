@@ -48,6 +48,7 @@
                             <template v-if="Object.values(link).length===1">
                                 <v-list-group
                                     v-if="getAllPermission(Object.values(link)[0])" class="text-capitalize"
+                                    :value="validateMenu(Object.values(link)[0])"
                                 >
                                     <template #activator>
                                         <v-list-item-content>
@@ -62,16 +63,13 @@
                                             <Link
                                                 :href="link2.url"
                                                 :key="key2"
-                                                class="v-list-item v-list-item--link theme--dark"
+                                                :class="'v-list-item v-list-item--link theme--dark' + (getUrl()==link2.url?' v-list-item--active':'') "
                                             >
-
                                                 <v-list-item-title>
                                                     {{ link2.label }}
                                                 </v-list-item-title>
                                             </Link>
-
                                         </template>
-
                                     </template>
 
                                 </v-list-group>
@@ -81,9 +79,9 @@
                                     <Link
                                         :href="link.url"
                                         :key="key"
-                                        class="v-list-item v-list-item--link theme--dark"
+                                        :class="'v-list-item v-list-item--link theme--dark' + (getUrl()==link.url?' v-list-item--active':'') "
                                     >
-                                        <v-list-item-content>
+                                        <v-list-item-content color>
                                             <v-list-item-title>
                                                 <span class="text-capitalize">{{ link.label }}</span>
                                             </v-list-item-title>
@@ -281,6 +279,15 @@ export default {
         },
         getUrl() {
             return this.$page.url;
+        },
+        validateMenu(data){
+            for(let value of data){
+                if( this.$page.url === value.url)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
