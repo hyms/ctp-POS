@@ -20,10 +20,12 @@ class CajaController extends Controller
     public function getAll()
     {
         $cajas = Cajas::getAll();
+        $cajasOptions = $cajas->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});
         $sucursales = Sucursal::getAll();
-        $sucursales = $sucursales->pluck('nombre', 'id');
+        $sucursales = $sucursales->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});
         return Inertia::render('Cajas', [
             'cajas' => $cajas,
+            'cajasOptions' => $cajasOptions,
             'sucursales' => $sucursales
         ]);
     }

@@ -22,7 +22,8 @@ export default {
     layout: Authenticated,
     props: {
         cajas: Array,
-        sucursales: Object,
+        cajasOptions: Array,
+        sucursales: Array,
         errors: Object,
     },
     components: {
@@ -79,7 +80,7 @@ export default {
                     type: "select",
                     state: null,
                     stateText: null,
-                    options: this.cajas,
+                    options: this.cajasOptions,
                     isPadre: 1
                 }, enable: {
                     label: 'enable',
