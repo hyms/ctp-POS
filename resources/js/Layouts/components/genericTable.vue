@@ -1,153 +1,159 @@
 <template>
     <v-row>
         <v-col>
-            <v-dialog v-model="dialogDelete" max-width="250px">
-                <v-card>
-                    <v-card-title class="text-h5">{{ deleteText }}</v-card-title>
-                    <v-card-text class="text-h6">
-                        {{ sureText }}
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn small color="error" @click="closeDelete">Cancel</v-btn>
-                        <v-btn small color="primary" @click="deleteItemConfirm">OK</v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
-            <v-row class="mb-1">
-                <v-col>
-                    <v-dialog v-model="dialog" max-width="500px" persistent>
-                        <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                                color="primary"
-                                dark
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                                {{ newText }}
-                            </v-btn>
-                        </template>
+            <h2>{{ title }}</h2>
+
+            <v-card>
+                <v-card-title>
+                    <v-dialog v-model="dialogDelete" max-width="250px">
                         <v-card>
-                            <v-card-title>
-                                <span class="text-h5">{{ formTitle }}</span>
-                            </v-card-title>
-
-                            <v-card-text>
-                                <v-container>
-                                    <v-row>
-                                        <v-col>
-                                            <form @submit.stop.prevent="sendForm">
-                                                <v-alert dismissible type="error" col v-model="alert">
-                                                    <ul>
-                                                        <li v-for="(value,key) in errors">
-                                                            {{ value }}
-                                                        </li>
-                                                    </ul>
-                                                </v-alert>
-                                                <template v-for="(item,key) in form">
-                                                    <v-text-field
-                                                        v-if="['text','password','date','email'].includes(item.type)"
-                                                        :id="key"
-                                                        v-model="item.value"
-                                                        outlined
-                                                        dense
-                                                        hide-details="auto"
-                                                        :type="item.type"
-                                                        :label="item.label"
-                                                        :error="item.state"
-                                                        :error-messages="item.stateText"
-                                                        class="mb-2"
-                                                    ></v-text-field>
-                                                    <v-textarea
-                                                        v-if="item.type==='textarea'"
-                                                        :id="key"
-                                                        v-model="item.value"
-                                                        auto-grow
-                                                        outlined
-                                                        dense
-                                                        hide-details="auto"
-                                                        :label="item.label"
-                                                        :error="item.state"
-                                                        :error-messages="item.stateText"
-                                                        class="mb-2"
-                                                    ></v-textarea>
-                                                    <v-select
-                                                        v-if="item.type==='select'"
-                                                        :id="key"
-                                                        v-model="item.value"
-                                                        item-text="text"
-                                                        item-value="value"
-                                                        outlined
-                                                        dense
-                                                        hide-details="auto"
-                                                        :items="getOptions(item.options,item.isPadre===1,editedIndex)"
-                                                        :label="item.label"
-                                                        :error="item.state"
-                                                        :error-messages="item.stateText"
-                                                        class="mb-2"
-                                                    ></v-select>
-                                                    <v-checkbox
-                                                        v-if="item.type==='bool'"
-                                                        v-model="item.value"
-                                                        :id="key"
-                                                        hide-details="auto"
-                                                        :error-messages="item.stateText"
-                                                        :label="item.label"
-                                                    ></v-checkbox>
-                                                    <template v-if="item.type==='group-check'">
-                                                        <template v-for="(valueOption,keyOption) in item.options">
-                                                            <v-checkbox
-                                                                v-model="item.value"
-                                                                :label="valueOption['nombre']"
-                                                                :value="valueOption['id']"
-                                                            ></v-checkbox>
-                                                        </template>
-                                                    </template>
-                                                </template>
-                                            </form>
-                                        </v-col>
-                                    </v-row>
-                                </v-container>
+                            <v-card-title class="text-h5">{{ deleteText }}</v-card-title>
+                            <v-card-text class="text-h6">
+                                {{ sureText }}
                             </v-card-text>
-
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <v-btn small color="error" @click="close">
-                                    Cancelar
-                                </v-btn>
-                                <v-btn small color="primary" @click="save"
-                                       :loading="sending" :disabled="sending">
-                                    Guardar
-                                </v-btn>
+                                <v-btn small color="error" class="ma-1" @click="closeDelete">Cancel</v-btn>
+                                <v-btn small color="primary" class="ma-1" @click="deleteItemConfirm">Borrar</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-dialog>
-                </v-col>
-                <v-col><v-text-field
-                    v-model="search"
-                    append-icon="mdi-magnify"
-                    label="Buscar"
-                    outlined
-                    dense
-                    single-line
-                    hide-details
-                ></v-text-field></v-col>
-            </v-row>
-            <v-card>
-                <v-card-title>
-                    <strong>{{ title }}</strong>
+                    <v-row>
+                        <v-col cols="4" sm="6">
+                            <v-dialog v-model="dialog" max-width="500px" persistent>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                        color="primary"
+                                        dark
+                                        v-bind="attrs"
+                                        v-on="on"
+                                    >
+                                        {{ newText }}
+                                    </v-btn>
+                                </template>
+                                <v-card>
+                                    <v-card-title>
+                                        <span class="text-h5">{{ formTitle }}</span>
+                                    </v-card-title>
+
+                                    <v-card-text>
+                                        <form>
+                                            <v-alert dismissible type="error" col v-model="alert">
+                                                <ul>
+                                                    <li v-for="(value,key) in errors">
+                                                        {{ value }}
+                                                    </li>
+                                                </ul>
+                                            </v-alert>
+                                            <template v-for="(item,key) in form">
+                                                <v-text-field
+                                                    v-if="['text','password','date','email'].includes(item.type)"
+                                                    :id="key"
+                                                    v-model="item.value"
+                                                    outlined
+                                                    dense
+                                                    hide-details="auto"
+                                                    :type="item.type"
+                                                    :label="item.label"
+                                                    :error="item.state"
+                                                    :error-messages="item.stateText"
+                                                    class="my-2"
+                                                ></v-text-field>
+                                                <v-textarea
+                                                    v-if="item.type==='textarea'"
+                                                    :id="key"
+                                                    v-model="item.value"
+                                                    rows="2"
+                                                    outlined
+                                                    dense
+                                                    hide-details="auto"
+                                                    :label="item.label"
+                                                    :error="item.state"
+                                                    :error-messages="item.stateText"
+                                                    class="my-2"
+                                                ></v-textarea>
+                                                <v-select
+                                                    v-if="item.type==='select'"
+                                                    :id="key"
+                                                    v-model="item.value"
+                                                    item-text="text"
+                                                    item-value="value"
+                                                    outlined
+                                                    dense
+                                                    hide-details="auto"
+                                                    :items="getOptions(item.options,item.isPadre===1,editedIndex)"
+                                                    :label="item.label"
+                                                    :error="item.state"
+                                                    :error-messages="item.stateText"
+                                                    class="my-2"
+                                                ></v-select>
+                                                <v-checkbox
+                                                    v-if="item.type==='bool'"
+                                                    v-model="item.value"
+                                                    :id="key"
+                                                    hide-details="auto"
+                                                    :error-messages="item.stateText"
+                                                    :label="item.label"
+                                                    class="my-2"
+                                                ></v-checkbox>
+                                                <template v-if="item.type==='group-check'">
+                                                    <v-row>
+                                                        <template v-for="(valueOption,keyOption) in item.options">
+                                                            <v-col>
+                                                                <v-checkbox
+                                                                    v-model="item.value"
+                                                                    :label="valueOption['text']"
+                                                                    :value="valueOption['value']"
+                                                                    hide-details="auto"
+                                                                    class="my-2"
+                                                                ></v-checkbox>
+                                                            </v-col>
+                                                        </template>
+                                                    </v-row>
+                                                </template>
+                                            </template>
+                                        </form>
+                                    </v-card-text>
+
+                                    <v-card-actions>
+                                        <v-spacer></v-spacer>
+                                        <v-btn small color="error" class="ma-1" @click="close">
+                                            Cancelar
+                                        </v-btn>
+                                        <v-btn small color="primary" class="ma-1" @click="save"
+                                               :loading="sending" :disabled="sending">
+                                            Guardar
+                                        </v-btn>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-dialog>
+                        </v-col>
+                        <v-col cols="8" sm="6">
+                            <v-text-field
+                                v-model="search"
+                                append-icon="mdi-magnify"
+                                label="Buscar"
+                                outlined
+                                dense
+                                single-line
+                                hide-details
+                            ></v-text-field>
+                        </v-col>
+                    </v-row>
                 </v-card-title>
+
                 <v-data-table
                     :items="items"
                     :headers="fields"
-                    no-data-text="emptyText"
+                    :search="search"
+                    :no-data-text="emptyText"
                     mobile-breakpoint="540"
                 >
                     <template v-slot:item.Acciones="{ item }">
                         <div class="row-actions">
                             <v-btn
                                 small
-                                class="mr-1"
+                                class="ma-1"
                                 color="primary"
                                 @click="editItem(item)"
                             >
@@ -157,6 +163,7 @@
                             </v-btn>
                             <v-btn
                                 color="error"
+                                class="ma-1"
                                 small
                                 @click="deleteItem(item)"
                             >
@@ -166,12 +173,7 @@
                             </v-btn>
                         </div>
                     </template>
-                    <template v-slot:item.central="{ item }">
-                        {{ (item.central === 1) ? "Si" : "No" }}
-                    </template>
-                    <template v-slot:item.enable="{ item }">
-                        {{ (item.enable === 1) ? "Si" : "No" }}
-                    </template>
+
                 </v-data-table>
             </v-card>
         </v-col>
@@ -215,7 +217,7 @@ export default {
             editedItem: {},
             //form
             sending: false,
-            search:""
+            search: ""
         }
     },
     methods: {

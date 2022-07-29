@@ -51,6 +51,7 @@ class User extends Authenticatable
         $users = $users->get();
         $users->transform(function ($item, $key) {
             $item->nombreRol = self::getRole($item->role);
+            $item->enableView=($item->enable === 1) ? "Si" : "No" ;
             return $item;
         });
         return $users;

@@ -15,6 +15,11 @@ class Cajas extends Model
     protected static string $tables = 'cajas';
     protected $guarded = [];
 
+    public function Sucursal(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Sucursal::class,'id','sucursal');
+    }
+
     public static function getAll(int $sucursal = null, int $caja_padre = null): Collection
     {
         $cajas = DB::table(self::$tables);

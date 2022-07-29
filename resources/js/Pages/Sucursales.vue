@@ -41,11 +41,11 @@ export default {
                         text: 'Telefono',
                     },
                     {
-                        value: 'central',
+                        value: 'centralView',
                         text: 'Central',
                     },
                     {
-                        value: 'enable',
+                        value: 'enableView',
                         text: 'Habilitado',
                     },
                     {

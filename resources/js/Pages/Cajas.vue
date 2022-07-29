@@ -43,7 +43,7 @@ export default {
                     },
                     {
                         text: 'Habiitado',
-                        value: 'enable'
+                        value: 'enableView'
                     },
                     {
                         text: 'Sucursal',

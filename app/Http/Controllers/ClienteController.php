@@ -15,10 +15,14 @@ class ClienteController extends Controller
 {
     public function getAll()
     {
-        $clientes = Cliente::getAll();
+        $clientes = Cliente::all();
+        $clientes->transform(function ($item, $key) {
+            $item['nombreSucursal']=$item->Sucursal?->nombre;
+            return $item;
+        });
         $sucursales = Sucursal::getAll();
-        $sucursales = $sucursales->pluck('nombre','id');
-        return Inertia::render('Clientes/tabla', [
+        $sucursales = $sucursales->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});
+        return Inertia::render('Clientes', [
             'clientes' => $clientes,
             'sucursales' => $sucursales
         ]);

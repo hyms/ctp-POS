@@ -19,7 +19,12 @@ class CajaController extends Controller
 {
     public function getAll()
     {
-        $cajas = Cajas::getAll();
+        $cajas = Cajas::all();
+        $cajas->transform(function ($item, $key) {
+            $item['nombreSucursal']=$item->Sucursal?->nombre;
+            $item->enableView=($item->enable === 1) ? "Si" : "No" ;
+            return $item;
+        });
         $cajasOptions = $cajas->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});
         $sucursales = Sucursal::getAll();
         $sucursales = $sucursales->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});

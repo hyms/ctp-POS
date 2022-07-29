@@ -39,7 +39,7 @@ export default {
                     },
                     {
                         text: 'habilitado',
-                        value: 'enable'
+                        value: 'enableView'
                     },
                     {
                         text: 'sucursal',

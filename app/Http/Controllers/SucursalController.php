@@ -15,6 +15,11 @@ class SucursalController extends Controller
     public function getAll()
     {
         $sucursal = Sucursal::getAll(true);
+        $sucursal->transform(function ($item, $key) {
+            $item->centralView=($item->enable === 1) ? "Si" : "No" ;
+            $item->enableView=($item->enable === 1) ? "Si" : "No" ;
+            return $item;
+        });
         $sucursales = $sucursal->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});
         return Inertia::render('Sucursales', ['sucursales' => $sucursal,'sucursalOptions'=>$sucursales]);
     }

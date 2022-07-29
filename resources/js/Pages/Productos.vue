@@ -22,7 +22,7 @@ export default {
     layout: Authenticated,
     props: {
         productos: Array,
-        tipoProducto: Object,
+        tipoProducto: Array,
         errors: Object,
     },
     components: {

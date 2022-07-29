@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 
@@ -16,9 +17,9 @@ class ProductosController extends Controller
     public function getAll()
     {
         $productos = Producto::getAll();
-        $productos = TipoProductos::setTiposProducto($productos);
+        $productos = TipoProductos::getTipoProductoxProducto($productos);
         $tipoProducto = TipoProductos::getAll();
-        $tipoProducto = $tipoProducto->pluck('nombre', 'id');
+        $tipoProducto = $tipoProducto->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});
         return Inertia::render('Productos',
             [
                 'productos' => $productos,
@@ -50,7 +51,7 @@ class ProductosController extends Controller
             $producto->save();
             if(isset($request['productoTipo']))
             {
-                TipoProductos::saveTiposProducto($producto->id, explode(',', $request['productoTipo']));
+                TipoProductos::saveTiposProducto($producto->id, Str::of($request['productoTipo'])->explode(','));
             }
             return response()->json(["status" => 0, 'path' => 'productos']);
         } catch (Exception $error) {
