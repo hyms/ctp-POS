@@ -1,6 +1,6 @@
 <template>
-    <div class="row">
-        <div class="col-12">
+    <v-row>
+        <v-col>
             <v-dialog v-model="dialogDelete" max-width="250px">
                 <v-card>
                     <v-card-title class="text-h5">{{ deleteText }}</v-card-title>
@@ -14,8 +14,8 @@
                     </v-card-actions>
                 </v-card>
             </v-dialog>
-            <div class="row mb-1">
-                <div class="col">
+            <v-row class="mb-1">
+                <v-col>
                     <v-dialog v-model="dialog" max-width="500px" persistent>
                         <template v-slot:activator="{ on, attrs }">
                             <v-btn
@@ -122,53 +122,60 @@
                             </v-card-actions>
                         </v-card>
                     </v-dialog>
-                </div>
-            </div>
+                </v-col>
+                <v-col><v-text-field
+                    v-model="search"
+                    append-icon="mdi-magnify"
+                    label="Buscar"
+                    outlined
+                    dense
+                    single-line
+                    hide-details
+                ></v-text-field></v-col>
+            </v-row>
             <v-card>
                 <v-card-title>
                     <strong>{{ title }}</strong>
                 </v-card-title>
-                <v-card-text>
-                    <v-data-table
-                        :items="items"
-                        :headers="fields"
-                        no-data-text="emptyText"
-                        mobile-breakpoint="540"
-                    >
-                        <template v-slot:item.Acciones="{ item }">
-                            <div class="row-actions">
-                                <v-btn
-                                    small
-                                    class="mr-1"
-                                    color="primary"
-                                    @click="editItem(item)"
-                                >
-                                    <v-icon>
-                                        mdi-pencil
-                                    </v-icon>
-                                </v-btn>
-                                <v-btn
-                                    color="error"
-                                    small
-                                    @click="deleteItem(item)"
-                                >
-                                    <v-icon>
-                                        mdi-delete
-                                    </v-icon>
-                                </v-btn>
-                            </div>
-                        </template>
-                        <template v-slot:item.central="{ item }">
-                            {{ (item.central === 1) ? "Si" : "No" }}
-                        </template>
-                        <template v-slot:item.enable="{ item }">
-                            {{ (item.enable === 1) ? "Si" : "No" }}
-                        </template>
-                    </v-data-table>
-                </v-card-text>
+                <v-data-table
+                    :items="items"
+                    :headers="fields"
+                    no-data-text="emptyText"
+                    mobile-breakpoint="540"
+                >
+                    <template v-slot:item.Acciones="{ item }">
+                        <div class="row-actions">
+                            <v-btn
+                                small
+                                class="mr-1"
+                                color="primary"
+                                @click="editItem(item)"
+                            >
+                                <v-icon>
+                                    mdi-pencil
+                                </v-icon>
+                            </v-btn>
+                            <v-btn
+                                color="error"
+                                small
+                                @click="deleteItem(item)"
+                            >
+                                <v-icon>
+                                    mdi-delete
+                                </v-icon>
+                            </v-btn>
+                        </div>
+                    </template>
+                    <template v-slot:item.central="{ item }">
+                        {{ (item.central === 1) ? "Si" : "No" }}
+                    </template>
+                    <template v-slot:item.enable="{ item }">
+                        {{ (item.enable === 1) ? "Si" : "No" }}
+                    </template>
+                </v-data-table>
             </v-card>
-        </div>
-    </div>
+        </v-col>
+    </v-row>
 </template>
 
 <script>
@@ -208,7 +215,7 @@ export default {
             editedItem: {},
             //form
             sending: false,
-
+            search:""
         }
     },
     methods: {
