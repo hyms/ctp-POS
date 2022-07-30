@@ -2,7 +2,7 @@
     <v-app>
         <Menu>
         </Menu>
-        <v-main >
+        <v-main>
             <v-container fluid>
                 <slot></slot>
             </v-container>
@@ -19,10 +19,8 @@
             <div class="boxed-container w-full">
                 <div class="mx-6 d-flex justify-space-between">
           <span>
-            &copy; 2021
-              <a
-              class="text-decoration-none"
-          >copito</a>
+            &copy; 2022
+              <a class="text-decoration-none">copito</a>
           </span>
                 </div>
             </div>
@@ -36,12 +34,7 @@ import Menu from './components/Menu.vue'
 export default {
     components: {
         Menu,
-
     },
 
 }
 </script>
-
-<style lang="scss" scoped>
-
-</style>

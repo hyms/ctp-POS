@@ -1,25 +1,22 @@
 <template>
     <v-row>
-        <v-col>
-            <h2>{{ title }}</h2>
-
-            <v-card>
-                <v-card-title>
-                    <v-dialog v-model="dialogDelete" max-width="250px">
-                        <v-card>
-                            <v-card-title class="text-h5">{{ deleteText }}</v-card-title>
-                            <v-card-text class="text-h6">
-                                {{ sureText }}
-                            </v-card-text>
-                            <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <v-btn small color="error" class="ma-1" @click="closeDelete">Cancel</v-btn>
-                                <v-btn small color="primary" class="ma-1" @click="deleteItemConfirm">Borrar</v-btn>
-                            </v-card-actions>
-                        </v-card>
-                    </v-dialog>
-                    <v-row>
-                        <v-col cols="4" sm="6">
+            <v-col>
+                <v-card>
+                    <v-card-title>
+                        <template>
+                            <v-dialog v-model="dialogDelete" max-width="250px">
+                                <v-card>
+                                    <v-card-title class="text-h5">{{ deleteText }}</v-card-title>
+                                    <v-card-text class="text-h6">
+                                        {{ sureText }}
+                                    </v-card-text>
+                                    <v-card-actions>
+                                        <v-spacer></v-spacer>
+                                        <v-btn small color="error" class="ma-1" @click="closeDelete">Cancel</v-btn>
+                                        <v-btn small color="primary" class="ma-1" @click="deleteItemConfirm">Borrar</v-btn>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-dialog>
                             <v-dialog v-model="dialog" max-width="500px" persistent>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-btn
@@ -40,7 +37,7 @@
                                         <form>
                                             <v-alert dismissible type="error" col v-model="alert">
                                                 <ul>
-                                                    <li v-for="(value,key) in errors">
+                                                    <li v-for="(value) in errors">
                                                         {{ value }}
                                                     </li>
                                                 </ul>
@@ -127,63 +124,65 @@
                                     </v-card-actions>
                                 </v-card>
                             </v-dialog>
-                        </v-col>
-                        <v-col cols="8" sm="6">
-                            <v-text-field
-                                v-model="search"
-                                append-icon="mdi-magnify"
-                                label="Buscar"
-                                outlined
-                                dense
-                                single-line
-                                hide-details
-                            ></v-text-field>
-                        </v-col>
-                    </v-row>
-                </v-card-title>
+                        </template>
+                        <v-spacer></v-spacer>
+                        <v-text-field
+                            v-model="search"
+                            append-icon="mdi-magnify"
+                            label="Buscar"
+                            outlined
+                            dense
+                            single-line
+                            hide-details
+                        ></v-text-field>
+                    </v-card-title>
 
-                <v-data-table
-                    :items="items"
-                    :headers="fields"
-                    :search="search"
-                    :no-data-text="emptyText"
-                    mobile-breakpoint="540"
-                >
-                    <template v-slot:item.Acciones="{ item }">
-                        <div class="row-actions">
-                            <v-btn
-                                small
-                                class="ma-1"
-                                color="primary"
-                                @click="editItem(item)"
-                            >
-                                <v-icon>
-                                    mdi-pencil
-                                </v-icon>
-                            </v-btn>
-                            <v-btn
-                                color="error"
-                                class="ma-1"
-                                small
-                                @click="deleteItem(item)"
-                            >
-                                <v-icon>
-                                    mdi-delete
-                                </v-icon>
-                            </v-btn>
-                        </div>
-                    </template>
+                    <v-data-table
+                        :items="items"
+                        :headers="fields"
+                        :search="search"
+                        :no-data-text="emptyText"
+                        mobile-breakpoint="540"
+                    >
+                        <template v-slot:item.Acciones="{ item }">
+                            <div class="row-actions">
+                                <v-btn
+                                    small
+                                    class="ma-1"
+                                    color="primary"
+                                    @click="editItem(item)"
+                                >
+                                    <v-icon>
+                                        mdi-pencil
+                                    </v-icon>
+                                </v-btn>
+                                <v-btn
+                                    color="error"
+                                    class="ma-1"
+                                    small
+                                    @click="deleteItem(item)"
+                                >
+                                    <v-icon>
+                                        mdi-delete
+                                    </v-icon>
+                                </v-btn>
+                            </div>
+                        </template>
 
-                </v-data-table>
-            </v-card>
-        </v-col>
+                    </v-data-table>
+                </v-card>
+            </v-col>
     </v-row>
 </template>
 
 <script>
 import axios from "axios";
+import {Head} from '@inertiajs/inertia-vue'
 
 export default {
+    components: {
+        Head
+    },
     props: {
         errors: Object,
 //table

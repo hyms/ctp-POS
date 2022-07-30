@@ -5,10 +5,12 @@
             flat
             absolute
             color="white"
+            class=""
+            elevation="1"
         >
             <v-app-bar-nav-icon @click="isDrawerOpen = !isDrawerOpen"></v-app-bar-nav-icon>
 
-            <v-toolbar-title>{{ title }}</v-toolbar-title>
+            <v-toolbar-title>{{ $page.props.titlePage}}</v-toolbar-title>
 
             <v-spacer></v-spacer>
                 <Link :href="route('logout')" method="post" class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default primary theme--light">
@@ -63,7 +65,7 @@
                                             <Link
                                                 :href="link2.url"
                                                 :key="key2"
-                                                :class="'v-list-item v-list-item--link theme--dark' + (getUrl()==link2.url?' v-list-item--active':'') "
+                                                :class="'v-list-item v-list-item--link theme--dark' + (getUrl()===link2.url?' v-list-item--active':'') "
                                             >
                                                 <v-list-item-title>
                                                     {{ link2.label }}
@@ -79,7 +81,7 @@
                                     <Link
                                         :href="link.url"
                                         :key="key"
-                                        :class="'v-list-item v-list-item--link theme--dark' + (getUrl()==link.url?' v-list-item--active':'') "
+                                        :class="'v-list-item v-list-item--link theme--dark' + (getUrl()===link.url?' v-list-item--active':'') "
                                     >
                                         <v-list-item-content color>
                                             <v-list-item-title>
@@ -106,12 +108,6 @@ import {Link} from '@inertiajs/inertia-vue'
 export default {
     components: {
         Link
-    },
-    props: {
-        title: {
-            type: String,
-            default: "xCTP",
-        },
     },
     data() {
         return {

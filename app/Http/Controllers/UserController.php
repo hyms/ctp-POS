@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Sucursal;
 use App\Models\User;
 use Exception;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -19,8 +18,9 @@ class UserController extends Controller
     {
         $users = User::getAll();
         $sucursales = Sucursal::getAll();
-        $sucursales = $sucursales->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});
+        $sucursales = $sucursales->map(function ($item){ return ['value'=>$item->id,'text'=>$item->nombre];});
         $roles = User::getRole();
+        Inertia::share('titlePage', 'Usuarios');
         return Inertia::render('Usuarios', ['users' => $users, 'sucursales' => $sucursales, 'roles' => $roles]);
     }
 

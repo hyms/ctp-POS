@@ -20123,7 +20123,8 @@ html.overflow-y-hidden {
 }
 .theme--light.v-list .v-list-group--active:before,
 .theme--light.v-list .v-list-group--active:after {
-    background: rgba(44,56,74, 0.12);
+    background: rgba(44,56,74, 0.9);
+    color: #ffffff;
 }
 
 .theme--dark.v-list {
@@ -20135,7 +20136,10 @@ html.overflow-y-hidden {
 }
 .theme--dark.v-list .v-list-group--active:before,
 .theme--dark.v-list .v-list-group--active:after {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.1);
+}
+.theme--dark.v-list .v-list-item--active:after {
+    color:rgba(255, 255, 255, 0.8);;
 }
 
 .v-sheet.v-list {
@@ -20666,7 +20670,7 @@ html.overflow-y-hidden {
     display: -webkit-box;
 }
 .v-list-item-group .v-list-item--active {
-    color: inherit;
+    color: inherit !important;
 }
 .v-item-group {
     flex: 0 1 auto;
