@@ -17,11 +17,12 @@ class ClienteController extends Controller
     {
         $clientes = Cliente::all();
         $clientes->transform(function ($item, $key) {
-            $item['nombreSucursal']=$item->Sucursal?->nombre;
+            $item['nombreSucursal']=$item->Sucursales?->nombre;
             return $item;
         });
         $sucursales = Sucursal::getAll();
         $sucursales = $sucursales->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});
+        Inertia::share('titlePage', 'Clientes');
         return Inertia::render('Clientes', [
             'clientes' => $clientes,
             'sucursales' => $sucursales

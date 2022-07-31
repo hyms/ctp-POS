@@ -14,7 +14,7 @@ class Cliente extends Model
     protected $guarded = [];
     use SoftDeletes;
 
-    public function Sucursal(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function Sucursales(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Sucursal::class,'id','sucursal');
     }
