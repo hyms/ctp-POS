@@ -47,21 +47,6 @@ class User extends Authenticatable
         return $this->hasOne(Sucursal::class,'id','sucursal');
     }
 
-    public static function getAll(): Collection
-    {
-        $users = DB::table(self::$tables)
-            ->whereNull(self::$tables . '.deleted_at')
-            ->select(self::$tables . '.*', Sucursal::$tables . '.nombre as nombreSucursal')
-            ->leftJoin(Sucursal::$tables, Sucursal::$tables . '.id', '=', self::$tables . '.sucursal');
-        $users = $users->get();
-        $users->transform(function ($item, $key) {
-            $item->nombreRol = self::getRole($item->role);
-            $item->enableView=($item->enable === 1) ? "Si" : "No" ;
-            return $item;
-        });
-        return $users;
-    }
-
     public static function getRole(int $id = null): array|string
     {
         $roles = collect([

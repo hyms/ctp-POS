@@ -21,6 +21,7 @@ class SucursalController extends Controller
             return $item;
         });
         $sucursales = $sucursal->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});
+        Inertia::share('titlePage', 'Sucursales');
         return Inertia::render('Sucursales', ['sucursales' => $sucursal,'sucursalOptions'=>$sucursales]);
     }
 

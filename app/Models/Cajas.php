@@ -15,7 +15,7 @@ class Cajas extends Model
     protected static string $tables = 'cajas';
     protected $guarded = [];
 
-    public function Sucursal(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function Sucursales(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Sucursal::class,'id','sucursal');
     }

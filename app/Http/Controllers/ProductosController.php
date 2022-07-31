@@ -20,6 +20,7 @@ class ProductosController extends Controller
         $productos = TipoProductos::getTipoProductoxProducto($productos);
         $tipoProducto = TipoProductos::getAll();
         $tipoProducto = $tipoProducto->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});
+        Inertia::share('titlePage', 'Productos');
         return Inertia::render('Productos',
             [
                 'productos' => $productos,
@@ -71,6 +72,7 @@ class ProductosController extends Controller
     public function tipos()
     {
         $tipos = TipoProductos::all();
+        Inertia::share('titlePage', 'Tipos de Producto');
         return Inertia::render('TipoProducto', ['tipos' => $tipos]);
     }
 
