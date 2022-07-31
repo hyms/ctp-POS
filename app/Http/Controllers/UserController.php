@@ -16,7 +16,13 @@ class UserController extends Controller
 {
     public function getAll()
     {
-        $users = User::getAll();
+        $users = User::all();
+        $users->transform(function ($item, $key) {
+            $item->nombreRol = User::getRole($item->role);
+            $item->nombreSucursal=$item->Sucursales?->nombre;
+            $item->enableView=($item->enable === 1) ? "Si" : "No" ;
+            return $item;
+        });
         $sucursales = Sucursal::getAll();
         $sucursales = $sucursales->map(function ($item){ return ['value'=>$item->id,'text'=>$item->nombre];});
         $roles = User::getRole();

@@ -17,7 +17,7 @@
                                     </v-card-actions>
                                 </v-card>
                             </v-dialog>
-                            <v-dialog v-model="dialog" max-width="500px" persistent>
+                            <v-dialog v-model="dialog" max-width="500px" persistent scrollable>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-btn
                                         color="primary"

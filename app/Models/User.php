@@ -42,6 +42,11 @@ class User extends Authenticatable
         return $this->nombre . ' ' . $this->apellido;
     }
 
+    public function Sucursales(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Sucursal::class,'id','sucursal');
+    }
+
     public static function getAll(): Collection
     {
         $users = DB::table(self::$tables)
