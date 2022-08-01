@@ -154,16 +154,14 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     //stocks
     Route::get('stocks', [StockController::class, 'getAll'])
         ->name('listaStocks');
-    Route::post('stockMore', [StockController::class, 'postMore'])
-        ->name('guardarStock');
-    Route::post('stockLess', [StockController::class, 'postLess'])
-        ->name('guardarStock');
     Route::delete('stock/{id}', [StockController::class, 'borrar'])
         ->name('eliminarStock');
     Route::post('stockEnable', [StockController::class, 'enableStock'])
         ->name('enablestock');
     Route::post('stockPrice', [StockController::class, 'priceStock'])
         ->name('priceStock');
+    Route::post('stockAmount', [StockController::class, 'amountStock'])
+        ->name('amountStock');
     Route::get('movimientosStock', [StockController::class, 'movimientos'])
         ->name('movimientosStock');
 
