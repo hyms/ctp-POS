@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use phpDocumentor\Reflection\Types\This;
 
 //use Kutia\Larafirebase\Facades\Larafirebase;
 
@@ -37,12 +38,12 @@ class OrdenesTrabajo extends Model
         }
 
         return $estado->first(function ($value, $key) use ($id) {
-            return $key > $id;
+            return $key == $id;
         });
 
     }
 
-    public static function getAll(int $sucursal, int $usuario = null, int $tipo = null, Collection $report = null): Builder
+    public static function  getAll(int $sucursal, int $usuario = null, int $tipo = null, Collection $report = null): Builder
     {
         $isEmpty = (empty($report));
         $ordenes = new Generic(self::$tables);
@@ -54,10 +55,10 @@ class OrdenesTrabajo extends Model
         if ($usuario != null) {
             $report->push(['userDiseñador' => $usuario]);
         }
-        if ($usuario != null) {
+        if ($tipo != null) {
             $report->push(['tipoOrden' => $tipo]);
         }
-        return $ordenes->getAll($report->all(), false, ($isEmpty) ? 500 : null);
+        return $ordenes->getAll(filters:$report->all(), limit:(($isEmpty) ? 500 : null));
     }
 
     public static function newOrden(array $orden, array $productos, int $id = null, bool $reposicion = false)

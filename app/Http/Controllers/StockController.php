@@ -21,7 +21,7 @@ class StockController extends Controller
         $stocksTable = ProductoStock::getTableAdmin($sucursales, $productos);
         Inertia::share('titlePage', 'Stoks de Producto');
 
-        return Inertia::render('Stocks/tabla',
+        return Inertia::render('Stocks',
             [
                 'productos' => $productos,
                 'sucursales' => $sucursales,

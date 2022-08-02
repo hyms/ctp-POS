@@ -178,10 +178,10 @@ class ProductoStock extends Model
                 $productosTipos = DB::table(TipoProductos::$tablesAlter)
                     ->where('tipoProducto', '=', $tiposProducto->id)
                     ->pluck('producto');
-                $stocks[$tiposProducto->id] = $stockTmp
+                $stocks->put($tiposProducto->id, $stockTmp
                     ->whereIn(Producto::$tables . '.id', $productosTipos)
                     ->get()
-                    ->toArray();
+                    ->toArray());
             }
             return $stocks;
         }
@@ -213,7 +213,7 @@ class ProductoStock extends Model
         if (!empty($id)) {
             $stock->where(self::$tables . '.id', '=', $id);
         }
-        $stock->leftJoin(Producto::$tables, self::$tables . 'producto', '=', Producto::$tables . '.id');
+        $stock->leftJoin(Producto::$tables, self::$tables . '.producto', '=', Producto::$tables . '.id');
         $stock->whereNull(Producto::$tables . '.deleted_at');
         return $stock;
     }

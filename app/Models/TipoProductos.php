@@ -18,7 +18,7 @@ class TipoProductos extends Model
     public static function getAll(): Collection
     {
         $tiposProductos = new Generic(self::$tables);
-        return $tiposProductos->getAll();
+        return $tiposProductos->getAll(asc: true);
     }
 
     public static function getTipoProductoxProducto(Collection $productos): Collection

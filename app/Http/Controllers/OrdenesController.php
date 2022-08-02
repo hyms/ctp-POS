@@ -27,12 +27,21 @@ class OrdenesController extends Controller
     {
         $reposicion = 5;
         $sucursal = Auth::user()['sucursal'];
-        $ordenes = OrdenesTrabajo::getAll($sucursal, null,null, collect($report));
-        $ordenes = $ordenes->whereIn('estado', $estado);
-        $ordenes = DetallesOrden::getAll($ordenes->get());
-        $estados = OrdenesTrabajo::estadoCTP();
         $tiposProductos = TipoProductos::getAll();
-        $tiposSelect = TipoProductos::getAll()->pluck('nombre','id');
+        $tiposSelect = TipoProductos::getAll()->map(function ($item, $key) {
+            return ['value' => $item->id, 'text' => $item->nombre];
+        });
+        $ordenes = OrdenesTrabajo::getAll($sucursal, null, null, collect($report));
+        $ordenes = $ordenes->whereIn('estado', $estado);
+        $ordenes = DetallesOrden::setAllDetalle($ordenes->get());
+        $ordenes->transform(function ($item, $key) use ($tiposSelect) {
+            $item->estadoView = OrdenesTrabajo::estadoCTP($item->estado);
+            $tipoOrden = $item->tipoOrden;
+            $tipoOrden =$tiposSelect->first(function ($value,$id) use ($tipoOrden) { return $value['value']==$tipoOrden;});
+            $item->tipoOrdenView =$tipoOrden['text']??'';
+            return $item;
+        });
+        $estados = OrdenesTrabajo::estadoCTP();
         $productos = ProductoStock::getProducts($sucursal, $tiposProductos->toArray());
         $productosAll = ProductoStock::getProducts($sucursal);
 
@@ -56,6 +65,7 @@ class OrdenesController extends Controller
 
     public function getAll()
     {
+        Inertia::share('titlePage', 'Nuevas Ordenes');
         return self::get([1]);
     }
 
@@ -74,7 +84,7 @@ class OrdenesController extends Controller
 
     public function getListVenta(Request $request)
     {
-        return self::get([-1, 0, 1, 2, 5,10],
+        return self::get([-1, 0, 1, 2, 5, 10],
             (Auth::user()->role >= 0 && Auth::user()->role <= 2),
             $request->all(),
             1
@@ -114,7 +124,7 @@ class OrdenesController extends Controller
                 : Cliente::newCliente($request['responsable'], $request['telefono'], Auth::user()['sucursal']);
             //armar detalleOrden
             $orden['montoVenta'] = 0;
-            $detalle =$this->setDetalle($request['productos']);
+            $detalle = $this->setDetalle($request['productos']);
             $orden['total'] = $detalle->sum('total');
             $id = OrdenesTrabajo::newOrden($orden, $detalle->all(), $id);
 //            OrdenesTrabajo::notifyNewOrden($id);
@@ -222,7 +232,7 @@ class OrdenesController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'item' => 'required',
-                'productos'=>'required'
+                'productos' => 'required'
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -242,7 +252,7 @@ class OrdenesController extends Controller
             $orden['montoVenta'] = 0;
             $orden['sucursal'] = Auth::user()['sucursal'];
             $orden['estado'] = 10;
-            $detalle =$this->setDetalle($request['productos']);
+            $detalle = $this->setDetalle($request['productos']);
             $orden['total'] = $detalle->sum('total');
             $id = OrdenesTrabajo::newOrden($orden, $detalle->all(), null, true);
             DetallesOrden::sell($id, true);
@@ -281,6 +291,7 @@ class OrdenesController extends Controller
             'tiposProductos' => $tiposProductos,
         ]);
     }
+
     private function setDetalle(string $productos): Collection
     {
         $detalle = Collection::empty();

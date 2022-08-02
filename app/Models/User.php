@@ -53,7 +53,7 @@ class User extends Authenticatable
             ['value' => 0, 'text' => 'sadmin'],
             ['value' => 1, 'text' => 'admin'],
             ['value' => 2, 'text' => 'venta'],
-            ['value' => 3, 'text' => 'operario']
+            ['value' => 4, 'text' => 'operario']
         ]);
 
         if ($id === null) {
@@ -61,6 +61,6 @@ class User extends Authenticatable
         }
 
         $first = $roles->firstWhere('value', '=', $id);
-        return $first['text'];
+        return $first['text']??'';
     }
 }
