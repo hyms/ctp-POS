@@ -84,6 +84,7 @@ class OrdenesController extends Controller
 
     public function getListVenta(Request $request)
     {
+        Inertia::share('titlePage', 'Buscar Ordenes');
         return self::get([-1, 0, 1, 2, 5, 10],
             (Auth::user()->role >= 0 && Auth::user()->role <= 2),
             $request->all(),

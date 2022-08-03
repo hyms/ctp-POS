@@ -21,15 +21,15 @@ class DetallesOrden extends Model
 
         $detalles = Collection::empty();
         foreach ($detalle as $item) {
-           $detalles->add([
-                    'stock' => $item['stock'],
-                    'cantidad' => $item['cantidad'],
-                    'costo' => $item['costo'],
-                    'total' => $item['total'],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                    'ordenTrabajo' => $ordenTrabajo
-                ]);
+            $detalles->add([
+                'stock' => $item['stock'],
+                'cantidad' => $item['cantidad'],
+                'costo' => $item['costo'],
+                'total' => $item['total'],
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+                'ordenTrabajo' => $ordenTrabajo
+            ]);
 
         }
         DB::table(self::$tables)
@@ -38,14 +38,13 @@ class DetallesOrden extends Model
 
     public static function setAllDetalle(Collection $ordenes): Collection
     {
-        $ordenes->transform(function ($item, $key) {
+        return $ordenes->map(function ($item, $key) {
             $item->detallesOrden = DB::table(self::$tables)
                 ->where('ordenTrabajo', $item->id)
                 ->get()
                 ->toArray();
             return $item;
         });
-        return $ordenes;
     }
 
 //    public static function setOneDetalles($orden)
@@ -84,8 +83,8 @@ class DetallesOrden extends Model
         foreach ($detalleOrden as $item) {
             $totalParcial = $item['costo'] * $item['cantidad'];
             DB::table(self::$tables)
-                ->where('ordenTrabajo',  $idOrden)
-                ->where('stock',  $item['stock'])
+                ->where('ordenTrabajo', $idOrden)
+                ->where('stock', $item['stock'])
                 ->update([
                     'costo' => $item['costo'],
                     'total' => $totalParcial,

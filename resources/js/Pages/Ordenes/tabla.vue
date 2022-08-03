@@ -2,24 +2,23 @@
     <v-row>
         <v-col>
             <!--            <formSearch :report="report" :estados="estados" v-if="typeReport===1" :tiposSelect="tiposSelect"></formSearch>-->
-            <!--            <div class="row mb-2" v-if="typeReport===0">
-
-                                <formOrden
-                                    :isNew="isNew"
-                                    id="ordenModal"
-                                    :itemRow="itemRow"
-                                    :productos="productos[tipoProductoFiltro]"
-                                    :productosSell="productosSell()"
-                                    :tipo="tipoProductoFiltro"
-                                ></formOrden>
-                            </div>
-                        </div>-->
+            <v-dialog v-model="dialog" max-width="500px" scrollable v-if="typeReport===0">
+                <formOrden
+                    :isNew="isNew"
+                    id="ordenModal"
+                    :itemRow="itemRow"
+                    :productos="productos[tipoProductoFiltro]"
+                    :productosSell="productosSell()"
+                    :tipo="tipoProductoFiltro"
+                    :title="titleForm"
+                ></formOrden>
+            </v-dialog>
             <v-card>
                 <v-card-title>
                     <template v-if="typeReport===0" v-for="(tipoProducto,key) in tiposProductos">
                         <v-btn
                             :key="key"
-                            @click="loadModal(tipoProducto.id)"
+                            @click="loadModal(tipoProducto.id,tipoProducto.nombre)"
                             color="primary"
                             small
                             elevation="1"
@@ -61,19 +60,9 @@
                                     :sort-desc.sync="sortDesc"
                                     :sort-direction="sortDirection"
                                 >
-                                    <template #empty="scope">
-                                        <p>{{ textoVacio }}</p>
-                                    </template>
-                                    <template v-slot:cell(estado)="data">
-                                        {{ estados[data.value] }}
-                                    </template>
-                                    <template v-slot:cell(tipoOrden)="data">
-                                        {{ getTipoOrden(data.value) }}
-                                    </template>
                                     <template v-slot:cell(created_at)="data">
                                         {{ data.value | moment("DD/MM/YYYY HH:mm") }}
                                     </template>
-                                    <
                                     <template v-slot:cell(updated_at)="data">
                                         {{ data.value | moment("DD/MM/YYYY HH:mm") }}
                                     </template>
@@ -121,6 +110,7 @@ export default {
         return {
             isNew: true,
             emptyText: 'No existen Ordenes',
+            titleForm:"",
             tipoProductoFiltro: null,
             fields: [],
             itemRow: {},
@@ -130,6 +120,10 @@ export default {
             sortBy: '',
             sortDesc: false,
             sortDirection: 'asc',
+            //forms
+            dialog: false,
+            dialogDelete: false,
+            dialogItem: false,
         }
     },
     props: {
@@ -141,7 +135,7 @@ export default {
         isVenta: Boolean,
         typeReport: Number,
         tiposProductos: Array,
-        tiposSelect: Object,
+        tiposSelect: Array,
         reposicion: Number,
     },
     components: {
@@ -151,13 +145,15 @@ export default {
         formSearch,
     },
     methods: {
-        loadModal(tipo, isNew = true, item = null) {
+        loadModal(tipo, title, isNew = true, item = null) {
+            this.dialog = true;
             this.tipoProductoFiltro = tipo;
             this.isNew = isNew;
             this.itemRow = {};
             if (!isNew) {
                 this.itemRow = item.item;
             }
+            this.titleForm = title;
         },
         borrar(id) {
             this.$inertia.delete(`orden/${id}`, {
@@ -205,28 +201,24 @@ export default {
         this.totalRows = this.ordenes.length;
     },
     created() {
-        if (this.isVenta) {
-            this.fields = [
-                {value: 'tipoOrdenView', text: 'Tipo Orden'},
-                {value: 'codigoServicio', text: 'Codigo'},
-                {value: 'estadoView', text: 'Estado'},
-                {value: 'responsable', text: 'Cliente'},
-                {value: 'montoVenta', text: 'Monto'},
-                {value: 'created_at', text: 'Fecha Nueva Orden'},
-                {value: 'updated_at', text: 'Fecha Pago/Deuda'},
-                {value: 'Acciones', text: 'Acciones'}
-            ];
-        } else {
-            this.fields = [
-                {value: 'tipoOrdenView', text: 'Tipo Orden'},
-                {value: 'codigoServicio', text: 'Codigo'},
-                {value: 'estadoView', text: 'Estado'},
-                {value: 'responsable', text: 'Cliente'},
-                {value: 'telefono', text: 'Telefono'},
-                {value: 'created_at', text: 'Fecha'},
-                {value: 'Acciones', text: 'Acciones'}
-            ];
-        }
+        this.fields = this.isVenta ? [
+            {value: 'tipoOrdenView', text: 'Tipo Orden'},
+            {value: 'codigoServicio', text: 'Codigo'},
+            {value: 'estadoView', text: 'Estado'},
+            {value: 'responsable', text: 'Cliente'},
+            {value: 'montoVenta', text: 'Monto'},
+            {value: 'created_at', text: 'Fecha Nueva Orden'},
+            {value: 'updated_at', text: 'Fecha Pago/Deuda'},
+            {value: 'Acciones', text: 'Acciones'}
+        ] : [
+            {value: 'tipoOrdenView', text: 'Tipo Orden'},
+            {value: 'codigoServicio', text: 'Codigo'},
+            {value: 'estadoView', text: 'Estado'},
+            {value: 'responsable', text: 'Cliente'},
+            {value: 'telefono', text: 'Telefono'},
+            {value: 'created_at', text: 'Fecha'},
+            {value: 'Acciones', text: 'Acciones'}
+        ];
     },
     computed: {
         sortOptions() {

@@ -177,12 +177,8 @@
 
 <script>
 import axios from "axios";
-import {Head} from '@inertiajs/inertia-vue'
 
 export default {
-    components: {
-        Head
-    },
     props: {
         errors: Object,
 //table

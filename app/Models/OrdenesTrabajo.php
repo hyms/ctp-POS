@@ -45,12 +45,9 @@ class OrdenesTrabajo extends Model
 
     public static function  getAll(int $sucursal, int $usuario = null, int $tipo = null, Collection $report = null): Builder
     {
-        $isEmpty = (empty($report));
+        $isEmpty = $report->isEmpty();
         $ordenes = new Generic(self::$tables);
         $ordenes->onlyBuild = true;
-        if ($isEmpty) {
-            $report = Collection::empty();
-        }
         $report->push(['sucursal' => $sucursal]);
         if ($usuario != null) {
             $report->push(['userDiseñador' => $usuario]);
