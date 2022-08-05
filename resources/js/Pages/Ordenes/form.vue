@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="dialog" max-width="500px" scrollable>
+    <v-dialog v-model="dialog" max-width="500px" scrollable persistent>
         <v-card>
             <v-card-title>{{ formTitle }}</v-card-title>
             <v-card-text>
@@ -47,11 +47,11 @@
                             ></v-textarea>
                             <v-autocomplete
                                 v-if="item.type==='search'"
-                                v-model="responsableValue"
+                                v-model="client"
                                 :loading="loading"
                                 :items="clients"
                                 :search-input.sync="search"
-                                :search-input.prop="selectSeachDemo(responsableValue)"
+                                :search-input.prop="selectSeachDemo(client)"
                                 hide-no-data
                                 hide-selected
                                 item-text="nombreResponsable"
@@ -64,7 +64,7 @@
                             ></v-autocomplete>
                         </template>
                     </template>
-                    <v-simple-table dense class="overflow-x-auto" >
+                    <v-simple-table dense class="overflow-x-auto">
                         <template v-slot:default>
                             <thead>
                             <tr>
@@ -119,10 +119,12 @@ export default {
     name: "Orden",
     components: {},
     props: {
-        isNew: Boolean,
         title: String,
-        id: String,
-        itemRow: Object,
+        editedItem: Object,
+        editedIndex: {
+            type: Number,
+            default: -1
+        },
         productos: Array,
         productosSell: Array,
         tipo: Number,
@@ -133,14 +135,21 @@ export default {
     },
     computed: {
         formTitle() {
-            return `${this.isNew ? this.titulo1 : this.titulo2} ${this.title}`;
+            return `${this.editedIndex === -1 ? this.titleNew : this.titleModify} ${this.title}`;
         },
     },
     data() {
         return {
+            //table
+            titleNew: "Nuevo - ",
+            titleModify: "Modificar - ",
+            options: [],
             sending: false,
-            titulo1: "Nuevo - ",
-            titulo2: "Modificar - ",
+            //autocomplete
+            client: "",
+            loading: false,
+            clients: [],
+            //form
             form: {
                 responsable: {
                     label: 'Cliente',
@@ -164,72 +173,71 @@ export default {
                     stateText: null
                 }
             },
-            idForm: -1,
-            errorsData: [],
-            options: [],
-            responsableValue: "",
-            cliente: "",
-            idCliente: null,
-            loading: false,
-            clients: [],
+            idClient: null,
             search: null,
+            errorsData: [],
             alert: false,
         }
     },
     methods: {
-        reset: function () {
-            this.limpiar();
-            if (this.isNew) {
-                this.idForm = null;
-                for (let key in this.form) {
-                    this.form[key].value = "";
-                }
-                this.responsableValue = ""
-            } else {
-                if ('id' in this.itemRow) {
-                    this.idForm = this.itemRow['id'];
-                }
-                for (let key in this.form) {
-                    if (['central', 'enable'].includes(key)) {
-                        this.form[key].value = (this.itemRow[key] === 1)
-                    } else if (['responsable'].includes(key)) {
-                        this.responsableValue = this.itemRow[key];
-                    } else {
-                        this.form[key].value = this.itemRow[key];
-                    }
-                }
-                for (let key in this.productosSell) {
-                    for (let value of this.itemRow.detallesOrden) {
-                        if (this.productosSell[key].id === value.stock) {
-                            this.productosSell[key].cantidad = value.cantidad;
-                        }
-                    }
-                }
-            }
+        close() {
+            this.dialog = false;
+            this.alert = false;
+            this.removeState();
+            this.removeValues();
+            this.$nextTick(() => {
+                this.editedIndex = -1
+                this.editedItem = Object.assign({}, {})
+            })
         },
-        limpiar() {
+        removeState() {
             for (let key in this.form) {
                 this.form[key].state = null;
                 this.form[key].stateText = null;
             }
-            this.errors = [];
+            this.errorsData = [];
         },
-        enviar() {
-            this.sending = true;
-            this.limpiar();
-            let producto = new FormData();
-            producto.append('tipo', this.tipo);
-            if (this.idForm) {
-                producto.append('id', this.idForm);
+        removeValues() {
+            for (let key in this.form) {
+                this.form[key].value = "";
             }
-            if (this.responsableValue) {
-                this.form.responsable.value = this.responsableValue;
+        },
+        setValues() {
+            for (let key in this.form) {
+                this.form[key].value = this.editedItem[key];
+            }
+            for (let key in this.productosSell) {
+                for (let value of this.editedItem?.detallesOrden) {
+                    if (this.productosSell[key].id === value.stock) {
+                        this.productosSell[key].cantidad = value.cantidad;
+                    }
+                }
+            }
+        },
+        setErrors(data) {
+            this.errorsData = data.errors;
+            for (let key in this.form) {
+                if (key in data.errors) {
+                    this.alert = true;
+                    this.form[key].state = false;
+                    this.form[key].stateText = data.errors[key][0];
+                } else {
+                    this.form[key].state = true;
+                    this.form[key].stateText = "";
+                }
+            }
+        },
+        loadFormData() {
+            let formData = new FormData();
+            formData.append('tipo', this.tipo);
+            if (this.editedIndex > 0) {
+                formData.append('id', this.editedIndex);
             }
             for (let key in this.form) {
-                producto.append(key, this.form[key].value);
+                formData.append(key, this.form[key].value);
             }
-            if (this.idCliente) {
-                producto.append('cliente', this.idCliente);
+            if (this.idClient) {
+                formData.append('cliente', this.idClient);
             }
             let items = [];
             for (let value of this.productosSell) {
@@ -238,23 +246,21 @@ export default {
                 }
             }
             if (items.length > 0) {
-                producto.append('productos', JSON.stringify(items));
+                formData.append('productos', JSON.stringify(items));
             }
-            axios.post('/orden', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            return formData;
+        },
+        enviar() {
+            this.sending = true;
+            this.removeState();
+
+            axios.post('/orden', this.loadFormData(), {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
-                    if (data["status"] == 0) {
-                        this.$bvModal.hide(this.id)
+                    if (data["status"] === 0) {
+                        this.close();
                         this.$inertia.get(data["path"])
                     } else {
-                        for (let key in this.form) {
-                            if (key in data.errors) {
-                                this.form[key].state = false;
-                                this.form[key].stateText = data.errors[key][0];
-                            } else {
-                                this.form[key].state = true;
-                                this.form[key].stateText = "";
-                            }
-                        }
+                        this.setErrors(data);
                     }
                 })
                 .catch(error => {
@@ -269,16 +275,19 @@ export default {
         selectSeachDemo(item) {
             this.form.responsable.value = item?.nombreResponsable;
             this.form.telefono.value = item?.telefono;
-            this.idCliente = item?.id
+            this.idClient = item?.id
         },
-        querySelections(v) {
+        querySelections(search) {
             // Items have already been requested
-            if (this.isLoading) return
+            if (this.loading) {
+                return
+            }
             this.loading = true
             // Simulated ajax query
-            axios.get('/search/' + escape(v)).then(({data}) => {
-                this.clients = data.items;
-            })
+            axios.get('/search/' + escape(search))
+                .then(({data}) => {
+                    this.clients = data.items;
+                })
                 .finally(() => {
                     this.loading = false
                 });
@@ -286,7 +295,7 @@ export default {
     },
     watch: {
         search(val) {
-            val && val !== this.responsableValue && this.querySelections(val)
+            val && val !== this.client && this.querySelections(val)
         },
         dialog(val) {
             val || this.close()
@@ -296,6 +305,6 @@ export default {
 </script>
 <style>
 .texto-small {
-    font-size: 0.85em !important;
+    font-size: 0.9em !important;
 }
 </style>

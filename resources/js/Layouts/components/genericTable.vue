@@ -284,8 +284,8 @@ export default {
             }
         },
         setErrors(data) {
+            this.errors = data.errors;
             for (let key in this.form) {
-                this.errors = data.errors;
                 if (key in data.errors) {
                     this.alert = true;
                     this.form[key].state = false;
