@@ -2,17 +2,17 @@
     <v-row>
         <v-col>
             <!--            <formSearch :report="report" :estados="estados" v-if="typeReport===1" :tiposSelect="tiposSelect"></formSearch>-->
-            <v-dialog v-model="dialog" max-width="500px" scrollable v-if="typeReport===0">
-                <formOrden
-                    :isNew="isNew"
-                    id="ordenModal"
-                    :itemRow="itemRow"
-                    :productos="productos[tipoProductoFiltro]"
-                    :productosSell="productosSell()"
-                    :tipo="tipoProductoFiltro"
-                    :title="titleForm"
-                ></formOrden>
-            </v-dialog>
+            <formOrden
+                :isNew="isNew"
+                id="ordenModal"
+                :itemRow="itemRow"
+                :productos="productos[tipoProductoFiltro]"
+                :productosSell="productosSell()"
+                :tipo="tipoProductoFiltro"
+                :title="titleForm"
+                :dialog="dialog"
+                v-if="typeReport===0"
+            ></formOrden>
             <v-card>
                 <v-card-title>
                     <template v-if="typeReport===0" v-for="(tipoProducto,key) in tiposProductos">
@@ -22,7 +22,7 @@
                             color="primary"
                             small
                             elevation="1"
-                            class="mx-2"
+                            class="mx-2 my-1"
                         >
                             {{ tipoProducto.nombre }}
                         </v-btn>
@@ -110,7 +110,7 @@ export default {
         return {
             isNew: true,
             emptyText: 'No existen Ordenes',
-            titleForm:"",
+            titleForm: "",
             tipoProductoFiltro: null,
             fields: [],
             itemRow: {},
