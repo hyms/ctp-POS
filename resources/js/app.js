@@ -4,6 +4,9 @@ import '@mdi/font/css/materialdesignicons.css'
 import Vue from 'vue';
 import Vuetify from 'vuetify'
 import es from 'vuetify/lib/locale/es'
+const vueMoment = require('vue-moment')
+const moment = require('moment')
+require('moment/locale/es')
 // import 'vuetify/dist/vuetify.min.css'
 
 import {createInertiaApp} from '@inertiajs/inertia-vue';
@@ -13,6 +16,7 @@ createInertiaApp({
     resolve: name => require(`./Pages/${name}`),
     setup({el, App, props, plugin}) {
         Vue.use(plugin)
+        Vue.use(vueMoment, {moment});
         Vue.use(Vuetify)
         Vue.mixin({methods: {route}})
         new Vue({
@@ -40,4 +44,4 @@ createInertiaApp({
     },
 })
 
-InertiaProgress.init({color: '#4B5563'});
+InertiaProgress.init({color: '#007b89'});

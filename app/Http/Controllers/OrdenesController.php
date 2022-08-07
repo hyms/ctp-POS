@@ -119,14 +119,11 @@ class OrdenesController extends Controller
             $orden['tipoOrden'] = $request['tipo'];
             $orden['responsable'] = $request['responsable'];
             $orden['telefono'] = $request['telefono'];
-            $orden['observaciones'] = !empty($request['observaciones']) ? $request['observaciones'] : "";
-            $orden['cliente'] = (!empty($request['cliente']))
-                ? $request['cliente']
-                : Cliente::newCliente($request['responsable'], $request['telefono'], Auth::user()['sucursal']);
+            $orden['observaciones'] = $request['observaciones'] ??"";
+            $orden['cliente'] = $request['cliente'] ?? Cliente::newCliente($request['responsable'], $request['telefono'], Auth::user()['sucursal']);
             //armar detalleOrden
-            $orden['montoVenta'] = 0;
             $detalle = $this->setDetalle($request['productos']);
-            $orden['total'] = $detalle->sum('total');
+            $orden['montoVenta'] = $detalle->sum('total');
             $id = OrdenesTrabajo::newOrden($orden, $detalle->all(), $id);
 //            OrdenesTrabajo::notifyNewOrden($id);
             return response()->json(["status" => 0, 'path' => 'ordenes', 'id' => $id]);
@@ -303,7 +300,7 @@ class OrdenesController extends Controller
             $tmp['producto'] = $item['producto'];
             $tmp['stock'] = $item['id'];
             $tmp['cantidad'] = $item['cantidad'];
-            $tmp['costo'] = !empty($item['costo']) ? $item['costo'] : 0;
+            $tmp['costo'] = $item['costo'] ?? 0;
             $tmp['total'] = $tmp['cantidad'] * $tmp['costo'];
             $detalle->add($tmp);
 //            $orden['montoVenta'] += $tmp['total'];

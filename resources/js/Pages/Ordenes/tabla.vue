@@ -3,15 +3,15 @@
         <v-col>
             <!--            <formSearch :report="report" :estados="estados" v-if="typeReport===1" :tiposSelect="tiposSelect"></formSearch>-->
             <formOrden
-                :isNew="isNew"
-                id="ordenModal"
-                :itemRow="itemRow"
+                :edited-index="isNew"
+                :edited-item="itemRow"
                 :productos="productos[tipoProductoFiltro]"
                 :productosSell="productosSell()"
                 :tipo="tipoProductoFiltro"
                 :title="titleForm"
                 :dialog="dialog"
                 v-if="typeReport===0"
+                @close="close()"
             ></formOrden>
             <v-card>
                 <v-card-title>
@@ -22,7 +22,7 @@
                             color="primary"
                             small
                             elevation="1"
-                            class="mx-2 my-1"
+                            class="mr-2 my-1"
                         >
                             {{ tipoProducto.nombre }}
                         </v-btn>
@@ -46,6 +46,12 @@
                     :headers="fields"
                     :no-data-text="emptyText"
                     mobile-breakpoint="540">
+                    <template v-slot:item.created_at="{item}">
+                        {{ item.created_at | moment("DD/MM/YYYY HH:mm") }}
+                    </template>
+                    <template v-slot:item.updated_at="{item}">
+                        {{ item.updated_at | moment("DD/MM/YYYY HH:mm") }}
+                    </template>
                 </v-data-table>
                 <!--                <b-table
                                     striped
@@ -101,25 +107,18 @@ import formOrden from './form'
 import itemOrden from './item'
 import itemReposicion from './itemReposicion'
 import formSearch from "./formSearch";
-import moment from 'moment';
 
 export default {
     name: "Ordenes",
     layout: Authenticated,
     data() {
         return {
-            isNew: true,
             emptyText: 'No existen Ordenes',
             titleForm: "",
             tipoProductoFiltro: null,
             fields: [],
+            isNew: -1,
             itemRow: {},
-            totalRows: 1,
-            currentPage: 1,
-            perPage: 20,
-            sortBy: '',
-            sortDesc: false,
-            sortDirection: 'asc',
             //forms
             dialog: false,
             dialogDelete: false,
@@ -145,15 +144,22 @@ export default {
         formSearch,
     },
     methods: {
-        loadModal(tipo, title, isNew = true, item = null) {
+        loadModal(tipo, title, id = -1, item = null) {
             this.dialog = true;
             this.tipoProductoFiltro = tipo;
-            this.isNew = isNew;
+            this.isNew = id;
             this.itemRow = {};
-            if (!isNew) {
+            if (id>0) {
                 this.itemRow = item.item;
             }
             this.titleForm = title;
+        },
+        close() {
+            this.dialog=false;
+             this.$nextTick(() => {
+                 this.editedIndex = -1
+                 this.editedItem = Object.assign({}, {})
+             })
         },
         borrar(id) {
             this.$inertia.delete(`orden/${id}`, {
@@ -219,16 +225,6 @@ export default {
             {value: 'created_at', text: 'Fecha'},
             {value: 'Acciones', text: 'Acciones'}
         ];
-    },
-    computed: {
-        sortOptions() {
-            // Create an options list from our fields
-            return this.fields
-                .filter(f => f.sortable)
-                .map(f => {
-                    return {text: f.label, value: f.key}
-                })
-        }
     },
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="dialog" max-width="500px" scrollable persistent>
+    <v-dialog  v-model="dialog" max-width="500px" scrollable persistent>
         <v-card>
             <v-card-title>{{ formTitle }}</v-card-title>
             <v-card-text>
@@ -86,6 +86,7 @@
                                             v-model="productosSell[key].cantidad"
                                             outlined
                                             dense
+                                            single-line
                                             style="min-width: 50px; max-width: 100px"
                                             class="my-1 texto-small"
                                             hide-details="auto"
@@ -128,10 +129,7 @@ export default {
         productos: Array,
         productosSell: Array,
         tipo: Number,
-        dialog: {
-            type: Boolean,
-            default: false
-        },
+        dialog: Boolean,
     },
     computed: {
         formTitle() {
@@ -181,14 +179,11 @@ export default {
     },
     methods: {
         close() {
-            this.dialog = false;
             this.alert = false;
+            this.client="";
             this.removeState();
             this.removeValues();
-            this.$nextTick(() => {
-                this.editedIndex = -1
-                this.editedItem = Object.assign({}, {})
-            })
+            this.$emit("close");
         },
         removeState() {
             for (let key in this.form) {
@@ -296,9 +291,6 @@ export default {
     watch: {
         search(val) {
             val && val !== this.client && this.querySelections(val)
-        },
-        dialog(val) {
-            val || this.close()
         },
     }
 }
