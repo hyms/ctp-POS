@@ -1,5 +1,5 @@
 <template>
-    <v-dialog  v-model="dialog" max-width="500px" scrollable persistent>
+    <v-dialog v-model="dialog" max-width="500px" scrollable>
         <v-card>
             <v-card-title>{{ formTitle }}</v-card-title>
             <v-card-text>
@@ -101,10 +101,10 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn small color="error" class="ma-1" @click="close">
+                <v-btn small color="error" class="ma-1" @click="closed">
                     Cancelar
                 </v-btn>
-                <v-btn small color="primary" class="ma-1" @click="enviar"
+                <v-btn small color="primary" class="ma-1" @click="sended"
                        :loading="sending" :disabled="sending">
                     Guardar
                 </v-btn>
@@ -133,6 +133,11 @@ export default {
     },
     computed: {
         formTitle() {
+            if (this.editedIndex > 0) {
+                this.setValues();
+            } else {
+                this.removeValues();
+            }
             return `${this.editedIndex === -1 ? this.titleNew : this.titleModify} ${this.title}`;
         },
     },
@@ -144,7 +149,7 @@ export default {
             options: [],
             sending: false,
             //autocomplete
-            client: "",
+            client: {},
             loading: false,
             clients: [],
             //form
@@ -178,9 +183,8 @@ export default {
         }
     },
     methods: {
-        close() {
+        closed() {
             this.alert = false;
-            this.client="";
             this.removeState();
             this.removeValues();
             this.$emit("close");
@@ -196,6 +200,8 @@ export default {
             for (let key in this.form) {
                 this.form[key].value = "";
             }
+            this.client = Object.assign({}, {});
+            this.clients = [];
         },
         setValues() {
             for (let key in this.form) {
@@ -207,6 +213,14 @@ export default {
                         this.productosSell[key].cantidad = value.cantidad;
                     }
                 }
+            }
+            if (this.editedItem.cliente !== "") {
+                this.client = {
+                    id: this.editedItem.cliente,
+                    nombreResponsable: this.editedItem.responsable,
+                    telefono: this.editedItem.telefono
+                }
+                this.clients.push(this.client);
             }
         },
         setErrors(data) {
@@ -245,14 +259,14 @@ export default {
             }
             return formData;
         },
-        enviar() {
+        sended() {
             this.sending = true;
             this.removeState();
 
             axios.post('/orden', this.loadFormData(), {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
-                        this.close();
+                        this.closed();
                         this.$inertia.get(data["path"])
                     } else {
                         this.setErrors(data);

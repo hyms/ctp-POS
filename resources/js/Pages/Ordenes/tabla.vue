@@ -3,8 +3,8 @@
         <v-col>
             <!--            <formSearch :report="report" :estados="estados" v-if="typeReport===1" :tiposSelect="tiposSelect"></formSearch>-->
             <formOrden
-                :edited-index="isNew"
-                :edited-item="itemRow"
+                :edited-index="editedIndex"
+                :edited-item="editedItem"
                 :productos="productos[tipoProductoFiltro]"
                 :productosSell="productosSell()"
                 :tipo="tipoProductoFiltro"
@@ -52,6 +52,30 @@
                     <template v-slot:item.updated_at="{item}">
                         {{ item.updated_at | moment("DD/MM/YYYY HH:mm") }}
                     </template>
+                    <template v-slot:item.Acciones="{ item }">
+                        <div class="row-actions">
+                            <v-btn
+                                small
+                                class="ma-1"
+                                color="primary"
+                                @click="loadModal(item.tipoOrden,item.tipoOrdenView,item.id,item)"
+                            >
+                                <v-icon>
+                                    mdi-pencil
+                                </v-icon>
+                            </v-btn>
+<!--                            <v-btn
+                                color="error"
+                                class="ma-1"
+                                small
+                                @click="deleteItem(item)"
+                            >
+                                <v-icon>
+                                    mdi-delete
+                                </v-icon>
+                            </v-btn>-->
+                        </div>
+                    </template>
                 </v-data-table>
                 <!--                <b-table
                                     striped
@@ -66,12 +90,6 @@
                                     :sort-desc.sync="sortDesc"
                                     :sort-direction="sortDirection"
                                 >
-                                    <template v-slot:cell(created_at)="data">
-                                        {{ data.value | moment("DD/MM/YYYY HH:mm") }}
-                                    </template>
-                                    <template v-slot:cell(updated_at)="data">
-                                        {{ data.value | moment("DD/MM/YYYY HH:mm") }}
-                                    </template>
                                     <template v-slot:cell(Acciones)="row">
                                         <div class="row-actions">
                                             <b-button variant="dark" v-b-modal="'ordenModal'"
@@ -117,8 +135,8 @@ export default {
             titleForm: "",
             tipoProductoFiltro: null,
             fields: [],
-            isNew: -1,
-            itemRow: {},
+            editedIndex: -1,
+            editedItem: {},
             //forms
             dialog: false,
             dialogDelete: false,
@@ -147,10 +165,10 @@ export default {
         loadModal(tipo, title, id = -1, item = null) {
             this.dialog = true;
             this.tipoProductoFiltro = tipo;
-            this.isNew = id;
-            this.itemRow = {};
+            this.editedIndex = id;
+            this.editedItem = {};
             if (id>0) {
-                this.itemRow = item.item;
+                this.editedItem = item;
             }
             this.titleForm = title;
         },
