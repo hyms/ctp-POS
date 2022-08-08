@@ -35,19 +35,21 @@
                         </v-btn>
                     </template>
                 </v-card-title>
-                <!--                <item-orden-->
-                <!--                    id="itemModal"-->
-                <!--                    :isVenta="isVenta"-->
-                <!--                    :item="itemRow"-->
-                <!--                    :productos="productosAll"-->
-                <!--                ></item-orden>-->
-                <!--                <item-reposicion-->
-                <!--                    id="itemRModal"-->
-                <!--                    :is-new="true"-->
-                <!--                    :item="itemRow"-->
-                <!--                    :productos="productos[tipoProductoFiltro]"-->
-                <!--                    :productosSell="productosSell()"-->
-                <!--                ></item-reposicion>-->
+                <item-orden
+                    :dialog="dialogItem"
+                    :isVenta="isVenta"
+                    :item="editedItem"
+                    :productos="productosAll"
+                    @close="close()"
+                ></item-orden>
+                <item-reposicion
+                    :dialog="dialogReposicion"
+                    :isVenta="isVenta"
+                    :item="editedItem"
+                    :productos="productos[tipoProductoFiltro]"
+                    :productosSell="productosSell()"
+                    @close="close()"
+                ></item-reposicion>
                 <v-data-table
                     :items="ordenes"
                     :headers="fields"
@@ -76,58 +78,32 @@
                                 color="error"
                                 class="ma-1"
                                 small
-                                @click="deleted(item.id)" size="sm"
-                                v-if="item.estado==1 && viewModify(item.created_at)">
+                                @click="deleted(item.id)"
+                                v-if="item.estado===1 && viewModify(item.created_at)">
                                 <v-icon>
                                     mdi-file-document-remove
                                 </v-icon>
                             </v-btn>
-                            <!--                            <v-btn
-                                                            color="error"
-                                                            class="ma-1"
-                                                            small
-                                                            @click="deleteItem(item)"
-                                                        >
-                                                            <v-icon>
-                                                                mdi-delete
-                                                            </v-icon>
-                                                        </v-btn>-->
+                            <v-btn
+                                color="primary"
+                                class="ma-1"
+                                small
+                                @click="loadItem(item)"
+                            >
+                                <v-icon>
+                                    mdi-file-document-check
+                                </v-icon>
+                            </v-btn>
+                            <v-btn color="info" v-b-modal="'itemRModal'"
+                                   @click="loadReposicion(item.tipoOrden,item)"
+                                   v-if="[0,2].includes(item.estado) && viewReposicion(item.created_at)">
+                                <v-icon>
+                                    mdi-file-document-alert
+                                </v-icon>
+                            </v-btn>
                         </div>
                     </template>
                 </v-data-table>
-                <!--                <b-table
-                                    striped
-                                    hover
-                                    :items="ordenes"
-                                    :fields="fields"
-                                    show-empty
-                                    small
-                                    :current-page="currentPage"
-                                    :per-page="perPage"
-                                    :sort-by.sync="sortBy"
-                                    :sort-desc.sync="sortDesc"
-                                    :sort-direction="sortDirection"
-                                >
-                                    <template v-slot:cell(Acciones)="row">
-                                        <div class="row-actions">
-
-                                            <b-button variant="primary" v-b-modal="'itemModal'"
-                                                      @click="loadModal(row.item.tipoOrden,false,row)"
-                                                      size="sm">
-                                                {{ boton2 }}
-                                            </b-button>
-                                            <b-button variant="danger" @click="borrar(row.item.id)" size="sm"
-                                                      v-if="row.item.estado==1 && viewModify(row.item.created_at)">
-                                                {{ boton3 }}
-                                            </b-button>
-                                            <b-button variant="info" v-b-modal="'itemRModal'"
-                                                      @click="loadModal(row.item.tipoOrden,false,row)"
-                                                      v-if="[0,2].includes(row.item.estado) && viewReposicion(row.item.created_at)">
-                                                {{ boton5 }}
-                                            </b-button>
-                                        </div>
-                                    </template>
-                                </b-table>-->
             </v-card>
         </v-col>
     </v-row>
@@ -143,13 +119,9 @@ import deleteItem from "@/Layouts/components/deleteItem.vue";
 import moment from 'moment'
 
 export default {
-    name: "Ordenes",
     layout: Authenticated,
     data() {
         return {
-            boton2: "Ver",
-            boton3: "Anular",
-            boton4: "Modificar",
             boton5: "Reposicion",
             emptyText: 'No existen Ordenes',
             deleteText: "Anular",
@@ -162,7 +134,8 @@ export default {
             dialogOrden: false,
             dialogDelete: false,
             dialogItem: false,
-            baseDeletePath:"orden"
+            dialogReposicion: false,
+            baseDeletePath: "orden"
         }
     },
     props: {
@@ -186,8 +159,16 @@ export default {
     },
     methods: {
         loadOrden(tipo, title, id = -1, item = null) {
-            this.dialogOrden = true;
             this.loadDialog(tipo, title, id, item)
+            this.dialogOrden = true;
+        },
+        loadItem(item) {
+            this.loadDialog(null, "", item.id, item)
+            this.dialogItem = true;
+        },
+        loadReposicion(tipoOrden, item) {
+            this.loadDialog(tipoOrden, "", item.id, item)
+            this.dialogReposicion = true;
         },
         loadDialog(tipo, title, id, item) {
             this.tipoProductoFiltro = tipo;
@@ -201,12 +182,14 @@ export default {
         close() {
             this.dialogOrden = false;
             this.dialogDelete = false;
+            this.dialogItem = false;
+            this.dialogReposicion = false;
             this.$nextTick(() => {
                 this.editedIndex = -1
                 this.editedItem = Object.assign({}, {})
             })
         },
-        deleted(id){
+        deleted(id) {
             this.editedIndex = id
             this.dialogDelete = true
         },
@@ -235,16 +218,6 @@ export default {
             limitDay = moment(limitDay).add(this.reposicion, 'days');
             return moment(limitDay).isSameOrAfter(today, 'day');
         },
-        getTipoOrden(value) {
-            let text = "";
-            for (let tipoProducto of this.tiposProductos) {
-                if (tipoProducto.id === value) {
-                    text = tipoProducto.nombre;
-                    break;
-                }
-            }
-            return text;
-        }
     },
     mounted() {
         // Set the initial number of items
