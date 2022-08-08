@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated'
-import genericTable from '@/Layouts/components/genericTable';
+import Authenticated from '@/Layouts/Authenticated.vue'
+import genericTable from '@/Layouts/components/genericTable.vue';
 
 export default {
     layout: Authenticated,
