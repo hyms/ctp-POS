@@ -25,21 +25,20 @@ class OrdenesTrabajo extends Model
     static public function estadoCTP($id = null)
     {
         $estado = collect([
-            '-1' => 'Anulado',
-            '0' => 'Pagado',
-            '1' => 'En Proceso',
-            '2' => 'Deuda',
-            '5' => 'Quemado',
-            '10' => 'Reposicion'
+            ['value'=> '-1' ,'text'=> 'Anulado'],
+            ['value'=> '0' ,'text'=> 'Pagado'],
+            ['value'=> '1' ,'text'=> 'En Proceso'],
+            ['value'=> '2' ,'text'=> 'Deuda'],
+            ['value'=> '5' ,'text'=> 'Quemado'],
+            ['value'=> '10' ,'text'=> 'Reposicion'],
         ]);
 
         if ($id === null) {
-            return $estado->all();
+            return $estado;
         }
 
-        return $estado->first(function ($value, $key) use ($id) {
-            return $key == $id;
-        });
+        $first = $estado->firstWhere('value', '=', $id);
+        return $first['text']??'';
 
     }
 
@@ -48,12 +47,12 @@ class OrdenesTrabajo extends Model
         $isEmpty = $report->isEmpty();
         $ordenes = new Generic(self::$tables);
         $ordenes->onlyBuild = true;
-        $report->push(['sucursal' => $sucursal]);
+        $report->put('sucursal', $sucursal);
         if ($usuario != null) {
-            $report->push(['userDiseñador' => $usuario]);
+            $report->put('userDiseñador', $usuario);
         }
         if ($tipo != null) {
-            $report->push(['tipoOrden' => $tipo]);
+            $report->put('tipoOrden', $tipo);
         }
         return $ordenes->getAll(filters:$report->all(), limit:(($isEmpty) ? 500 : null));
     }
@@ -173,7 +172,7 @@ class OrdenesTrabajo extends Model
         }
     }
 
-    public static function getTotal(array $ordenes)
+    public static function getTotal(Collection $ordenes)
     {
         $pagado = 0;
         $total = 0;
@@ -181,16 +180,18 @@ class OrdenesTrabajo extends Model
             if ($orden->estado == 1) {
                 continue;
             }
-            $detalle = $orden->detallesOrden;
-            foreach ($detalle as $item) {
+            $detalle = collect($orden->detallesOrden);
+            $total += $detalle->sum('total');
+          /*  foreach ($detalle as $item) {
                 $total += $item->total;
-            }
+            }*/
             $movimientos = DB::table(MovimientoCaja::$tables)
                 ->where('ordenTrabajo', $orden->id)
                 ->get();
-            foreach ($movimientos as $movimiento) {
+            $pagado += $movimientos->sum('monto');
+            /*foreach ($movimientos as $movimiento) {
                 $pagado += $movimiento->monto;
-            }
+            }*/
         }
         return ($total - $pagado) == 0
             ? $total

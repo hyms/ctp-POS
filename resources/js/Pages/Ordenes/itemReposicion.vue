@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="dialog" max-width="500px" scrollable persistent>
+    <v-dialog v-model="dialog" max-width="450px" scrollable persistent>
         <v-card>
             <v-card-title>
                 {{ 'Reposicion de ' + titulo + ' ' + (item.codigoServicio ? item.codigoServicio : item.correlativo) }}
@@ -20,8 +20,8 @@
                         <tbody>
                         <template v-for="(product,key) in productos">
                             <tr>
-                                <td>{{ product.formato }}</td>
-                                <td>{{ product.dimension }}</td>
+                                <td>{{ key + 1 }}</td>
+                                <td>{{ product.formato }} ({{ product.dimension }})</td>
                                 <td>
                                     <v-text-field
                                         type="number"

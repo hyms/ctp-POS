@@ -1,7 +1,6 @@
 <template>
     <v-row>
         <v-col>
-            <!--            <formSearch :report="report" :estados="estados" v-if="typeReport===1" :tiposSelect="tiposSelect"></formSearch>-->
             <formOrden
                 :edited-index="editedIndex"
                 :edited-item="editedItem"
@@ -48,6 +47,18 @@
                             class="mr-2 my-1"
                         >
                             {{ tipoProducto.nombre }}
+                        </v-btn>
+                    </template>
+                    <formSearch
+                        :report="report"
+                        :estados="estados"
+                        v-if="typeReport===1"
+                        :tiposSelect="tiposSelect"
+                    ></formSearch>
+                    <template v-if="report.total">
+                        <v-spacer></v-spacer>
+                        <v-btn outlined  color="secondary">
+                            <strong>Total:</strong> {{ report.total }}
                         </v-btn>
                     </template>
                 </v-card-title>
@@ -125,7 +136,6 @@ export default {
     layout: Authenticated,
     data() {
         return {
-            boton5: "Reposicion",
             emptyText: 'No existen Ordenes',
             deleteText: "Anular",
             titleForm: "",
@@ -145,7 +155,7 @@ export default {
         ordenes: Array,
         productos: Object,
         productosAll: Array,
-        estados: Object,
+        estados: Array,
         report: Object,
         isVenta: Boolean,
         typeReport: Number,
