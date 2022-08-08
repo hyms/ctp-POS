@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="dialog" max-width="500px" scrollable>
+    <v-dialog v-model="dialog" max-width="500px" scrollable persistent>
         <v-card>
             <v-card-title>{{ formTitle }}</v-card-title>
             <v-card-text>

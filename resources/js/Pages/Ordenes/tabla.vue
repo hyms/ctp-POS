@@ -9,16 +9,23 @@
                 :productosSell="productosSell()"
                 :tipo="tipoProductoFiltro"
                 :title="titleForm"
-                :dialog="dialog"
+                :dialog="dialogOrden"
                 v-if="typeReport===0"
                 @close="close()"
             ></formOrden>
+            <delete-item
+                :dialog="dialogDelete"
+                :edited-index="editedIndex"
+                :base-path="baseDeletePath"
+                :delete-text="deleteText"
+                @close="close()"
+            />
             <v-card>
                 <v-card-title>
                     <template v-if="typeReport===0" v-for="(tipoProducto,key) in tiposProductos">
                         <v-btn
                             :key="key"
-                            @click="loadModal(tipoProducto.id,tipoProducto.nombre)"
+                            @click="loadOrden(tipoProducto.id,tipoProducto.nombre)"
                             color="primary"
                             small
                             elevation="1"
@@ -57,23 +64,34 @@
                             <v-btn
                                 small
                                 class="ma-1"
-                                color="primary"
-                                @click="loadModal(item.tipoOrden,item.tipoOrdenView,item.id,item)"
+                                color="secondary"
+                                @click="loadOrden(item.tipoOrden,item.tipoOrdenView,item.id,item)"
+                                v-if="!isVenta && viewModify(item.created_at)"
                             >
                                 <v-icon>
-                                    mdi-pencil
+                                    mdi-file-document-edit
                                 </v-icon>
                             </v-btn>
-<!--                            <v-btn
+                            <v-btn
                                 color="error"
                                 class="ma-1"
                                 small
-                                @click="deleteItem(item)"
-                            >
+                                @click="deleted(item.id)" size="sm"
+                                v-if="item.estado==1 && viewModify(item.created_at)">
                                 <v-icon>
-                                    mdi-delete
+                                    mdi-file-document-remove
                                 </v-icon>
-                            </v-btn>-->
+                            </v-btn>
+                            <!--                            <v-btn
+                                                            color="error"
+                                                            class="ma-1"
+                                                            small
+                                                            @click="deleteItem(item)"
+                                                        >
+                                                            <v-icon>
+                                                                mdi-delete
+                                                            </v-icon>
+                                                        </v-btn>-->
                         </div>
                     </template>
                 </v-data-table>
@@ -92,11 +110,7 @@
                                 >
                                     <template v-slot:cell(Acciones)="row">
                                         <div class="row-actions">
-                                            <b-button variant="dark" v-b-modal="'ordenModal'"
-                                                      @click="loadModal(row.item.tipoOrden,false,row)"
-                                                      size="sm" v-if="!isVenta && viewModify(row.item.created_at)">
-                                                {{ boton4 }}
-                                            </b-button>
+
                                             <b-button variant="primary" v-b-modal="'itemModal'"
                                                       @click="loadModal(row.item.tipoOrden,false,row)"
                                                       size="sm">
@@ -120,27 +134,35 @@
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated'
-import formOrden from './form'
-import itemOrden from './item'
-import itemReposicion from './itemReposicion'
-import formSearch from "./formSearch";
+import Authenticated from '@/Layouts/Authenticated.vue'
+import formOrden from './form.vue'
+import itemOrden from './item.vue'
+import itemReposicion from './itemReposicion.vue'
+import formSearch from './formSearch.vue'
+import deleteItem from "@/Layouts/components/deleteItem.vue";
+import moment from 'moment'
 
 export default {
     name: "Ordenes",
     layout: Authenticated,
     data() {
         return {
+            boton2: "Ver",
+            boton3: "Anular",
+            boton4: "Modificar",
+            boton5: "Reposicion",
             emptyText: 'No existen Ordenes',
+            deleteText: "Anular",
             titleForm: "",
             tipoProductoFiltro: null,
             fields: [],
             editedIndex: -1,
             editedItem: {},
-            //forms
-            dialog: false,
+            //dialogs
+            dialogOrden: false,
             dialogDelete: false,
             dialogItem: false,
+            baseDeletePath:"orden"
         }
     },
     props: {
@@ -160,29 +182,33 @@ export default {
         itemOrden,
         itemReposicion,
         formSearch,
+        deleteItem,
     },
     methods: {
-        loadModal(tipo, title, id = -1, item = null) {
-            this.dialog = true;
+        loadOrden(tipo, title, id = -1, item = null) {
+            this.dialogOrden = true;
+            this.loadDialog(tipo, title, id, item)
+        },
+        loadDialog(tipo, title, id, item) {
             this.tipoProductoFiltro = tipo;
             this.editedIndex = id;
             this.editedItem = {};
-            if (id>0) {
+            if (id > 0) {
                 this.editedItem = item;
             }
             this.titleForm = title;
         },
         close() {
-            this.dialog=false;
-             this.$nextTick(() => {
-                 this.editedIndex = -1
-                 this.editedItem = Object.assign({}, {})
-             })
-        },
-        borrar(id) {
-            this.$inertia.delete(`orden/${id}`, {
-                onBefore: () => confirm('Esta seguro?'),
+            this.dialogOrden = false;
+            this.dialogDelete = false;
+            this.$nextTick(() => {
+                this.editedIndex = -1
+                this.editedItem = Object.assign({}, {})
             })
+        },
+        deleted(id){
+            this.editedIndex = id
+            this.dialogDelete = true
         },
         productosSell() {
             let sell = [];

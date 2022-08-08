@@ -4,19 +4,12 @@
             <v-card>
                 <v-card-title>
                     <template>
-                        <v-dialog v-model="dialogDelete" max-width="250px">
-                            <v-card>
-                                <v-card-title class="text-h5">{{ deleteText }}</v-card-title>
-                                <v-card-text class="text-h6">
-                                    {{ sureText }}
-                                </v-card-text>
-                                <v-card-actions>
-                                    <v-spacer></v-spacer>
-                                    <v-btn small color="error" class="ma-1" @click="closeDelete">Cancel</v-btn>
-                                    <v-btn small color="primary" class="ma-1" @click="deleteItemConfirm">Borrar</v-btn>
-                                </v-card-actions>
-                            </v-card>
-                        </v-dialog>
+                        <delete-item
+                            :dialog="dialogDelete"
+                            :edited-index="editedIndex"
+                            :base-path="basePath"
+                            @close="close()"
+                        />
                         <v-dialog v-model="dialog" max-width="500px" persistent scrollable>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-btn
@@ -177,8 +170,12 @@
 
 <script>
 import axios from "axios";
+import deleteItem from "./deleteItem.vue";
 
 export default {
+    components:{
+        deleteItem
+    },
     props: {
         errors: Object,
 //table
@@ -204,10 +201,8 @@ export default {
             //btn's
             newText: "Nuevo",
             modifyText: "Modificar",
-            deleteText: "Eliminar",
             //table
             emptyText: 'No existen datos a mostrar',
-            sureText: 'Esta seguro?',
             editedIndex: -1,
             editedItem: {},
             //form
@@ -228,13 +223,9 @@ export default {
             this.dialogDelete = true
         },
 
-        deleteItemConfirm() {
-            this.$inertia.delete(`${this.basePath}/${this.editedIndex}`)
-            this.closeDelete()
-        },
-
         close() {
             this.dialog = false;
+            this.dialogDelete = false;
             this.alert = false;
             this.removeState();
             this.removeValues();
@@ -243,15 +234,6 @@ export default {
                 this.editedItem = Object.assign({}, {})
             })
         },
-
-        closeDelete() {
-            this.dialogDelete = false
-            this.$nextTick(() => {
-                this.editedItem = Object.assign({}, {})
-                this.editedIndex = -1
-            })
-        },
-
         getOptions(options, isPadre, id) {
             if (!isPadre) {
                 return options;
@@ -338,7 +320,7 @@ export default {
             val || this.close()
         },
         dialogDelete(val) {
-            val || this.closeDelete()
+            val || this.close()
         },
     },
 }
