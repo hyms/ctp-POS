@@ -20,6 +20,22 @@
                 :delete-text="deleteText"
                 @close="close()"
             />
+            <item-orden
+                :dialog="dialogItem"
+                :isVenta="isVenta"
+                :item="editedItem"
+                :productos="productosAll"
+                @close="close()"
+            ></item-orden>
+            <item-reposicion
+                :dialog="dialogReposicion"
+                :isVenta="isVenta"
+                :item="editedItem"
+                :edited-index="editedIndex"
+                :productos="productos[tipoProductoFiltro]"
+                :productosSell="productosSell()"
+                @close="close()"
+            ></item-reposicion>
             <v-card>
                 <v-card-title>
                     <template v-if="typeReport===0" v-for="(tipoProducto,key) in tiposProductos">
@@ -35,21 +51,6 @@
                         </v-btn>
                     </template>
                 </v-card-title>
-                <item-orden
-                    :dialog="dialogItem"
-                    :isVenta="isVenta"
-                    :item="editedItem"
-                    :productos="productosAll"
-                    @close="close()"
-                ></item-orden>
-                <item-reposicion
-                    :dialog="dialogReposicion"
-                    :isVenta="isVenta"
-                    :item="editedItem"
-                    :productos="productos[tipoProductoFiltro]"
-                    :productosSell="productosSell()"
-                    @close="close()"
-                ></item-reposicion>
                 <v-data-table
                     :items="ordenes"
                     :headers="fields"
@@ -94,7 +95,9 @@
                                     mdi-file-document-check
                                 </v-icon>
                             </v-btn>
-                            <v-btn color="info" v-b-modal="'itemRModal'"
+                            <v-btn color="info"
+                                   class="ma-1"
+                                   small
                                    @click="loadReposicion(item.tipoOrden,item)"
                                    v-if="[0,2].includes(item.estado) && viewReposicion(item.created_at)">
                                 <v-icon>

@@ -40,8 +40,13 @@
                     </template>
                 </v-simple-table>
                 <div>
-                    <p><strong>Observaciones:</strong></p>
-                    <v-textarea outlined dense v-model="item.observaciones">
+                    <v-textarea
+                        label="Observaciones"
+                        outlined dense
+                        v-model="item.observaciones"
+                        rows="2"
+                        hide-details="auto"
+                        class="my-2">
                     </v-textarea>
                 </div>
             </v-card-text>
@@ -80,8 +85,8 @@ export default {
     props: {
         productos: Array,
         item: Object,
-        id: String,
-        editedIndex: Boolean,
+        dialog: Boolean,
+        editedIndex: Number,
         productosSell: Array,
     },
     methods: {
