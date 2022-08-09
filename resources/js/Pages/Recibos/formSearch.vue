@@ -1,110 +1,82 @@
 <template>
-    <CCard>
-        <CButton
-            @click="cardCollapse = !cardCollapse"
-            tag="button"
-            color="link"
-            block
-            class="text-left shadow-none card-header"
-        >
-            <h5 class="m-0">Filtros</h5>
-        </CButton>
-        <CCollapse :show="cardCollapse">
-            <CCardBody class="m-1">
-                <div class="row">
-                    <div class="col">
-                        <form class="form-inline" method="get">
-                            <div class="col-sm-5">
-                                <b-form-group
-                                    label="Fecha"
-                                    label-for="fecha Desde"
-                                    label-cols="4"
-                                    content-cols="8"
-                                >
-                                    <b-input
-                                        type="date"
-                                        placeholder="fecha"
-                                        v-model="searchModel.fechaI"
-                                        id="fechaI"
-                                        name="fechaI"
-                                    ></b-input>
-                                </b-form-group>
-                            </div>
-                            <div class="col-sm-5">
-                                <b-form-group
-                                    label="hasta"
-                                    label-for="fecha"
-                                    label-cols="4"
-                                    content-cols="8"
-                                >
-                                    <b-input
-                                        type="date"
-                                        placeholder="fecha hasta"
-                                        v-model="searchModel.fechaF"
-                                        id="fechaF"
-                                        name="fechaF"
-                                    ></b-input>
-                                </b-form-group>
-                            </div>
-                            <div class="col-sm-5">
-                                <b-form-group
-                                    label="Secuencia"
-                                    label-for="secuencia"
-                                    label-cols="4"
-                                    content-cols="8"
-                                >
-                                    <b-input
-                                        type="text"
-                                        placeholder="Secuencia"
-                                        v-model="searchModel.secuencia"
-                                        id="secuencia"
-                                        name="secuencia"
-                                    ></b-input>
-                                </b-form-group>
-                            </div>
-                            <div class="col-sm-5">
-                                <b-form-group
-                                    label="Cliente"
-                                    label-for="nombre"
-                                    label-cols="4"
-                                    content-cols="8"
-                                >
-                                    <b-input
-                                        type="text"
-                                        placeholder="Cliente"
-                                        v-model="searchModel.nombre"
-                                        id="nombre"
-                                        name="nombre"
-                                    ></b-input>
-                                </b-form-group>
-                            </div>
-                            <div class="col-sm-5">
-                                <b-form-group
-                                    label="Detalle"
-                                    label-for="detalle"
-                                    label-cols="4"
-                                    content-cols="8"
-                                >
-                                    <b-input
-                                        type="text"
-                                        placeholder="Detalle"
-                                        v-model="searchModel.detalle"
-                                        id="detalle"
-                                        name="detalle"
-                                    ></b-input>
-                                </b-form-group>
-                            </div>
+    <v-menu
+        v-model="menu"
+        :close-on-content-click="false"
+        :nudge-width="500"
+        offset-y>
+        <template v-slot:activator="{ on, attrs }">
+            <v-btn
+                color="primary"
+                outlined
+                small
+                elevation="1"
+                class="mr-2 my-1"
+                v-bind="attrs"
+                v-on="on"
+            >
+                Filtros
+                <v-icon right>
+                    mdi-magnify
+                </v-icon>
+            </v-btn>
+        </template>
 
-                            <div class="col-12 text-center">
-                                <b-button size="sm" type="submit" variant="primary">Buscar</b-button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </CCardBody>
-        </CCollapse>
-    </CCard>
-
+        <v-card>
+            <v-card-text>
+                <form>
+                    <v-row>
+                        <template v-for="(item,key) in form">
+                            <v-col cols="6">
+                                <v-text-field
+                                    v-if="['text','password','date','email'].includes(item.type)"
+                                    :id="key"
+                                    v-model="item.value"
+                                    outlined
+                                    dense
+                                    clearable
+                                    hide-details="auto"
+                                    :type="item.type"
+                                    :label="item.label"
+                                ></v-text-field>
+                                <v-select
+                                    v-if="item.type==='select'"
+                                    :id="key"
+                                    v-model="item.value"
+                                    item-text="text"
+                                    item-value="value"
+                                    outlined
+                                    dense
+                                    clearable
+                                    hide-details="auto"
+                                    :items="item.options"
+                                    :label="item.label"
+                                ></v-select>
+                            </v-col>
+                        </template>
+                    </v-row>
+                </form>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                    outlined
+                    small
+                    color="error"
+                    @click="menu = false"
+                >
+                    Cancelar
+                </v-btn>
+                <v-btn
+                    outlined
+                    small
+                    color="primary"
+                    @click="search"
+                >
+                    Buscar
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-menu>
 </template>
 
 <script>
@@ -112,22 +84,64 @@ export default {
     data() {
         return {
             searchModel: {
-                fechaI: "",
-                fechaF: "",
-                detalle: "",
                 secuencia: "",
                 nombre: "",
             },
-            total: 0,
-            cardCollapse: false,
+            form: {
+                fechaI: {
+                    label: 'Fecha desde',
+                    value: "",
+                    type: "date",
+                    state: null,
+                    stateText: null
+                },
+                fechaF: {
+                    label: 'Fecha hasta',
+                    value: "",
+                    type: "date",
+                    state: null,
+                    stateText: null
+                },
+                detalle: {
+                    label: 'Detalle',
+                    value: "",
+                    type: "text",
+                    state: null,
+                    stateText: null
+                },
+                secuencia: {
+                    label: 'Secuencia',
+                    value: "",
+                    type: "text",
+                    state: null,
+                    stateText: null
+                },
+                nombre: {
+                    label: 'Nombre',
+                    value: "",
+                    type: "text",
+                    state: null,
+                    stateText: null
+                },
+            },
+            menu: false
         }
     },
     props: {
         report: Object
     },
     mounted() {
-        for (const key in this.report) {
-            this.searchModel[key] = this.report[key];
+        for (let key in this.form) {
+            this.form[key].value = this.report[key]??"";
+        }
+    },
+    methods: {
+        search() {
+            let form = {}
+            for (let key in this.form) {
+                form[key] = this.form[key].value;
+            }
+            this.$inertia.get(this.$page.url, form);
         }
     }
 }

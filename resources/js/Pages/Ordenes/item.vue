@@ -184,29 +184,35 @@ export default {
             }
             return "";
         },
+        setErrors(data) {
+            for (let key in this.form) {
+                if (key in data.errors) {
+                    this.form[key].state = false;
+                    this.form[key].stateText = data.errors[key][0];
+                } else {
+                    this.form[key].state = true;
+                    this.form[key].stateText = "";
+                }
+            }
+        },
+        loadFormData() {
+            let formData = new FormData();
+            formData.append('item', JSON.stringify(this.item));
+            if (this.monto) {
+                formData.append('monto', this.monto);
+            }
+            return formData;
+        },
         seved(url) {
             this.sending = true;
             this.resyncOrden();
-            let producto = new FormData();
-            producto.append('item', JSON.stringify(this.item));
-            if (this.monto) {
-                producto.append('monto', this.monto);
-            }
-            axios.post(url, producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            axios.post(url, this.loadFormData(), {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
                         this.$emit("close")
                         this.$inertia.get(data["path"])
                     } else {
-                        for (let key in this.form) {
-                            if (key in data.errors) {
-                                this.form[key].state = false;
-                                this.form[key].stateText = data.errors[key][0];
-                            } else {
-                                this.form[key].state = true;
-                                this.form[key].stateText = "";
-                            }
-                        }
+                       this.setErrors(data)
                     }
                 })
                 .catch(error => {

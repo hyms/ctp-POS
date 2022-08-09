@@ -103,10 +103,20 @@ export default {
             }
             return "";
         },
-        saved() {
-            this.sending = true;
-            let producto = new FormData();
-            producto.append('item', JSON.stringify(this.item));
+        setErrors(data) {
+            for (let key in this.form) {
+                if (key in data.errors) {
+                    this.form[key].state = false;
+                    this.form[key].stateText = data.errors[key][0];
+                } else {
+                    this.form[key].state = true;
+                    this.form[key].stateText = "";
+                }
+            }
+        },
+        loadFormData() {
+            let formData = new FormData();
+            formData.append('item', JSON.stringify(this.item));
             let items = [];
             for (let value of this.productosSell) {
                 if (value.cantidad > 0) {
@@ -114,22 +124,20 @@ export default {
                 }
             }
             if (items.length > 0) {
-                producto.append('productos', JSON.stringify(items));
+                formData.append('productos', JSON.stringify(items));
             }
-            axios.post('/reposicion', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            return formData;
+        },
+        saved() {
+            this.sending = true;
+            axios.post('/reposicion', this.loadFormData(), {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
                         this.$emit("close")
                         this.$inertia.get(data["path"])
                     } else {
                         for (let key in this.form) {
-                            if (key in data.errors) {
-                                this.form[key].state = false;
-                                this.form[key].stateText = data.errors[key][0];
-                            } else {
-                                this.form[key].state = true;
-                                this.form[key].stateText = "";
-                            }
+                           this.setErrors(data)
                         }
                     }
                 })
@@ -141,7 +149,6 @@ export default {
                 this.sending = false;
             })
         },
-
         getObservaciones(item) {
             if (item)
                 return item.replace(/\n/g, "<br/>");

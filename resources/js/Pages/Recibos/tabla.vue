@@ -1,66 +1,50 @@
 <template>
-    <div class="row">
-        <div class="col-12">
-            <div class="row mb-2">
-                <div class="col">
-                    <b-button v-b-modal="'reciboModal'" @click="loadModal()" variant="primary">
-                        {{ boton1 }}
-                    </b-button>
-                    <Form
-                        id="reciboModal"
-                        :tipo="tipo"
-                        :item-row="itemRow"
-                    ></Form>
-                </div>
-            </div>
-            <FormSearch :report="report"></FormSearch>
-            <b-card no-body>
-                <b-card-header>
-                    <strong>{{ titulo + ((tipo) ? ' de Egreso' : ' de Ingreso') }}</strong>
-                </b-card-header>
-                <b-card-body>
-                    <b-table
-                        striped
-                        hover
-                        :items="recibos"
-                        :fields="fields"
-                        show-empty
+    <v-row>
+        <v-col>
+            <Form :tipo="tipo" :dialog="dialog" @close="close"></Form>
+            <v-card>
+                <v-card-title>
+                    <v-btn
+                        @click="loadModal()"
+                        color="primary"
                         small
-                        :current-page="currentPage"
-                        :per-page="perPage"
+                        elevation="1"
+                        class="mr-2 my-1"
                     >
-                        <template #empty="scope">
-                            <p>{{ textoVacio }}</p>
-                        </template>
-                        <template v-slot:cell(created_at)="data">
-                            {{ data.value | moment("DD/MM/YYYY HH:mm") }}
-                        </template>
-                        <template v-slot:cell(Acciones)="row">
-                            <div class="row-actions">
-                                <a class="btn btn-primary btn-sm" :href="'/reciboPdf/'+row.item.id" target="_blank">Imprimir</a>
-                            </div>
-                        </template>
-                    </b-table>
-                    <b-col>
-                        <b-pagination
-                            v-model="currentPage"
-                            :total-rows="totalRows"
-                            :per-page="perPage"
-                            align="center"
-                            class="my-0"
-                            v-if="totalRows>perPage"
-                        ></b-pagination>
-                    </b-col>
-                </b-card-body>
-            </b-card>
-        </div>
-    </div>
+                        Recibo
+                        <v-icon right>
+                            mdi-file-document-plus
+                        </v-icon>
+                    </v-btn>
+                    <v-spacer></v-spacer>
+                    <FormSearch :report="report"></FormSearch>
+                </v-card-title>
+                <v-data-table
+                    :items="recibos"
+                    :headers="fields"
+                    :no-data-text="emptyText"
+                    mobile-breakpoint="540">
+                    <template v-slot:item.created_at="{item}">
+                        {{ item.created_at | moment("DD/MM/YYYY HH:mm") }}
+                    </template>
+                    <template v-slot:item.Acciones="{ item }">
+                        <v-btn small color="primary" class="ma-1"
+                               :href="'/reciboPdf/'+item.id" target="_blank">
+                            <v-icon>
+                                mdi-printer
+                            </v-icon>
+                        </v-btn>
+                    </template>
+                </v-data-table>
+            </v-card>
+        </v-col>
+    </v-row>
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated'
-import Form from './form'
-import FormSearch from './formSearch'
+import Authenticated from '@/Layouts/Authenticated.vue'
+import Form from './form.vue'
+import FormSearch from './formSearch.vue'
 import moment from 'moment';
 
 export default {
@@ -78,53 +62,31 @@ export default {
     data() {
         return {
             isNew: true,
-            boton1: "Nuevo",
-            boton3: "imprimir",
-            titulo: 'Recibos',
             textoVacio: 'No existen recibos',
             fields:
                 [
-                    'secuencia',
-                    'detalle',
-                    'saldo',
-                    'monto',
-                    {
-                        'key': 'created_at',
-                        'label': 'Fecha'
-                    },
-                    'Acciones'
+                    {value: 'secuencia', text: 'Secuencia'},
+                    {value: 'detalle', text: 'Detalle'},
+                    {value: 'saldo', text: 'Saldo'},
+                    {value: 'monto', text: 'Monto'},
+                    {value: 'created_at', text: 'Fecha'},
+                    {value: 'Acciones', text: 'Acciones'},
                 ],
-            itemRow: {},
-            totalRows: 1,
-            currentPage: 1,
-            perPage: 20,
+            editedItem: {},
+            dialog: false,
+            emptyText: 'No existen Ordenes',
         }
     },
     methods: {
-        loadModal(isNew = true, item = null) {
-            this.isNew = isNew;
-            this.itemRow = {};
-            if (!isNew) {
-                this.itemRow = item.item;
-            }
-        },
-        borrar(id) {
-            this.$inertia.delete(`recibo/${id}`, {
-                onBefore: () => confirm('Esta seguro?'),
-            })
+        loadModal() {
+            this.dialog = true
         },
         getSucursal($id) {
             return this.sucursales[$id];
         },
-        viewModify(date) {
-            const today = moment();
-            date = moment(date);
-            return moment(today).isSame(date, 'day');
-        },
-    },
-    mounted() {
-        // Set the initial number of items
-        this.totalRows = this.recibos.length;
+        close() {
+            this.dialog = false;
+        }
     },
 }
 </script>

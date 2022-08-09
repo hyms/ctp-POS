@@ -25,11 +25,13 @@ class ReciboController extends Controller
 
     public function getIngreso(Request $request)
     {
+        Inertia::share('titlePage', 'Recibos de Ingreso');
         return $this->getAll(0, $request);
     }
 
     public function getEgreso(Request $request)
     {
+        Inertia::share('titlePage', 'Recibos de Egreso');
         return $this->getAll(1, $request);
     }
 
@@ -63,8 +65,8 @@ class ReciboController extends Controller
                 'sucursal' => Auth::user()['sucursal'],
                 'userVenta' => Auth::id(),
             ];
-            $caja = Cajas::getOne(Auth::user()['sucursal']);
-            Recibo::guardar($values, $caja->get()->first()->id, $request['tipo']);
+            $caja = Cajas::where('sucursal',Auth::user()['sucursal'])->get();
+            Recibo::guardar($values, $caja->first()->id, $request['tipo']);
             return response()->json([
                 'status' => 0,
                 'path' => ($request['tipo']) ? 'recibosEgreso' : 'recibosIngreso'

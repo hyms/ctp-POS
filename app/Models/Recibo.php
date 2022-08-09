@@ -26,7 +26,7 @@ class Recibo extends Model
             ->insertGetId([
                 'cajaOrigen' => null,
                 'cajaDestino' => $idcaja,
-                'tipo' => MovimientoCaja::$tipoMovimiento->recibos,
+                'tipo' => MovimientoCaja::tipoMovimiento('recibos'),
                 'monto' => $request['monto'],
                 'observaciones' => "Pago de Deuda",
                 'ordenTrabajo' => !empty($ordenTrabajo) ? $ordenTrabajo : "",
@@ -48,7 +48,7 @@ class Recibo extends Model
             ->insertGetId([
                 'cajaOrigen' => ($tipo) ? $idcaja : null,
                 'cajaDestino' => ($tipo) ? null : $idcaja,
-                'tipo' => MovimientoCaja::$tipoMovimiento->recibos,
+                'tipo' => MovimientoCaja::tipoMovimiento('recibos'),
                 'monto' => $request['monto'],
                 'observaciones' => $request['detalle'],
                 'user' => Auth::id(),
