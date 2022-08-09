@@ -19,6 +19,7 @@
                                     v-on="on"
                                 >
                                     {{ newText }}
+                                    <v-icon right> mdi-plus-thick</v-icon>
                                 </v-btn>
                             </template>
                             <v-card>
@@ -144,6 +145,7 @@
                                 class="ma-1"
                                 color="primary"
                                 @click="editItem(item)"
+                                v-if="isModify"
                             >
                                 <v-icon>
                                     mdi-pencil
@@ -154,6 +156,7 @@
                                 class="ma-1"
                                 small
                                 @click="deleteItem(item)"
+                                v-if="isDelete"
                             >
                                 <v-icon>
                                     mdi-delete
@@ -173,7 +176,7 @@ import axios from "axios";
 import deleteItem from "./deleteItem.vue";
 
 export default {
-    components:{
+    components: {
         deleteItem
     },
     props: {
@@ -186,7 +189,16 @@ export default {
         items: Array,
         //form
         form: Object,
-        urlPost: String
+        urlPost: String,
+
+        isDelete: {
+            type: Boolean,
+            default: true,
+        },
+        isModify: {
+            type: Boolean,
+            default: true,
+        }
     },
     computed: {
         formTitle() {
