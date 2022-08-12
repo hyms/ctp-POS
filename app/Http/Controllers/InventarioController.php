@@ -17,29 +17,44 @@ class InventarioController extends Controller
 {
     public function get(Request $request)
     {
-        $ingreso=false;
         $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
         $productos = ProductoStock::getProducts(Auth::user()['sucursal'])->pluck('formato', 'producto');
         $stocks = ProductoStock::getAll(Auth::user()['sucursal']);
         $fields = [
-            'producto',
-            'observaciones',
-            'cantidad',
             [
-                'key' => 'created_at',
-                'label' => 'Fecha'
+                'value' => 'producto',
+                'text' => 'Producto'
+            ],
+            [
+                'value' => 'observaciones',
+                'text' => 'Observaciones'
+            ],
+            [
+                'value' => 'cantidad',
+                'text' => 'Cantidad'
+            ],
+            [
+                'value' => 'created_at',
+                'text' => 'Fecha'
             ],
         ];
-        $movimientos = MovimientoStock::getAllTable($stocks->pluck('id')->toArray(), $ingreso,$request->all());
+        $stocksId = $stocks->pluck('id')->toArray();
+        $requestIngreso = $request['typeInventario'] == 1 ? $request->all() : [];
+        $requestEgreso = $request['typeInventario'] == 2 ? $request->all() : [];
+        $ingresos = MovimientoStock::getAllTable($stocksId, true, $requestIngreso);
+        $egresos = MovimientoStock::getAllTable($stocksId, false, $requestEgreso);
+        $inventario = [
+            ['title' => 'Egreso', 'typeInventario' => 1, 'data' => $egresos],
+            ['title' => 'Ingreso', 'typeInventario' => 2, 'data' => $ingresos],
+        ];
         Inertia::share('titlePage', 'Inventario');
         return Inertia::render('Inventario', [
             'productos' => $productosAll,
             'productosSelect' => $productos,
-            'movimientos' => $movimientos,
+            'inventario' => $inventario,
             'fields' => $fields,
             'stocks' => $stocks,
-            'active' => (($ingreso) ? 2 : 1),
-            'report'=>$request->all()
+            'report' => $request->all()
         ]);
     }
 
