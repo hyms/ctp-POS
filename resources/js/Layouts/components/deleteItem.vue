@@ -7,7 +7,7 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn small color="error" class="ma-1" @click="closeDelete">Cancel</v-btn>
+                <v-btn small color="error" class="ma-1" @click="closeDelete">Cancelar</v-btn>
                 <v-btn small color="primary" class="ma-1" @click="deleteItemConfirm">Borrar</v-btn>
             </v-card-actions>
         </v-card>

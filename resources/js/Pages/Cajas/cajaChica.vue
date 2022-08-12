@@ -5,8 +5,8 @@
         :basePath="'caja'"
         :fields="fields"
         :title="'Caja Chica'"
-:isDelete="false"
-:is-modify="false"
+        :isDelete="false"
+        :is-modify="false"
         :titleForm="'Registro de Caja Chica'"
         :form="form"
         :urlPost="'/cajaDebito'"
@@ -18,15 +18,14 @@
 <script>
 import Authenticated from '@/Layouts/Authenticated.vue'
 import genericTable from "@/Layouts/components/genericTable.vue";
-import moment from 'moment';
 
 export default {
     layout: Authenticated,
     props: {
         registros: Array,
         credito: Boolean,
-        report:Object,
-        errors:Object
+        report: Object,
+        errors: Object
     },
     components: {
         genericTable
@@ -54,7 +53,8 @@ export default {
                     type: "textarea",
                     state: null,
                     stateText: null
-                }, monto: {
+                },
+                monto: {
                     label: 'monto',
                     value: "",
                     type: "text",
@@ -63,17 +63,6 @@ export default {
                 }
             },
         }
-    },
-    methods: {
-        viewModify(date) {
-            const today = moment();
-            date = moment(date);
-            return moment(today).isSame(date, 'day');
-        }
-    },
-    mounted() {
-        // Set the initial number of items
-        this.totalRows = this.registros.length
     },
 }
 </script>

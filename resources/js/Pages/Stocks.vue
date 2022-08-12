@@ -1,9 +1,6 @@
 <template>
     <v-row>
-        <v-col
-            v-for="(sucursal,key) in stocks"
-            :key="key"
-        >
+        <v-col v-for="(sucursal,key) in stocks" :key="key">
             <v-card>
                 <v-card-title>
                     {{ sucursal.sucursalView }}
@@ -70,7 +67,6 @@
                 </v-data-table>
             </v-card>
         </v-col>
-
     </v-row>
 </template>
 
@@ -95,13 +91,16 @@ export default {
                 {
                     text: 'Producto',
                     value: 'productoView'
-                }, {
+                },
+                {
                     text: 'Cantidad',
                     value: 'cantidad'
-                }, {
+                },
+                {
                     text: 'Precio',
                     value: 'precio'
-                }, {
+                },
+                {
                     text: 'Estado',
                     value: 'estado'
                 },
@@ -109,47 +108,25 @@ export default {
         }
     },
     methods: {
-        getEnable(enable) {
-            let texto = 'Deshabilitado';
-            if (enable != null && enable === 1) {
-                texto = 'Habilitado';
-            }
-            return texto;
-        },
         saveEnable(id) {
             let stock = new FormData();
             stock.append('id', id)
-            axios.post('/admin/stockEnable', stock, {headers: {'Content-Type': 'multipart/form-data'}})
-                .then(({data}) => {
-                })
-                .catch(error => {
-                    // handle error
-                    this.errors = error
-                    console.log(error);
-                }).finally(() => {
-                this.$inertia.get(this.$page.url);
-            })
+            this.saved( '/admin/stockEnable',stock)
         },
         savePrice(id, newPrice) {
-            let producto = new FormData();
-            producto.append('id', id);
-            producto.append('precioUnidad', newPrice);
-            axios.post('/admin/stockPrice', producto, {headers: {'Content-Type': 'multipart/form-data'}})
-                .then(({data}) => {
-                })
-                .catch(error => {
-                    // handle error
-                    this.errors = error
-                    console.log(error);
-                }).finally(() => {
-                this.$inertia.get(this.$page.url);
-            })
+            let stock = new FormData();
+            stock.append('id', id);
+            stock.append('precioUnidad', newPrice);
+            this.saved( '/admin/stockPrice',stock)
         },
         saveAmount(id, newAmount) {
-            let producto = new FormData();
-            producto.append('id', id);
-            producto.append('cantidad', newAmount);
-            axios.post('/admin/stockAmount', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            let stock = new FormData();
+            stock.append('id', id);
+            stock.append('cantidad', newAmount);
+            this.saved( '/admin/stockAmount',stock)
+        },
+        saved(url,formdata){
+            axios.post(url, formdata, {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                 })
                 .catch(error => {
@@ -159,7 +136,7 @@ export default {
                 }).finally(() => {
                 this.$inertia.get(this.$page.url);
             })
-        },
+        }
     }
 }
 </script>

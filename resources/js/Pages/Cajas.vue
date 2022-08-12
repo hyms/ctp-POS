@@ -61,20 +61,23 @@ export default {
                     type: "text",
                     state: null,
                     stateText: null
-                }, descripcion: {
+                },
+                descripcion: {
                     label: 'descripcion',
                     value: "",
                     type: "textarea",
                     state: null,
                     stateText: null
-                }, sucursal: {
+                },
+                sucursal: {
                     label: 'sucursal',
                     value: "",
                     type: "select",
                     state: null,
                     stateText: null,
                     options: this.sucursales
-                }, dependeDe: {
+                },
+                dependeDe: {
                     label: 'Depende de',
                     value: "",
                     type: "select",
@@ -82,13 +85,15 @@ export default {
                     stateText: null,
                     options: this.cajasOptions,
                     isPadre: 1
-                }, enable: {
+                },
+                enable: {
                     label: 'enable',
                     value: "",
                     type: "boolean",
                     state: null,
                     stateText: null
-                }, monto: {
+                },
+                monto: {
                     label: '',
                     value: "",
                     type: "hidden",

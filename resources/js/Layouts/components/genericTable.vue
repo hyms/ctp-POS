@@ -31,7 +31,7 @@
                                     <form>
                                         <v-alert dismissible type="error" col v-model="alert">
                                             <ul>
-                                                <li v-for="(value) in errors">
+                                                <li v-for="(value) in errorsData">
                                                     {{ value }}
                                                 </li>
                                             </ul>
@@ -181,7 +181,7 @@ export default {
     },
     props: {
         errors: Object,
-//table
+        //table
         title: String,
         titleForm: String,
         basePath: String,
@@ -219,7 +219,8 @@ export default {
             editedItem: {},
             //form
             sending: false,
-            search: ""
+            search: "",
+            errorsData: []
         }
     },
     methods: {
@@ -278,7 +279,7 @@ export default {
             }
         },
         setErrors(data) {
-            this.errors = data.errors;
+            this.errorsData = data.errors;
             for (let key in this.form) {
                 if (key in data.errors) {
                     this.alert = true;
@@ -319,7 +320,7 @@ export default {
                 })
                 .catch(error => {
                     // handle error
-                    this.errors = error;
+                    this.errorsData = error;
                     console.log(error);
                 }).finally(() => {
                 this.sending = false;

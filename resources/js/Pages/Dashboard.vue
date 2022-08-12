@@ -1,13 +1,12 @@
 <template>
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 bg-white border-b border-gray-200">
-                        You're logged in!
-                    </div>
-                </div>
-            </div>
-        </div>
+    <v-row>
+        <v-col>
+            <v-card>
+                <v-card-title>Bienvenid@ {{ usernames }}</v-card-title>
+                <v-card-subtitle>{{ sucursal }}</v-card-subtitle>
+            </v-card>
+        </v-col>
+    </v-row>
 </template>
 <script>
 import Authenticated from '@/Layouts/Authenticated.vue'

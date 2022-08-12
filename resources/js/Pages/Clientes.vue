@@ -32,19 +32,19 @@ export default {
         return {
             fields:
                 [
-                     {
+                    {
                         text: 'Nombre',
                         value: 'nombreResponsable'
                     },
-                     {
+                    {
                         text: 'Correo',
                         value: 'correo'
                     },
-                     {
+                    {
                         text: 'Telefono',
                         value: 'telefono'
                     },
-                     {
+                    {
                         text: 'Sucursal',
                         value: 'nombreSucursal'
                     },
@@ -60,49 +60,57 @@ export default {
                     type: "text",
                     state: null,
                     stateText: null
-                }, nombreNegocio: {
+                },
+                nombreNegocio: {
                     label: 'nombreNegocio',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                }, nombreResponsable: {
+                },
+                nombreResponsable: {
                     label: 'nombreResponsable',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                }, correo: {
+                },
+                correo: {
                     label: 'correo',
                     value: "",
                     type: "email",
                     state: null,
                     stateText: null
-                }, telefono: {
+                },
+                telefono: {
                     label: 'telefono',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                }, direccion: {
+                },
+                direccion: {
                     label: 'direccion',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                }, nitCi: {
+                },
+                nitCi: {
                     label: 'nitCi',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                }, codigo: {
+                },
+                codigo: {
                     label: 'codigo',
                     value: "",
                     type: "text",
                     state: null,
                     stateText: null
-                }, sucursal: {
+                },
+                sucursal: {
                     label: 'sucursal',
                     value: "",
                     type: "select",

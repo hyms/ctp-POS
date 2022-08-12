@@ -231,10 +231,6 @@ export default {
             return moment(limitDay).isSameOrAfter(today, 'day');
         },
     },
-    mounted() {
-        // Set the initial number of items
-        this.totalRows = this.ordenes.length;
-    },
     created() {
         this.fields = this.isVenta ? [
             {value: 'tipoOrdenView', text: 'Tipo Orden'},
