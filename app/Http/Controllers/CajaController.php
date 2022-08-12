@@ -114,6 +114,7 @@ class CajaController extends Controller
 
     public function getDebito(Request $request)
     {
+        Inertia::share('titlePage', 'Caja Chica');
         return self::getCreditoDebito(false, $request->all());
     }
 
@@ -199,7 +200,7 @@ class CajaController extends Controller
     {
         $sucursal = Auth::user()['sucursal'];
         $registro = DB::table(MovimientoCaja::$tables);
-        $caja = Cajas::getOne($sucursal)->first();
+        $caja = Cajas::where('sucursal',$sucursal)->first();
         $id = $registro->insertGetId([
             $credito ? 'cajaDestino' : 'cajaOrigen' => $caja->id,
             'user' => Auth::user()['id'],

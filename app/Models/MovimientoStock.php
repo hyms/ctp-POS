@@ -27,6 +27,7 @@ class MovimientoStock extends Model
     public static function getAllTable(array $stock, bool $ingreso, array $request = []): Collection
     {
         $movimientos = new Generic(self::$tables);
+        $movimientos->isDelete = false;
         $movimientos->onlyBuild = true;
         $movimientos = isset($request)
             ? $movimientos->getAll($request)

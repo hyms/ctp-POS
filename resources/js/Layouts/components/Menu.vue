@@ -10,15 +10,16 @@
         >
             <v-app-bar-nav-icon @click="isDrawerOpen = !isDrawerOpen"></v-app-bar-nav-icon>
 
-            <v-toolbar-title>{{ $page.props.titlePage}}</v-toolbar-title>
+            <v-toolbar-title>{{ $page.props.titlePage }}</v-toolbar-title>
 
             <v-spacer></v-spacer>
-                <Link :href="route('logout')" method="post" class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default primary theme--light">
-                    Salir
-                    <v-icon right color="white">
-                        mdi-exit-to-app
-                    </v-icon>
-                </Link>
+            <Link :href="route('logout')" method="post"
+                  class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default primary theme--light">
+                Salir
+                <v-icon right color="white">
+                    mdi-exit-to-app
+                </v-icon>
+            </Link>
 
         </v-app-bar>
         <v-navigation-drawer
@@ -38,63 +39,65 @@
 
 
             <template v-for="(value) in menu">
-                <v-subheader>
-                    <span class="title-wrapper text-uppercase">{{ value.titulo }}</span>
-                </v-subheader>
-                <v-list
-                    nav
-                >
-                    <v-list-item-group>
-                        <!-- Navigation Items -->
-                        <template v-for="(link, key) in value.submenu">
-                            <template v-if="Object.values(link).length===1">
-                                <v-list-group
-                                    v-if="getAllPermission(Object.values(link)[0])" class="text-capitalize"
-                                    :value="validateMenu(Object.values(link)[0])"
-                                >
-                                    <template #activator>
-                                        <v-list-item-content>
-                                            <v-list-item-title>
-                                                {{ Object.keys(link)[0] }}
-                                            </v-list-item-title>
-                                        </v-list-item-content>
-                                    </template>
-                                    <template v-for="(link2, key2) in Object.values(link)[0]">
-                                        <template v-if="getPermission(link2.role)">
-
-                                            <Link
-                                                :href="link2.url"
-                                                :key="key2"
-                                                :class="'v-list-item v-list-item--link theme--dark' + (getUrl()===link2.url?' v-list-item--active':'') "
-                                            >
-                                                <v-list-item-title>
-                                                    {{ link2.label }}
-                                                </v-list-item-title>
-                                            </Link>
-                                        </template>
-                                    </template>
-
-                                </v-list-group>
-                            </template>
-                            <template v-else>
-                                <template v-if="getPermission(link.role)">
-                                    <Link
-                                        :href="link.url"
-                                        :key="key"
-                                        :class="'v-list-item v-list-item--link theme--dark' + (getUrl()===link.url?' v-list-item--active':'') "
+                <template v-if="getAllPermission(Object.values(value.submenu))">
+                    <v-subheader>
+                        <span class="title-wrapper text-uppercase">{{ value.titulo }}</span>
+                    </v-subheader>
+                    <v-list
+                        nav
+                    >
+                        <v-list-item-group>
+                            <!-- Navigation Items -->
+                            <template v-for="(link, key) in value.submenu">
+                                <template v-if="Object.values(link).length===1">
+                                    <v-list-group
+                                        v-if="getAllPermission(Object.values(link)[0])" class="text-capitalize"
+                                        :value="validateMenu(Object.values(link)[0])"
                                     >
-                                        <v-list-item-content color>
-                                            <v-list-item-title>
-                                                <span class="text-capitalize">{{ link.label }}</span>
-                                            </v-list-item-title>
-                                        </v-list-item-content>
+                                        <template #activator>
+                                            <v-list-item-content>
+                                                <v-list-item-title>
+                                                    {{ Object.keys(link)[0] }}
+                                                </v-list-item-title>
+                                            </v-list-item-content>
+                                        </template>
+                                        <template v-for="(link2, key2) in Object.values(link)[0]">
+                                            <template v-if="getPermission(link2.role)">
 
-                                    </Link>
+                                                <Link
+                                                    :href="link2.url"
+                                                    :key="key2"
+                                                    :class="'v-list-item v-list-item--link theme--dark' + (getUrl()===link2.url?' v-list-item--active':'') "
+                                                >
+                                                    <v-list-item-title>
+                                                        {{ link2.label }}
+                                                    </v-list-item-title>
+                                                </Link>
+                                            </template>
+                                        </template>
+
+                                    </v-list-group>
+                                </template>
+                                <template v-else>
+                                    <template v-if="getPermission(link.role)">
+                                        <Link
+                                            :href="link.url"
+                                            :key="key"
+                                            :class="'v-list-item v-list-item--link theme--dark' + (getUrl()===link.url?' v-list-item--active':'') "
+                                        >
+                                            <v-list-item-content color>
+                                                <v-list-item-title>
+                                                    <span class="text-capitalize">{{ link.label }}</span>
+                                                </v-list-item-title>
+                                            </v-list-item-content>
+
+                                        </Link>
+                                    </template>
                                 </template>
                             </template>
-                        </template>
-                    </v-list-item-group>
-                </v-list>
+                        </v-list-item-group>
+                    </v-list>
+                </template>
             </template>
 
         </v-navigation-drawer>
@@ -121,12 +124,12 @@ export default {
                                 {
                                     label: 'Nuevas Ordenes',
                                     url: '/ordenes',
-                                    role: 'all',
+                                    role: 'desing',
                                 },
                                 {
                                     label: 'Buscar Ordenes',
                                     url: '/realizados',
-                                    role: 'all',
+                                    role: 'desing',
                                 },
                             ]
                         },
@@ -150,7 +153,10 @@ export default {
                             role: 'vendor',
                         },
                         {
-                            Inventario: [
+                            label: 'Inventario',
+                            url: '/inventario',
+                            role: 'vendor'
+                            /*Inventario: [
                                 {
                                     label: 'Ingresos',
                                     url: '/inventario/ingreso',
@@ -166,7 +172,7 @@ export default {
                                     url: '/inventario/saldos',
                                     role: 'vendor'
                                 },
-                            ]
+                            ]*/
                         },
                         {
                             reportes: [
@@ -254,32 +260,31 @@ export default {
     },
     methods: {
         getPermission(role) {
-            let value = false;
             //for (const key in this.$page.props.rolesP) {
             for (const [key, item] of Object.entries(this.$page.props.rolesP)) {
                 if (key === role) {
                     if (item.includes(this.$page.props.user.role)) {
-                        value = true;
-                        break;
+                        return true;
                     }
                 }
             }
-            return value;
+            return false;
         },
         getAllPermission(data) {
-            let value = false;
             for (const val of data) {
-                value = this.getPermission(val.role);
+                let value = this.getPermission(val.role);
+                if (value) {
+                    return true;
+                }
             }
-            return value;
+            return false;
         },
         getUrl() {
             return this.$page.url;
         },
-        validateMenu(data){
-            for(let value of data){
-                if( this.$page.url === value.url)
-                {
+        validateMenu(data) {
+            for (let value of data) {
+                if (this.$page.url === value.url) {
                     return true;
                 }
             }

@@ -96,10 +96,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     //inventario
     Route::get('inventario/saldos', [InventarioController::class, 'saldo'])
         ->name('saldoInventario');
-    Route::get('inventario/ingreso', [InventarioController::class, 'getIngreso'])
-        ->name('ingresoInventario');
-    Route::get('inventario/egreso', [InventarioController::class, 'getEgreso'])
-        ->name('egresoInventario');
+    Route::get('inventario', [InventarioController::class, 'get'])
+        ->name('inventario');
     Route::post('inventario/ingreso', [InventarioController::class, 'postIngreso'])
         ->name('ingresoInventario');
     Route::post('inventario/egreso', [InventarioController::class, 'postEgreso'])

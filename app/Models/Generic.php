@@ -14,6 +14,7 @@ class Generic
         public bool $onlyBuild = false,
         public string $orderBy = 'updated_at',
         public string $filterDate = 'created_at',
+        public bool $isDelete = true,
     )
     {
     }
@@ -73,7 +74,9 @@ class Generic
             $fechaF = Carbon::parse($filters['fechaF']);
             $collection = $collection->whereBetween($this->filterDate, [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()]);
         }
-        $collection = $collection->whereNull('deleted_at');
+        if ($this->isDelete) {
+            $collection = $collection->whereNull('deleted_at');
+        }
         $collection = $collection->orderBy($this->orderBy, ($asc) ? 'asc' : 'desc');
 
         return $this->onlyBuild ? $collection : $collection->get();

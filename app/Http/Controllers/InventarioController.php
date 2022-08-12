@@ -15,8 +15,9 @@ use Inertia\Inertia;
 
 class InventarioController extends Controller
 {
-    public function get(Request $request, bool $ingreso)
+    public function get(Request $request)
     {
+        $ingreso=false;
         $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
         $productos = ProductoStock::getProducts(Auth::user()['sucursal'])->pluck('formato', 'producto');
         $stocks = ProductoStock::getAll(Auth::user()['sucursal']);
@@ -30,7 +31,8 @@ class InventarioController extends Controller
             ],
         ];
         $movimientos = MovimientoStock::getAllTable($stocks->pluck('id')->toArray(), $ingreso,$request->all());
-        return Inertia::render('Inventario/tabla', [
+        Inertia::share('titlePage', 'Inventario');
+        return Inertia::render('Inventario', [
             'productos' => $productosAll,
             'productosSelect' => $productos,
             'movimientos' => $movimientos,
@@ -40,17 +42,6 @@ class InventarioController extends Controller
             'report'=>$request->all()
         ]);
     }
-
-    public function getIngreso(Request $request)
-    {
-        return $this->get($request, true);
-    }
-
-    public function getEgreso(Request $request)
-    {
-        return $this->get($request, false);
-    }
-
 
     public function postIngreso(Request $request)
     {
