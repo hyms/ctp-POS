@@ -20,7 +20,7 @@ class InventarioController extends Controller
     {
         $productosStocks = ProductoStock::getProducts(Auth::user()['sucursal']);
         $productos = $productosStocks->map(function ($value){
-            return ['text'=>$value->formato,'value'=>$value->producto];
+            return ['text'=>$value->formato,'value'=>(string)$value->producto];
         });
 
         $stocks = ProductoStock::getAll(Auth::user()['sucursal']);

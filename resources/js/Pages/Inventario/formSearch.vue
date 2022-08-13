@@ -29,7 +29,6 @@
                             <v-col cols="6">
                                 <v-text-field
                                     v-if="['text','password','date','email'].includes(item.type)"
-                                    :id="key"
                                     v-model="item.value"
                                     outlined
                                     dense
@@ -40,7 +39,6 @@
                                 ></v-text-field>
                                 <v-select
                                     v-if="item.type==='select'"
-                                    :id="key"
                                     v-model="item.value"
                                     item-text="text"
                                     item-value="value"
@@ -117,7 +115,6 @@ export default {
                     state: null,
                     stateText: null,
                     options: this.productosSelect,
-                    isPadre: 1
                 },
             },
             menu: false
@@ -130,6 +127,8 @@ export default {
     mounted() {
         for (let key in this.form) {
             this.form[key].value = this.report[key] ?? "";
+            // let val = this.report[key] ?? "";
+            // this.form[key].value = isNaN(parseInt(val)) ? val : parseInt(val);
         }
     },
     methods: {

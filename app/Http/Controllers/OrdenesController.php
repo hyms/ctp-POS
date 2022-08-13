@@ -29,7 +29,7 @@ class OrdenesController extends Controller
         $sucursal = Auth::user()['sucursal'];
         $tiposProductos = TipoProductos::getAll();
         $tiposSelect = TipoProductos::getAll()->map(function ($item, $key) {
-            return ['value' => $item->id, 'text' => $item->nombre];
+            return ['value' => (string)$item->id, 'text' => $item->nombre];
         });
         $ordenes = OrdenesTrabajo::getAll($sucursal, null, null, collect($report));
         $ordenes = $ordenes->whereIn('estado', $estado);
