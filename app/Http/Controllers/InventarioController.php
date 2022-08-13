@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MovimientoStock;
+use App\Models\Producto;
 use App\Models\ProductoStock;
 use Carbon\Carbon;
 use Exception;
@@ -17,12 +18,15 @@ class InventarioController extends Controller
 {
     public function get(Request $request)
     {
-        $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
-        $productos = ProductoStock::getProducts(Auth::user()['sucursal'])->pluck('formato', 'producto');
+        $productosStocks = ProductoStock::getProducts(Auth::user()['sucursal']);
+        $productos = $productosStocks->map(function ($value){
+            return ['text'=>$value->formato,'value'=>$value->producto];
+        });
+
         $stocks = ProductoStock::getAll(Auth::user()['sucursal']);
         $fields = [
             [
-                'value' => 'producto',
+                'value' => 'productoView',
                 'text' => 'Producto'
             ],
             [
@@ -39,22 +43,20 @@ class InventarioController extends Controller
             ],
         ];
         $stocksId = $stocks->pluck('id')->toArray();
-        $requestIngreso = $request['typeInventario'] == 1 ? $request->all() : [];
-        $requestEgreso = $request['typeInventario'] == 2 ? $request->all() : [];
-        $ingresos = MovimientoStock::getAllTable($stocksId, true, $requestIngreso);
-        $egresos = MovimientoStock::getAllTable($stocksId, false, $requestEgreso);
+        $ingresos = MovimientoStock::getAllTable($stocksId, true, $request->all());
+        $egresos = MovimientoStock::getAllTable($stocksId, false, $request->all());
         $inventario = [
-            ['title' => 'Egreso', 'typeInventario' => 1, 'data' => $egresos],
-            ['title' => 'Ingreso', 'typeInventario' => 2, 'data' => $ingresos],
+            ['title' => 'Egreso', 'typeInventario' => 1, 'data' => $egresos->all()],
+            ['title' => 'Ingreso', 'typeInventario' => 2, 'data' => $ingresos->all()],
         ];
         Inertia::share('titlePage', 'Inventario');
         return Inertia::render('Inventario', [
-            'productos' => $productosAll,
+            'productos' => $productosStocks,
             'productosSelect' => $productos,
             'inventario' => $inventario,
             'fields' => $fields,
             'stocks' => $stocks,
-            'report' => $request->all()
+            'report' => (object)$request->all()
         ]);
     }
 

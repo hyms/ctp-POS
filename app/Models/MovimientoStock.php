@@ -29,7 +29,7 @@ class MovimientoStock extends Model
         $movimientos = new Generic(self::$tables);
         $movimientos->isDelete = false;
         $movimientos->onlyBuild = true;
-        $movimientos = isset($request)
+        $movimientos = count($request)>0
             ? $movimientos->getAll($request)
             : $movimientos->getAll(limit: 500);
 
@@ -37,6 +37,14 @@ class MovimientoStock extends Model
             ? $movimientos->whereIn('stockDestino', $stock)
             : $movimientos->whereIn('stockOrigen', $stock);
 
-        return $movimientos->get();
+        $movimientos = $movimientos->get();
+        $productosAll = Producto::all();
+        return $movimientos->map(function ($value) use ($productosAll){
+            $producto = $productosAll->first(function ($item)use ($value){
+                return $item->id === $value->producto;
+            });
+            $value->productoView = "{$producto->formato} ({$producto->dimension})";
+            return $value;
+        });
     }
 }
