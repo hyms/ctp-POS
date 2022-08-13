@@ -127,8 +127,6 @@ export default {
     mounted() {
         for (let key in this.form) {
             this.form[key].value = this.report[key] ?? "";
-            // let val = this.report[key] ?? "";
-            // this.form[key].value = isNaN(parseInt(val)) ? val : parseInt(val);
         }
     },
     methods: {

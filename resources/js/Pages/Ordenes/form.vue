@@ -117,7 +117,6 @@
 import axios from "axios";
 
 export default {
-    name: "Orden",
     components: {},
     props: {
         title: String,

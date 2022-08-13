@@ -1,6 +1,13 @@
 <template>
     <v-row>
         <v-col>
+            <formStock
+                :dialog="dialog"
+                :productos="productos"
+                :ingreso="typeInventario===2"
+                :productos-sell="productosSell()"
+                @close="close"
+            ></formStock>
             <v-row>
                 <v-col>
                     <v-dialog max-width="400px" scrollable>
@@ -54,12 +61,12 @@
                     <v-col>
                         <v-card>
                             <v-card-title>
-                                    {{ item.title }}
-                                    <v-spacer></v-spacer>
-                                    <v-btn outlined color="primary" small>
-                                        Nuevo
-                                        <v-icon right> mdi-plus-thick</v-icon>
-                                    </v-btn>
+                                {{ item.title }}
+                                <v-spacer></v-spacer>
+                                <v-btn outlined color="primary" small @click="loadForm(item.typeInventario)">
+                                    Nuevo
+                                    <v-icon right> mdi-plus-thick</v-icon>
+                                </v-btn>
                             </v-card-title>
                             <v-divider></v-divider>
                             <v-data-table
@@ -80,7 +87,8 @@
 <script>
 import Authenticated from "@/Layouts/Authenticated.vue";
 import genericTable from "@/Layouts/components/genericTable.vue";
-import formSearch from "@/Pages/Inventario/formSearch.vue";
+import formSearch from "./formSearch.vue";
+import formStock from "./form.vue";
 
 export default {
     layout: Authenticated,
@@ -108,7 +116,8 @@ export default {
     },
     components: {
         genericTable,
-        formSearch
+        formSearch,
+        formStock
     },
     methods: {
         openDialogFilter(typeInventario) {
@@ -118,13 +127,6 @@ export default {
         close() {
             this.dialog = false;
             this.dialogFilter = false;
-            this.alert = false;
-            this.removeState();
-            this.removeValues();
-            this.$nextTick(() => {
-                this.editedIndex = -1
-                this.editedItem = Object.assign({}, {})
-            })
         },
         searchItems() {
             let form = {}
@@ -138,7 +140,23 @@ export default {
                     this.sendingF = false;
                 }
             });
-        }
+        },
+        loadForm(typeInventario) {
+            this.typeInventario = typeInventario;
+            this.dialog = true;
+        },
+        productosSell() {
+            let sell = [];
+                for (let key in this.productos) {
+                    sell[key] = {
+                        id: this.productos[key].id,
+                        cantidad: 0,
+                        costo: this.productos[key].precioUnidad,
+                        producto: this.productos[key].producto
+                    };
+                }
+            return sell;
+        },
     },
 }
 </script>

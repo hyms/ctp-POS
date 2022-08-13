@@ -50,7 +50,7 @@ class InventarioController extends Controller
             ['title' => 'Ingreso', 'typeInventario' => 2, 'data' => $ingresos->all()],
         ];
         Inertia::share('titlePage', 'Inventario');
-        return Inertia::render('Inventario', [
+        return Inertia::render('Inventario/table', [
             'productos' => $productosStocks,
             'productosSelect' => $productos,
             'inventario' => $inventario,
@@ -74,7 +74,8 @@ class InventarioController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'productos' => 'required'
+                'productos' => 'required',
+                'observaciones'=>'required'
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -101,7 +102,7 @@ class InventarioController extends Controller
                     'updated_at' => Carbon::now()
                 ]);
             }
-            return response()->json(["status" => 0, 'path' => '/inventario/' . ($ingreso ? 'ingreso' : 'egreso')]);
+            return response()->json(["status" => 0, 'path' => '/inventario']);
         } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,
