@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
-use Maatwebsite\Excel\Facades\Excel;
+//use Maatwebsite\Excel\Facades\Excel;
 
 class ReporteController extends Controller
 {
@@ -179,25 +179,19 @@ class ReporteController extends Controller
 
             switch ($orden->estado) {
                 case 2:
-                    $row['observaciones'] = "<span class=\"green--text\">Deuda</span>";
+                    $row['observaciones'] = "<strong class=\"green--text\">Deuda</strong>";
                     break;
                 case 5:
-                    $row['observaciones'] = "<span class=\"yellow--text\">Quemado</span>";
+                    $row['observaciones'] = "<strong class=\"yellow--text\">Quemado</strong>";
                     break;
                 case -1:
-                    $row['observaciones'] = "<span class=\"red--text\">Anulado</span>";
+                    $row['observaciones'] = "<strong class=\"red--text\">Anulado</strong>";
                     break;
                 case 10:
-                    $row['observaciones'] = "<span class=\"black--text\">Reposicion</span>";
+                    $row['observaciones'] = "<strong class=\"black--text\">Reposicion</strong>";
                     break;
             }
             if ($orden->tipoOrden == 0) {
-//                if ($orden->tipoOrden == 2) {
-//                    if (!empty($row['observaciones']))
-//                    {$row['observaciones'] = $row['observaciones'] . "-";}
-//                    $row['observaciones'] = $row['observaciones'] . "<span class=\"text-warning\">" . ((is_array(SGOperation::tiposReposicion($orden->tipoRepos))) ? '' : SGOperation::tiposReposicion($orden->tipoRepos)) . "</span>" . ((empty($orden->attribuible)) ? "" : "-" . $orden->attribuible);
-//                    $row['observaciones'] = $row['observaciones'] . "- <span class=\"text-info\">Orden ".((empty($orden->fk_idParent))?$orden->codDependiente:$orden->fkIdParent->correlativo). "</span>";
-//                }
                 if (!empty($row['observaciones'])) {
                     $row['observaciones'] .= " - ";
                 }
@@ -237,7 +231,8 @@ class ReporteController extends Controller
         $export->data = $data['table'];
         array_shift($data['fields']);
         $export->dataHeading = $data['fields'];
-        return Excel::download($export, 'registroPlacas.xlsx');
+        //return Excel::download($export, 'registroPlacas.xlsx');
+        return null;
     }
 
     public
@@ -377,31 +372,36 @@ class ReporteController extends Controller
                         ->where('id', $item->ordenTrabajo)
                         ->get()
                         ->first();
-                    if ($orden->deleted_at) {
-                        $item->observaciones = "Eliminado " . $item->observaciones;
-                        $item->monto = 0;
-                    } else {
-                        $item->observaciones = "Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
+                    if (isset($orden)) {
+                        if ($orden->deleted_at) {
+                            $item->observaciones = "Eliminado " . $item->observaciones;
+                            $item->monto = 0;
+                        } else {
+                            $item->observaciones = "Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
+                        }
                     }
                 } elseif ($item->tipo == 4) {
                     $recibo = DB::table(Recibo::$tables)
                         ->where('movimientoCaja', $item->id)
                         ->get()
                         ->first();
-                    if ($recibo->deleted_at) {
-                        $item->observaciones = "Eliminado " . $item->observaciones;
-                        $item->monto = 0;
-                    } else if ($recibo->codigoVenta) {
-                        $orden = DB::table(OrdenesTrabajo::$tables)
-                            ->where('correlativo', $recibo->codigoVenta)
-                            ->where('sucursal', $recibo->sucursal)
-                            ->get()
-                            ->first();
-                        $item->observaciones = "Pago de deuda de la Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
-                    } else {
-                        $item->observaciones = $recibo->detalle;
+                    if (isset($recibo)) {
+                        if ($recibo->deleted_at) {
+                            $item->observaciones = "Eliminado " . $item->observaciones;
+                            $item->monto = 0;
+                        } else if ($recibo->codigoVenta) {
+                            $orden = DB::table(OrdenesTrabajo::$tables)
+                                ->where('correlativo', $recibo->codigoVenta)
+                                ->where('sucursal', $recibo->sucursal)
+                                ->get()
+                                ->first();
+                            $item->observaciones = "Pago de deuda de la Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
+                        } else {
+                            $item->observaciones = $recibo->detalle;
+                        }
                     }
                 }
+                $item->fecha = $item->created_at;
                 return $item;
             });
 
@@ -411,22 +411,28 @@ class ReporteController extends Controller
                         ->where('movimientoCaja', $item->id)
                         ->get()
                         ->first();
-                    if ($recibo->deleted_at) {
-                        $item->observaciones = "Eliminado " . $item->observaciones;
-                        $item->monto = 0;
-                    } else {
-                        $item->observaciones = $recibo->detalle;
+                    if(isset($recibo)) {
+                        if ($recibo->deleted_at) {
+                            $item->observaciones = "Eliminado " . $item->observaciones;
+                            $item->monto = 0;
+                        } else {
+                            $item->observaciones = $recibo->detalle;
+                        }
                     }
                 }
+                $item->fecha = $item->created_at;
+                return $item;
             });
 
             $movimientos = [
                 'egreso' => $egreso,
                 'ingreso' => $ingreso
             ];
-            $fields = ['observaciones', ['key' => 'created_at', 'label' => 'Fecha'], 'monto'];
+            $fields = ['observaciones', 'fecha', 'monto'];
         }
-        $sucursales = Sucursal::getAll()->pluck('nombre', 'id');
+        $sucursales = Sucursal::getAll()->map(function ($value) {
+            return ['text' => $value->nombre, 'value' => (string)$value->id];
+        });
         $data = ['table' => $movimientos, 'fields' => $fields];
         return Inertia::render('Reportes/rendicionDiaria',
             [
@@ -440,6 +446,7 @@ class ReporteController extends Controller
     public
     function rendicionDiaria(Request $request)
     {
+        Inertia::share('titlePage', 'Rendicion Diaria');
         return $this->rendicion($request, false);
     }
 

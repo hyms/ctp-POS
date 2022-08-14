@@ -1,154 +1,182 @@
 <template>
-    <div class="content-w">
-        <div class="content-box">
-            <Menu :active="6" v-if="admin"></Menu>
-            <div class="row" v-else>
-                <div class="col-sm-12">
-                    <h4 class="header-title m-t-0 m-b-20">Rendición Diaria</h4>
-                </div>
-            </div>
-            <b-card>
-                <b-form @submit.prevent="enviar">
-                    <b-row>
-                        <b-col md="4" sm="6" v-if="admin && Object.keys(sucursales).length>0">
-                            <b-form-group
-                                :label="form.sucursal.label"
-                                label-for="sucursal"
-                                :state="form.sucursal.state"
-                            >
-                                <b-form-select
-                                    :placeholder="form.sucursal.label"
-                                    v-model="form.sucursal.value"
-                                    :options="sucursales"
-                                    id="sucursal"
-                                    :state="form.sucursal.state"
-                                >
-                                    <template #first>
-                                        <b-form-select-option value="">-- Seleccione una sucursal --
-                                        </b-form-select-option>
-                                    </template>
-                                </b-form-select>
-                            </b-form-group>
-                        </b-col>
-                        <b-col md="4" sm="6">
-                            <b-form-group
-                                :label="form.fechaI.label"
-                                label-for="fechaI"
-                                :state="form.fechaI.state"
-                            >
-                                <b-input
-                                    :type="form.fechaI.type"
-                                    :placeholder="form.fechaI.label"
-                                    v-model="form.fechaI.value"
-                                    id="fechaI"
-                                    :state="form.fechaI.state"
-                                ></b-input>
-                            </b-form-group>
-                        </b-col>
-                        <b-col md="4" sm="6" v-if="admin">
-                            <b-form-group
-                                :label="form.fechaF.label"
-                                label-for="fechaF"
-                                :state="form.fechaF.state"
-                            >
-                                <b-input
-                                    :type="form.fechaF.type"
-                                    :placeholder="form.fechaF.label"
-                                    v-model="form.fechaF.value"
-                                    id="fechaF"
-                                    :state="form.fechaF.state"
-                                ></b-input>
-                            </b-form-group>
-                        </b-col>
-                    </b-row>
-                    <b-row>
-                        <b-col>
-                            <b-button type="submit" size="sm" variant="primary">Buscar</b-button>
-                        </b-col>
-                    </b-row>
+    <v-row>
+        <v-col>
+            <v-card>
+                <v-card-title>
+                    <v-row>
+                        <template v-for="(item,key) in form">
+                            <template v-if="item.active">
+                                <v-col cols="6">
+                                    <v-text-field
+                                        v-if="['text','password','date','email'].includes(item.type)"
+                                        :id="key"
+                                        v-model="item.value"
+                                        outlined
+                                        dense
+                                        clearable
+                                        hide-details="auto"
+                                        :type="item.type"
+                                        :label="item.label"
+                                    ></v-text-field>
+                                    <v-select
+                                        v-if="item.type==='select'"
+                                        :id="key"
+                                        v-model="item.value"
+                                        item-text="text"
+                                        item-value="value"
+                                        outlined
+                                        dense
+                                        clearable
+                                        hide-details="auto"
+                                        :items="item.options"
+                                        :label="item.label"
+                                    ></v-select>
+                                </v-col>
+                            </template>
+                        </template>
+                        <v-col>
+                            <v-row>
+                                <v-col>
+                                    <v-btn left small color="primary" @click="sended"
+                                           :loading="sending" :disabled="sending">
+                                        Consultar
+                                        <v-icon right>
+                                            mdi-poll
+                                        </v-icon>
+                                    </v-btn>
+                                </v-col>
+                                <v-spacer></v-spacer>
+                                <v-col>
+                                    <v-btn elevation="1" color="secondary"><h3>Total: {{
+                                            totalIngreso - totalEgreso
+                                        }}</h3></v-btn>
+                                </v-col>
+                            </v-row>
+                        </v-col>
+                    </v-row>
+                </v-card-title>
+                <v-divider></v-divider>
+                <v-card-text>
+                    <v-row>
 
-                </b-form>
-            </b-card>
-            <b-row class="mt-2">
-                <b-col>
-                    <b-card>
-                    <span class="h4">Rendicion Total <span class="badge badge-primary text-bold">{{ totalIngreso - totalEgreso }} Bs</span> </span>
-                    </b-card>
-                </b-col>
-            </b-row>
-            <b-row>
-                <b-col sm="6">
-                    <b-card no-body>
-                        <b-card-header header-tag="div">
-                        <span class="h4">
-                       INGRESOS DIARIOS <span class="badge badge-primary text-bold">TOTAL {{ totalIngreso }} Bs</span>
-                        </span>
-                        </b-card-header>
-                        <b-card-body class="table-responsive">
-                            <b-table
-                                striped
-                                hover
-                                :items="data['table']['ingreso']"
-                                :fields="data['fields']"
-                                show-empty
-                                small
-                                sticky-header
-                            >
-                                <template v-slot:cell(created_at)="data">
-                                    {{ data.value | moment("DD/MM/YYYY HH:mm") }}
-                                </template>
-                                <template #empty="scope">
-                                    <p>No existen Datos</p>
-                                </template>
-                            </b-table>
-                        </b-card-body>
-                    </b-card>
-                </b-col>
-                <b-col sm="6">
-                    <b-card no-body>
-                        <b-card-header header-tag="header">
-                            <span class="h4">EGRESOS DIARIOS <span
-                                class="badge badge-primary text-bold">TOTAL {{ totalEgreso }} Bs</span></span>
-                        </b-card-header>
-                        <b-card-body class="table-responsive">
-                            <b-table
-                                striped
-                                hover
-                                :items="data['table']['egreso']"
-                                :fields="data['fields']"
-                                show-empty
-                                small
-                                sticky-header
-                            >
-                                <template v-slot:cell(created_at)="data">
-                                    {{ data.value | moment("DD/MM/YYYY HH:mm") }}
-                                </template>
-                                <template #empty="scope">
-                                    <p>No existen Datos</p>
-                                </template>
-                            </b-table>
-                        </b-card-body>
-                    </b-card>
-                </b-col>
-            </b-row>
+                        <template v-for="(dataTable,key) in data['table']">
+                            <v-col cols="6">
+                                <v-card outlined color="primary">
+                                    <v-card-title>
+                                        <h4 class="white--text text-uppercase">{{ key }}</h4>
+                                        <v-spacer></v-spacer>
+                                        <v-btn color="secondary"><h3>Total: {{
+                                                (key === "egreso") ? totalEgreso : totalIngreso
+                                            }}</h3></v-btn>
+                                    </v-card-title>
+                                    <v-divider></v-divider>
+                                    <v-simple-table dense fixed-header height="60vh">
+                                        <template v-slot:default>
+                                            <thead>
+                                            <tr>
+                                                <template v-for="field in data['fields']">
+                                                    <th>
+                                                        <span class="text-uppercase">{{ field }}</span>
+                                                    </th>
+                                                </template>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <template
+                                                v-for="(item,key) in dataTable"
+                                            >
+                                                <tr>
+                                                    <template v-for="field in data['fields']">
+                                                        <td>
+                                            <span v-if="field!=='fecha'">{{
+                                                    (field === '#') ? key + 1 : item[field]
+                                                }}</span>
+                                                            <span
+                                                                v-else> {{ item[field]|moment("DD/MM/YYYY HH:mm") }}</span>
+                                                        </td>
+                                                    </template>
+                                                </tr>
+                                            </template>
+                                            </tbody>
+                                        </template>
+                                    </v-simple-table>
+                                </v-card>
+                            </v-col>
+                        </template>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+            <!--            <b-row>
+                            <b-col sm="6">
+                                <b-card no-body>
+                                    <b-card-header header-tag="div">
+                                    <span class="h4">
+                                   INGRESOS DIARIOS <span class="badge badge-primary text-bold">TOTAL {{ totalIngreso }} Bs</span>
+                                    </span>
+                                    </b-card-header>
+                                    <b-card-body class="table-responsive">
+                                        <b-table
+                                            striped
+                                            hover
+                                            :items="data['table']['ingreso']"
+                                            :fields="data['fields']"
+                                            show-empty
+                                            small
+                                            sticky-header
+                                        >
+                                            <template v-slot:cell(created_at)="data">
+                                                {{ data.value | moment("DD/MM/YYYY HH:mm") }}
+                                            </template>
+                                            <template #empty="scope">
+                                                <p>No existen Datos</p>
+                                            </template>
+                                        </b-table>
+                                    </b-card-body>
+                                </b-card>
+                            </b-col>
+                            <b-col sm="6">
+                                <b-card no-body>
+                                    <b-card-header header-tag="header">
+                                        <span class="h4">EGRESOS DIARIOS <span
+                                            class="badge badge-primary text-bold">TOTAL {{ totalEgreso }} Bs</span></span>
+                                    </b-card-header>
+                                    <b-card-body class="table-responsive">
+                                        <b-table
+                                            striped
+                                            hover
+                                            :items="data['table']['egreso']"
+                                            :fields="data['fields']"
+                                            show-empty
+                                            small
+                                            sticky-header
+                                        >
+                                            <template v-slot:cell(created_at)="data">
+                                                {{ data.value | moment("DD/MM/YYYY HH:mm") }}
+                                            </template>
+                                            <template #empty="scope">
+                                                <p>No existen Datos</p>
+                                            </template>
+                                        </b-table>
+                                    </b-card-body>
+                                </b-card>
+                            </b-col>
+                        </b-row>-->
 
-        </div>
-    </div>
+        </v-col>
+    </v-row>
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated'
-import Menu from "./menuReportes";
+import Authenticated from '@/Layouts/Authenticated.vue'
 
 export default {
     layout: Authenticated,
-    name: "rendicionDiaria",
-    components: {
-        Menu
-    },
     props: {
-        admin: Boolean,
-        sucursales: Object,
+        admin: {
+            type: Boolean,
+            default: false
+        },
+        sucursales: Array,
         request: Object,
         data: Object
     },
@@ -160,29 +188,34 @@ export default {
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
+                    active: true
                 },
                 fechaF: {
                     label: 'Fecha Final',
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
+                    active: this.admin
                 },
                 sucursal: {
                     label: 'Sucursal',
                     value: "",
                     type: "select",
                     state: null,
-                    stateText: null
+                    stateText: null,
+                    active: this.admin
                 },
             },
             totalIngreso: 0,
             totalEgreso: 0,
+            sending: false,
         }
     },
     methods: {
-        enviar() {
+        sended() {
+            this.sending = true;
             let form = {};
             form['fechaI'] = this.form.fechaI.value;
             if (this.admin) {
@@ -190,6 +223,7 @@ export default {
                 form['sucursal'] = this.form.sucursal.value;
             }
             this.$inertia.get(window.location.pathname, form);
+            this.sending = false;
         },
         getTotal(table) {
             let total = 0.0;
