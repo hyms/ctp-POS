@@ -156,23 +156,6 @@ export default {
                             label: 'Inventario',
                             url: '/inventario',
                             role: 'vendor'
-                            /*Inventario: [
-                                {
-                                    label: 'Ingresos',
-                                    url: '/inventario/ingreso',
-                                    role: 'vendor'
-                                },
-                                {
-                                    label: 'Egresos',
-                                    url: '/inventario/egreso',
-                                    role: 'vendor'
-                                },
-                                {
-                                    label: 'Saldos',
-                                    url: '/inventario/saldos',
-                                    role: 'vendor'
-                                },
-                            ]*/
                         },
                         {
                             reportes: [
@@ -186,11 +169,11 @@ export default {
                                     url: '/reportes/diario',
                                     role: 'vendor',
                                 },
-                                {
+                               /* {
                                     label: 'Reporte cliente',
                                     url: '/reportes/cliente',
                                     role: 'vendor',
-                                },
+                                },*/
                             ]
                         },
 

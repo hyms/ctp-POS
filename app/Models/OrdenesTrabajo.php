@@ -110,7 +110,7 @@ class OrdenesTrabajo extends Model
             'sucursal' => $sucursal
         ]);
         if (!empty($tipo)) {
-            $filter->add(['tipoOrden' => $tipo]);
+            $filter->put('tipoOrden',$tipo);
         }
         $ordenes = $ordenes->getAll($filter->all())
             ->whereIn('estado', [0, 2, 5, -1, 10]);

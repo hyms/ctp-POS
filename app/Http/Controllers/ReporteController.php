@@ -86,34 +86,43 @@ class ReporteController extends Controller
         $validator = Validator::make($request->all(), [
             'fecha' => 'required',
         ]);
-        if ($validator->fails()) {
-            return Inertia::render('Reportes/placas',
-                [
-                    'sucursales' => (object)[],
-                    'forms' => $request->all(),
-                    'tipoPlacas' => $tipo->pluck('nombre', 'id'),
-                    'data' => ['table' => [], 'fields' => []]
-                ]);
-        }
+        Inertia::share('titlePage', 'Registro diario');
         $request = $request->all();
-        $request['sucursal'] = Auth::user()['sucursal'];
-        return $this->placas($request, [], $tipo);
+        $data = ['table' => [], 'fields' => []];
+        if (!$validator->fails()) {
+            $request['sucursal'] = Auth::user()['sucursal'];
+            $data = $this->getTablePlacas($request);
+        }
+
+        return Inertia::render('Reportes/placas',
+            [
+                'forms' => $request,
+                'tipoPlacas' => $tipo->map(function ($value) {
+                    return ['text' => $value->nombre, 'value' => (string)$value->id];
+                }),
+                'ventaReport' => true,
+                'data' => $data,
+            ]);
     }
 
-    private function placas($request, $sucursales, $tipo)
+    private
+    function placas($request, $sucursales, $tipo)
     {
         $data = $this->getTablePlacas($request);
         return Inertia::render('Reportes/placas',
             [
                 'sucursales' => (object)$sucursales,
                 'forms' => (array)$request,
-                'tipoPlacas' => $tipo->pluck('nombre', 'id'),
+                'tipoPlacas' => $tipo->map(function ($value) {
+                    return ['text' => $value->nombre, 'value' => $value->id];
+                }),
                 'errors' => (object)[],
                 'data' => $data,
             ]);
     }
 
-    public function getTablePlacas($request)
+    public
+    function getTablePlacas($request)
     {
         $data = ['table' => collect([]), 'fields' => collect([])];
         if (!isset($request['tipoOrden'])) {
@@ -134,8 +143,8 @@ class ReporteController extends Controller
             $placas = ProductoStock::getProducts($request['sucursal']);
         }
         if (!empty($request['tipoOrden'])) {
-            $placas = $placas->first(function ($item,$key) use ($request){
-                return $key==$request['tipoOrden'];
+            $placas = $placas->first(function ($item, $key) use ($request) {
+                return $key == $request['tipoOrden'];
             });
         }
         foreach ($ordenes as $orden) {
@@ -158,7 +167,7 @@ class ReporteController extends Controller
                 case 2:
                 case 5:
                 case 10:
-                    $orden = DetallesOrden::getOne($orden);
+                    $orden = DetallesOrden::setAllDetalle(collect([$orden]))->first();
                     foreach ($orden->detallesOrden as $detalle) {
                         $productoTmp = ProductoStock::getProduct($request['sucursal'], $detalle->stock);
                         if (!empty($productoTmp)) {
@@ -170,16 +179,16 @@ class ReporteController extends Controller
 
             switch ($orden->estado) {
                 case 2:
-                    $row['observaciones'] = "<span class=\"text-primary\">Deuda</span>";
+                    $row['observaciones'] = "<span class=\"green--text\">Deuda</span>";
                     break;
                 case 5:
-                    $row['observaciones'] = "<span class=\"text-warning\">Quemado</span>";
+                    $row['observaciones'] = "<span class=\"yellow--text\">Quemado</span>";
                     break;
                 case -1:
-                    $row['observaciones'] = "<span class=\"text-danger\">Anulado</span>";
+                    $row['observaciones'] = "<span class=\"red--text\">Anulado</span>";
                     break;
                 case 10:
-                    $row['observaciones'] = "<span class=\"text-info\">Reposicion</span>";
+                    $row['observaciones'] = "<span class=\"black--text\">Reposicion</span>";
                     break;
             }
             if ($orden->tipoOrden == 0) {
@@ -205,13 +214,14 @@ class ReporteController extends Controller
 //                'monto'
         ]);
         foreach ($placas as $row) {
-           $data['fields']->add($row->formato);
+            $data['fields']->add($row->formato);
         }
         $data['fields']->add('observaciones');
         return $data;
     }
 
-    public function exportPlacas(Request $request)
+    public
+    function exportPlacas(Request $request)
     {
         $data = $this->getTablePlacas($request->all());
 //        return Excel::create('regsitroPlacas', function($excel) use($data) {
@@ -230,7 +240,8 @@ class ReporteController extends Controller
         return Excel::download($export, 'registroPlacas.xlsx');
     }
 
-    public function arqueos(Request $request)
+    public
+    function arqueos(Request $request)
     {
         $sucursal = Auth::user()['sucursal'];
         $arqueo = new MovimientoCaja();
@@ -261,7 +272,8 @@ class ReporteController extends Controller
             ]);
     }
 
-    public function clientes(Request $request)
+    public
+    function clientes(Request $request)
     {
         $total = 0;
         $sucursales = Sucursal::getAll()->pluck('nombre', 'id');
@@ -282,7 +294,7 @@ class ReporteController extends Controller
                 $ordenes->where('estado', '=', $tipoBusqueda);
                 $ordenes = DetallesOrden::setAllDetalle($ordenes->get());
                 $ordenes = Recibo::setRecibos($ordenes);
-                $ordenes->transform(function ($item){
+                $ordenes->transform(function ($item) {
                     $totalVenta = 0;
                     $totalPagado = 0;
                     foreach ($item->detallesOrden as $detalle) {
@@ -297,20 +309,20 @@ class ReporteController extends Controller
                 $totalCliente += $ordenes->sum('totalDeuda');
                 $total += $totalCliente;
                 if ($totalCliente > 0) {
-                   $clientes->add([
-                            'nombreResponsable' => $cliente->nombreResponsable,
-                            'ordenes' => $ordenes,
-                            'fields' => [
-                                'codigoServicio',
-                                'totalDeuda',
-                                [
-                                    'key' => 'created_at',
-                                    'label' => 'Fecha'
-                                ],
-                                'detalle'
+                    $clientes->add([
+                        'nombreResponsable' => $cliente->nombreResponsable,
+                        'ordenes' => $ordenes,
+                        'fields' => [
+                            'codigoServicio',
+                            'totalDeuda',
+                            [
+                                'key' => 'created_at',
+                                'label' => 'Fecha'
                             ],
-                            'mora' => $totalCliente
-                        ]);
+                            'detalle'
+                        ],
+                        'mora' => $totalCliente
+                    ]);
                 }
             }
             $data = ['table' => $clientes->all(), 'fields' => ['nombreResponsable', 'mora', 'desde', 'hasta', 'cantidad']];
@@ -326,7 +338,8 @@ class ReporteController extends Controller
             ]);
     }
 
-    private function rendicion(Request $request, bool $isAdmin)
+    private
+    function rendicion(Request $request, bool $isAdmin)
     {
         $movimientos = ['egreso' => [], 'ingreso' => []];
         $fields = [];
@@ -358,41 +371,41 @@ class ReporteController extends Controller
                 ->where('cajaDestino', $caja->id)
                 ->get();
             ///recorrer array para llenado de datos del array
-           $ingreso->transform(function ($item){
-               if ($item->tipo == 0) {
-                   $orden = DB::table(OrdenesTrabajo::$tables)
-                       ->where('id', $item->ordenTrabajo)
-                       ->get()
-                       ->first();
-                   if ($orden->deleted_at) {
-                       $item->observaciones = "Eliminado " . $item->observaciones;
-                       $item->monto = 0;
-                   } else {
-                       $item->observaciones = "Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
-                   }
-               } elseif ($item->tipo == 4) {
-                   $recibo = DB::table(Recibo::$tables)
-                       ->where('movimientoCaja', $item->id)
-                       ->get()
-                       ->first();
-                   if ($recibo->deleted_at) {
-                       $item->observaciones = "Eliminado " . $item->observaciones;
-                       $item->monto = 0;
-                   } else if ($recibo->codigoVenta) {
-                       $orden = DB::table(OrdenesTrabajo::$tables)
-                           ->where('correlativo', $recibo->codigoVenta)
-                           ->where('sucursal', $recibo->sucursal)
-                           ->get()
-                           ->first();
-                       $item->observaciones = "Pago de deuda de la Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
-                   } else {
-                       $item->observaciones = $recibo->detalle;
-                   }
-               }
-               return $item;
-           });
+            $ingreso->transform(function ($item) {
+                if ($item->tipo == 0) {
+                    $orden = DB::table(OrdenesTrabajo::$tables)
+                        ->where('id', $item->ordenTrabajo)
+                        ->get()
+                        ->first();
+                    if ($orden->deleted_at) {
+                        $item->observaciones = "Eliminado " . $item->observaciones;
+                        $item->monto = 0;
+                    } else {
+                        $item->observaciones = "Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
+                    }
+                } elseif ($item->tipo == 4) {
+                    $recibo = DB::table(Recibo::$tables)
+                        ->where('movimientoCaja', $item->id)
+                        ->get()
+                        ->first();
+                    if ($recibo->deleted_at) {
+                        $item->observaciones = "Eliminado " . $item->observaciones;
+                        $item->monto = 0;
+                    } else if ($recibo->codigoVenta) {
+                        $orden = DB::table(OrdenesTrabajo::$tables)
+                            ->where('correlativo', $recibo->codigoVenta)
+                            ->where('sucursal', $recibo->sucursal)
+                            ->get()
+                            ->first();
+                        $item->observaciones = "Pago de deuda de la Orden " . (($orden->tipoOrden == null) ? "#" . $orden->correlativo : $orden->codigoServicio);
+                    } else {
+                        $item->observaciones = $recibo->detalle;
+                    }
+                }
+                return $item;
+            });
 
-            $egreso->transform(function ($item){
+            $egreso->transform(function ($item) {
                 if ($item->tipo == 4) {
                     $recibo = DB::table(Recibo::$tables)
                         ->where('movimientoCaja', $item->id)
@@ -424,17 +437,20 @@ class ReporteController extends Controller
             ]);
     }
 
-    public function rendicionDiaria(Request $request)
+    public
+    function rendicionDiaria(Request $request)
     {
         return $this->rendicion($request, false);
     }
 
-    public function rendicionDiariaAdm(Request $request)
+    public
+    function rendicionDiariaAdm(Request $request)
     {
         return $this->rendicion($request, true);
     }
 
-    public function reporteCliente(Request $request, bool $isAdm)
+    public
+    function reporteCliente(Request $request, bool $isAdm)
     {
         $movimientos = [];
         $fields = [];
@@ -456,7 +472,7 @@ class ReporteController extends Controller
             $fechaI = Carbon::parse($request['fechaI']);
             $fechaF = Carbon::parse($request['fechaF']);
 
-            $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null,null, collect(['cliente' => $request['cliente'], 'fechaI' => $fechaI, 'fechaF' => $fechaF]));
+            $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, null, collect(['cliente' => $request['cliente'], 'fechaI' => $fechaI, 'fechaF' => $fechaF]));
             $ordenes->whereIn('estado', [0, 1, 2]);
             $ordenes = DetallesOrden::getAll($ordenes->get());
             $movimientos = $ordenes;
@@ -477,17 +493,20 @@ class ReporteController extends Controller
             ]);
     }
 
-    public function cliente(Request $request)
+    public
+    function cliente(Request $request)
     {
         return $this->reporteCliente($request, false);
     }
 
-    public function clienteAdm(Request $request)
+    public
+    function clienteAdm(Request $request)
     {
         return $this->reporteCliente($request, true);
     }
 
-    public function ordenes(Request $request)
+    public
+    function ordenes(Request $request)
     {
         return null;
     }
