@@ -28,9 +28,7 @@ class MovimientoCaja extends Model
             'cajaChicaEgreso' => 3,
             'recibos' => 4,
         ]);
-        return $tipoMovimiento->first(function ($value, $key) use ($tipo) {
-            return $tipo == $key;
-        });
+        return $tipoMovimiento->get($tipo);
     }
 
     public static function getAllOrdenes(array $ordenes)
