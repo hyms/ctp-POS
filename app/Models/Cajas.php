@@ -57,7 +57,7 @@ class Cajas extends Model
                 ->insertGetId([
                     'cajaOrigen' => null,
                     'cajaDestino' => $caja->get()->first()->id,
-                    'tipo' => MovimientoCaja::$tipoMovimiento->ordenesVenta,
+                    'tipo' => MovimientoCaja::tipoMovimiento('ordenesVenta'),
                     'monto' => $request['montoVenta'],
                     'observaciones' => "venta de insumos",
                     'ordenTrabajo' => !empty($request['ordenTrabajo']) ? $request['ordenTrabajo'] : "",
