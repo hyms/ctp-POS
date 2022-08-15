@@ -1,5 +1,5 @@
 <template>
-    <div class="content-w">
+<!--    <div class="content-w">
         <div class="content-box">
             <div class="row">
                 <div class="col-sm-12">
@@ -97,11 +97,11 @@
                 </div>
             </b-card>
         </div>
-    </div>
+    </div>-->
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated'
+import Authenticated from '@/Layouts/Authenticated.vue'
 
 export default {
     layout: Authenticated,
