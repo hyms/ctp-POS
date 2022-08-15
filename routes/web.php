@@ -50,7 +50,7 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::post('orden', [OrdenesController::class, 'post'])
         ->name('guardarOrden');
     Route::post('orden/quemado', [OrdenesController::class, 'quemado'])
-        ->name('guardarOrden');
+        ->name('guardarOrdenQ');
     Route::post('ordenVenta', [OrdenesController::class, 'postVenta'])
         ->name('guardarOrdenV');
     Route::post('ordenDeuda', [OrdenesController::class, 'postDeuda'])
@@ -60,7 +60,7 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::get('espera', [OrdenesController::class, 'getAllVenta'])
         ->name('listaOrdenesV');
     Route::get('mora', [OrdenesController::class, 'getAllMora'])
-        ->name('listaOrdenesV');
+        ->name('listaOrdenesM');
     Route::get('realizados', [OrdenesController::class, 'getListVenta'])
         ->name('reporteOrden');
     Route::get('reposicion', [OrdenesController::class, 'newReposition'])
@@ -86,9 +86,9 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::get('recibosIngreso', [ReciboController::class, 'getIngreso'])
         ->name('recibosI');
     Route::get('recibosEgreso', [ReciboController::class, 'getEgreso'])
-        ->name('recibosI');
+        ->name('recibosE');
     Route::get('reportes/placas', [ReporteController::class, 'placasV'])
-        ->name('listaReportes');
+        ->name('listaReportesPlacas');
     Route::get('reportes/diario', [ReporteController::class, 'rendicionDiaria'])
         ->name('diarioReportes');
     Route::get('reportes/cliente', [ReporteController::class, 'cliente'])
@@ -122,9 +122,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('tipoProductos', [ProductosController::class, 'tipos'])
         ->name('tipoProductos');
     Route::post('tipoProductos', [ProductosController::class, 'tiposPost'])
-        ->name('tipoProductos');
+        ->name('tipoProductosP');
     Route::delete('tipoProductos/{id}', [ProductosController::class, 'borrarTipo'])
-        ->name('tipoProductos');
+        ->name('tipoProductosD');
     //sucursales
     Route::get('sucursales', [SucursalController::class, 'getAll'])
         ->name('listaSucursales');
@@ -174,13 +174,13 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('reportes', [ReporteController::class, 'get'])
         ->name('listaReportes');
     Route::get('reportes/placas', [ReporteController::class, 'placasA'])
-        ->name('listaReportes');
+        ->name('listaReportesA');
     Route::get('reportes/placasE', [ReporteController::class, 'exportPlacas'])
         ->name('listaReportesE');
     Route::get('reportes/arqueos', [ReporteController::class, 'arqueos'])
         ->name('listaArqueos');
     Route::get('reportes/cajas', [ReporteController::class, 'cajas'])
-        ->name('listaReportes');
+        ->name('listaReportesCajas');
     Route::get('reportes/resumen', [ReporteController::class, 'resumen']);
     Route::get('reportes/mora', [ReporteController::class, 'clientes']);
     Route::get('reportes/rendicion', [ReporteController::class, 'rendicionDiariaAdm']);

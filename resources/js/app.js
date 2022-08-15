@@ -20,7 +20,6 @@ createInertiaApp({
         Vue.use(plugin)
         Vue.use(vueMoment, {moment});
         Vue.use(Vuetify)
-        Vue.mixin({methods: {route}})
         new Vue({
             render: h => h(App, props),
             vuetify: new Vuetify({
