@@ -1,5 +1,5 @@
 <template>
-    <div class="content-w">
+<!--    <div class="content-w">
         <div class="content-box">
             <Menu :active="6" v-if="admin"></Menu>
             <div class="row" v-else>
@@ -30,7 +30,7 @@
                                     :state="form.sucursal.state"
                                 >
                                     <template #first>
-                                        <b-form-select-option value="">-- Seleccione una sucursal --
+                                        <b-form-select-option value="">&#45;&#45; Seleccione una sucursal &#45;&#45;
                                         </b-form-select-option>
                                     </template>
                                 </b-form-select>
@@ -80,7 +80,7 @@
                                     :state="form.cliente.state"
                                 >
                                     <template #first>
-                                        <b-form-select-option value="">-- Seleccione un cliente --
+                                        <b-form-select-option value="">&#45;&#45; Seleccione un cliente &#45;&#45;
                                         </b-form-select-option>
                                     </template>
                                 </b-form-select>
@@ -124,13 +124,13 @@
                 </b-card-body>
             </b-card>
         </div>
-    </div>
+    </div>-->
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated'
-import Menu from "./menuReportes";
-import itemOrden from "../Ordenes/item";
+import Authenticated from '@/Layouts/Authenticated.vue'
+import Menu from "./menuReportes.vue";
+import itemOrden from "../Ordenes/item.vue";
 
 export default {
     layout: Authenticated,

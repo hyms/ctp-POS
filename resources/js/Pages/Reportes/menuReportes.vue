@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import TopMenu from "@/Shared/menu/TopMenu";
+import TopMenu from "@/Shared/menu/TopMenu.vue";
 
 export default {
     props: {

@@ -1,5 +1,5 @@
 <template>
-    <div class="content-w">
+<!--    <div class="content-w">
         <div class="content-box">
             <Menu :active="0"></Menu>
             <div class="tab-content">
@@ -67,12 +67,12 @@
 
             </div>
         </div>
-    </div>
+    </div>-->
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated'
-import Menu from "./menuReportes";
+import Authenticated from '@/Layouts/Authenticated.vue'
+import Menu from "./menuReportes.vue";
 
 export default {
     layout: Authenticated,

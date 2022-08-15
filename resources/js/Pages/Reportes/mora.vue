@@ -1,5 +1,5 @@
 <template>
-    <div class="content-w">
+<!--    <div class="content-w">
         <div class="content-box">
             <Menu :active="4"></Menu>
             <div class="tab-content">
@@ -25,7 +25,7 @@
                                                 :state="form.sucursal.state"
                                             >
                                                 <template #first>
-                                                    <b-form-select-option value="">-- Seleccione una sucursal --
+                                                    <b-form-select-option value="">&#45;&#45; Seleccione una sucursal &#45;&#45;
                                                     </b-form-select-option>
                                                 </template>
                                             </b-form-select>
@@ -178,12 +178,12 @@
                 </b-card>
             </div>
         </div>
-    </div>
+    </div>-->
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated'
-import Menu from "./menuReportes";
+import Authenticated from '@/Layouts/Authenticated.vue'
+import Menu from "./menuReportes.vue";
 import moment from 'moment';
 
 export default {

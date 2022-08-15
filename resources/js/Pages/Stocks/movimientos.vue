@@ -1,7 +1,6 @@
 <template>
-    <div class="content-w">
+<!--    <div class="content-w">
         <div class="content-box">
-            <Menu :active="2"></Menu>
             <div class="tab-content">
                 <div class="m-b-20">
                     <div class="table-responsive">
@@ -43,12 +42,11 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>-->
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated'
-import Menu from '@/Shared/menu/menuProductos';
+import Authenticated from '@/Layouts/Authenticated.vue'
 
 export default {
     layout: Authenticated,
@@ -59,7 +57,6 @@ export default {
         errors: Object,
     },
     components: {
-        Menu
     },
     data() {
         return {
