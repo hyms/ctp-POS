@@ -2,8 +2,8 @@
     <v-row>
         <v-col>
             <v-card>
-                <v-card-title>Bienvenid@ {{ usernames }}</v-card-title>
-                <v-card-subtitle>{{ sucursal }}</v-card-subtitle>
+                <v-card-title>Bienvenid@ </v-card-title>
+                <v-card-subtitle></v-card-subtitle>
             </v-card>
         </v-col>
     </v-row>
