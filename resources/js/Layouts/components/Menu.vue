@@ -39,7 +39,7 @@
 
 
             <template v-for="(value) in menu">
-                <template v-if="getAllPermission(Object.values(value.submenu))">
+                <template >
                     <v-subheader>
                         <span class="title-wrapper text-uppercase">{{ value.titulo }}</span>
                     </v-subheader>
