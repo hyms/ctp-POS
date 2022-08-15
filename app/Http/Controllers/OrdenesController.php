@@ -10,6 +10,7 @@ use App\Models\TipoProductos;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -25,14 +26,24 @@ class OrdenesController extends Controller
     private function get(array $estado, bool $venta = false, array $report = [], int $typeReport = 0)
     {
         $reposicion = 5;
-        $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null, $report);
-        $ordenes = $ordenes->whereIn('estado', $estado);
-        $ordenes = DetallesOrden::getAll($ordenes->get());
-        $estados = OrdenesTrabajo::estadoCTP();
+        $sucursal = Auth::user()['sucursal'];
         $tiposProductos = TipoProductos::getAll();
-        $tiposSelect = TipoProductos::getAll()->pluck('nombre','id');
-        $productos = ProductoStock::getProducts(Auth::user()['sucursal'], $tiposProductos->toArray());
-        $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
+        $tiposSelect = TipoProductos::getAll()->map(function ($item, $key) {
+            return ['value' => (string)$item->id, 'text' => $item->nombre];
+        });
+        $ordenes = OrdenesTrabajo::getAll($sucursal, null, null, collect($report));
+        $ordenes = $ordenes->whereIn('estado', $estado);
+        $ordenes = DetallesOrden::setAllDetalle($ordenes->get());
+        $ordenes->transform(function ($item, $key) use ($tiposSelect) {
+            $item->estadoView = OrdenesTrabajo::estadoCTP($item->estado);
+            $tipoOrden = $item->tipoOrden;
+            $tipoOrden =$tiposSelect->first(function ($value,$id) use ($tipoOrden) { return $value['value']==$tipoOrden;});
+            $item->tipoOrdenView =$tipoOrden['text']??'';
+            return $item;
+        });
+        $estados = OrdenesTrabajo::estadoCTP();
+        $productos = ProductoStock::getProducts($sucursal, $tiposProductos->toArray());
+        $productosAll = ProductoStock::getProducts($sucursal);
 
         if (isset($report['responsable'])) {
             $report['total'] = OrdenesTrabajo::getTotal($ordenes);
@@ -54,6 +65,7 @@ class OrdenesController extends Controller
 
     public function getAll()
     {
+        Inertia::share('titlePage', 'Nuevas Ordenes');
         return self::get([1]);
     }
 
@@ -72,7 +84,8 @@ class OrdenesController extends Controller
 
     public function getListVenta(Request $request)
     {
-        return self::get([-1, 0, 1, 2, 5,10],
+        Inertia::share('titlePage', 'Buscar Ordenes');
+        return self::get([-1, 0, 1, 2, 5, 10],
             (Auth::user()->role >= 0 && Auth::user()->role <= 2),
             $request->all(),
             1
@@ -106,27 +119,13 @@ class OrdenesController extends Controller
             $orden['tipoOrden'] = $request['tipo'];
             $orden['responsable'] = $request['responsable'];
             $orden['telefono'] = $request['telefono'];
-            $orden['observaciones'] = !empty($request['observaciones']) ? $request['observaciones'] : "";
-            $orden['cliente'] = (!empty($request['cliente']))
-                ? $request['cliente']
-                : Cliente::newCliente($request['responsable'], $request['telefono'], Auth::user()['sucursal']);
+            $orden['observaciones'] = $request['observaciones'] ??"";
+            $orden['cliente'] = $request['cliente'] ?? Cliente::newCliente($request['responsable'], $request['telefono'], Auth::user()['sucursal']);
             //armar detalleOrden
-            $detalle = array();
-            $orden['montoVenta'] = 0;
-            $products = json_decode($request['productos'], true);
-            foreach ($products as $item) {
-                $tmp = array();
-                $tmp['sucursal'] = Auth::user()['sucursal'];
-                $tmp['producto'] = $item['producto'];
-                $tmp['stock'] = $item['id'];
-                $tmp['cantidad'] = $item['cantidad'];
-                $tmp['costo'] = !empty($item['costo']) ? $item['costo'] : 0;
-                $tmp['total'] = $tmp['cantidad'] * $tmp['costo'];
-                $orden['montoVenta'] += $tmp['total'];
-                array_push($detalle, $tmp);
-            }
-            $id = OrdenesTrabajo::newOrden($orden, $detalle, $id);
-            OrdenesTrabajo::notifyNewOrden($id);
+            $detalle = $this->setDetalle($request['productos']);
+            $orden['montoVenta'] = $detalle->sum('total');
+            $id = OrdenesTrabajo::newOrden($orden, $detalle->all(), $id);
+//            OrdenesTrabajo::notifyNewOrden($id);
             return response()->json(["status" => 0, 'path' => 'ordenes', 'id' => $id]);
         } catch (Exception $error) {
             Log::error($error->getMessage());
@@ -140,7 +139,7 @@ class OrdenesController extends Controller
         $orden = OrdenesTrabajo::find($id);
         if (isset($orden)) {
             $orden->estado = -1;
-            $orden->updated_at = now();
+            $orden->updated_at = Carbon::now();
             $orden->save();
         }
         return back()->withInput();
@@ -155,7 +154,7 @@ class OrdenesController extends Controller
         $orden = OrdenesTrabajo::find($request['id']);
         if (isset($orden)) {
             $orden->estado = 5;
-            $orden->updated_at = now();
+            $orden->updated_at = Carbon::now();
             $orden->save();
         }
         return back()->withInput();
@@ -178,11 +177,7 @@ class OrdenesController extends Controller
             $orden = array();
             $orden['id'] = $ordenPost['id'];
             $total = DetallesOrden::getTotal($orden['id'], $ordenPost['detallesOrden']);
-            if ($ordenPost['montoVenta'] >= $total) {
-                $orden['estado'] = 0;
-            } else {
-                $orden['estado'] = 2;
-            }
+            $orden['estado'] = (($ordenPost['montoVenta'] >= $total)) ? 0 : 2;
             $orden['montoVenta'] = $ordenPost['montoVenta'];
             $orden['userVenta'] = Auth::user()['id'];
             $id = OrdenesTrabajo::venta($orden);
@@ -235,7 +230,7 @@ class OrdenesController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'item' => 'required',
-                'productos'=>'required'
+                'productos' => 'required'
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -255,20 +250,9 @@ class OrdenesController extends Controller
             $orden['montoVenta'] = 0;
             $orden['sucursal'] = Auth::user()['sucursal'];
             $orden['estado'] = 10;
-            $detalle = [];
-            $products = json_decode($request['productos'], true);
-            foreach ($products as $item) {
-                $tmp = array();
-                $tmp['sucursal'] = Auth::user()['sucursal'];
-                $tmp['producto'] = $item['producto'];
-                $tmp['stock'] = $item['id'];
-                $tmp['cantidad'] = $item['cantidad'];
-                $tmp['costo'] = !empty($item['costo']) ? $item['costo'] : 0;
-                $tmp['total'] = $tmp['cantidad'] * $tmp['costo'];
-                $orden['montoVenta'] += $tmp['total'];
-                array_push($detalle, $tmp);
-            }
-            $id = OrdenesTrabajo::newOrden($orden, $detalle, null, true);
+            $detalle = $this->setDetalle($request['productos']);
+            $orden['total'] = $detalle->sum('total');
+            $id = OrdenesTrabajo::newOrden($orden, $detalle->all(), null, true);
             DetallesOrden::sell($id, true);
             return response()->json([
                 'status' => 0,
@@ -287,7 +271,7 @@ class OrdenesController extends Controller
         $maxDayReposition = 5;
         $now = Carbon::now();
         $initDate = Carbon::now()->subDays($maxDayReposition);
-        $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null, []);
+        $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal']);
         $ordenes = $ordenes->whereBetween('updated_at', [$initDate->startOfDay()->toDateTimeString(), $now->endOfDay()->toDateTimeString()]);
         $ordenes = $ordenes->whereIn('estado', [10]);
         $ordenes = DetallesOrden::getAll($ordenes->get());
@@ -295,7 +279,7 @@ class OrdenesController extends Controller
         $tiposProductos = TipoProductos::getAll();
         $productos = ProductoStock::getProducts(Auth::user()['sucursal'], $tiposProductos->toArray());
         $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
-        $reposiciones = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null, [], 0);
+        $reposiciones = OrdenesTrabajo::getAll(Auth::user()['sucursal'], null, 0);
         return Inertia::render('Ordenes/tablaReposicion', [
             'ordenes' => $ordenes,
             'reposiciones' => $reposiciones,
@@ -304,5 +288,23 @@ class OrdenesController extends Controller
             'estados' => $estados,
             'tiposProductos' => $tiposProductos,
         ]);
+    }
+
+    private function setDetalle(string $productos): Collection
+    {
+        $detalle = Collection::empty();
+        $products = json_decode($productos, true);
+        foreach ($products as $item) {
+            $tmp = array();
+            $tmp['sucursal'] = Auth::user()['sucursal'];
+            $tmp['producto'] = $item['producto'];
+            $tmp['stock'] = $item['id'];
+            $tmp['cantidad'] = $item['cantidad'];
+            $tmp['costo'] = $item['costo'] ?? 0;
+            $tmp['total'] = $tmp['cantidad'] * $tmp['costo'];
+            $detalle->add($tmp);
+//            $orden['montoVenta'] += $tmp['total'];
+        }
+        return $detalle;
     }
 }

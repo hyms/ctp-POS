@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cajas;
+use App\Models\Generic;
 use App\Models\MovimientoCaja;
 use App\Models\Sucursal;
 use Carbon\Carbon;
@@ -18,11 +19,23 @@ class CajaController extends Controller
 {
     public function getAll()
     {
-        $cajas = Cajas::getAll();
+        $cajas = Cajas::all();
+        $cajas->transform(function ($item, $key) {
+            $item->nombreSucursal = $item->Sucursales?->nombre;
+            $item->enableView = ($item->enable === 1) ? "Si" : "No";
+            return $item;
+        });
+        $cajasOptions = $cajas->map(function ($item, $key) {
+            return ['value' => $item->id, 'text' => $item->nombre];
+        });
         $sucursales = Sucursal::getAll();
-        $sucursales = $sucursales->pluck('nombre', 'id');
+        $sucursales = $sucursales->map(function ($item, $key) {
+            return ['value' => $item->id, 'text' => $item->nombre];
+        });
+        Inertia::share('titlePage', 'Cajas');
         return Inertia::render('Cajas', [
             'cajas' => $cajas,
+            'cajasOptions' => $cajasOptions,
             'sucursales' => $sucursales
         ]);
     }
@@ -59,15 +72,13 @@ class CajaController extends Controller
 
     public function borrar($id)
     {
-        $Cliente = Cajas::find($id);
-        $Cliente->delete();
+        Cajas::find($id)->delete();
         return back()->withInput();
     }
 
     public function borrarMovimiento($id)
     {
-        $Cliente = MovimientoCaja::find($id);
-        $Cliente->delete();
+        MovimientoCaja::find($id)->delete();
         return back()->withInput();
     }
 
@@ -103,6 +114,7 @@ class CajaController extends Controller
 
     public function getDebito(Request $request)
     {
+        Inertia::share('titlePage', 'Caja Chica');
         return self::getCreditoDebito(false, $request->all());
     }
 
@@ -114,33 +126,24 @@ class CajaController extends Controller
     private function getCreditoDebito(bool $credito, array $request)
     {
         $sucursal = Auth::user()['sucursal'];
-        $registros = DB::table(MovimientoCaja::$tables);
-        $caja = Cajas::getOne($sucursal)->first();
-        $registros = $registros
-            ->where('tipo', '=', 2)
-            ->where($credito ? 'cajaDestino' : 'cajaOrigen', '=', $caja->id)
-            ->orderBy('created_at', 'desc');
-        if(isset($request))
-        {
-            if (isset($request['fechaI']) && isset($request['fechaF'])) {
-                $fechaI = Carbon::parse($request['fechaI']);
-                $fechaF = Carbon::parse($request['fechaF']);
-                $registros = $registros->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()]);
-            }
-            if (isset($request['observaciones'])) {
-                $registros = $registros->where('observaciones', 'like', "%{$request['observaciones']}%");
-            }
+        $caja = Cajas::where('sucursal', $sucursal)->first();
+        $registros = new Generic(MovimientoCaja::$tables);
+        $registros->onlyBuild = true;
+        $registros->orderBy = 'created_at';
+        if (isset($request)) {
+            $request['tipo'] = 2;
+            $registros = $registros->getAll($request);
+        } else {
+            $registros = $registros->getAll(['tipo' => 2], false, 500);
         }
-        else{
-            $registros = $registros->limit(500);
-        }
+        $registros->where($credito ? 'cajaDestino' : 'cajaOrigen', '=', $caja->id);
         $registros = $registros->get();
 
         return Inertia::render('Cajas/cajaChica',
             [
                 'registros' => $registros,
                 'credito' => $credito,
-                'report'=>$request
+                'report' => $request
             ]);
     }
 
@@ -197,7 +200,7 @@ class CajaController extends Controller
     {
         $sucursal = Auth::user()['sucursal'];
         $registro = DB::table(MovimientoCaja::$tables);
-        $caja = Cajas::getOne($sucursal)->first();
+        $caja = Cajas::where('sucursal',$sucursal)->first();
         $id = $registro->insertGetId([
             $credito ? 'cajaDestino' : 'cajaOrigen' => $caja->id,
             'user' => Auth::user()['id'],

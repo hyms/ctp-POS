@@ -16,11 +16,18 @@ class UserController extends Controller
 {
     public function getAll()
     {
-        $users = User::getAll();
+        $users = User::all();
+        $users->transform(function ($item, $key) {
+            $item->nombreRol = User::getRole($item->role);
+            $item->nombreSucursal=$item->Sucursales?->nombre;
+            $item->enableView=($item->enable === 1) ? "Si" : "No" ;
+            return $item;
+        });
         $sucursales = Sucursal::getAll();
-        $sucursales = $sucursales->pluck('nombre', 'id');
+        $sucursales = $sucursales->map(function ($item){ return ['value'=>$item->id,'text'=>$item->nombre];});
         $roles = User::getRole();
-        return Inertia::render('Usuarios', ['userss' => $users, 'sucursales' => $sucursales, 'roles' => $roles]);
+        Inertia::share('titlePage', 'Usuarios');
+        return Inertia::render('Usuarios', ['users' => $users, 'sucursales' => $sucursales, 'roles' => $roles]);
     }
 
     public function post(Request $request)
@@ -38,10 +45,10 @@ class UserController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            $usuarios = new User();
-            if (!empty($request['id'])) {
-                $usuarios = User::find($request['id']);
-            }
+
+            $usuarios = !empty($request['id'])
+                ? User::find($request['id'])
+                : new User();
             if (!empty($request['password']) && (strcmp($usuarios->password, $request['password']) !== 0)) {
                 $usuarios->password = Hash::make($request['password']);
             }

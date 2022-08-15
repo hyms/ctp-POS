@@ -1,56 +1,77 @@
 <template>
-    <b-modal
-        :id="id"
-        :title="'Reposicion de '+titulo + ' '+(item.codigoServicio?item.codigoServicio:item.correlativo)">
-        <div><strong>Cliente:</strong> {{ item.responsable }}</div>
-        <div><strong>Telefono:</strong> {{ item.telefono }}</div>
-        <br>
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Productos</th>
-                    <th scope="col">Cant.</th>
-                </tr>
-                </thead>
-                <tbody>
-                <template v-for="(product,key) in productos">
-                    <b-tr>
-                        <b-td>{{ product.formato }}</b-td>
-                        <b-td>{{ product.dimension }}</b-td>
-                        <b-td>
-                            <b-form-spinbutton id="demo-sb" v-model="productosSell[key].cantidad" min="0"
-                                               max="100" size="sm" inline></b-form-spinbutton>
-                        </b-td>
-                    </b-tr>
-                </template>
-                </tbody>
-            </table>
-        </div>
-        <div>
-            <p><strong>Observaciones:</strong><br>
-                <b-textarea size="sm" v-model="item.observaciones">
-                </b-textarea>
-            </p>
-        </div>
-        <template #modal-footer="{ ok, cancel }">
-            <b-button size="sm" variant="danger" @click="cancel()">
-                Cerrar
-            </b-button>
-            <template>
-                <loading-button :loading="sending" :variant="'primary'" :size="'sm'"
-                                @click.native="guardar()" :text="'Reponer'" :textLoad="'Guardando'" v-if="isNew">Reponer
-                </loading-button>
-                <a class="btn btn-outline-primary btn-sm" :href="getUrlPrint(item.id)" target="_blank" v-else>Imprimir</a>
-            </template>
-        </template>
-    </b-modal>
+    <v-dialog v-model="dialog" max-width="450px" scrollable persistent>
+        <v-card>
+            <v-card-title>
+                {{ 'Reposicion de ' + titulo + ' ' + (item.codigoServicio ? item.codigoServicio : item.correlativo) }}
+            </v-card-title>
+            <v-card-text>
+                <div><strong>Cliente:</strong> {{ item.responsable }}</div>
+                <div><strong>Telefono:</strong> {{ item.telefono }}</div>
+                <br>
+                <v-simple-table dense class="overflow-x-auto">
+                    <template v-slot:default>
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Productos</th>
+                            <th>Cant.</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(product,key) in productos">
+                            <tr>
+                                <td>{{ key + 1 }}</td>
+                                <td>{{ product.formato }} ({{ product.dimension }})</td>
+                                <td>
+                                    <v-text-field
+                                        type="number"
+                                        v-model="productosSell[key].cantidad"
+                                        outlined
+                                        dense
+                                        single-line
+                                        style="min-width: 50px; max-width: 100px"
+                                        class="my-1 texto-small"
+                                        hide-details="auto"
+                                        min="0"></v-text-field>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                    </template>
+                </v-simple-table>
+                <div>
+                    <v-textarea
+                        label="Observaciones"
+                        outlined dense
+                        v-model="item.observaciones"
+                        rows="2"
+                        hide-details="auto"
+                        class="my-2">
+                    </v-textarea>
+                </div>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn small color="error" class="ma-1" @click="$emit('close')">
+                    Cancelar
+                </v-btn>
+                <v-btn small color="primary" class="ma-1"
+                       v-if="editedIndex>0"
+                       @click="saved()"
+                       :loading="sending" :disabled="sending">
+                    Reponer
+                </v-btn>
+                <v-btn v-else small color="primary" class="ma-1"
+                       outlined :href="getUrlPrint(item.id)" target="_blank">
+                    Imprimir
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script>
 import axios from "axios";
-import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
     data() {
@@ -64,18 +85,15 @@ export default {
     props: {
         productos: Array,
         item: Object,
-        id: String,
-        isNew: Boolean,
+        dialog: Boolean,
+        editedIndex: Number,
         productosSell: Array,
-    },
-    components: {
-        LoadingButton
     },
     methods: {
         getProduct(id) {
             let item = {};
             for (let value of this.productos) {
-                if (value.id == id) {
+                if (value.id === id) {
                     item = value;
                     break;
                 }
@@ -85,10 +103,20 @@ export default {
             }
             return "";
         },
-        guardar() {
-            this.sending = true;
-            let producto = new FormData();
-            producto.append('item', JSON.stringify(this.item));
+        setErrors(data) {
+            for (let key in this.form) {
+                if (key in data.errors) {
+                    this.form[key].state = false;
+                    this.form[key].stateText = data.errors[key][0];
+                } else {
+                    this.form[key].state = true;
+                    this.form[key].stateText = "";
+                }
+            }
+        },
+        loadFormData() {
+            let formData = new FormData();
+            formData.append('item', JSON.stringify(this.item));
             let items = [];
             for (let value of this.productosSell) {
                 if (value.cantidad > 0) {
@@ -96,22 +124,20 @@ export default {
                 }
             }
             if (items.length > 0) {
-                producto.append('productos', JSON.stringify(items));
+                formData.append('productos', JSON.stringify(items));
             }
-            axios.post('/reposicion', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            return formData;
+        },
+        saved() {
+            this.sending = true;
+            axios.post('/reposicion', this.loadFormData(), {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
-                    if (data["status"] == 0) {
-                        this.$bvModal.hide(this.id)
+                    if (data["status"] === 0) {
+                        this.$emit("close")
                         this.$inertia.get(data["path"])
                     } else {
                         for (let key in this.form) {
-                            if (key in data.errors) {
-                                this.form[key].state = false;
-                                this.form[key].stateText = data.errors[key][0];
-                            } else {
-                                this.form[key].state = true;
-                                this.form[key].stateText = "";
-                            }
+                           this.setErrors(data)
                         }
                     }
                 })
@@ -123,7 +149,6 @@ export default {
                 this.sending = false;
             })
         },
-
         getObservaciones(item) {
             if (item)
                 return item.replace(/\n/g, "<br/>");

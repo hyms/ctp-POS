@@ -11,12 +11,28 @@ class MovimientoCaja extends Model
     public static string $tables = 'movimientoCajas';
     protected $guarded = [];
     use SoftDeletes;
+
     //tipo de movimiento
     // 0 ordenes,
     // 1
     // 2 cajaChica
     // 3
     // 4 Recibos
+
+    public static function tipoMovimiento(string $tipo)
+    {
+        $tipoMovimiento = collect([
+            'ordenesVenta' => 0,
+            'ordenesDevolucion' => 1,
+            'cajaChicaIngreso' => 2,
+            'cajaChicaEgreso' => 3,
+            'recibos' => 4,
+        ]);
+        return $tipoMovimiento->first(function ($value, $key) use ($tipo) {
+            return $tipo == $key;
+        });
+    }
+
     public static function getAllOrdenes(array $ordenes)
     {
 

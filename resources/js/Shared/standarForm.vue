@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-modal
+<!--        <b-modal
             :id="id"
             :title="`${(isNew ? newText : modifyText)} ${titleForm}`"
             @show="reset"
@@ -69,13 +69,12 @@
                                 @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
                 </loading-button>
             </template>
-        </b-modal>
+        </b-modal>-->
     </div>
 </template>
 
 <script>
 import axios from "axios";
-import LoadingButton from './LoadingButton'
 
 export default {
     name: "standarForm",
@@ -86,9 +85,6 @@ export default {
         titleForm: String,
         form: Object,
         urlPost: String
-    },
-    components: {
-        LoadingButton
     },
     data() {
         return {

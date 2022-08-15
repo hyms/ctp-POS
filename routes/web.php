@@ -2,9 +2,7 @@
 
 use App\Http\Controllers\CajaController;
 use App\Http\Controllers\ClienteController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventarioController;
-use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrdenesController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ProductosController;
@@ -13,7 +11,9 @@ use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\UserController;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,24 +26,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('login', [LoginController::class, 'showLoginForm'])
-    ->name('login')
-    ->middleware('guest');
+//Route::get('/', function () {
+//    return Inertia::render('Welcome', [
+//        'canLogin' => Route::has('login'),
+//        'canRegister' => Route::has('register'),
+//        'laravelVersion' => Application::VERSION,
+//        'phpVersion' => PHP_VERSION,
+//    ]);
+//});
 
-Route::post('login', [LoginController::class, 'login'])
-    ->name('login.attempt')
-    ->middleware('guest');
+Route::get('/', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::post('logout', [LoginController::class, 'logout'])
-    ->name('logout');
-
-
-Route::get('/', [DashboardController::class, 'index'])
-    ->name('dashboard')
-    ->middleware('auth');
-Route::post('/savePush', [UserController::class, 'savePush'])
-    ->name('push')
-    ->middleware('auth');
+require __DIR__.'/auth.php';
 
 Route::get('search/{id}', [ClienteController::class, 'buscar'])
     ->name('buscar');
@@ -100,10 +96,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     //inventario
     Route::get('inventario/saldos', [InventarioController::class, 'saldo'])
         ->name('saldoInventario');
-    Route::get('inventario/ingreso', [InventarioController::class, 'getIngreso'])
-        ->name('ingresoInventario');
-    Route::get('inventario/egreso', [InventarioController::class, 'getEgreso'])
-        ->name('egresoInventario');
+    Route::get('inventario', [InventarioController::class, 'get'])
+        ->name('inventario');
     Route::post('inventario/ingreso', [InventarioController::class, 'postIngreso'])
         ->name('ingresoInventario');
     Route::post('inventario/egreso', [InventarioController::class, 'postEgreso'])
@@ -158,16 +152,14 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     //stocks
     Route::get('stocks', [StockController::class, 'getAll'])
         ->name('listaStocks');
-    Route::post('stockMore', [StockController::class, 'postMore'])
-        ->name('guardarStock');
-    Route::post('stockLess', [StockController::class, 'postLess'])
-        ->name('guardarStock');
     Route::delete('stock/{id}', [StockController::class, 'borrar'])
         ->name('eliminarStock');
     Route::post('stockEnable', [StockController::class, 'enableStock'])
         ->name('enablestock');
     Route::post('stockPrice', [StockController::class, 'priceStock'])
         ->name('priceStock');
+    Route::post('stockAmount', [StockController::class, 'amountStock'])
+        ->name('amountStock');
     Route::get('movimientosStock', [StockController::class, 'movimientos'])
         ->name('movimientosStock');
 
@@ -194,4 +186,5 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('reportes/rendicion', [ReporteController::class, 'rendicionDiariaAdm']);
 
 });
+
 

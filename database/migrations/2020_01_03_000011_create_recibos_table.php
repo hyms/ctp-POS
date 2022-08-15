@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRecibosTable extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -15,12 +14,12 @@ class CreateRecibosTable extends Migration
     {
         Schema::create('recibos', function (Blueprint $table) {
             $table->id();
-            $table->string('codigo',100);
+            $table->string('codigo', 100);
             $table->unsignedBigInteger('secuencia');
             $table->text('detalle');
-            $table->string('nombre',50);
-            $table->string('ciNit',50);
-            $table->string('codigoVenta',50);
+            $table->string('nombre', 50);
+            $table->string('ciNit', 50);
+            $table->string('codigoVenta', 50);
             $table->decimal('saldo');
             $table->decimal('monto');
             $table->decimal('acuenta');
@@ -42,4 +41,4 @@ class CreateRecibosTable extends Migration
     {
         Schema::dropIfExists('recibos');
     }
-}
+};

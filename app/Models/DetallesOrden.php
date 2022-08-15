@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -14,52 +15,51 @@ class DetallesOrden extends Model
 
     public static function newOrdenDetalle(array $detalle, int $ordenTrabajo)
     {
-        $detalles = DB::table(self::$tables)->where('ordenTrabajo', '=', $ordenTrabajo);
-        if ($detalles->count() > 0) {
-            $detalles->delete();
-        }
+        DB::table(self::$tables)
+            ->where('ordenTrabajo', $ordenTrabajo)
+            ->delete();
+
+        $detalles = Collection::empty();
         foreach ($detalle as $item) {
-            DB::table(self::$tables)
-                ->insertGetId([
-                    'stock' => $item['stock'],
-                    'cantidad' => $item['cantidad'],
-                    'costo' => $item['costo'],
-                    'total' => $item['total'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                    'ordenTrabajo' => $ordenTrabajo
-                ]);
+            $detalles->add([
+                'stock' => $item['stock'],
+                'cantidad' => $item['cantidad'],
+                'costo' => $item['costo'],
+                'total' => $item['total'],
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+                'ordenTrabajo' => $ordenTrabajo
+            ]);
 
         }
+        DB::table(self::$tables)
+            ->insert($detalles->toArray());
     }
 
-    public static function getAll(Collection $ordenes)
+    public static function setAllDetalle(Collection $ordenes): Collection
     {
-        $ordenes = $ordenes->toArray();
-        if (!empty($ordenes)) {
-            foreach ($ordenes as $key => $item) {
-                $detalle = DB::table(self::$tables)
-                    ->where('ordenTrabajo', '=', $item->id)
-                    ->get()->toArray();
-                $ordenes[$key]->detallesOrden = $detalle;
-            }
-        }
-        return $ordenes;
+        return $ordenes->map(function ($item, $key) {
+            $item->detallesOrden = DB::table(self::$tables)
+                ->where('ordenTrabajo', $item->id)
+                ->get()
+                ->toArray();
+            return $item;
+        });
     }
 
-    public static function getOne($orden)
-    {
-        $detalle = DB::table(self::$tables)
-            ->where('ordenTrabajo', '=', $orden->id)
-            ->get()->toArray();
-        $orden->detallesOrden = $detalle;
-        return $orden;
-    }
+//    public static function setOneDetalles($orden)
+//    {
+//        $detalle = DB::table(self::$tables)
+//            ->where('ordenTrabajo',  $orden->id)
+//            ->get()->toArray();
+//        $orden->detallesOrden = $detalle;
+//        return $orden;
+//    }
 
     public static function sell(int $idOrden, bool $reposicion = false)
     {
         $detalle = DB::table(self::$tables)
-            ->where('ordenTrabajo', '=', $idOrden)
+            ->where('ordenTrabajo', $idOrden)
             ->leftJoin(ProductoStock::$tables, self::$tables . '.stock', '=', ProductoStock::$tables . '.id')
             ->select(self::$tables . '.*',
                 ProductoStock::$tables . '.producto as producto',
@@ -77,18 +77,19 @@ class DetallesOrden extends Model
         }
     }
 
-    public static function getTotal(int $idOrden, array $detalleOrden)
+    public static function getTotal(int $idOrden, array $detalleOrden): float|int
     {
         $total = 0;
         foreach ($detalleOrden as $item) {
-            $total += $item['costo'] * $item['cantidad'];
+            $totalParcial = $item['costo'] * $item['cantidad'];
             DB::table(self::$tables)
-                ->where('ordenTrabajo', '=', $idOrden)
-                ->where('stock', '=', $item['stock'])
+                ->where('ordenTrabajo', $idOrden)
+                ->where('stock', $item['stock'])
                 ->update([
                     'costo' => $item['costo'],
-                    'total' => $item['costo'] * $item['cantidad'],
+                    'total' => $totalParcial,
                 ]);
+            $total += ($totalParcial);
         }
         return $total;
     }

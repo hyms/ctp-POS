@@ -47,11 +47,11 @@
 </template>
 
 <script>
-import Layout from '@/Shared/Layout'
+import Authenticated from '@/Layouts/Authenticated'
 import Menu from '@/Shared/menu/menuProductos';
 
 export default {
-    layout: Layout,
+    layout: Authenticated,
     props: {
         movimientos: Array,
         productos: Array,

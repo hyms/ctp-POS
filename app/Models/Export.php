@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\Exportable;
+use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class Export implements FromCollection, WithHeadings
@@ -13,7 +14,7 @@ class Export implements FromCollection, WithHeadings
     public array $data;
     public array $dataHeading;
 
-    public function collection(): \Illuminate\Support\Collection
+    public function collection(): Collection
     {
         return collect($this->data);
     }

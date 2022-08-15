@@ -15,10 +15,15 @@ class ClienteController extends Controller
 {
     public function getAll()
     {
-        $clientes = Cliente::getAll();
+        $clientes = Cliente::all();
+        $clientes->transform(function ($item, $key) {
+            $item['nombreSucursal']=$item->Sucursales?->nombre;
+            return $item;
+        });
         $sucursales = Sucursal::getAll();
-        $sucursales = $sucursales->pluck('nombre','id');
-        return Inertia::render('Clientes/tabla', [
+        $sucursales = $sucursales->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});
+        Inertia::share('titlePage', 'Clientes');
+        return Inertia::render('Clientes', [
             'clientes' => $clientes,
             'sucursales' => $sucursales
         ]);
@@ -39,10 +44,10 @@ class ClienteController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            $Cliente = new Cliente();
-            if (!empty($request['id'])) {
-                $Cliente = Cliente::find($request['id']);
-            }
+
+            $Cliente = !empty($request['id'])
+                ? Cliente::find($request['id'])
+                : new Cliente();
             $Cliente->fill($request->all());
 
             $Cliente->save();
@@ -56,8 +61,8 @@ class ClienteController extends Controller
 
     public function borrar($id)
     {
-        $Cliente = Cliente::find($id);
-        $Cliente->delete();
+        Cliente::find($id)
+            ->delete();
         return back()->withInput();
     }
 

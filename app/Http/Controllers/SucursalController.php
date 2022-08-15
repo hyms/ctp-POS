@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Sucursal;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -14,7 +15,14 @@ class SucursalController extends Controller
     public function getAll()
     {
         $sucursal = Sucursal::getAll(true);
-        return Inertia::render('Sucursales', ['sucursales' => $sucursal]);
+        $sucursal->transform(function ($item, $key) {
+            $item->centralView=($item->enable === 1) ? "Si" : "No" ;
+            $item->enableView=($item->enable === 1) ? "Si" : "No" ;
+            return $item;
+        });
+        $sucursales = $sucursal->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});
+        Inertia::share('titlePage', 'Sucursales');
+        return Inertia::render('Sucursales', ['sucursales' => $sucursal,'sucursalOptions'=>$sucursales]);
     }
 
     public function post(Request $request)
@@ -31,10 +39,10 @@ class SucursalController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            $sucursal = new Sucursal();
-            if (!empty($request['id'])) {
-                $sucursal = Sucursal::find($request['id']);
-            }
+
+            $sucursal = !empty($request['id'])
+                ? Sucursal::find($request['id'])
+                : new Sucursal();
             $sucursal->fill($request->all());
             $sucursal->save();
             return response()->json(["status" => 0, 'path' => 'sucursales']);
@@ -47,8 +55,7 @@ class SucursalController extends Controller
 
     public function borrar($id)
     {
-        $sucursal = Sucursal::find($id);
-        $sucursal->delete();
+        Sucursal::find($id)->delete();
         return back()->withInput();
     }
 

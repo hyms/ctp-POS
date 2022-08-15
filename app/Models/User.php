@@ -2,83 +2,65 @@
 
 namespace App\Models;
 
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Kutia\Larafirebase\Facades\Larafirebase;
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Model implements AuthenticatableContract
+class User extends Authenticatable
 {
-    use Authenticatable;
+    use HasApiTokens, HasFactory, Notifiable,SoftDeletes;
 
     protected $table = 'users';
     public static string $tables = 'users';
     protected $guarded = [];
 
-    public function getNameAttribute()
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function getNameAttribute(): string
     {
         return $this->nombre . ' ' . $this->apellido;
     }
 
-    public function setPasswordAttribute($password)
+    public function Sucursales(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        $this->attributes['password'] = Hash::needsRehash($password) ? Hash::make($password) : $password;
+        return $this->hasOne(Sucursal::class,'id','sucursal');
     }
 
-    public static function getAll()
+    public static function getRole(int $id = null): array|string
     {
-        $users = DB::table(self::$tables)
-            ->whereNull(self::$tables.'.deleted_at')
-            ->select(self::$tables.'.*', Sucursal::$tables.'.nombre as nombreSucursal')
-            ->leftJoin(Sucursal::$tables,Sucursal::$tables.'.id','=',self::$tables.'.sucursal');
-        $users=$users->get();
-        foreach ($users as $key=>$user) {
-            $users[$key]->nombreRol = self::getRole($user->role);
+        $roles = collect([
+            ['value' => 0, 'text' => 'sadmin'],
+            ['value' => 1, 'text' => 'admin'],
+            ['value' => 2, 'text' => 'venta'],
+            ['value' => 4, 'text' => 'operario']
+        ]);
+
+        if ($id === null) {
+            return $roles->all();
         }
-        return $users;
-    }
 
-    public static function getRole($int = null)
-    {
-        $roles = array(
-            '0' => 'sadmin',
-            '1' => 'admin',
-            '2' => 'venta',
-            '3' => 'operario',
-            '4' => 'diseño',
-            '5' => 'auxVenta'
-        );
-        if ($int===null) {
-            return array(
-                ['value' => '0', 'text' => 'sadmin'],
-                ['value' => '1', 'text' => 'admin'],
-                ['value' => '2', 'text' => 'venta'],
-                ['value' => '3', 'text' => 'operario'],
-                ['value' => '4', 'text' => 'diseño'],
-                ['value' => '5', 'text' => 'auxVenta'],
-            );
-        }
-        return $roles[$int];
-    }
-
-    public static function sendNotify($message, $title, $orden = 0)
-    {
-        $fcmTokens = DB::table(self::$tables)
-            ->where('id', '!=', Auth::id())
-            ->pluck('tokenpush')->toArray();
-        Larafirebase::fromRaw([
-            'registration_ids' => $fcmTokens,
-            'data' => [
-                'newOrden' => true,
-                'orden' => $orden
-            ],
-            'notification' => [
-                'title' => $title,
-                'body' => $message
-            ],
-        ])->send();
+        $first = $roles->firstWhere('value', '=', $id);
+        return $first['text']??'';
     }
 }

@@ -11,14 +11,14 @@
     </div>
 </template>
 <script>
-import Layout from '@/Shared/Layout'
+import Authenticated from '@/Layouts/Authenticated'
 
 export default {
     props: {
         usernames: String,
         sucursal: Object,
     },
-    layout: Layout,
+    layout: Authenticated,
 }
 
 </script>

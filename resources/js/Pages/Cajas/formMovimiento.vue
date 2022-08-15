@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-modal
+<!--        <b-modal
             :id="id"
             :title="(isNew)?titulo1:titulo2"
             @show="reset"
@@ -40,17 +40,16 @@
                 <b-button variant="danger" @click="cancel()" size="sm">
                     Cancel
                 </b-button>
-                <loading-button :loading="sending" variant="primary" size="sm"
+&lt;!&ndash;                <loading-button :loading="sending" variant="primary" size="sm"
                                 @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
-                </loading-button>
+                </loading-button>&ndash;&gt;
             </template>
-        </b-modal>
+        </b-modal>-->
     </div>
 </template>
 
 <script>
 import axios from "axios";
-import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
     name: "cliente",
@@ -59,9 +58,6 @@ export default {
         id: String,
         itemRow: Object,
         credito: Boolean,
-    },
-    components: {
-        LoadingButton
     },
     data() {
         return {

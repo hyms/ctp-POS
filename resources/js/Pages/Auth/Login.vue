@@ -1,100 +1,192 @@
 <template>
-    <div class="c-app flex-row align-items-center">
-        <CContainer>
-            <CRow class="justify-content-center">
-                <CCol md="6" lg="4" sm="8">
-                        <CCard>
-                            <CCardBody>
-                                <b-alert variant="danger" dismissible :show="!!errors.usuario">
-                                    {{ errors.usuario }}
-                                </b-alert>
-                                <form class="form-element" @submit.prevent="submit">
-                                    <h1>Login</h1>
+    <v-app>
+        <v-main>
+            <div class="auth-wrapper auth-v1">
+                <div class="auth-inner">
+                    <v-card class="auth-card">
+                        <!-- title -->
+                        <v-card-text>
+                            <p class="text-2xl font-weight-semibold text--primary mb-2">
+                                Bienvenido a xCTP
+                            </p>
+                            <p class="mb-2">
+                                Por favor ingresa tu usuario y contraseña
+                            </p>
+                            <v-alert
+                                dismissible
+                                class="mb-4"
+                                v-if="Object.keys(errors).length > 0"
+                                v-model="alert"
+                                color="red"
+                                outlined
+                                text
+                            >
+                                <ul class="text-sm">
+                                    <li v-for="(error, key) in errors" :key="key">{{ key }}: {{ error }}</li>
+                                </ul>
+                            </v-alert>
 
-                                    <div class="input-group mb-3">
-                                        <b-form-input
-                                            id="username"
-                                            v-model="form.username"
-                                            placeholder="Usuario"
-                                            trim
-                                            type="text"
-                                            :state="state(errors.username)"
-                                            :invalid-feedback="errors.username"
-                                        ></b-form-input>
-                                    </div>
-                                    <div class="input-group mb-4">
-                                        <b-form-input
-                                            id="password"
-                                            v-model="form.password"
-                                            placeholder="Contraseña"
-                                            trim
-                                            type="password"
-                                            :state="state(errors.password)"
-                                            :invalid-feedback="errors.password"
-                                        ></b-form-input>
-                                    </div>
-                                    <div class="form-group text-left">
-                                        <div class="checkbox checkbox-fill d-inline">
-                                            <input id="remember" v-model="form.remember" type="checkbox">
-                                            <label for="remember" class="cr">
-                                                Remember Me
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="form-group account-btn text-center m-t-10">
-                                        <div class="col-12">
-                                            <loading-button :loading="sending"
-                                                            class="btn btn-block btn-info shadow-2 mb-4"
-                                                            type="submit" :text="'Ingresar'" :textLoad="'Ingresando'">
-                                                Login
-                                            </loading-button>
-                                        </div>
-                                    </div>
-                                </form>
+                            <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
+                                {{ status }}
+                            </div>
+                        </v-card-text>
+                        <!-- login form -->
+                        <v-card-text>
+                            <form @submit.prevent="submit">
+                                <div>
+                                    <v-text-field
+                                        dense
+                                        label="Usuario"
+                                        outlined
+                                        id="username"
+                                        v-model="form.username"
+                                        type="text"
+                                        hide-details="auto"
+                                    ></v-text-field>
+                                </div>
+                                <div class="mt-3">
+                                    <v-text-field
+                                        dense
+                                        label="Contraseña"
+                                        outlined
+                                        id="password"
+                                        v-model="form.password"
+                                        type="password"
+                                        hide-details="auto"
+                                    ></v-text-field>
+                                </div>
 
-                            </CCardBody>
-                        </CCard>
-                </CCol>
-            </CRow>
-        </CContainer>
-    </div>
+                                <div class="d-flex align-center justify-space-between flex-wrap">
+                                    <v-checkbox
+                                        label="Remember Me"
+                                        hide-details
+                                        class="me-3 mt-1"
+                                    >
+                                    </v-checkbox>
+                                </div>
+
+                                <v-btn
+                                    class="mt-6"
+                                    block
+                                    color="primary"
+                                    type="submit"
+                                    :loading="form.processing"
+                                    :disabled="form.processing">
+                                    Ingresar
+                                    <template v-slot:loader>
+                                        <span>Ingresando...</span>
+                                    </template>
+                                </v-btn>
+                            </form>
+                        </v-card-text>
+                    </v-card>
+                </div>
+            </div>
+        </v-main>
+    </v-app>
 </template>
-
 <script>
-import LoadingButton from '@/Shared/LoadingButton'
-
 export default {
-    components: {
-        LoadingButton,
-    },
     props: {
+        canResetPassword: Boolean,
+        status: String,
         errors: Object,
     },
     data() {
         return {
-            sending: false,
-            form: {
+            form: this.$inertia.form({
                 username: '',
                 password: '',
-                remember: null,
-            },
+                remember: false
+            }),
+            alert: false
         }
     },
     methods: {
         submit() {
-            this.errors = [];
-            this.sending = true
-            this.$inertia.post('/login', this.form, {
-                onFinish: () => this.sending = false,
-            })
+            console.log('login')
+            this.form.post('/login', {
+                onFinish: () => {
+                    this.form.reset('password')
+                    if (Object.keys(this.errors).length > 0) {
+                        this.alert = true;
+                    }
+                },
+            });
         },
         state(value) {
             if (value === undefined || Object.keys(this.errors).length === 0) {
                 return null;
             }
             return !value;
-        }
-    },
-
+        },
+    }
 }
+
 </script>
+<style lang="scss">
+
+.auth-wrapper {
+    display: flex;
+    min-height: calc(var(--vh, 1vh) * 100);
+    width: 100%;
+    flex-basis: 100%;
+    align-items: center;
+
+    // common style for both v1 and v2
+    a {
+        text-decoration: unset;
+    }
+
+    // auth v1
+    &.auth-v1 {
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        padding: 1.5rem;
+
+        .auth-mask-bg {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .auth-tree,
+        .auth-tree-3 {
+            position: absolute;
+        }
+
+        .auth-tree {
+            bottom: 0;
+            left: 0;
+        }
+
+        .auth-tree-3 {
+            bottom: 0;
+            right: 0;
+        }
+
+        // auth card
+        .auth-inner {
+            width: 28rem;
+            z-index: 1;
+
+            .auth-card {
+                padding: 0.9375rem 0.875rem;
+            }
+        }
+    }
+}
+
+@media (max-width: 600px) {
+    // auth bg and tree hide in sm screen
+    .auth-v1 {
+        .auth-tree,
+        .auth-tree-3,
+        .auth-mask-bg {
+            display: none;
+        }
+    }
+}
+
+</style>

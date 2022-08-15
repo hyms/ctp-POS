@@ -128,12 +128,12 @@
 </template>
 
 <script>
-import Layout from '@/Shared/Layout'
+import Authenticated from '@/Layouts/Authenticated'
 import Menu from "./menuReportes";
 import itemOrden from "../Ordenes/item";
 
 export default {
-    layout: Layout,
+    layout: Authenticated,
     name: "xclientes",
     components: {
         Menu,

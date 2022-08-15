@@ -1,159 +1,165 @@
 <template>
-    <div class="row">
-        <div class="col-12">
-            <formSearch :report="report" :estados="estados" v-if="typeReport===1" :tiposSelect="tiposSelect"></formSearch>
-            <div class="row mb-2" v-if="typeReport===0">
-                <div class="col">
-                    <b-button-group>
-                        <b-button v-for="(tipoProducto,key) in tiposProductos"
-                                  :key="key"
-                                  v-b-modal="'ordenModal'"
-                                  @click="loadModal(tipoProducto.id)"
-                                  variant="primary"
-                        >
-                            {{ boton1 + ' ' + tipoProducto.nombre }}
-                        </b-button>
-                    </b-button-group>
-                    <formOrden
-                        :isNew="isNew"
-                        id="ordenModal"
-                        :itemRow="itemRow"
-                        :productos="productos[tipoProductoFiltro]"
-                        :productosSell="productosSell()"
-                        :tipo="tipoProductoFiltro"
-                    ></formOrden>
-                </div>
-            </div>
-            <b-card no-body>
-                <b-card-header>
-                    <strong>{{ titulo }}</strong>
-                </b-card-header>
-                <b-card-body>
-                    <item-orden
-                        id="itemModal"
-                        :isVenta="isVenta"
-                        :item="itemRow"
-                        :productos="productosAll"
-                    ></item-orden>
-                    <item-reposicion
-                        id="itemRModal"
-                        :is-new="true"
-                        :item="itemRow"
-                        :productos="productos[tipoProductoFiltro]"
-                        :productosSell="productosSell()"
-                    ></item-reposicion>
-                    <div class="table-responsive">
-                        <b-table
-                            striped
-                            hover
-                            :items="ordenes"
-                            :fields="fields"
-                            show-empty
+    <v-row>
+        <v-col>
+            <formOrden
+                :edited-index="editedIndex"
+                :edited-item="editedItem"
+                :productos="productos[tipoProductoFiltro]"
+                :productosSell="productosSell()"
+                :tipo="tipoProductoFiltro"
+                :title="titleForm"
+                :dialog="dialogOrden"
+                v-if="typeReport===0"
+                @close="close()"
+            ></formOrden>
+            <delete-item
+                :dialog="dialogDelete"
+                :edited-index="editedIndex"
+                :base-path="baseDeletePath"
+                :delete-text="deleteText"
+                @close="close()"
+            />
+            <item-orden
+                :dialog="dialogItem"
+                :isVenta="isVenta"
+                :item="editedItem"
+                :productos="productosAll"
+                @close="close()"
+            ></item-orden>
+            <item-reposicion
+                :dialog="dialogReposicion"
+                :isVenta="isVenta"
+                :item="editedItem"
+                :edited-index="editedIndex"
+                :productos="productos[tipoProductoFiltro]"
+                :productosSell="productosSell()"
+                @close="close()"
+            ></item-reposicion>
+            <v-card>
+                <v-card-title>
+                    <template v-if="typeReport===0" v-for="(tipoProducto,key) in tiposProductos">
+                        <v-btn
+                            :key="key"
+                            @click="loadOrden(tipoProducto.id,tipoProducto.nombre)"
+                            color="primary"
                             small
-                            :current-page="currentPage"
-                            :per-page="perPage"
-                            :sort-by.sync="sortBy"
-                            :sort-desc.sync="sortDesc"
-                            :sort-direction="sortDirection"
+                            elevation="1"
+                            class="mr-2 my-1"
                         >
-                            <template #empty="scope">
-                                <p>{{ textoVacio }}</p>
-                            </template>
-                            <template v-slot:cell(estado)="data">
-                                {{ estados[data.value] }}
-                            </template>
-                            <template v-slot:cell(tipoOrden)="data">
-                                {{ getTipoOrden(data.value) }}
-                            </template>
-                            <template v-slot:cell(created_at)="data">
-                                {{ data.value | moment("DD/MM/YYYY HH:mm") }}
-                            </template>
-                            <<template v-slot:cell(updated_at)="data">
-                                {{ data.value | moment("DD/MM/YYYY HH:mm") }}
-                            </template>
-                            <template v-slot:cell(Acciones)="row">
-                                <div class="row-actions">
-                                    <b-button variant="dark" v-b-modal="'ordenModal'"
-                                              @click="loadModal(row.item.tipoOrden,false,row)"
-                                              size="sm" v-if="!isVenta && viewModify(row.item.created_at)">
-                                        {{ boton4 }}
-                                    </b-button>
-                                    <b-button variant="primary" v-b-modal="'itemModal'"
-                                              @click="loadModal(row.item.tipoOrden,false,row)"
-                                              size="sm">
-                                        {{ boton2 }}
-                                    </b-button>
-                                    <b-button variant="danger" @click="borrar(row.item.id)" size="sm"
-                                              v-if="row.item.estado==1 && viewModify(row.item.created_at)">
-                                        {{ boton3 }}
-                                    </b-button>
-                                    <b-button variant="info" v-b-modal="'itemRModal'"
-                                              @click="loadModal(row.item.tipoOrden,false,row)"
-                                              v-if="[0,2].includes(row.item.estado) && viewReposicion(row.item.created_at)">
-                                        {{ boton5 }}
-                                    </b-button>
-                                </div>
-                            </template>
-                        </b-table>
-                    </div>
-                    <b-col>
-                        <b-pagination
-                            v-model="currentPage"
-                            :total-rows="totalRows"
-                            :per-page="perPage"
-                            align="center"
-                            class="my-0"
-                            v-if="totalRows>perPage"
-                        ></b-pagination>
-                    </b-col>
-                </b-card-body>
-            </b-card>
-        </div>
-    </div>
+                            {{ tipoProducto.nombre }}
+                        </v-btn>
+                    </template>
+                    <formSearch
+                        :report="report"
+                        :estados="estados"
+                        v-if="typeReport===1"
+                        :tiposSelect="tiposSelect"
+                    ></formSearch>
+                    <template v-if="report.total">
+                        <v-spacer></v-spacer>
+                        <v-btn outlined color="secondary">
+                            <strong>Total:</strong> {{ report.total }}
+                        </v-btn>
+                    </template>
+                </v-card-title>
+                <v-data-table
+                    :items="ordenes"
+                    :headers="fields"
+                    :no-data-text="emptyText"
+                    mobile-breakpoint="540">
+                    <template v-slot:item.created_at="{item}">
+                        {{ item.created_at | moment("DD/MM/YYYY HH:mm") }}
+                    </template>
+                    <template v-slot:item.updated_at="{item}">
+                        {{ item.updated_at | moment("DD/MM/YYYY HH:mm") }}
+                    </template>
+                    <template v-slot:item.Acciones="{ item }">
+                        <v-btn
+                            small
+                            class="ma-1"
+                            color="secondary"
+                            @click="loadOrden(item.tipoOrden,item.tipoOrdenView,item.id,item)"
+                            v-if="!isVenta && viewModify(item.created_at)"
+                        >
+                            <v-icon>
+                                mdi-file-document-edit
+                            </v-icon>
+                        </v-btn>
+                        <v-btn
+                            color="error"
+                            class="ma-1"
+                            small
+                            @click="deleted(item.id)"
+                            v-if="item.estado===1 && viewModify(item.created_at)">
+                            <v-icon>
+                                mdi-file-document-remove
+                            </v-icon>
+                        </v-btn>
+                        <v-btn
+                            color="primary"
+                            class="ma-1"
+                            small
+                            @click="loadItem(item)"
+                        >
+                            <v-icon>
+                                mdi-file-document-check
+                            </v-icon>
+                        </v-btn>
+                        <v-btn
+                            color="info"
+                               class="ma-1"
+                               small
+                               @click="loadReposicion(item.tipoOrden,item)"
+                               v-if="[0,2].includes(item.estado) && viewReposicion(item.created_at)">
+                            <v-icon>
+                                mdi-file-document-alert
+                            </v-icon>
+                        </v-btn>
+                    </template>
+                </v-data-table>
+            </v-card>
+        </v-col>
+    </v-row>
 </template>
 
 <script>
-import Layout from '@/Shared/Layout'
-import formOrden from './form'
-import itemOrden from './item'
-import itemReposicion from './itemReposicion'
-import formSearch from "./formSearch";
-import moment from 'moment';
+import Authenticated from '@/Layouts/Authenticated.vue'
+import formOrden from './form.vue'
+import itemOrden from './item.vue'
+import itemReposicion from './itemReposicion.vue'
+import formSearch from './formSearch.vue'
+import deleteItem from "@/Layouts/components/deleteItem.vue";
+import moment from 'moment'
 
 export default {
-    name: "Ordenes",
-    layout: Layout,
+    layout: Authenticated,
     data() {
         return {
-            isNew: true,
-            titulo: 'Ordenes',
-            boton1: "Nuevo",
-            boton2: "Ver",
-            boton3: "Anular",
-            boton4: "Modificar",
-            boton5: "Reposicion",
-            textoVacio: 'No existen Ordenes',
+            emptyText: 'No existen Ordenes',
+            deleteText: "Anular",
+            titleForm: "",
             tipoProductoFiltro: null,
             fields: [],
-            itemRow: {},
-            totalRows: 1,
-            currentPage: 1,
-            perPage: 20,
-            sortBy: '',
-            sortDesc: false,
-            sortDirection: 'asc',
+            editedIndex: -1,
+            editedItem: {},
+            //dialogs
+            dialogOrden: false,
+            dialogDelete: false,
+            dialogItem: false,
+            dialogReposicion: false,
+            baseDeletePath: "orden"
         }
     },
     props: {
         ordenes: Array,
         productos: Object,
         productosAll: Array,
-        estados: Object,
+        estados: Array,
         report: Object,
         isVenta: Boolean,
         typeReport: Number,
         tiposProductos: Array,
-        tiposSelect: Object,
+        tiposSelect: Array,
         reposicion: Number,
     },
     components: {
@@ -161,20 +167,43 @@ export default {
         itemOrden,
         itemReposicion,
         formSearch,
+        deleteItem,
     },
     methods: {
-        loadModal(tipo, isNew = true, item = null) {
-            this.tipoProductoFiltro = tipo;
-            this.isNew = isNew;
-            this.itemRow = {};
-            if (!isNew) {
-                this.itemRow = item.item;
-            }
+        loadOrden(tipo, title, id = -1, item = null) {
+            this.loadDialog(tipo, title, id, item)
+            this.dialogOrden = true;
         },
-        borrar(id) {
-            this.$inertia.delete(`orden/${id}`, {
-                onBefore: () => confirm('Esta seguro?'),
+        loadItem(item) {
+            this.loadDialog(null, "", item.id, item)
+            this.dialogItem = true;
+        },
+        loadReposicion(tipoOrden, item) {
+            this.loadDialog(tipoOrden, "", item.id, item)
+            this.dialogReposicion = true;
+        },
+        loadDialog(tipo, title, id, item) {
+            this.tipoProductoFiltro = tipo;
+            this.editedIndex = id;
+            this.editedItem = {};
+            if (id > 0) {
+                this.editedItem = item;
+            }
+            this.titleForm = title;
+        },
+        close() {
+            this.dialogOrden = false;
+            this.dialogDelete = false;
+            this.dialogItem = false;
+            this.dialogReposicion = false;
+            this.$nextTick(() => {
+                this.editedIndex = -1
+                this.editedItem = Object.assign({}, {})
             })
+        },
+        deleted(id) {
+            this.editedIndex = id
+            this.dialogDelete = true
         },
         productosSell() {
             let sell = [];
@@ -201,77 +230,26 @@ export default {
             limitDay = moment(limitDay).add(this.reposicion, 'days');
             return moment(limitDay).isSameOrAfter(today, 'day');
         },
-        getTipoOrden(value) {
-            let text = "";
-            for (let tipoProducto of this.tiposProductos) {
-                if (tipoProducto.id === value) {
-                    text = tipoProducto.nombre;
-                    break;
-                }
-            }
-            return text;
-        }
-    },
-    mounted() {
-        // Set the initial number of items
-        this.totalRows = this.ordenes.length;
     },
     created() {
-        this.$messaging.onMessage((payload) => {
-            if (!window.Notification) {
-                console.log('Browser does not support notifications.');
-            } else {
-                let notification = payload.notification;
-                const alert = new Notification(
-                    notification.title, {
-                        body: notification.body,
-                    });
-                if (payload.data.orden) {
-                    alert.addEventListener('click', () => {
-                        window.open('/ordenPdf/' + payload.data.orden, '_blank');
-                    });
-                    if (payload.data.newOrden) {
-                        if (this.ordenes[0].id <= payload.data.orden) {
-                            this.$inertia.reload();
-                        }
-                    }
-                }
-            }
-        });
-        if(this.isVenta)
-        {
-            this.fields=[
-                { key: 'tipoOrden', label: 'Tipo Orden', sortable: true },
-                { key: 'codigoServicio', label: 'Codigo', sortable: true },
-                { key: 'estado', label: 'Estado', sortable: true },
-                { key: 'responsable', label: 'Cliente', sortable: true },
-                { key: 'montoVenta', label: 'Monto', sortable: true },
-                { key: 'created_at', label: 'Fecha Nueva Orden', sortable: true },
-                { key: 'updated_at', label: 'Fecha Pago/Deuda', sortable: true },
-                'Acciones'
-            ];
-        }
-        else {
-            this.fields=[
-                { key: 'tipoOrden', label: 'Tipo Orden', sortable: true },
-                { key: 'codigoServicio', label: 'Codigo', sortable: true },
-                { key: 'estado', label: 'Estado', sortable: true },
-                { key: 'responsable', label: 'Cliente', sortable: true },
-                { key: 'telefono', label: 'Telefono', sortable: true },
-                { key: 'created_at', label: 'Fecha', sortable: true },
-                'Acciones'
-            ];
-        }
-    },
-    computed: {
-        sortOptions() {
-            // Create an options list from our fields
-            return this.fields
-                .filter(f => f.sortable)
-                .map(f => {
-                    return { text: f.label, value: f.key }
-                })
-        }
+        this.fields = this.isVenta ? [
+            {value: 'tipoOrdenView', text: 'Tipo Orden'},
+            {value: 'codigoServicio', text: 'Codigo'},
+            {value: 'estadoView', text: 'Estado'},
+            {value: 'responsable', text: 'Cliente'},
+            {value: 'montoVenta', text: 'Monto'},
+            {value: 'created_at', text: 'Fecha Nueva Orden'},
+            {value: 'updated_at', text: 'Fecha Pago/Deuda'},
+            {value: 'Acciones', text: 'Acciones'}
+        ] : [
+            {value: 'tipoOrdenView', text: 'Tipo Orden'},
+            {value: 'codigoServicio', text: 'Codigo'},
+            {value: 'estadoView', text: 'Estado'},
+            {value: 'responsable', text: 'Cliente'},
+            {value: 'telefono', text: 'Telefono'},
+            {value: 'created_at', text: 'Fecha'},
+            {value: 'Acciones', text: 'Acciones'}
+        ];
     },
 }
 </script>

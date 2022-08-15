@@ -1,5 +1,5 @@
 <template>
-    <standar-table
+    <generic-table
         :items="cajas"
         :errors="errors"
         :basePath="'caja'"
@@ -11,35 +11,48 @@
         :urlPost="'/admin/caja'"
 
     >
-    </standar-table>
+    </generic-table>
 </template>
 
 <script>
-import Layout from '@/Shared/Layout'
-import StandarTable from '@/Shared/standarTable';
+import Authenticated from '@/Layouts/Authenticated.vue'
+import GenericTable from '@/Layouts/components/genericTable.vue';
 
 export default {
-    layout: Layout,
+    layout: Authenticated,
     props: {
         cajas: Array,
-        sucursales: Object,
+        cajasOptions: Array,
+        sucursales: Array,
         errors: Object,
     },
     components: {
-        StandarTable,
+        GenericTable,
     },
     data() {
         return {
             fields:
                 [
-                    'nombre',
-                    'monto',
-                    'enable',
                     {
-                        key: 'nombreSucursal',
-                        label: 'Sucursal'
+                        text: 'Nombre',
+                        value: 'nombre'
                     },
-                    'Acciones'
+                    {
+                        text: 'Monto',
+                        value: 'monto'
+                    },
+                    {
+                        text: 'Habiitado',
+                        value: 'enableView'
+                    },
+                    {
+                        text: 'Sucursal',
+                        value: 'nombreSucursal',
+                    },
+                    {
+                        text: 'Acciones',
+                        value: 'Acciones'
+                    },
                 ],
             form: {
                 nombre: {
@@ -48,34 +61,39 @@ export default {
                     type: "text",
                     state: null,
                     stateText: null
-                }, descripcion: {
+                },
+                descripcion: {
                     label: 'descripcion',
                     value: "",
                     type: "textarea",
                     state: null,
                     stateText: null
-                }, sucursal: {
+                },
+                sucursal: {
                     label: 'sucursal',
                     value: "",
                     type: "select",
                     state: null,
                     stateText: null,
                     options: this.sucursales
-                }, dependeDe: {
+                },
+                dependeDe: {
                     label: 'Depende de',
                     value: "",
                     type: "select",
                     state: null,
                     stateText: null,
-                    options: this.cajas,
+                    options: this.cajasOptions,
                     isPadre: 1
-                }, enable: {
+                },
+                enable: {
                     label: 'enable',
                     value: "",
                     type: "boolean",
                     state: null,
                     stateText: null
-                }, monto: {
+                },
+                monto: {
                     label: '',
                     value: "",
                     type: "hidden",

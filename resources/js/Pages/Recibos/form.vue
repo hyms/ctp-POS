@@ -1,66 +1,86 @@
 <template>
-    <div>
-        <b-modal
-            :id="id"
-            :title="titulo1 + ((tipo)?' de Egreso':' de Ingreso')"
-            @show="reset"
-            @hidden="reset"
-            @ok="handleOk">
-            <form @submit.stop.prevent="enviar">
-                <b-alert dismissible :show="errors.length">
-                    {{ errors }}
-                </b-alert>
-                <template v-for="(item,key) in form">
-                    <b-form-group
-                        :label="item.label"
-                        :label-for="key"
-                        :state="item.state"
-                        :invalid-feedback="item.stateText"
-                        v-if="['text','password','date','textarea','email','select'].includes(item.type)"
+    <v-dialog v-model="dialog" max-width="500px" scrollable persistent>
+        <v-card>
+            <v-card-title>{{ titulo1 + ((tipo)?' de Egreso':' de Ingreso') }}</v-card-title>
+            <v-card-text>
+                <form>
+                    <v-alert
+                        dismissible
+                        class="mb-4"
+                        v-if="Object.keys(errorsData).length > 0"
+                        v-model="alert"
+                        color="red"
+                        outlined
+                        text
                     >
-                        <b-input
-                            :type="item.type"
-                            :placeholder="item.label"
-                            v-model="item.value"
-                            :id="key"
-                            :state="item.state"
-                            v-if="['text','password','date','email'].includes(item.type)"
-                        ></b-input>
-                        <b-textarea
-                            v-if="item.type==='textarea'"
-                            :placeholder="item.label"
-                            v-model="item.value"
-                            :id="key"
-                            :state="item.state"
-                        ></b-textarea>
-                    </b-form-group>
-                </template>
-            </form>
-            <template #modal-footer="{ ok, cancel }">
-                <b-button variant="danger" @click="cancel()" size="sm">
-                    Cancel
-                </b-button>
-                <loading-button :loading="sending" variant="primary" size="sm"
-                                @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
-                </loading-button>
-            </template>
-        </b-modal>
-    </div>
+                        <ul class="text-sm">
+                            <li v-for="(error, key) in errorsData" :key="key">{{ key }}: {{ error }}</li>
+                        </ul>
+                    </v-alert>
+                    <template v-for="(item,key) in form">
+                        <template v-if="['text','password','date','textarea','select','search'].includes(item.type)">
+                            <v-text-field
+                                v-model="item.value"
+                                :id="key"
+                                v-if="['text','password','date'].includes(item.type)"
+                                outlined
+                                dense
+                                hide-details="auto"
+                                :type="item.type"
+                                :label="item.label"
+                                :error="item.state"
+                                :error-messages="item.stateText"
+                                class="my-2"
+                            ></v-text-field>
+                            <v-textarea
+                                v-if="item.type==='textarea'"
+                                :id="key"
+                                v-model="item.value"
+                                rows="2"
+                                outlined
+                                dense
+                                hide-details="auto"
+                                :label="item.label"
+                                :error="item.state"
+                                :error-messages="item.stateText"
+                                class="my-2"
+                            ></v-textarea>
+                        </template>
+                    </template>
+                </form>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn small color="error" class="ma-1" @click="$emit('close')">
+                    Cancelar
+                </v-btn>
+                <v-btn small color="primary" class="ma-1" @click="sended"
+                       :loading="sending" :disabled="sending">
+                    Guardar
+                </v-btn>
+            </v-card-actions>
+            <!--        <b-modal
+                        <template #modal-footer="{ ok, cancel }">
+                            <b-button variant="danger" @click="cancel()" size="sm">
+                                Cancel
+                            </b-button>
+                            <loading-button :loading="sending" variant="primary" size="sm"
+                                            @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
+                            </loading-button>
+                        </template>
+                    </b-modal>-->
+        </v-card>
+    </v-dialog>
 </template>
 
 <script>
 import axios from "axios";
-import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
     name: "recibo",
     props: {
-        id: String,
-        itemRow: Object,
         tipo: Number,
-    },
-    components: {
-        LoadingButton
+        dialog:Boolean,
     },
     data() {
         return {
@@ -94,57 +114,57 @@ export default {
                     stateText: null
                 }
             },
-            idForm: null,
-            errors: Array
+            errorsData: Array
         }
     },
     methods: {
-        reset() {
-            this.limpiar();
-            if ('id' in this.itemRow) {
-                this.idForm = null;
-            }
-            for (let key in this.form) {
-                this.form[key].value = "";
-            }
-        },
-        limpiar() {
+        removeState() {
             for (let key in this.form) {
                 this.form[key].state = null;
                 this.form[key].stateText = null;
             }
-            this.errors = [];
+            this.errorsData = [];
         },
-        handleOk(bvModalEvt) {
-            // Prevent modal from closing
-            bvModalEvt.preventDefault();
-            this.enviar();
-        },
-        enviar() {
-            this.sending = true;
-            this.limpiar();
-            let recibo = new FormData();
+        removeValues() {
             for (let key in this.form) {
-                recibo.append(key, this.form[key].value);
+                this.form[key].value = "";
             }
-            recibo.append('tipo',this.tipo);
-
-            axios.post('/recibo', recibo, {headers: {'Content-Type': 'multipart/form-data'}})
+            this.client = Object.assign({}, {});
+            this.clients = [];
+        },
+        setErrors(data) {
+            this.errorsData = data.errors;
+            for (let key in this.form) {
+                if (key in data.errors) {
+                    this.alert = true;
+                    this.form[key].state = false;
+                    this.form[key].stateText = data.errors[key][0];
+                } else {
+                    this.form[key].state = true;
+                    this.form[key].stateText = "";
+                }
+            }
+        },
+        loadFormData() {
+            let formData = new FormData();
+            for (let key in this.form) {
+                formData.append(key, this.form[key].value);
+            }
+            formData.append('tipo', this.tipo);
+            return formData;
+        },
+        sended() {
+            this.sending = true;
+            this.removeState();
+            axios.post('/recibo', this.loadFormData(), {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
-                        this.$bvModal.hide(this.id)
+                        this.removeValues()
+                        this.removeState()
+                        this.$emit("close")
                         this.$inertia.get(data["path"])
-                    }
-                    else {
-                        for (let key in this.form) {
-                            if (key in data.errors) {
-                                this.form[key].state = false;
-                                this.form[key].stateText = data.errors[key][0];
-                            } else {
-                                this.form[key].state = true;
-                                this.form[key].stateText = "";
-                            }
-                        }
+                    } else {
+                        this.setErrors(data)
                     }
                 })
                 .catch(error => {

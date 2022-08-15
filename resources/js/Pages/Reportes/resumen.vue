@@ -71,11 +71,11 @@
 </template>
 
 <script>
-import Layout from '@/Shared/Layout'
+import Authenticated from '@/Layouts/Authenticated'
 import Menu from "./menuReportes";
 
 export default {
-    layout: Layout,
+    layout: Authenticated,
     props: {
         totalOrdenes: Array,
         fechaI: String,

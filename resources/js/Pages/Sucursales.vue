@@ -1,5 +1,5 @@
 <template>
-    <standar-table
+    <generic-table
         :items="sucursales"
         :errors="errors"
         :basePath="'sucursal'"
@@ -11,36 +11,47 @@
         :urlPost="'/admin/sucursal'"
 
     >
-    </standar-table>
+    </generic-table>
 </template>
 
 <script>
-import Layout from '@/Shared/Layout'
-import StandarTable from '@/Shared/standarTable';
+import Authenticated from '@/Layouts/Authenticated.vue'
+import genericTable from '@/Layouts/components/genericTable.vue';
 
 export default {
-    layout: Layout,
+    layout: Authenticated,
     props: {
         sucursales: Array,
+        sucursalOptions: Array,
         errors: Object,
     },
     components: {
-        StandarTable
+        genericTable
     },
     data() {
         return {
             fields:
                 [
-                    'nombre',
-                    'telefono',
-                    'gmap',
-                    'central',
                     {
-                        key: 'enable',
-                        label:
-                            'Habilitado',
+                        value: 'nombre',
+                        text: 'Nombre',
                     },
-                    'Acciones'
+                    {
+                        value: 'telefono',
+                        text: 'Telefono',
+                    },
+                    {
+                        value: 'centralView',
+                        text: 'Central',
+                    },
+                    {
+                        value: 'enableView',
+                        text: 'Habilitado',
+                    },
+                    {
+                        value: 'Acciones',
+                        text: 'Acciones',
+                    },
                 ],
             form: {
                 codigo: {
@@ -84,20 +95,20 @@ export default {
                     type: "select",
                     state: null,
                     stateText: null,
-                    options: this.sucursales,
+                    options: this.sucursalOptions,
                     isPadre: 1
                 },
                 central: {
                     label: 'Central',
                     value: "",
-                    type: "boolean",
+                    type: "bool",
                     state: null,
                     stateText: null
                 },
                 enable: {
                     label: 'Habilitado',
                     value: "",
-                    type: "boolean",
+                    type: "bool",
                     state: null,
                     stateText: null
                 },

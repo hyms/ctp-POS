@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class MovimientoStock extends Model
@@ -12,11 +13,10 @@ class MovimientoStock extends Model
     public static string $tables = 'movimientosStock';
     protected $guarded = [];
 
-    public static function gelAll()
+    public static function gelAll(): Collection
     {
-        $movimientos = DB::table(self::$tables);
-        $movimientos = $movimientos
-            ->leftJoin(User::$tables, 'user', '=', User::$tables . '.id')
+        $movimientos = DB::table(self::$tables)
+            ->leftJoin(User::$tables, 'user', User::$tables . '.id')
             ->leftJoin(ProductoStock::$tables . ' as so', 'stockOrigen', '=', 'so.id')
             ->leftJoin(ProductoStock::$tables . ' as sd', 'stockDestino', '=', 'sd.id')
             ->select(self::$tables . '.*', 'so.sucursal as soSucursal', 'sd.sucursal as sdSucursal', User::$tables . '.nombre', User::$tables . '.apellido')
@@ -24,30 +24,27 @@ class MovimientoStock extends Model
         return $movimientos->get();
     }
 
-    public static function getAllTable(array $stock, bool $ingreso,array $request=[])
+    public static function getAllTable(array $stock, bool $ingreso, array $request = []): Collection
     {
-        $movimientos = DB::table(self::$tables);
+        $movimientos = new Generic(self::$tables);
+        $movimientos->isDelete = false;
+        $movimientos->onlyBuild = true;
+        $movimientos = count($request)>0
+            ? $movimientos->getAll($request)
+            : $movimientos->getAll(limit: 500);
+
         $movimientos = $ingreso
             ? $movimientos->whereIn('stockDestino', $stock)
             : $movimientos->whereIn('stockOrigen', $stock);
-        if(isset($request))
-        {
-            if (isset($request['fechaI']) && isset($request['fechaF'])) {
-                $fechaI = Carbon::parse($request['fechaI']);
-                $fechaF = Carbon::parse($request['fechaF']);
-                $movimientos = $movimientos->whereBetween('created_at', [$fechaI->startOfDay()->toDateTimeString(), $fechaF->endOfDay()->toDateTimeString()]);
-            }
-            if (isset($request['producto'])) {
-                $movimientos = $movimientos->where('producto', '=', $request['producto']);
-            }
-            if (isset($request['observaciones'])) {
-                $movimientos = $movimientos->where('observaciones', 'like', "%{$request['observaciones']}%");
-            }
-        }
-        else{
-            $movimientos = $movimientos->limit(500);
-        }
-        $movimientos = $movimientos->orderBy(self::$tables . '.updated_at', 'DESC');
-        return $movimientos->get();
+
+        $movimientos = $movimientos->get();
+        $productosAll = Producto::all();
+        return $movimientos->map(function ($value) use ($productosAll){
+            $producto = $productosAll->first(function ($item)use ($value){
+                return $item->id === $value->producto;
+            });
+            $value->productoView = "{$producto->formato} ({$producto->dimension})";
+            return $value;
+        });
     }
 }

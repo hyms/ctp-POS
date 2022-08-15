@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\MovimientoStock;
+use App\Models\Producto;
 use App\Models\ProductoStock;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,42 +16,49 @@ use Inertia\Inertia;
 
 class InventarioController extends Controller
 {
-    public function get(Request $request, bool $ingreso)
+    public function get(Request $request)
     {
-        $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
-        $productos = ProductoStock::getProducts(Auth::user()['sucursal'])->pluck('formato', 'producto');
+        $productosStocks = ProductoStock::getProducts(Auth::user()['sucursal']);
+        $productos = $productosStocks->map(function ($value){
+            return ['text'=>$value->formato,'value'=>(string)$value->producto];
+        });
+
         $stocks = ProductoStock::getAll(Auth::user()['sucursal']);
         $fields = [
-            'producto',
-            'observaciones',
-            'cantidad',
             [
-                'key' => 'created_at',
-                'label' => 'Fecha'
+                'value' => 'productoView',
+                'text' => 'Producto'
+            ],
+            [
+                'value' => 'observaciones',
+                'text' => 'Observaciones'
+            ],
+            [
+                'value' => 'cantidad',
+                'text' => 'Cantidad'
+            ],
+            [
+                'value' => 'created_at',
+                'text' => 'Fecha'
             ],
         ];
-        $movimientos = MovimientoStock::getAllTable($stocks->pluck('id')->toArray(), $ingreso,$request->all());
-        return Inertia::render('Inventario/tabla', [
-            'productos' => $productosAll,
+        $stocksId = $stocks->pluck('id')->toArray();
+        $ingresos = MovimientoStock::getAllTable($stocksId, true, $request->all());
+        $egresos = MovimientoStock::getAllTable($stocksId, false, $request->all());
+        $inventario = [
+            ['title' => 'Egreso', 'typeInventario' => 1, 'data' => $egresos->all()],
+            ['title' => 'Ingreso', 'typeInventario' => 2, 'data' => $ingresos->all()],
+        ];
+        Inertia::share('titlePage', 'Inventario');
+        return Inertia::render('Inventario/table', [
+            'productos' => $productosStocks,
             'productosSelect' => $productos,
-            'movimientos' => $movimientos,
+            'inventario' => $inventario,
             'fields' => $fields,
             'stocks' => $stocks,
-            'active' => (($ingreso) ? 2 : 1),
-            'report'=>$request->all()
+            'report' => (object)$request->all()
         ]);
     }
-
-    public function getIngreso(Request $request)
-    {
-        return $this->get($request, true);
-    }
-
-    public function getEgreso(Request $request)
-    {
-        return $this->get($request, false);
-    }
-
 
     public function postIngreso(Request $request)
     {
@@ -65,7 +74,8 @@ class InventarioController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'productos' => 'required'
+                'productos' => 'required',
+                'observaciones'=>'required'
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -76,25 +86,23 @@ class InventarioController extends Controller
             $products = json_decode($request['productos'], true);
             foreach ($products as $item) {
                 $stock = ProductoStock::find($item['id']);
-                if ($ingreso) {
-                    $stock->cantidad = $stock->cantidad + $item['cantidad'];
-                } else {
-                    $stock->cantidad = $stock->cantidad - $item['cantidad'];
-                }
+                $stock->cantidad = $ingreso
+                    ? ($stock->cantidad + $item['cantidad'])
+                    : ($stock->cantidad - $item['cantidad']);
                 $stock->save();
                 $movimiento = DB::table(MovimientoStock::$tables);
                 $movimiento->insert([
                     'producto' => $item['producto'],
-                    'stockOrigen' => (($ingreso) ? null : $item['id']),
-                    'stockDestino' => (($ingreso) ? $item['id'] : null),
+                    'stockOrigen' => ($ingreso ? null : $item['id']),
+                    'stockDestino' => ($ingreso ? $item['id'] : null),
                     'cantidad' => $item['cantidad'],
                     'observaciones' => $request['observaciones'],
                     'user' => Auth::id(),
-                    'created_at' => now(),
-                    'updated_at' => now()
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
                 ]);
             }
-            return response()->json(["status" => 0, 'path' => '/inventario/' . (($ingreso) ? 'ingreso' : 'egreso')]);
+            return response()->json(["status" => 0, 'path' => '/inventario']);
         } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,

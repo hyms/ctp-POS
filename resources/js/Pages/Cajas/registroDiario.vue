@@ -101,10 +101,10 @@
 </template>
 
 <script>
-import Layout from '@/Shared/Layout'
+import Authenticated from '@/Layouts/Authenticated'
 
 export default {
-    layout: Layout,
+    layout: Authenticated,
     props: {
         saldo: Number,
         arqueo: Array,

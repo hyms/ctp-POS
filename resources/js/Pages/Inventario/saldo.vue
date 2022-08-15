@@ -33,11 +33,11 @@
 </template>
 
 <script>
-import Layout from '@/Shared/Layout'
+import Authenticated from '@/Layouts/Authenticated'
 
 export default {
     name: "Orden",
-    layout: Layout,
+    layout: Authenticated,
     components: {},
     props: {
         id: String,

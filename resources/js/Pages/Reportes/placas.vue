@@ -1,151 +1,116 @@
 <template>
-    <div class="content-w">
-        <div class="content-box">
-            <Menu :active="1" v-if="Object.keys(sucursales).length>0"></Menu>
-            <div class="tab-content">
-                <b-card>
-                    <template #header>
-                        <h5 class="mb-0">Filtros</h5>
-                    </template>
-                    <form @submit.prevent="enviar">
-                        <b-row>
-                            <b-col md="4" sm="6" v-if="Object.keys(sucursales).length>0">
-                                <b-form-group
-                                    :label="form.sucursal.label"
-                                    label-for="sucursal"
-                                    :state="form.sucursal.state"
-                                >
-                                    <b-form-select
-                                        :placeholder="form.sucursal.label"
-                                        v-model="form.sucursal.value"
-                                        :options="sucursales"
-                                        id="sucursal"
-                                        :state="form.sucursal.state"
-                                    >
-                                        <template #first>
-                                            <b-form-select-option value="">-- Seleccione una sucursal --
-                                            </b-form-select-option>
-                                        </template>
-                                    </b-form-select>
-                                </b-form-group>
-                            </b-col>
-                            <b-col md="4" sm="6">
-                                <b-form-group
-                                    :label="form.fecha.label"
-                                    label-for="fecha"
-                                    :state="form.fecha.state"
-                                >
-                                    <b-input
-                                        :type="form.fecha.type"
-                                        :placeholder="form.fecha.label"
-                                        v-model="form.fecha.value"
-                                        id="fecha"
-                                        :state="form.fecha.state"
-                                    ></b-input>
-                                </b-form-group>
-                            </b-col>
-                            <b-col md="4" sm="6" v-if="Object.keys(sucursales).length>0">
-                                <b-form-group
-                                    :label="form.fechahasta.label"
-                                    label-for="hasta"
-                                    :state="form.fechahasta.state"
-                                >
-                                    <b-input
-                                        :type="form.fechahasta.type"
-                                        :placeholder="form.fechahasta.label"
-                                        v-model="form.fechahasta.value"
-                                        id="hasta"
-                                        :state="form.fechahasta.state"
-                                    ></b-input>
-                                </b-form-group>
-                            </b-col>
-                            <b-col md="4" sm="6">
-                                <b-form-group
-                                    :label="form.tipoOrden.label"
-                                    label-for="tipoOrden"
-                                    :state="form.tipoOrden.state"
-                                >
-                                    <b-form-select
-                                        :placeholder="form.tipoOrden.label"
-                                        v-model="form.tipoOrden.value"
-                                        :options="tipoPlacas"
-                                        id="tipoOrden"
-                                        :state="form.tipoOrden.state"
-                                    >
-                                        <template #first>
-                                            <b-form-select-option value="">-- Seleccione un tipo --
-                                            </b-form-select-option>
-                                        </template>
-                                    </b-form-select>
-                                </b-form-group>
-                            </b-col>
-
-                        </b-row>
-                        <b-row>
-                            <b-col>
-                                <b-button @click="enviar()" variant="primary" size="sm">Buscar</b-button>
-                            </b-col>
-                        </b-row>
-                    </form>
-                </b-card>
-                <b-card v-if="data['table'].length>0">
-                    <template #header>
-                        <h5 class="mb-0">Registro de Placas</h5>
-                        <b-button v-if="Object.keys(sucursales).length>0" @click="exportar()" variant="link">exportar</b-button>
-                    </template>
-                    <div class="table-responsive">
-                        <b-table
-                            striped
-                            hover
-                            :items="data['table']"
-                            :fields="data['fields']"
-                            show-empty
-                            small
-                            sticky-header
-                        >
-                            <template #cell(#)="data">
-                                {{ data.index + 1 }}
+    <v-row>
+        <v-col>
+            <v-card>
+                <v-card-title>
+                    <v-row>
+                        <template v-for="(item,key) in form">
+                            <template v-if="item.active">
+                                <v-col cols="6">
+                                    <v-text-field
+                                        v-if="['text','password','date','email'].includes(item.type)"
+                                        :id="key"
+                                        v-model="item.value"
+                                        outlined
+                                        dense
+                                        clearable
+                                        hide-details="auto"
+                                        :type="item.type"
+                                        :label="item.label"
+                                    ></v-text-field>
+                                    <v-select
+                                        v-if="item.type==='select'"
+                                        :id="key"
+                                        v-model="item.value"
+                                        item-text="text"
+                                        item-value="value"
+                                        outlined
+                                        dense
+                                        clearable
+                                        hide-details="auto"
+                                        :items="item.options"
+                                        :label="item.label"
+                                    ></v-select>
+                                </v-col>
                             </template>
-                            <template v-slot:cell(observaciones)="data">
-                                <span v-html="data.value"></span>
-                            </template>
-                            <template #custom-foot="data">
-                                <b-tr>
-                                    <b-th colspan="5" class="text-right"><strong>Total</strong></b-th>
-                                    <template v-for="(item,key) in data['fields']">
-                                        <b-th v-if="(key>=5) && (key<=data['fields'].length-2)"> {{ getTotal(item) }}
-                                        </b-th>
+                        </template>
+                        <v-col>
+                            <v-btn small color="primary" @click="sended"
+                                   :loading="sending" :disabled="sending">
+                                Consultar
+                                <v-icon right>
+                                    mdi-poll
+                                </v-icon>
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </v-card-title>
+                <v-divider></v-divider>
+                <template v-if="data['table'].length>0">
+                    <v-simple-table dense fixed-header height="60vh">
+                        <template v-slot:default>
+                            <thead>
+                            <tr>
+                                <template v-for="field in data['fields']">
+                                    <th>
+                                        <span class="text-uppercase">{{ field }}</span>
+                                    </th>
+                                </template>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <template
+                                v-for="(item,key) in data['table']"
+                            >
+                                <tr>
+                                    <template v-for="field in data['fields']">
+                                        <td>
+                                            <span v-if="field!=='observaciones'">{{
+                                                    (field === '#') ? key + 1 : item[field]
+                                                }}</span>
+                                            <span v-else v-html="item[field]"></span>
+                                        </td>
                                     </template>
-                                    <b-th></b-th>
-                                </b-tr>
+                                </tr>
                             </template>
-
-                        </b-table>
-                    </div>
-                </b-card>
-            </div>
-        </div>
-    </div>
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th colspan="5" class="text-right"><strong>Total</strong></th>
+                                <template v-for="(item,key) in data['fields']">
+                                    <th v-if="(key>=5) && (key<=data['fields'].length-2)"> {{ getTotal(item) }}
+                                    </th>
+                                </template>
+                                <th></th>
+                            </tr>
+                            </tfoot>
+                        </template>
+                    </v-simple-table>
+                </template>
+            </v-card>
+        </v-col>
+    </v-row>
 </template>
 
 <script>
-import Layout from '@/Shared/Layout'
-import Menu from "./menuReportes";
+import Authenticated from '@/Layouts/Authenticated.vue'
 import axios from "axios";
 import FileDownload from 'js-file-download';
 
 export default {
-    layout: Layout,
+    layout: Authenticated,
     props: {
-        sucursales: Object,
-        forms: Object,
-        tipoPlacas: Object,
+        sucursales: {
+            type: [Object, Array],
+            default: null
+        },
+        forms: Array,
+        tipoPlacas: Array,
         errors: Object,
-        data: Object
+        data: Object,
+        ventaReport: Boolean
     },
-    components: {
-        Menu
-    },
+    components: {},
     data() {
         return {
             form: {
@@ -154,67 +119,74 @@ export default {
                     value: "",
                     type: "select",
                     state: null,
-                    stateText: null
+                    stateText: null,
+                    active: (!this.ventaReport)
                 },
                 fecha: {
                     label: 'Fecha',
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
+                    active: true,
                 },
                 fechahasta: {
                     label: 'hasta',
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
+                    active: (!this.ventaReport)
                 },
                 tipoOrden: {
                     label: 'TipoOrden',
                     value: "",
                     type: "select",
                     state: null,
-                    stateText: null
+                    stateText: null,
+                    options: this.tipoPlacas,
+                    active: true
                 }
             },
+            sending: false,
+
         }
     },
     methods: {
-        enviar() {
+        sended() {
+            this.sending = true;
             let form = {};
             for (let key in this.form) {
-                form[key] = this.form[key].value;
+                if (this.form[key] != null) {
+                    form[key] = this.form[key].value;
+                }
             }
-            let url = '/reportes/placas';
-            if (Object.keys(this.sucursales).length > 0) {
-                url = '/admin/reportes/placas';
-            }
+            let url = !this.ventaReport
+                ? '/admin/reportes/placas'
+                : '/reportes/placas';
             this.$inertia.get(url, form)
+            this.sending = false;
         },
         getTotal(key) {
             let total = 0;
             for (let value of this.data['table']) {
-                total += (value[key['key']] * 1);
+                total += (value[key] * 1);
             }
             return total;
         },
-        exportar(){
+        exportar() {
             let form = {};
             for (let key in this.form) {
                 form[key] = this.form[key].value;
             }
             let url = '/admin/reportes/placasE';
-            location.href=url+window.location.search;
+            location.href = url + window.location.search;
             // "bootstrap": "^4.6.0",
         }
     },
     created() {
         for (let key in this.form) {
             this.form[key].value = this.forms[key];
-            // if (this.errors[key])) {
-            //     this.form[key].state = false;
-            // }
         }
         for (let key in this.errors) {
             this.form[key].state = false;
@@ -222,7 +194,10 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-
+<style>
+.v-data-table table tfoot th {
+    position: sticky;
+    bottom: 0;
+    background: #FFF;
+}
 </style>

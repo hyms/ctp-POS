@@ -182,12 +182,12 @@
 </template>
 
 <script>
-import Layout from '@/Shared/Layout'
+import Authenticated from '@/Layouts/Authenticated'
 import Menu from "./menuReportes";
 import moment from 'moment';
 
 export default {
-    layout: Layout,
+    layout: Authenticated,
     props: {
         sucursales: Object,
         productos: Array,

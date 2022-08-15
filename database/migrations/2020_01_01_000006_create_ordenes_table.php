@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateOrdenesTable extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -68,4 +67,4 @@ class CreateOrdenesTable extends Migration
         Schema::dropIfExists('detallesOrden');
         Schema::dropIfExists('ordenesTrabajo');
     }
-}
+};

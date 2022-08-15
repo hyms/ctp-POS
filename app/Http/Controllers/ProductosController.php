@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Producto;
 use App\Models\TipoProductos;
 use Exception;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 
@@ -17,9 +17,10 @@ class ProductosController extends Controller
     public function getAll()
     {
         $productos = Producto::getAll();
-        $productos = TipoProductos::setTiposProducto($productos);
+        $productos = TipoProductos::getTipoProductoxProducto($productos);
         $tipoProducto = TipoProductos::getAll();
-        $tipoProducto = $tipoProducto->pluck('nombre', 'id');
+        $tipoProducto = $tipoProducto->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});
+        Inertia::share('titlePage', 'Productos');
         return Inertia::render('Productos',
             [
                 'productos' => $productos,
@@ -43,15 +44,15 @@ class ProductosController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            $producto = new Producto();
-            if (!empty($request['id'])) {
-                $producto = Producto::find($request['id']);
-            }
+
+            $producto = !empty($request['id'])
+                ? Producto::find($request['id'])
+                : new Producto();
             $producto->fill($request->except('productoTipo'));
             $producto->save();
             if(isset($request['productoTipo']))
             {
-                TipoProductos::saveTiposProducto($producto->id, explode(',', $request['productoTipo']));
+                TipoProductos::saveTiposProducto($producto->id, Str::of($request['productoTipo'])->explode(','));
             }
             return response()->json(["status" => 0, 'path' => 'productos']);
         } catch (Exception $error) {
@@ -71,6 +72,7 @@ class ProductosController extends Controller
     public function tipos()
     {
         $tipos = TipoProductos::all();
+        Inertia::share('titlePage', 'Tipos de Producto');
         return Inertia::render('TipoProducto', ['tipos' => $tipos]);
     }
 
@@ -86,10 +88,10 @@ class ProductosController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            $producto = new TipoProductos();
-            if (!empty($request['id'])) {
-                $producto = TipoProductos::find($request['id']);
-            }
+
+            $producto = !empty($request['id'])
+                ? TipoProductos::find($request['id'])
+                : new TipoProductos();
             $producto->fill($request->all());
             $producto->save();
             return response()->json(["status" => 0, 'path' => ' tipoProductos']);

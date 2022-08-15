@@ -1,124 +1,157 @@
 <template>
-    <div>
-        <b-modal
-            :id="id"
-            :title="(isNew)?titulo1:titulo2"
-            @show="reset"
-            @hidden="reset"
-            @ok="handleOk">
-            <form @submit.stop.prevent="enviar">
-                <b-alert dismissible :show="errors.length">
-                    {{ errors }}
-                </b-alert>
-                <template v-for="(item,key) in form">
-                    <b-form-group
-                        :label="item.label"
-                        :label-for="key"
-                        :state="item.state"
-                        :invalid-feedback="item.stateText"
-                        v-if="['text','password','date','textarea','select','search'].includes(item.type)"
+    <v-dialog v-model="dialog" max-width="500px" scrollable persistent>
+        <v-card>
+            <v-card-title>{{ formTitle }}</v-card-title>
+            <v-card-text>
+                <form>
+                    <v-alert
+                        dismissible
+                        class="mb-4"
+                        v-if="Object.keys(errorsData).length > 0"
+                        v-model="alert"
+                        color="red"
+                        outlined
+                        text
                     >
-                        <b-input
-                            :type="item.type"
-                            :placeholder="item.label"
-                            v-model="item.value"
-                            :id="key"
-                            :state="item.state"
-                            v-if="['text','password','date'].includes(item.type)"
-                        ></b-input>
-                        <b-textarea
-                            v-if="item.type==='textarea'"
-                            :placeholder="item.label"
-                            v-model="item.value"
-                            :id="key"
-                            :state="item.state"
-                        ></b-textarea>
-                        <vue-bootstrap-typeahead
-                            size="sm"
-                            :placeholder="item.label"
-                            :data="options"
-                            v-model="responsableValue"
-                            v-if="item.type==='search'"
-                            :serializer="s => s.nombreResponsable"
-                            @hit="cliente = $event"
-                            ref="typeahead"
-                            backgroundVariant="light"
-                        >
-                        </vue-bootstrap-typeahead>
-                    </b-form-group>
-                    <b-checkbox
-                        v-if="item.type==='boolean'"
-                        v-model="item.value"
-                        :id="key"
-                        :state="item.state"
-                    >{{ item.label }}
-                    </b-checkbox>
-                </template>
-                <div class="table-responsive">
-                    <b-table-simple class="table-hover table-small texto-small">
-                        <b-thead>
-                            <b-tr>
-                                <b-th>Formato</b-th>
-                                <b-th>Dimension</b-th>
-                                <b-th>Cant.</b-th>
-                                <b-th></b-th>
-                            </b-tr>
-                        </b-thead>
-                        <b-tbody>
+                        <ul class="text-sm">
+                            <li v-for="(error, key) in errorsData" :key="key">{{ key }}: {{ error }}</li>
+                        </ul>
+                    </v-alert>
+                    <template v-for="(item,key) in form">
+                        <template v-if="['text','password','date','textarea','select','search'].includes(item.type)">
+                            <v-text-field
+                                v-model="item.value"
+                                :id="key"
+                                v-if="['text','password','date'].includes(item.type)"
+                                outlined
+                                dense
+                                hide-details="auto"
+                                :type="item.type"
+                                :label="item.label"
+                                :error="item.state"
+                                :error-messages="item.stateText"
+                                class="my-2"
+                            ></v-text-field>
+                            <v-textarea
+                                v-if="item.type==='textarea'"
+                                :id="key"
+                                v-model="item.value"
+                                rows="2"
+                                outlined
+                                dense
+                                hide-details="auto"
+                                :label="item.label"
+                                :error="item.state"
+                                :error-messages="item.stateText"
+                                class="my-2"
+                            ></v-textarea>
+                            <v-autocomplete
+                                v-if="item.type==='search'"
+                                v-model="client"
+                                :loading="loading"
+                                :items="clients"
+                                :search-input.sync="search"
+                                :search-input.prop="selectSeachDemo(client)"
+                                hide-no-data
+                                hide-selected
+                                item-text="nombreResponsable"
+                                label="Nombre"
+                                return-object
+                                dense
+                                outlined
+                                hide-details="auto"
+                                class="my-2"
+                            ></v-autocomplete>
+                        </template>
+                    </template>
+                    <v-simple-table dense class="overflow-x-auto">
+                        <template v-slot:default>
+                            <thead>
+                            <tr>
+                                <th>Formato</th>
+                                <th>Dimension</th>
+                                <th>Cant.</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
                             <template v-for="(product,key) in productos">
-                                <b-tr>
-                                    <b-td>{{ product.formato }}</b-td>
-                                    <b-td>{{ product.dimension }}</b-td>
-                                    <b-td>{{ product.cantidad }}</b-td>
-                                    <b-td>
-<!--                                        <b-form-spinbutton id="demo-sb" v-model="productosSell[key].cantidad" min="0"-->
-<!--                                                           max="100" size="sm" inline></b-form-spinbutton>-->
-                                        <b-input type="number" id="demo-sb" v-model="productosSell[key].cantidad"
-                                                size="sm" min="0"></b-input>
-                                    </b-td>
-                                </b-tr>
+                                <tr>
+                                    <td>{{ product.formato }}</td>
+                                    <td>{{ product.dimension }}</td>
+                                    <td>{{ product.cantidad }}</td>
+                                    <td>
+                                        <v-text-field
+                                            type="number"
+                                            v-model="productosSell[key].cantidad"
+                                            outlined
+                                            dense
+                                            single-line
+                                            style="min-width: 50px; max-width: 100px"
+                                            class="my-1 texto-small"
+                                            hide-details="auto"
+                                            min="0"></v-text-field>
+                                    </td>
+                                </tr>
                             </template>
-                        </b-tbody>
-                    </b-table-simple>
-                </div>
-            </form>
-            <template #modal-footer="{ ok, cancel }">
-                <b-button variant="danger" @click="cancel()" :size="'sm'">
-                    Cancel
-                </b-button>
-                <loading-button :loading="sending" :variant="'primary'" :size="'sm'"
-                                @click.native="ok()" :text="'Guardar'" :textLoad="'Guardando'">Guardar
-                </loading-button>
-            </template>
-        </b-modal>
-    </div>
+                            </tbody>
+                        </template>
+                    </v-simple-table>
+                </form>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn small color="error" class="ma-1" @click="closed">
+                    Cancelar
+                </v-btn>
+                <v-btn small color="primary" class="ma-1" @click="sended"
+                       :loading="sending" :disabled="sending">
+                    Guardar
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script>
 import axios from "axios";
-import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
-import LoadingButton from '@/Shared/LoadingButton'
 
 export default {
-    name: "Orden",
-    components: {
-        VueBootstrapTypeahead,
-        LoadingButton
-    },
+    components: {},
     props: {
-        isNew: Boolean,
-        isVenta: Boolean,
-        id: String,
-        itemRow: Object,
+        title: String,
+        editedItem: Object,
+        editedIndex: {
+            type: Number,
+            default: -1
+        },
         productos: Array,
         productosSell: Array,
         tipo: Number,
+        dialog: Boolean,
+    },
+    computed: {
+        formTitle() {
+            if (this.editedIndex > 0) {
+                this.setValues();
+            } else {
+                this.removeValues();
+            }
+            return `${this.editedIndex === -1 ? this.titleNew : this.titleModify} ${this.title}`;
+        },
     },
     data() {
         return {
+            //table
+            titleNew: "Nuevo - ",
+            titleModify: "Modificar - ",
+            options: [],
             sending: false,
-            titulo1: "Nueva Orden",
-            titulo2: "Modificar Orden",
+            //autocomplete
+            client: {},
+            loading: false,
+            clients: [],
+            //form
             form: {
                 responsable: {
                     label: 'Cliente',
@@ -142,73 +175,77 @@ export default {
                     stateText: null
                 }
             },
-            idForm: null,
-            errors: Array,
-            options: [],
-            responsableValue: "",
-            cliente: "",
-            idCliente: null
+            idClient: null,
+            search: null,
+            errorsData: [],
+            alert: false,
         }
     },
     methods: {
-        reset: function () {
-            this.limpiar();
-            if (this.isNew) {
-                this.idForm = null;
-                for (let key in this.form) {
-                    this.form[key].value = "";
-                }
-                this.responsableValue = ""
-            } else {
-                if ('id' in this.itemRow) {
-                    this.idForm = this.itemRow['id'];
-                }
-                for (let key in this.form) {
-                    if (['central', 'enable'].includes(key)) {
-                        this.form[key].value = (this.itemRow[key] === 1)
-                    } else if (['responsable'].includes(key)) {
-                        this.responsableValue = this.itemRow[key];
-                    } else {
-                        this.form[key].value = this.itemRow[key];
-                    }
-                }
-                for (let key in this.productosSell) {
-                    for (let value of this.itemRow.detallesOrden) {
-                        if (this.productosSell[key].id === value.stock) {
-                            this.productosSell[key].cantidad = value.cantidad;
-                        }
-                    }
-                }
-            }
+        closed() {
+            this.alert = false;
+            this.removeState();
+            this.removeValues();
+            this.$emit("close");
         },
-        limpiar() {
+        removeState() {
             for (let key in this.form) {
                 this.form[key].state = null;
                 this.form[key].stateText = null;
             }
-            this.errors = [];
+            this.errorsData = [];
         },
-        handleOk(bvModalEvt) {
-            // Prevent modal from closing
-            bvModalEvt.preventDefault();
-            this.enviar();
-        },
-        enviar() {
-            this.sending = true;
-            this.limpiar();
-            let producto = new FormData();
-            producto.append('tipo', this.tipo);
-            if (this.idForm) {
-                producto.append('id', this.idForm);
+        removeValues() {
+            for (let key in this.form) {
+                this.form[key].value = "";
             }
-            if (this.responsableValue) {
-                this.form.responsable.value = this.responsableValue;
+            this.client = Object.assign({}, {});
+            this.clients = [];
+        },
+        setValues() {
+            for (let key in this.form) {
+                this.form[key].value = this.editedItem[key];
+            }
+            for (let key in this.productosSell) {
+                for (let value of this.editedItem?.detallesOrden) {
+                    if (this.productosSell[key].id === value.stock) {
+                        this.productosSell[key].cantidad = value.cantidad;
+                    }
+                }
+            }
+            if (this.editedItem.cliente !== "") {
+                this.client = {
+                    id: this.editedItem.cliente,
+                    nombreResponsable: this.editedItem.responsable,
+                    telefono: this.editedItem.telefono
+                }
+                this.clients.push(this.client);
+            }
+        },
+        setErrors(data) {
+            this.errorsData = data.errors;
+            for (let key in this.form) {
+                if (key in data.errors) {
+                    this.alert = true;
+                    this.form[key].state = false;
+                    this.form[key].stateText = data.errors[key][0];
+                } else {
+                    this.form[key].state = true;
+                    this.form[key].stateText = "";
+                }
+            }
+        },
+        loadFormData() {
+            let formData = new FormData();
+            formData.append('tipo', this.tipo);
+            if (this.editedIndex > 0) {
+                formData.append('id', this.editedIndex);
             }
             for (let key in this.form) {
-                producto.append(key, this.form[key].value);
+                formData.append(key, this.form[key].value);
             }
-            if (this.idCliente) {
-                producto.append('cliente', this.idCliente);
+            if (this.idClient) {
+                formData.append('cliente', this.idClient);
             }
             let items = [];
             for (let value of this.productosSell) {
@@ -217,23 +254,21 @@ export default {
                 }
             }
             if (items.length > 0) {
-                producto.append('productos', JSON.stringify(items));
+                formData.append('productos', JSON.stringify(items));
             }
-            axios.post('/orden', producto, {headers: {'Content-Type': 'multipart/form-data'}})
+            return formData;
+        },
+        sended() {
+            this.sending = true;
+            this.removeState();
+
+            axios.post('/orden', this.loadFormData(), {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
-                    if (data["status"] == 0) {
-                        this.$bvModal.hide(this.id)
+                    if (data["status"] === 0) {
+                        this.closed();
                         this.$inertia.get(data["path"])
                     } else {
-                        for (let key in this.form) {
-                            if (key in data.errors) {
-                                this.form[key].state = false;
-                                this.form[key].stateText = data.errors[key][0];
-                            } else {
-                                this.form[key].state = true;
-                                this.form[key].stateText = "";
-                            }
-                        }
+                        this.setErrors(data);
                     }
                 })
                 .catch(error => {
@@ -244,33 +279,37 @@ export default {
                 this.sending = false;
             })
         },
-        fetchOptions(text) {
-            this.search(text);
+        //autoComplete
+        selectSeachDemo(item) {
+            this.form.responsable.value = item?.nombreResponsable;
+            this.form.telefono.value = item?.telefono;
+            this.idClient = item?.id
         },
-        async search(search) {
-            if (search) {
-                axios.get('/search/' + escape(search)).then(({data}) => {
-                    this.options = data.items
-                });
+        querySelections(search) {
+            // Items have already been requested
+            if (this.loading) {
+                return
             }
-        },
-        selectSeach(item) {
-            this.form.responsable.value = item.nombreResponsable;
+            this.loading = true
+            // Simulated ajax query
+            axios.get('/search/' + escape(search))
+                .then(({data}) => {
+                    this.clients = data.items;
+                })
+                .finally(() => {
+                    this.loading = false
+                });
         }
     },
     watch: {
-        responsableValue: function (data) {
-            this.search(data)
+        search(val) {
+            val && val !== this.client && this.querySelections(val)
         },
-        cliente: function (data) {
-            this.form.telefono.value = data.telefono;
-            this.idCliente = data.id
-        }
     }
 }
 </script>
 <style>
 .texto-small {
-    font-size: 0.85em;
+    font-size: 0.9em !important;
 }
 </style>
