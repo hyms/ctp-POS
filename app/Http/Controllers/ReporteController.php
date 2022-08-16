@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+
 //use Maatwebsite\Excel\Facades\Excel;
 
 class ReporteController extends Controller
@@ -105,8 +106,7 @@ class ReporteController extends Controller
             ]);
     }
 
-    private
-    function placas($request, $sucursales, $tipo)
+    private function placas($request, $sucursales, $tipo)
     {
         $data = $this->getTablePlacas($request);
         return Inertia::render('Reportes/placas',
@@ -121,8 +121,7 @@ class ReporteController extends Controller
             ]);
     }
 
-    public
-    function getTablePlacas($request)
+    public function getTablePlacas($request)
     {
         $data = ['table' => collect([]), 'fields' => collect([])];
         if (!isset($request['tipoOrden'])) {
@@ -271,8 +270,9 @@ class ReporteController extends Controller
     function clientes(Request $request)
     {
         $total = 0;
-        $sucursales = Sucursal::getAll()->pluck('nombre', 'id');
-        $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
+        $sucursales = Sucursal::getSelect();
+        $productosAll = ProductoStock::getProducts();
+        //$productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
         $validator = Validator::make($request->all(), [
             'sucursal' => 'required',
             'fechaI' => 'required',
@@ -307,7 +307,7 @@ class ReporteController extends Controller
                     $clientes->add([
                         'nombreResponsable' => $cliente->nombreResponsable,
                         'ordenes' => $ordenes,
-                        'fields' => [
+                        /*'fields' => [
                             'codigoServicio',
                             'totalDeuda',
                             [
@@ -315,13 +315,14 @@ class ReporteController extends Controller
                                 'label' => 'Fecha'
                             ],
                             'detalle'
-                        ],
+                        ],*/
                         'mora' => $totalCliente
                     ]);
                 }
             }
             $data = ['table' => $clientes->all(), 'fields' => ['nombreResponsable', 'mora', 'desde', 'hasta', 'cantidad']];
         }
+        Inertia::share('titlePage', 'Mora de Clientes');
         return Inertia::render('Reportes/mora',
             [
                 'sucursales' => $sucursales,
@@ -333,8 +334,7 @@ class ReporteController extends Controller
             ]);
     }
 
-    private
-    function rendicion(Request $request, bool $isAdmin)
+    private function rendicion(Request $request, bool $isAdmin)
     {
         $movimientos = ['egreso' => [], 'ingreso' => []];
         $fields = [];
@@ -411,7 +411,7 @@ class ReporteController extends Controller
                         ->where('movimientoCaja', $item->id)
                         ->get()
                         ->first();
-                    if(isset($recibo)) {
+                    if (isset($recibo)) {
                         if ($recibo->deleted_at) {
                             $item->observaciones = "Eliminado " . $item->observaciones;
                             $item->monto = 0;

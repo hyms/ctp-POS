@@ -183,11 +183,15 @@ export default {
                 {
                     titulo: 'Administracion',
                     submenu: [
-                        /*{
-                            label: 'Reportes',
-                            url: '/admin/reportes/placas',
-                            role: 'admin',
-                        },*/
+                        {
+                            Reportes: [
+                                {
+                                    label: 'Mora Clientes',
+                                    url: '/admin/reportes/mora',
+                                    role: 'admin',
+                                },
+                            ]
+                        },
                         {
                             label: 'Clientes',
                             url: '/admin/clientes',

@@ -23,38 +23,36 @@
 
         <v-card>
             <v-card-text>
-                <form>
-                    <v-row>
-                        <template v-for="(item,key) in form">
-                            <v-col cols="6">
-                                <v-text-field
-                                    v-if="['text','password','date','email'].includes(item.type)"
-                                    :id="key"
-                                    v-model="item.value"
-                                    outlined
-                                    dense
-                                    clearable
-                                    hide-details="auto"
-                                    :type="item.type"
-                                    :label="item.label"
-                                ></v-text-field>
-                                <v-select
-                                    v-if="item.type==='select'"
-                                    :id="key"
-                                    v-model="item.value"
-                                    item-text="text"
-                                    item-value="value"
-                                    outlined
-                                    dense
-                                    clearable
-                                    hide-details="auto"
-                                    :items="item.options"
-                                    :label="item.label"
-                                ></v-select>
-                            </v-col>
-                        </template>
-                    </v-row>
-                </form>
+                <v-row>
+                    <template v-for="(item,key) in form">
+                        <v-col cols="6">
+                            <v-text-field
+                                v-if="['text','password','date','email'].includes(item.type)"
+                                :id="key"
+                                v-model="item.value"
+                                outlined
+                                dense
+                                clearable
+                                hide-details="auto"
+                                :type="item.type"
+                                :label="item.label"
+                            ></v-text-field>
+                            <v-select
+                                v-if="item.type==='select'"
+                                :id="key"
+                                v-model="item.value"
+                                item-text="text"
+                                item-value="value"
+                                outlined
+                                dense
+                                clearable
+                                hide-details="auto"
+                                :items="item.options"
+                                :label="item.label"
+                            ></v-select>
+                        </v-col>
+                    </template>
+                </v-row>
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
@@ -141,7 +139,7 @@ export default {
     },
     mounted() {
         for (let key in this.form) {
-            this.form[key].value = this.report[key]??"";
+            this.form[key].value = this.report[key] ?? "";
         }
     },
     methods: {

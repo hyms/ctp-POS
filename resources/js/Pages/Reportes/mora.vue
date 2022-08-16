@@ -1,205 +1,229 @@
 <template>
-<!--    <div class="content-w">
-        <div class="content-box">
-            <Menu :active="4"></Menu>
-            <div class="tab-content">
-                <b-row>
-                    <b-col md="8">
-                        <b-card>
-                            <template #header>
-                                <h5 class="mb-0">Resumen Mora</h5>
-                            </template>
-                            <form @submit.prevent="enviar">
-                                <b-row>
-                                    <b-col md="4" sm="6">
-                                        <b-form-group
-                                            :label="form.sucursal.label"
-                                            label-for="sucursal"
-                                            :state="form.sucursal.state"
-                                        >
-                                            <b-form-select
-                                                :placeholder="form.sucursal.label"
-                                                v-model="form.sucursal.value"
-                                                :options="sucursales"
-                                                id="sucursal"
-                                                :state="form.sucursal.state"
-                                            >
-                                                <template #first>
-                                                    <b-form-select-option value="">&#45;&#45; Seleccione una sucursal &#45;&#45;
-                                                    </b-form-select-option>
+    <v-row>
+        <v-col>
+            <v-card>
+                <v-card-title>
+                    <v-row>
+                        <template v-for="(item,key) in form">
+                            <v-col cols="4">
+                                <v-text-field
+                                    v-if="['text','password','date','email'].includes(item.type)"
+                                    :id="key"
+                                    v-model="item.value"
+                                    outlined
+                                    dense
+                                    clearable
+                                    hide-details="auto"
+                                    :type="item.type"
+                                    :label="item.label"
+                                ></v-text-field>
+                                <v-select
+                                    v-if="item.type==='select'"
+                                    :id="key"
+                                    v-model="item.value"
+                                    item-text="text"
+                                    item-value="value"
+                                    outlined
+                                    dense
+                                    clearable
+                                    hide-details="auto"
+                                    :items="item.options"
+                                    :label="item.label"
+                                ></v-select>
+                            </v-col>
+                        </template>
+                        <v-col>
+                            <v-row>
+                                <v-col>
+                                    <v-btn left color="primary" @click="sended"
+                                           :loading="sending" :disabled="sending">
+                                        Consultar
+                                        <v-icon right>
+                                            mdi-poll
+                                        </v-icon>
+                                    </v-btn>
+                                </v-col>
+                                <v-spacer></v-spacer>
+                                <v-col align="right">
+                                    <v-btn right elevation="1" color="secondary"><h3>Total: {{ total }}</h3></v-btn>
+                                </v-col>
+                            </v-row>
+                        </v-col>
+                    </v-row>
+                </v-card-title>
+                <v-divider></v-divider>
+                <v-card-text>
+                    <template v-if="data['table'].length>0">
+                        <v-simple-table fixed-header height="60vh">
+                            <template v-slot:default>
+                                <thead>
+                                <tr>
+                                    <template v-for="field in data['fields']">
+                                        <th>
+                                            <span class="text-uppercase">{{ field }}</span>
+                                        </th>
+                                    </template>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <template
+                                    v-for="(item,key) in data['table']"
+                                >
+                                    <tr>
+                                        <template v-for="field in data['fields']">
+                                            <td>
+                                                <template v-if="field==='desde'">{{ getDesde(item) }}</template>
+                                                <template v-else-if="field==='hasta'">{{ getHasta(item) }}</template>
+                                                <template v-else-if="field==='cantidad'">{{
+                                                        getCantidad(item)
+                                                    }}
                                                 </template>
-                                            </b-form-select>
-                                        </b-form-group>
-                                    </b-col>
-                                    <b-col md="4" sm="6">
-                                        <b-form-group
-                                            :label="form.fechaI.label"
-                                            label-for="fechaI"
-                                            :state="form.fechaI.state"
-                                        >
-                                            <b-input
-                                                :type="form.fechaI.type"
-                                                :placeholder="form.fechaI.label"
-                                                v-model="form.fechaI.value"
-                                                id="fechaI"
-                                                :state="form.fechaI.state"
-                                            ></b-input>
-                                        </b-form-group>
-                                    </b-col>
-                                    <b-col md="4" sm="6">
-                                        <b-form-group
-                                            :label="form.fechaF.label"
-                                            label-for="fechaF"
-                                            :state="form.fechaF.state"
-                                        >
-                                            <b-input
-                                                :type="form.fechaF.type"
-                                                :placeholder="form.fechaF.label"
-                                                v-model="form.fechaF.value"
-                                                id="fechaF"
-                                                :state="form.fechaF.state"
-                                            ></b-input>
-                                        </b-form-group>
-                                    </b-col>
+                                                <template v-else>{{ item[field] }}</template>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                </template>
+                                </tbody>
+                            </template>
+                        </v-simple-table>
+                    </template>
+                </v-card-text>
+            </v-card>
+        </v-col>
+    </v-row>
+    <!--    <div class="content-w">
+                <div class="tab-content">
+                    <b-row>
+
+                        <b-col md="4">
+                            <b-card>
+                                <template #header>
+                                    <h5 class="mb-0">Total</h5>
+                                </template>
+                                <b-row>
                                     <b-col>
-                                        <b-button type="submit">Buscar</b-button>
+                                        <h2>{{ total }}</h2>
                                     </b-col>
                                 </b-row>
-                            </form>
-                        </b-card>
-                    </b-col>
-                    <b-col md="4">
-                        <b-card>
-                            <template #header>
-                                <h5 class="mb-0">Total</h5>
-                            </template>
-                            <b-row>
-                                <b-col>
-                                    <h2>{{ total }}</h2>
-                                </b-col>
-                            </b-row>
-                        </b-card>
-                    </b-col>
-                </b-row>
+                            </b-card>
+                        </b-col>
+                    </b-row>
 
-                <b-card v-if="data['table'].length>0">
-                    <template #header>
-                        <h5 class="mb-0">Resultados</h5>
-                    </template>
-                    <b-modal id="cliente"
-                             :title="'Cliente: '+ item.nombreResponsable" size="lg">
+                    <b-card v-if="data['table'].length>0">
+                        <template #header>
+                            <h5 class="mb-0">Resultados</h5>
+                        </template>
+                        <b-modal id="cliente"
+                                 :title="'Cliente: '+ item.nombreResponsable" size="lg">
+                            <div class="table-responsive">
+                                <b-table
+                                    striped
+                                    hover
+                                    :items="item.ordenes"
+                                    :fields="item.fields"
+                                    show-empty
+                                    small>
+                                    <template #empty="scope">
+                                        <p>No existen deudas</p>
+                                    </template>
+                                    <template v-slot:cell(created_at)="data">
+                                        {{ data.value | moment("DD/MM/YYYY HH:mm") }}
+                                    </template>
+
+                                    <template #cell(detalle)="row">
+                                        <b-button size="sm" @click="row.toggleDetails" class="mr-2">
+                                            {{ row.detailsShowing ? 'Ocultar' : 'Mostrar' }} Orden
+                                        </b-button>
+                                    </template>
+
+                                    <template #row-details="row">
+                                        <b-card>
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <thead>
+                                                    <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">Productos</th>
+                                                        <th scope="col">Cant.</th>
+                                                        <th scope="col">Precio</th>
+                                                        <th scope="col">Total</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr v-for="(itemOrden,key) in row.item.detallesOrden">
+                                                        <td>{{ key + 1 }}</td>
+                                                        <td>{{ getProduct(itemOrden.stock) }}</td>
+                                                        <td>{{ itemOrden.cantidad }}</td>
+                                                        <td>{{ itemOrden.costo }}</td>
+                                                        <td>{{ itemOrden.costo * itemOrden.cantidad }}</td>
+                                                    </tr>
+                                                    </tbody>
+                                                    <tfoot>
+                                                    <tr>
+                                                        <td colspan="4" class="text-right"><strong>Total</strong></td>
+                                                        <td>{{ getTotal(row.item.detallesOrden) }}</td>
+                                                    </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </b-card>
+                                    </template>
+                                </b-table>
+                            </div>
+                        </b-modal>
                         <div class="table-responsive">
                             <b-table
                                 striped
                                 hover
-                                :items="item.ordenes"
-                                :fields="item.fields"
+                                :items="data['table']"
+                                :fields="data['fields']"
                                 show-empty
-                                small>
+                                small
+                            >
+                                <template #cell(#)="data">
+                                    {{ data.index + 1 }}
+                                </template>
                                 <template #empty="scope">
-                                    <p>No existen deudas</p>
+                                    <p>No existen clientes</p>
                                 </template>
-                                <template v-slot:cell(created_at)="data">
-                                    {{ data.value | moment("DD/MM/YYYY HH:mm") }}
-                                </template>
-
-                                <template #cell(detalle)="row">
-                                    <b-button size="sm" @click="row.toggleDetails" class="mr-2">
-                                        {{ row.detailsShowing ? 'Ocultar' : 'Mostrar' }} Orden
+                                <template v-slot:cell(nombreResponsable)="row">
+                                    <b-button variant="link" v-b-modal="'cliente'" @click="loadModal(row.item)">
+                                        {{ row.item.nombreResponsable }}
                                     </b-button>
                                 </template>
-
-                                <template #row-details="row">
-                                    <b-card>
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <thead>
-                                                <tr>
-                                                    <th scope="col">#</th>
-                                                    <th scope="col">Productos</th>
-                                                    <th scope="col">Cant.</th>
-                                                    <th scope="col">Precio</th>
-                                                    <th scope="col">Total</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                <tr v-for="(itemOrden,key) in row.item.detallesOrden">
-                                                    <td>{{ key + 1 }}</td>
-                                                    <td>{{ getProduct(itemOrden.stock) }}</td>
-                                                    <td>{{ itemOrden.cantidad }}</td>
-                                                    <td>{{ itemOrden.costo }}</td>
-                                                    <td>{{ itemOrden.costo * itemOrden.cantidad }}</td>
-                                                </tr>
-                                                </tbody>
-                                                <tfoot>
-                                                <tr>
-                                                    <td colspan="4" class="text-right"><strong>Total</strong></td>
-                                                    <td>{{ getTotal(row.item.detallesOrden) }}</td>
-                                                </tr>
-                                                </tfoot>
-                                            </table>
-                                        </div>
-                                    </b-card>
+                                <template v-slot:cell(desde)="row">
+                                    {{ getDesde(row.item) }}
+                                </template>
+                                <template v-slot:cell(hasta)="row">
+                                    {{ getHasta(row.item) }}
+                                </template>
+                                <template v-slot:cell(cantidad)="row">
+                                    {{ getCantidad(row.item) }}
                                 </template>
                             </b-table>
                         </div>
-                    </b-modal>
-                    <div class="table-responsive">
-                        <b-table
-                            striped
-                            hover
-                            :items="data['table']"
-                            :fields="data['fields']"
-                            show-empty
-                            small
-                        >
-                            <template #cell(#)="data">
-                                {{ data.index + 1 }}
-                            </template>
-                            <template #empty="scope">
-                                <p>No existen clientes</p>
-                            </template>
-                            <template v-slot:cell(nombreResponsable)="row">
-                                <b-button variant="link" v-b-modal="'cliente'" @click="loadModal(row.item)">
-                                    {{ row.item.nombreResponsable }}
-                                </b-button>
-                            </template>
-                            <template v-slot:cell(desde)="row">
-                                {{ getDesde(row.item) }}
-                            </template>
-                            <template v-slot:cell(hasta)="row">
-                                {{ getHasta(row.item) }}
-                            </template>
-                            <template v-slot:cell(cantidad)="row">
-                                {{ getCantidad(row.item) }}
-                            </template>
-                        </b-table>
-                    </div>
-                </b-card>
+                    </b-card>
+                </div>
             </div>
-        </div>
-    </div>-->
+        </div>-->
 </template>
 
 <script>
 import Authenticated from '@/Layouts/Authenticated.vue'
-import Menu from "./menuReportes.vue";
 import moment from 'moment';
 
 export default {
     layout: Authenticated,
     props: {
-        sucursales: Object,
+        sucursales: Array,
         productos: Array,
-        request: Object,
+        request: Object | Array,
         clientes: Array,
         total: Number,
         errors: Object,
         data: Object,
     },
-    components: {
-        Menu
-    },
+    components: {},
     data() {
         return {
             form: {
@@ -208,7 +232,8 @@ export default {
                     value: "",
                     type: "select",
                     state: null,
-                    stateText: null
+                    stateText: null,
+                    options: this.sucursales,
                 },
                 fechaI: {
                     label: 'Fecha Inicio',
@@ -225,10 +250,11 @@ export default {
                 },
             },
             item: {},
+            sending: false,
         }
     },
     methods: {
-        enviar() {
+        sended() {
             let form = {};
             for (let key in this.form) {
                 form[key] = this.form[key].value;
