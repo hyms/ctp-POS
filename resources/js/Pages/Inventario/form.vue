@@ -109,7 +109,6 @@ export default {
     },
     computed: {
         formTitle() {
-            this.removeValues();
             return this.ingreso ? this.titulo1 : this.titulo2;
         },
     },
@@ -212,6 +211,13 @@ export default {
                 this.sending = false;
             })
         },
+    },
+    watch: {
+        dialog(val) {
+            if (val) {
+                this.removeValues();
+            }
+        }
     },
 }
 </script>

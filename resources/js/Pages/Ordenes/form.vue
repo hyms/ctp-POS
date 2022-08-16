@@ -52,6 +52,7 @@
                                 :items="clients"
                                 :search-input.sync="search"
                                 :search-input.prop="selectSeachDemo(client)"
+                                cache-items
                                 hide-no-data
                                 hide-selected
                                 item-text="nombreResponsable"
@@ -61,6 +62,7 @@
                                 outlined
                                 hide-details="auto"
                                 class="my-2"
+                                clearable
                             ></v-autocomplete>
                         </template>
                     </template>
@@ -121,10 +123,7 @@ export default {
     props: {
         title: String,
         editedItem: Object,
-        editedIndex: {
-            type: Number,
-            default: -1
-        },
+        editedIndex: Number,
         productos: Array,
         productosSell: Array,
         tipo: Number,
@@ -132,11 +131,6 @@ export default {
     },
     computed: {
         formTitle() {
-            if (this.editedIndex > 0) {
-                this.setValues();
-            } else {
-                this.removeValues();
-            }
             return `${this.editedIndex === -1 ? this.titleNew : this.titleModify} ${this.title}`;
         },
     },
@@ -148,7 +142,7 @@ export default {
             options: [],
             sending: false,
             //autocomplete
-            client: {},
+            client: null,
             loading: false,
             clients: [],
             //form
@@ -214,12 +208,16 @@ export default {
                 }
             }
             if (this.editedItem.cliente !== "") {
+                this.clients.push({
+                    id: this.editedItem.cliente,
+                    nombreResponsable: this.editedItem.responsable,
+                    telefono: this.editedItem.telefono
+                })
                 this.client = {
                     id: this.editedItem.cliente,
                     nombreResponsable: this.editedItem.responsable,
                     telefono: this.editedItem.telefono
                 }
-                this.clients.push(this.client);
             }
         },
         setErrors(data) {
@@ -305,7 +303,16 @@ export default {
         search(val) {
             val && val !== this.client && this.querySelections(val)
         },
-    }
+        dialog(val) {
+            if (val) {
+                if (this.editedIndex > 0) {
+                    this.setValues();
+                } else {
+                    this.removeValues();
+                }
+            }
+        }
+    },
 }
 </script>
 <style>
