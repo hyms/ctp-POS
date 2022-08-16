@@ -251,7 +251,7 @@ class OrdenesController extends Controller
             $orden['sucursal'] = Auth::user()['sucursal'];
             $orden['estado'] = 10;
             $detalle = $this->setDetalle($request['productos']);
-            $orden['total'] = $detalle->sum('total');
+            $orden['montoVenta'] = $detalle->sum('total');
             $id = OrdenesTrabajo::newOrden($orden, $detalle->all(), null, true);
             DetallesOrden::sell($id, true);
             return response()->json([
@@ -274,7 +274,7 @@ class OrdenesController extends Controller
         $ordenes = OrdenesTrabajo::getAll(Auth::user()['sucursal']);
         $ordenes = $ordenes->whereBetween('updated_at', [$initDate->startOfDay()->toDateTimeString(), $now->endOfDay()->toDateTimeString()]);
         $ordenes = $ordenes->whereIn('estado', [10]);
-        $ordenes = DetallesOrden::getAll($ordenes->get());
+        $ordenes = DetallesOrden::setAllDetalle($ordenes->get());
         $estados = OrdenesTrabajo::estadoCTP();
         $tiposProductos = TipoProductos::getAll();
         $productos = ProductoStock::getProducts(Auth::user()['sucursal'], $tiposProductos->toArray());
