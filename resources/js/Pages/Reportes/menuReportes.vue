@@ -1,16 +1,13 @@
 <template>
-    <TopMenu :active="active" :links="links"></TopMenu>
 </template>
 
 <script>
-import TopMenu from "@/Shared/menu/TopMenu.vue";
 
 export default {
     props: {
         active: Number
     },
     components: {
-        TopMenu
     },
     data() {
         return {
