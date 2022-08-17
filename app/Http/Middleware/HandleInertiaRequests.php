@@ -45,8 +45,8 @@ class HandleInertiaRequests extends Middleware
             },
             'rolesP' => [
                 'admin' => [0, 1],
-                'vendor' => [0, 2, 5],
-                'desing' => [0, 2, 3, 4, 5],
+                'vendor' => [0, 1, 2, 5],
+                'desing' => [0, 1, 2, 3, 4, 5],
                 'all' => [0, 1, 2, 3, 4, 5],
             ],
         ]);
