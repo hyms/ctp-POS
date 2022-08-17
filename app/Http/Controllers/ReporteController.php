@@ -538,7 +538,7 @@ class ReporteController extends Controller
         $tiposSelect = TipoProductos::getAll()->map(function ($item, $key) {
             return ['value' => (string)$item->id, 'text' => $item->nombre];
         });
-        Inertia::share('titlePage', 'Mora de Clientes');
+        Inertia::share('titlePage', 'Reporte de Ordenes');
         return Inertia::render('Reportes/ordenes',
             [
                 'sucursales' => Sucursal::getSelect(),

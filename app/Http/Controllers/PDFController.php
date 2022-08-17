@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Mpdf\Mpdf;
 use PDF;
+use Ramsey\Collection\Collection;
 use UnexpectedValueException;
 
 
@@ -75,15 +76,11 @@ class PDFController extends Controller
         }
     }
 
-    function getProduct($id, $products)
+    function getProduct($id, Collection $products)
     {
-        $item = [];
-        foreach ($products as $product) {
-            if ($product->id == $id) {
-                $item = $product;
-                break;
-            }
-        }
+        $item = $products->first(function ($value, $key) use ($id) {
+            return $value->id == $id;
+        });
         if ($item) {
             return "{$item->formato} ({$item->dimension})";
         }
@@ -98,7 +95,8 @@ class PDFController extends Controller
         return $detalle;
     }
 
-    public function getRecibo($id){
+    public function getRecibo($id)
+    {
         try {
             $recibo = Recibo::find($id);
             if (empty($recibo)) {
