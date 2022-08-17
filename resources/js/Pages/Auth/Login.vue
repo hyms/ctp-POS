@@ -68,8 +68,8 @@
                                     block
                                     color="primary"
                                     type="submit"
-                                    :loading="form.processing"
-                                    :disabled="form.processing">
+                                    :loading="processing"
+                                    :disabled="processing">
                                     Ingresar
                                     <template v-slot:loader>
                                         <span>Ingresando...</span>
@@ -97,6 +97,7 @@ export default {
                 password: '',
                 remember: false
             },
+            processing:false,
             alert: false
         }
     },
@@ -111,6 +112,7 @@ export default {
             return formData;
         },
         submit() {
+            this.processing=true
             this.$inertia.post('/login', this.loadFormData(), {
                 headers: {'Content-Type': 'multipart/form-data'},
 
@@ -119,6 +121,7 @@ export default {
                     if (Object.keys(this.errors).length > 0) {
                         this.alert = true;
                     }
+                    this.processing=false
                 }
             });
         },

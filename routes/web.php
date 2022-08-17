@@ -184,6 +184,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('reportes/resumen', [ReporteController::class, 'resumen']);
     Route::get('reportes/mora', [ReporteController::class, 'clientes']);
     Route::get('reportes/rendicion', [ReporteController::class, 'rendicionDiariaAdm']);
+    Route::get('reportes/ordenes', [ReporteController::class, 'ordenes']);
 
 });
 

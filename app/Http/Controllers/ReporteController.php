@@ -213,8 +213,7 @@ class ReporteController extends Controller
         return $data;
     }
 
-    public
-    function exportPlacas(Request $request)
+    public function exportPlacas(Request $request)
     {
         $data = $this->getTablePlacas($request->all());
 //        return Excel::create('regsitroPlacas', function($excel) use($data) {
@@ -234,8 +233,7 @@ class ReporteController extends Controller
         return null;
     }
 
-    public
-    function arqueos(Request $request)
+    public function arqueos(Request $request)
     {
         $sucursal = Auth::user()['sucursal'];
         $arqueo = new MovimientoCaja();
@@ -266,8 +264,7 @@ class ReporteController extends Controller
             ]);
     }
 
-    public
-    function clientes(Request $request)
+    public function clientes(Request $request)
     {
         $total = 0;
         $sucursales = Sucursal::getSelect();
@@ -443,21 +440,18 @@ class ReporteController extends Controller
             ]);
     }
 
-    public
-    function rendicionDiaria(Request $request)
+    public function rendicionDiaria(Request $request)
     {
         Inertia::share('titlePage', 'Rendicion Diaria');
         return $this->rendicion($request, false);
     }
 
-    public
-    function rendicionDiariaAdm(Request $request)
+    public function rendicionDiariaAdm(Request $request)
     {
         return $this->rendicion($request, true);
     }
 
-    public
-    function reporteCliente(Request $request, bool $isAdm)
+    public function reporteCliente(Request $request, bool $isAdm)
     {
         $movimientos = [];
         $fields = [];
@@ -500,21 +494,58 @@ class ReporteController extends Controller
             ]);
     }
 
-    public
-    function cliente(Request $request)
+    public function cliente(Request $request)
     {
         return $this->reporteCliente($request, false);
     }
 
-    public
-    function clienteAdm(Request $request)
+    public function clienteAdm(Request $request)
     {
         return $this->reporteCliente($request, true);
     }
 
-    public
-    function ordenes(Request $request)
+    public function ordenes(Request $request)
     {
-        return null;
+        $data = ['table' => [], 'fields' => []];
+        $validator = Validator::make($request->all(), [
+            'sucursal' => 'required',
+            'fechaI' => 'required',
+            'fechaF' => 'required',
+        ]);
+        if (!$validator->fails()) {
+            $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, null, collect($request->except(['sucursal'])));
+            $ordenes = DetallesOrden::setAllDetalle($ordenes->get());
+            $ordenes = Recibo::setRecibos($ordenes);
+            $ordenes->transform(function ($item, $key) {
+                $totalVenta = 0;
+                $totalPagado = 0;
+                foreach ($item->detallesOrden as $detalle) {
+                    $totalVenta += $detalle->total;
+                }
+                foreach ($item->recibos as $recibo) {
+                    $totalPagado += $recibo->monto;
+                }
+                $item->totalDeuda = $totalVenta - $totalPagado;
+                $item->totalPagado = $totalPagado;
+                $item->fechaCreado = $item->created_at;
+                $item->fechaActualizado = $item->updated_at;
+                $item->estado = OrdenesTrabajo::estadoCTP( $item->estado);
+                return $item;
+            });
+            $data = ['table' => $ordenes, 'fields' => ['codigoServicio', 'responsable', 'estado', 'montoVenta', 'totalPagado', 'totalDeuda', 'fechaCreado', 'fechaActualizado']];
+        }
+        $tiposSelect = TipoProductos::getAll()->map(function ($item, $key) {
+            return ['value' => (string)$item->id, 'text' => $item->nombre];
+        });
+        Inertia::share('titlePage', 'Mora de Clientes');
+        return Inertia::render('Reportes/ordenes',
+            [
+                'sucursales' => Sucursal::getSelect(),
+                'tipoOrdenes' => OrdenesTrabajo::estadoCTP(),
+                'tipoProducto' => $tiposSelect,
+                'clientes' => Cliente::getAll(),
+                'request' => $request->all(),
+                'data' => $data,
+            ]);
     }
 }

@@ -190,6 +190,11 @@ export default {
                                     url: '/admin/reportes/mora',
                                     role: 'admin',
                                 },
+                                {
+                                    label: 'Ordenes',
+                                    url: '/admin/reportes/ordenes',
+                                    role: 'admin',
+                                },
                             ]
                         },
                         {
