@@ -525,6 +525,7 @@ class ReporteController extends Controller
                 foreach ($item->recibos as $recibo) {
                     $totalPagado += $recibo->monto;
                 }
+                $item->montoVenta = $totalVenta;
                 $item->totalDeuda = $totalVenta - $totalPagado;
                 $item->totalPagado = $totalPagado;
                 $item->fechaCreado = $item->created_at;
