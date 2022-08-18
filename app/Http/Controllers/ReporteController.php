@@ -507,6 +507,11 @@ class ReporteController extends Controller
     public function ordenes(Request $request)
     {
         $data = ['table' => [], 'fields' => []];
+        $totals = ['venta' => [], 'deuda' => [], 'pagado' => [], 'ordenes' => [],];
+        $estadoCTP = OrdenesTrabajo::estadoCTP();
+        $tiposSelect = TipoProductos::getAll()->map(function ($item, $key) {
+            return ['value' => (string)$item->id, 'text' => $item->nombre];
+        });
         $validator = Validator::make($request->all(), [
             'sucursal' => 'required',
             'fechaI' => 'required',
@@ -516,7 +521,19 @@ class ReporteController extends Controller
             $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, null, collect($request->except(['sucursal'])));
             $ordenes = DetallesOrden::setAllDetalle($ordenes->get());
             $ordenes = Recibo::setRecibos($ordenes);
-            $ordenes->transform(function ($item, $key) {
+            $totalVentaOrden = collect([]);
+            $totalDeudaOrden = collect([]);
+            $totalPagadoOrden = collect([]);
+            $totalesOrden = collect([]);
+            $tiposSelect->each(function ($item) use ($totalVentaOrden, $totalPagadoOrden, $totalDeudaOrden) {
+                $totalVentaOrden->put($item['text'], 0);
+                $totalDeudaOrden->put($item['text'], 0);
+                $totalPagadoOrden->put($item['text'], 0);
+            });
+            $estadoCTP->each(function ($item) use ($totalesOrden) {
+                $totalesOrden->put($item['text'], 0);
+            });
+            $ordenes->transform(function ($item, $key) use ($totalVentaOrden, $totalPagadoOrden, $totalDeudaOrden, $tiposSelect, $totalesOrden) {
                 $totalVenta = 0;
                 $totalPagado = 0;
                 foreach ($item->detallesOrden as $detalle) {
@@ -528,25 +545,38 @@ class ReporteController extends Controller
                 $item->montoVenta = $totalVenta;
                 $item->totalDeuda = $totalVenta - $totalPagado;
                 $item->totalPagado = $totalPagado;
-                $item->fechaCreado = $item->created_at;
-                $item->fechaActualizado = $item->updated_at;
-                $item->estado = OrdenesTrabajo::estadoCTP( $item->estado);
+                $item->estado = OrdenesTrabajo::estadoCTP($item->estado);
+                $tipoSelect = $tiposSelect->firstWhere('value', '=', $item->tipoOrden);
+                $totalVentaOrden[$tipoSelect['text']] += $item->montoVenta;
+                $totalDeudaOrden[$tipoSelect['text']] += $item->totalDeuda;
+                $totalPagadoOrden[$tipoSelect['text']] += $item->totalPagado;
+                $totalesOrden[$item->estado] += 1;
                 return $item;
             });
-            $data = ['table' => $ordenes, 'fields' => ['codigoServicio', 'responsable', 'estado', 'montoVenta', 'totalPagado', 'totalDeuda', 'fechaCreado', 'fechaActualizado']];
+            $fields = [
+                ['value' => 'codigoServicio', 'text' => 'Codigo'],
+                ['value' => 'responsable', 'text' => 'Cliente'],
+                ['value' => 'estado', 'text' => 'Estado'],
+                ['value' => 'montoVenta', 'text' => 'Venta (Bs)'],
+                ['value' => 'totalPagado', 'text' => 'Pagado (Bs)'],
+                ['value' => 'totalDeuda', 'text' => 'Deuda (Bs)'],
+                ['value' => 'created_at', 'text' => 'Fecha Creado'],
+                ['value' => 'updated_at', 'text' => 'Fecha Modificado'],
+            ];
+            $data = ['table' => $ordenes, 'fields' => $fields];
+            $totals = ['venta' => $totalVentaOrden->all(), 'deuda' => $totalDeudaOrden->all(), 'pagado' => $totalPagadoOrden->all(), 'ordenes' => $totalesOrden->all(),];
         }
-        $tiposSelect = TipoProductos::getAll()->map(function ($item, $key) {
-            return ['value' => (string)$item->id, 'text' => $item->nombre];
-        });
+
         Inertia::share('titlePage', 'Reporte de Ordenes');
         return Inertia::render('Reportes/ordenes',
             [
                 'sucursales' => Sucursal::getSelect(),
-                'tipoOrdenes' => OrdenesTrabajo::estadoCTP(),
+                'tipoOrdenes' => $estadoCTP,
                 'tipoProducto' => $tiposSelect,
                 'clientes' => Cliente::getAll(),
                 'request' => $request->all(),
                 'data' => $data,
+                'totals' => $totals
             ]);
     }
 }
