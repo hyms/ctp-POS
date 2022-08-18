@@ -148,8 +148,8 @@ class ReporteController extends Controller
         }
         foreach ($ordenes as $orden) {
             $row = [
-                'fechaOrden' => $orden->created_at,
-                'fechaTrabajo' => $orden->updated_at,
+                'fechaOrden' =>  Carbon::parse($orden->created_at)->format("d/m/Y H:i"),
+                'fechaTrabajo' =>  Carbon::parse($orden->updated_at)->format("d/m/Y H:i"),
                 'cliente' => $orden->responsable,
                 'orden' => ($orden->tipoOrden == null && $orden->estado != 10) ? $orden->correlativo : $orden->codigoServicio,
                 'tipo' => $orden->tipoOrden,

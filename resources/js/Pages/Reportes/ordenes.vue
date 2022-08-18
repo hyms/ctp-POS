@@ -260,11 +260,8 @@ export default {
             for (let key in this.form) {
                 form[key] = this.form[key].value;
             }
-            this.$inertia.get('/admin/reportes/ordenes', form, {
-                onFinish() {
-                    this.sending = false;
-                }
-            })
+            this.$inertia.get('/admin/reportes/ordenes', form)
+            this.sending = false;
         },
         loadModal(item) {
             this.item = item;

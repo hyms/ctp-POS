@@ -65,9 +65,8 @@
                                 <tr>
                                     <template v-for="field in data['fields']">
                                         <td>
-                                            <span v-if="field!=='observaciones'">{{
-                                                    (field === '#') ? key + 1 : item[field]
-                                                }}</span>
+                                            <span v-if="field!=='observaciones'">
+                                                {{ (field === '#') ? key + 1 : item[field] }}</span>
                                             <span v-else v-html="item[field]"></span>
                                         </td>
                                     </template>
