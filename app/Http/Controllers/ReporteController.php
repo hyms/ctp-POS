@@ -530,6 +530,9 @@ class ReporteController extends Controller
                 $totalDeudaOrden->put($item['text'], 0);
                 $totalPagadoOrden->put($item['text'], 0);
             });
+            $totalVentaOrden->put('reposicion', 0);
+            $totalDeudaOrden->put('reposicion', 0);
+            $totalPagadoOrden->put('reposicion', 0);
             $estadoCTP->each(function ($item) use ($totalesOrden) {
                 $totalesOrden->put($item['text'], 0);
             });
@@ -546,11 +549,18 @@ class ReporteController extends Controller
                 $item->totalDeuda = $totalVenta - $totalPagado;
                 $item->totalPagado = $totalPagado;
                 $item->estado = OrdenesTrabajo::estadoCTP($item->estado);
-                $tipoSelect = $tiposSelect->firstWhere('value', '=', $item->tipoOrden);
-                $totalVentaOrden[$tipoSelect['text']] += $item->montoVenta;
-                $totalDeudaOrden[$tipoSelect['text']] += $item->totalDeuda;
-                $totalPagadoOrden[$tipoSelect['text']] += $item->totalPagado;
-                $totalesOrden[$item->estado] += 1;
+                $tipoSelect = $tiposSelect->firstWhere('value', '=', (string)$item->tipoOrden);
+                if(isset($tipoSelect)) {
+                    $totalVentaOrden[$tipoSelect['text']] += $item->montoVenta ?? 0;
+                    $totalDeudaOrden[$tipoSelect['text']] += $item->totalDeuda ?? 0;
+                    $totalPagadoOrden[$tipoSelect['text']] += $item->totalPagado ?? 0;
+                }
+                else{
+                    $totalVentaOrden['reposicion'] += $item->montoVenta ?? 0;
+                    $totalDeudaOrden['reposicion'] += $item->totalDeuda ?? 0;
+                    $totalPagadoOrden['reposicion'] += $item->totalPagado ?? 0;
+                }
+                $totalesOrden[(string)$item->estado] += 1;
                 return $item;
             });
             $fields = [

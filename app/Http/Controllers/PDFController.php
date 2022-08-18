@@ -76,11 +76,15 @@ class PDFController extends Controller
         }
     }
 
-    function getProduct($id, Collection $products)
+    function getProduct($id,$products)
     {
-        $item = $products->first(function ($value, $key) use ($id) {
-            return $value->id == $id;
-        });
+        $item = [];
+        foreach ($products as $product) {
+            if ($product->id == $id) {
+                $item = $product;
+                break;
+            }
+        }
         if ($item) {
             return "{$item->formato} ({$item->dimension})";
         }
@@ -95,8 +99,7 @@ class PDFController extends Controller
         return $detalle;
     }
 
-    public function getRecibo($id)
-    {
+    public function getRecibo($id){
         try {
             $recibo = Recibo::find($id);
             if (empty($recibo)) {
