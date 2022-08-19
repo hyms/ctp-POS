@@ -34,8 +34,8 @@
                                     v-if="item.type==='search'"
                                     v-model="item.value"
                                     :items="clientes"
-                                    item-text="nombreResponsable"
-                                    item-value="id"
+                                    item-text="text"
+                                    item-value="value"
                                     label="Cliente"
                                     dense
                                     outlined
@@ -220,7 +220,7 @@ export default {
                     stateText: null
                 },
 
-                responsable: {
+                cliente: {
                     label: 'Cliente',
                     value: "",
                     type: "search",

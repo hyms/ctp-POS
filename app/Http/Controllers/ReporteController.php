@@ -148,8 +148,8 @@ class ReporteController extends Controller
         }
         foreach ($ordenes as $orden) {
             $row = [
-                'fechaOrden' =>  Carbon::parse($orden->created_at)->format("d/m/Y H:i"),
-                'fechaTrabajo' =>  Carbon::parse($orden->updated_at)->format("d/m/Y H:i"),
+                'fechaOrden' => Carbon::parse($orden->created_at)->format("d/m/Y H:i"),
+                'fechaTrabajo' => Carbon::parse($orden->updated_at)->format("d/m/Y H:i"),
                 'cliente' => $orden->responsable,
                 'orden' => ($orden->tipoOrden == null && $orden->estado != 10) ? $orden->correlativo : $orden->codigoServicio,
                 'tipo' => $orden->tipoOrden,
@@ -539,23 +539,22 @@ class ReporteController extends Controller
             $ordenes->transform(function ($item, $key) use ($totalVentaOrden, $totalPagadoOrden, $totalDeudaOrden, $tiposSelect, $totalesOrden) {
                 $totalVenta = 0;
                 $totalPagado = 0;
-                foreach ($item->detallesOrden as $detalle) {
-                    $totalVenta += $detalle->total;
-                }
-                foreach ($item->recibos as $recibo) {
-                    $totalPagado += $recibo->monto;
+                if ($item->estado === 2 || $item->estado === 0) {
+                    foreach ($item->detallesOrden as $detalle) {
+                        $totalVenta += $detalle->total;
+                    }
+                    $totalPagado = $item->montoVenta;
                 }
                 $item->montoVenta = $totalVenta;
                 $item->totalDeuda = $totalVenta - $totalPagado;
                 $item->totalPagado = $totalPagado;
                 $item->estado = OrdenesTrabajo::estadoCTP($item->estado);
                 $tipoSelect = $tiposSelect->firstWhere('value', '=', (string)$item->tipoOrden);
-                if(isset($tipoSelect)) {
+                if (isset($tipoSelect)) {
                     $totalVentaOrden[$tipoSelect['text']] += $item->montoVenta ?? 0;
                     $totalDeudaOrden[$tipoSelect['text']] += $item->totalDeuda ?? 0;
                     $totalPagadoOrden[$tipoSelect['text']] += $item->totalPagado ?? 0;
-                }
-                else{
+                } else {
                     $totalVentaOrden['reposicion'] += $item->montoVenta ?? 0;
                     $totalDeudaOrden['reposicion'] += $item->totalDeuda ?? 0;
                     $totalPagadoOrden['reposicion'] += $item->totalPagado ?? 0;
@@ -583,7 +582,9 @@ class ReporteController extends Controller
                 'sucursales' => Sucursal::getSelect(),
                 'tipoOrdenes' => $estadoCTP,
                 'tipoProducto' => $tiposSelect,
-                'clientes' => Cliente::getAll(),
+                'clientes' => Cliente::getAll()->map(function ($value) {
+                    return ['value' => (string)$value->id, 'text' => $value->nombreResponsable];
+                }),
                 'request' => $request->all(),
                 'data' => $data,
                 'totals' => $totals
