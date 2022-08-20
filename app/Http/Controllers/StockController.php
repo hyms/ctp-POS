@@ -110,14 +110,10 @@ class StockController extends Controller
                 ]);
             }
             $stock = ProductoStock::find($request['id']);
-            $request2 = collect(['sucursal'=>$stock->sucursal,'producto'=>$stock->producto]);
-            if ($request['cantidad'] > $stock->cantidad) {
-                $request2->put('cantidad',$request['cantidad'] - $stock->cantidad);
-                ProductoStock::more($request2->all());
-            } else if ($request['cantidad'] < $stock->cantidad) {
-                $request2->put('cantidad',$stock->cantidad - $request['cantidad']);
-                ProductoStock::less($request2->all());
-            }
+            $request2 = collect(['sucursal' => $stock->sucursal, 'producto' => $stock->producto]);
+            $request2->put('cantidad', $request['cantidad']);
+            ProductoStock::more($request2->all());
+
             return response()->json(["status" => 0]);
         } catch (Exception $error) {
             Log::error($error->getMessage());

@@ -536,7 +536,7 @@ class ReporteController extends Controller
             $estadoCTP->each(function ($item) use ($totalesOrden) {
                 $totalesOrden->put($item['text'], 0);
             });
-            $ordenes->transform(function ($item, $key) use ($totalVentaOrden, $totalPagadoOrden, $totalDeudaOrden, $tiposSelect, $totalesOrden) {
+            $ordenes = $ordenes->map(function ($item, $key) use ($totalVentaOrden, $totalPagadoOrden, $totalDeudaOrden, $tiposSelect, $totalesOrden) {
                 $totalVenta = 0;
                 $totalPagado = 0;
                 if ($item->estado === 2 || $item->estado === 0) {
@@ -560,17 +560,26 @@ class ReporteController extends Controller
                     $totalPagadoOrden['reposicion'] += $item->totalPagado ?? 0;
                 }
                 $totalesOrden[(string)$item->estado] += 1;
-                return $item;
+                return [
+                    'codigo' => $item->codigoServicio,
+                    'cliente' => $item->responsable,
+                    'estado' => $item->estado,
+                    'venta' => $item->montoVenta * 1,
+                    'pagado' => $item->totalPagado * 1,
+                    'deuda' => $item->totalDeuda * 1,
+                    'fechaCreado' => $item->created_at,
+                    'fechaModificado' => $item->updated_at,
+                ];
             });
             $fields = [
-                ['value' => 'codigoServicio', 'text' => 'Codigo'],
-                ['value' => 'responsable', 'text' => 'Cliente'],
+                ['value' => 'codigo', 'text' => 'Codigo'],
+                ['value' => 'cliente', 'text' => 'Cliente'],
                 ['value' => 'estado', 'text' => 'Estado'],
-                ['value' => 'montoVenta', 'text' => 'Venta (Bs)'],
-                ['value' => 'totalPagado', 'text' => 'Pagado (Bs)'],
-                ['value' => 'totalDeuda', 'text' => 'Deuda (Bs)'],
-                ['value' => 'created_at', 'text' => 'Fecha Creado'],
-                ['value' => 'updated_at', 'text' => 'Fecha Modificado'],
+                ['value' => 'venta', 'text' => 'Venta (Bs)'],
+                ['value' => 'pagado', 'text' => 'Pagado (Bs)'],
+                ['value' => 'deuda', 'text' => 'Deuda (Bs)'],
+                ['value' => 'fechaCreado', 'text' => 'Fecha Creado'],
+                ['value' => 'fechaModificado', 'text' => 'Fecha Modificado'],
             ];
             $data = ['table' => $ordenes, 'fields' => $fields];
             $totals = ['venta' => $totalVentaOrden->all(), 'deuda' => $totalDeudaOrden->all(), 'pagado' => $totalPagadoOrden->all(), 'ordenes' => $totalesOrden->all(),];

@@ -79,10 +79,10 @@
                                     <v-list>
                                         <v-list-item v-for="(value,key) in totals['venta']">
                                             <v-list-item-content>
-                                                <v-list-item-title>{{key}}</v-list-item-title>
+                                                <v-list-item-title>{{ key }}</v-list-item-title>
                                             </v-list-item-content>
                                             <v-list-item-action>
-                                                <v-list-item-action-text><h2>{{value}}</h2></v-list-item-action-text>
+                                                <v-list-item-action-text><h2>{{ value }}</h2></v-list-item-action-text>
                                             </v-list-item-action>
                                         </v-list-item>
                                     </v-list>
@@ -93,7 +93,7 @@
                                 offset-y>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-btn right elevation="1" color="secondary" class="ma-1" v-bind="attrs"
-                                           v-on="on"><h3>Total Deuda:  {{ getTotalMonto(totals['deuda']) }}</h3>
+                                           v-on="on"><h3>Total Deuda: {{ getTotalMonto(totals['deuda']) }}</h3>
                                     </v-btn>
                                 </template>
 
@@ -101,10 +101,10 @@
                                     <v-list>
                                         <v-list-item v-for="(value,key) in totals['deuda']">
                                             <v-list-item-content>
-                                                <v-list-item-title>{{key}}</v-list-item-title>
+                                                <v-list-item-title>{{ key }}</v-list-item-title>
                                             </v-list-item-content>
                                             <v-list-item-action>
-                                                <v-list-item-action-text><h2>{{value}}</h2></v-list-item-action-text>
+                                                <v-list-item-action-text><h2>{{ value }}</h2></v-list-item-action-text>
                                             </v-list-item-action>
                                         </v-list-item>
                                     </v-list>
@@ -123,10 +123,10 @@
                                     <v-list>
                                         <v-list-item v-for="(value,key) in totals['pagado']">
                                             <v-list-item-content>
-                                                <v-list-item-title>{{key}}</v-list-item-title>
+                                                <v-list-item-title>{{ key }}</v-list-item-title>
                                             </v-list-item-content>
                                             <v-list-item-action>
-                                                <v-list-item-action-text><h2>{{value}}</h2></v-list-item-action-text>
+                                                <v-list-item-action-text><h2>{{ value }}</h2></v-list-item-action-text>
                                             </v-list-item-action>
                                         </v-list-item>
                                     </v-list>
@@ -145,19 +145,28 @@
                                     <v-list>
                                         <v-list-item v-for="(value,key) in totals['ordenes']">
                                             <v-list-item-content>
-                                                <v-list-item-title>{{key}}</v-list-item-title>
+                                                <v-list-item-title>{{ key }}</v-list-item-title>
                                             </v-list-item-content>
                                             <v-list-item-action>
-                                                <v-list-item-action-text><h2>{{value}}</h2></v-list-item-action-text>
+                                                <v-list-item-action-text><h2>{{ value }}</h2></v-list-item-action-text>
                                             </v-list-item-action>
                                         </v-list-item>
                                     </v-list>
                                 </v-card>
                             </v-menu>
+                            <v-btn right elevation="1" color="secondary" class="ma-1">
+                                <h3>
+                                    <json-excel :data="data['table']">
+                                        Exportar
+                                        <v-icon>mdi-download</v-icon>
+                                    </json-excel>
+                                </h3>
+                            </v-btn>
                         </v-col>
                     </v-row>
                 </v-card-title>
                 <v-divider></v-divider>
+
                 <v-data-table
                     :items="data['table']"
                     :headers="data['fields']"
@@ -179,7 +188,7 @@
 <script>
 import Authenticated from '@/Layouts/Authenticated.vue'
 import moment from 'moment';
-import axios from "axios";
+import JsonExcel from "vue-json-excel";
 
 export default {
     layout: Authenticated,
@@ -193,7 +202,9 @@ export default {
         totals: Object,
         clientes: Array
     },
-    components: {},
+    components: {
+        JsonExcel
+    },
     data() {
         return {
             form: {
@@ -250,7 +261,7 @@ export default {
             client: {},
             loading: false,
             search: null,
-            menuventa:false,
+            menuventa: false,
         }
     },
     methods: {
@@ -277,9 +288,9 @@ export default {
             }
             return total;
         },
-        getTotalMonto(items){
+        getTotalMonto(items) {
             let total = 0
-            for(let value of Object.values(items)){
+            for (let value of Object.values(items)) {
                 total += value
             }
             return total
