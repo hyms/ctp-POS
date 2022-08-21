@@ -12,8 +12,10 @@ use App\Models\ProductoStock;
 use App\Models\Recibo;
 use App\Models\Sucursal;
 use App\Models\TipoProductos;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -597,6 +599,100 @@ class ReporteController extends Controller
                 'request' => $request->all(),
                 'data' => $data,
                 'totals' => $totals
+            ]);
+    }
+
+    public function ordenesAudit(Request $request)
+    {
+        $data = ['table' => [], 'fields' => []];
+        $estadoCTP = OrdenesTrabajo::estadoCTP();
+        $tiposSelect = TipoProductos::getAll()->map(function ($item, $key) {
+            return ['value' => (string)$item->id, 'text' => $item->nombre];
+        });
+
+        $validator = Validator::make($request->all(), [
+            'sucursal' => 'required',
+            'fechaI' => 'required',
+            'fechaF' => 'required',
+        ]);
+        if (!$validator->fails()) {
+            $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, null, collect($request->except(['sucursal'])));
+            $ordenes = DetallesOrden::setAllDetalle($ordenes->get());
+            $ordenes = Recibo::setRecibos($ordenes);
+            $productosAll = ProductoStock::getProducts($request['sucursal']);
+
+            $reporte = Collection::empty();
+            $ordenes->each(function ($item, $key) use ($reporte, $tiposSelect, $productosAll) {
+                $totalVenta = 0;
+                $totalPagado = 0;
+                if ($item->estado === 2 || $item->estado === 0) {
+                    foreach ($item->detallesOrden as $detalle) {
+                        $totalVenta += $detalle->total;
+                    }
+                    $totalPagado = $item->montoVenta;
+                }
+                $item->montoVenta = $totalVenta;
+                $item->totalDeuda = $totalVenta - $totalPagado;
+                $item->totalPagado = $totalPagado;
+                $item->estado = OrdenesTrabajo::estadoCTP($item->estado);
+                $item->usuario = User::where('id','=',$item->userDiseñador)->first()?->username;
+                $item->vendedor = User::where('id','=',$item->userVenta)->first()?->username;
+                $tipoSelect = $tiposSelect->firstWhere('value', '=', (string)$item->tipoOrden);
+
+                foreach ($item->detallesOrden as $value) {
+                    $producto = $productosAll->first(function ($item) use ($value) {
+                        return $item->id === $value->stock;
+                    });
+                    $reporte->add([
+                        'codigo' => $item->codigoServicio,
+                        'tipoOrden' => $tipoSelect['text'],
+                        'estado' => $item->estado,
+                        'fechaCreado' => $item->created_at,
+                        'fechaModificado' => $item->updated_at,
+                        'venta' => $item->montoVenta * 1,
+                        'pagado' => $item->totalPagado * 1,
+                        'deuda' => $item->totalDeuda * 1,
+                        'cliente' => $item->responsable,
+                        'diseñador' => $item->usuario,
+                        'vendedor' => $item->vendedor,
+
+                        'producto' => $producto?->formato,
+                        'costoProducto' => $value->costo * 1,
+                        'cantidadProducto' => $value->cantidad * 1,
+                        'totalProducto' => $value->total * 1,
+
+                    ]);
+                }
+            });
+            $fields = [
+                ['value' => 'codigo', 'text' => 'Codigo'],
+                ['value' => 'tipoOrden', 'text' => 'Tipo de Orden'],
+                ['value' => 'estado', 'text' => 'Estado'],
+                ['value' => 'fechaCreado', 'text' => 'Fecha Creado'],
+                ['value' => 'fechaModificado', 'text' => 'Fecha Modificado'],
+                ['value' => 'venta', 'text' => 'Monto Venta'],
+                ['value' => 'pagado', 'text' => 'Monto Pagado'],
+                ['value' => 'deuda', 'text' => 'Monto Deuda'],
+                ['value' => 'cliente', 'text' => 'Cliente'],
+                ['value' => 'diseñador', 'text' => 'Diseñador'],
+                ['value' => 'vendedor', 'text' => 'Vendedor'],
+
+                ['value' => 'producto', 'text' => 'Producto'],
+                ['value' => 'costoProducto', 'text' => 'Costo de Producto'],
+                ['value' => 'cantidadProducto', 'text' => 'Cnt. de Producto'],
+                ['value' => 'totalProducto', 'text' => 'Monto de Producto'],
+            ];
+            $data = ['table' => $reporte, 'fields' => $fields];
+        }
+
+        Inertia::share('titlePage', 'Reporte de Ordenes');
+        return Inertia::render('Reportes/ordenesAudit',
+            [
+                'sucursales' => Sucursal::getSelect(),
+                'tipoOrdenes' => $estadoCTP,
+                'tipoProducto' => $tiposSelect,
+                'request' => $request->all(),
+                'data' => $data,
             ]);
     }
 }

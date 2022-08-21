@@ -195,6 +195,11 @@ export default {
                                     url: '/admin/reportes/ordenes',
                                     role: 'admin',
                                 },
+                                {
+                                    label: 'Auditar',
+                                    url: '/admin/reportes/auditar',
+                                    role: 'admin',
+                                },
                             ]
                         },
                         {
