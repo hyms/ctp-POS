@@ -42,7 +42,7 @@ class OrdenesTrabajo extends Model
 
     }
 
-    public static function  getAll(int $sucursal, int $usuario = null, int $tipo = null, Collection $report = null): Builder
+    public static function  getAll(int $sucursal, int $usuario = null, int $tipo = null, Collection $report = null,bool $filter_date=false): Builder
     {
         $isEmpty = $report->isEmpty();
         $ordenes = new Generic(self::$tables);
@@ -53,6 +53,9 @@ class OrdenesTrabajo extends Model
         }
         if ($tipo != null) {
             $report->put('tipoOrden', $tipo);
+        }
+        if ($filter_date){
+            $ordenes->filterDate='updated_at';
         }
         return $ordenes->getAll(filters:$report->all(), limit:(($isEmpty) ? 500 : null));
     }

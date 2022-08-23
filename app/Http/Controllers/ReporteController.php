@@ -520,7 +520,7 @@ class ReporteController extends Controller
             'fechaF' => 'required',
         ]);
         if (!$validator->fails()) {
-            $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, null, collect($request->except(['sucursal'])));
+            $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, null, collect($request->except(['sucursal'])), true);
             $ordenes = DetallesOrden::setAllDetalle($ordenes->get());
             $ordenes = Recibo::setRecibos($ordenes);
             $totalVentaOrden = collect([]);
@@ -616,7 +616,7 @@ class ReporteController extends Controller
             'fechaF' => 'required',
         ]);
         if (!$validator->fails()) {
-            $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, null, collect($request->except(['sucursal'])));
+            $ordenes = OrdenesTrabajo::getAll($request['sucursal'], null, null, collect($request->except(['sucursal'])), true);
             $ordenes = DetallesOrden::setAllDetalle($ordenes->get());
             $ordenes = Recibo::setRecibos($ordenes);
             $productosAll = ProductoStock::getProducts($request['sucursal']);
@@ -635,8 +635,8 @@ class ReporteController extends Controller
                 $item->totalDeuda = $totalVenta - $totalPagado;
                 $item->totalPagado = $totalPagado;
                 $item->estado = OrdenesTrabajo::estadoCTP($item->estado);
-                $item->usuario = User::where('id','=',$item->userDiseñador)->first()?->username;
-                $item->vendedor = User::where('id','=',$item->userVenta)->first()?->username;
+                $item->usuario = User::where('id', '=', $item->userDiseñador)->first()?->username;
+                $item->vendedor = User::where('id', '=', $item->userVenta)->first()?->username;
                 $tipoSelect = $tiposSelect->firstWhere('value', '=', (string)$item->tipoOrden);
 
                 foreach ($item->detallesOrden as $value) {
@@ -645,7 +645,7 @@ class ReporteController extends Controller
                     });
                     $reporte->add([
                         'codigo' => $item->codigoServicio,
-                        'tipoOrden' => $tipoSelect['text'],
+                        'tipoOrden' => $tipoSelect['text'] ?? 'reposicion',
                         'estado' => $item->estado,
                         'fechaCreado' => $item->created_at,
                         'fechaModificado' => $item->updated_at,
