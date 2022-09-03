@@ -209,8 +209,8 @@ export default {
             axios.post(url, this.loadFormData(), {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
+                        this.$inertia.reload()
                         this.$emit("close")
-                        this.$inertia.get(data["path"])
                     } else {
                        this.setErrors(data)
                     }

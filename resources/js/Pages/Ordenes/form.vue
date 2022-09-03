@@ -263,8 +263,8 @@ export default {
             axios.post('/orden', this.loadFormData(), {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
+                        this.$inertia.reload()
                         this.closed();
-                        this.$inertia.get(data["path"])
                     } else {
                         this.setErrors(data);
                     }

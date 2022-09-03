@@ -161,8 +161,8 @@ export default {
                     if (data["status"] === 0) {
                         this.removeValues()
                         this.removeState()
+                        this.$inertia.reload()
                         this.$emit("close")
-                        this.$inertia.get(data["path"])
                     } else {
                         this.setErrors(data)
                     }

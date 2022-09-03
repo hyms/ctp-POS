@@ -133,8 +133,8 @@ export default {
             axios.post('/reposicion', this.loadFormData(), {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
+                        this.$inertia.reload()
                         this.$emit("close")
-                        this.$inertia.get(data["path"])
                     } else {
                         for (let key in this.form) {
                            this.setErrors(data)
