@@ -6,8 +6,11 @@ use App\Models\Cajas;
 use App\Models\Cliente;
 use App\Models\DetallesOrden;
 use App\Models\Export;
+use App\Models\Generic;
 use App\Models\MovimientoCaja;
+use App\Models\MovimientoStock;
 use App\Models\OrdenesTrabajo;
+use App\Models\Producto;
 use App\Models\ProductoStock;
 use App\Models\Recibo;
 use App\Models\Sucursal;
@@ -605,7 +608,6 @@ class ReporteController extends Controller
     public function ordenesAudit(Request $request)
     {
         $data = ['table' => [], 'fields' => []];
-        $estadoCTP = OrdenesTrabajo::estadoCTP();
         $tiposSelect = TipoProductos::getAll()->map(function ($item, $key) {
             return ['value' => (string)$item->id, 'text' => $item->nombre];
         });
@@ -689,7 +691,71 @@ class ReporteController extends Controller
         return Inertia::render('Reportes/ordenesAudit',
             [
                 'sucursales' => Sucursal::getSelect(),
-                'tipoOrdenes' => $estadoCTP,
+                'tipoProducto' => $tiposSelect,
+                'request' => $request->all(),
+                'data' => $data,
+            ]);
+    }
+
+    public function movimientosInventario(Request $request)
+    {
+        $data = ['table' => [], 'fields' => []];
+        $tiposSelect = TipoProductos::getAll()->map(function ($item, $key) {
+            return ['value' => (string)$item->id, 'text' => $item->nombre];
+        });
+
+        $validator = Validator::make($request->all(), [
+            'sucursal' => 'required',
+            'fechaI' => 'required',
+            'fechaF' => 'required',
+        ]);
+        if (!$validator->fails()) {
+            $productos = Producto::all();
+            $stocks = ProductoStock::getAll(Auth::user()['sucursal']);
+            $stocksId = $stocks->pluck('id')->toArray();
+            $movimientos = new Generic(MovimientoStock::$tables);
+            $movimientos->isDelete = false;
+            $movimientos->onlyBuild = true;
+            $movimientos = $movimientos->getAll($request->except('sucursal'));
+            $movimientos = $movimientos->where(function ($query) use ($stocksId) {
+                $query->whereIn('stockDestino', $stocksId)
+                    ->orWhereIn('stockOrigen', $stocksId);
+            })->get();
+            $reporte = $movimientos->map(function ($value, $key) use ($productos, $stocks) {
+                $producto = $productos->first(function ($item) use ($value) {
+                    return $item->id === $value->producto;
+                });
+
+                $tipoMovimiento = "-";
+                if (!empty($value->stockOrigen)) {
+                    $tipoMovimiento = "Egreso";
+                }
+                if (!empty($value->stockDestino)) {
+                    $tipoMovimiento = "Ingreso";
+                }
+                if(!empty($value->detalleOrden)) {
+                    $detalles = DB::table(DetallesOrden::$tables)->where('id', $value->detalleOrden)->get()->first();
+                    $orden = DB::table(OrdenesTrabajo::$tables)->where('id', $detalles->ordenTrabajo)->get()->first();
+                    $value->observaciones.= " codigo:{$orden->codigoServicio}";
+                }
+                return [
+                    'producto' => "{$producto->formato} ({$producto->dimension})",
+                    'tipoMovimiento' => $tipoMovimiento,
+                    'detalle' => $value->observaciones,
+                ];
+            });
+            $fields = [
+                ['value' => 'producto', 'text' => 'Producto'],
+                ['value' => 'tipoMovimiento', 'text' => 'Tipo Movimiento'],
+                ['value' => 'detalle', 'text' => 'Detalle'],
+            ];
+            $data = ['table' => $reporte, 'fields' => $fields];
+        }
+
+        Inertia::share('titlePage', 'Reporte Movimiento de Inventario');
+        return Inertia::render('Reportes/ordenesAudit',
+            [
+                'sucursales' => Sucursal::getSelect(),
                 'tipoProducto' => $tiposSelect,
                 'request' => $request->all(),
                 'data' => $data,

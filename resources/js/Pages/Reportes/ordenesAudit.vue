@@ -106,7 +106,6 @@ export default {
     layout: Authenticated,
     props: {
         sucursales: Array,
-        tipoOrdenes: Array,
         tipoProducto: Array,
         request: Object | Array,
         errors: Object,
@@ -158,7 +157,7 @@ export default {
             for (let key in this.form) {
                 form[key] = this.form[key].value;
             }
-            this.$inertia.get('/admin/reportes/auditar', form)
+            this.$inertia.get(this.$page.url, form)
             this.sending = false;
         },
         loadModal(item) {

@@ -39,7 +39,7 @@
 
 
             <template v-for="(value) in menu">
-                <template >
+                <template>
                     <v-subheader>
                         <span class="title-wrapper text-uppercase">{{ value.titulo }}</span>
                     </v-subheader>
@@ -169,11 +169,11 @@ export default {
                                     url: '/reportes/diario',
                                     role: 'vendor',
                                 },
-                               /* {
-                                    label: 'Reporte cliente',
-                                    url: '/reportes/cliente',
-                                    role: 'vendor',
-                                },*/
+                                /* {
+                                     label: 'Reporte cliente',
+                                     url: '/reportes/cliente',
+                                     role: 'vendor',
+                                 },*/
                             ]
                         },
 
@@ -185,11 +185,11 @@ export default {
                     submenu: [
                         {
                             Reportes: [
-                                {
+                                /*{
                                     label: 'Mora Clientes',
                                     url: '/admin/reportes/mora',
                                     role: 'admin',
-                                },
+                                },*/
                                 {
                                     label: 'Ordenes',
                                     url: '/admin/reportes/ordenes',
@@ -198,6 +198,11 @@ export default {
                                 {
                                     label: 'Auditar',
                                     url: '/admin/reportes/auditar',
+                                    role: 'admin',
+                                },
+                                {
+                                    label: 'Inventario',
+                                    url: '/admin/reportes/inventario',
                                     role: 'admin',
                                 },
                             ]

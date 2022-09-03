@@ -186,6 +186,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('reportes/rendicion', [ReporteController::class, 'rendicionDiariaAdm']);
     Route::get('reportes/ordenes', [ReporteController::class, 'ordenes']);
     Route::get('reportes/auditar', [ReporteController::class, 'ordenesAudit']);
+    Route::get('reportes/inventario', [ReporteController::class, 'movimientosInventario']);
 
 });
 
