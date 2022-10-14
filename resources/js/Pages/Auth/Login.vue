@@ -38,7 +38,6 @@
                                         dense
                                         label="Usuario"
                                         outlined
-                                        id="username"
                                         v-model="form.username"
                                         type="text"
                                         hide-details="auto"
@@ -49,7 +48,6 @@
                                         dense
                                         label="Contraseña"
                                         outlined
-                                        id="password"
                                         v-model="form.password"
                                         type="password"
                                         hide-details="auto"
@@ -70,8 +68,8 @@
                                     block
                                     color="primary"
                                     type="submit"
-                                    :loading="form.processing"
-                                    :disabled="form.processing">
+                                    :loading="processing"
+                                    :disabled="processing">
                                     Ingresar
                                     <template v-slot:loader>
                                         <span>Ingresando...</span>
@@ -94,24 +92,37 @@ export default {
     },
     data() {
         return {
-            form: this.$inertia.form({
+            form: {
                 username: '',
                 password: '',
                 remember: false
-            }),
+            },
+            processing:false,
             alert: false
         }
     },
     methods: {
+        loadFormData() {
+            let formData = new FormData();
+            for (let key in this.form) {
+                if (this.form[key] != null) {
+                    formData.append(key, this.form[key]);
+                }
+            }
+            return formData;
+        },
         submit() {
-            console.log('login')
-            this.form.post('/login', {
+            this.processing=true
+            this.$inertia.post('/login', this.loadFormData(), {
+                headers: {'Content-Type': 'multipart/form-data'},
+
                 onFinish: () => {
-                    this.form.reset('password')
+                    this.form.password = ''
                     if (Object.keys(this.errors).length > 0) {
                         this.alert = true;
                     }
-                },
+                    this.processing=false
+                }
             });
         },
         state(value) {

@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class Cliente extends Model
@@ -19,7 +20,7 @@ class Cliente extends Model
         return $this->hasOne(Sucursal::class,'id','sucursal');
     }
 
-    public static function getAll(int $sucursal = null): \Illuminate\Support\Collection
+    public static function getAll(int $sucursal = null): Collection
     {
         $clientes = new Generic(self::$tables);
         if (!empty($sucursal)) {

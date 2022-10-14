@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Mpdf\Mpdf;
 use PDF;
+use Ramsey\Collection\Collection;
 use UnexpectedValueException;
 
 
@@ -75,7 +76,7 @@ class PDFController extends Controller
         }
     }
 
-    function getProduct($id, $products)
+    function getProduct($id,$products)
     {
         $item = [];
         foreach ($products as $product) {

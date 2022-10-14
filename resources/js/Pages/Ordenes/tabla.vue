@@ -74,47 +74,73 @@
                         {{ item.updated_at | moment("DD/MM/YYYY HH:mm") }}
                     </template>
                     <template v-slot:item.Acciones="{ item }">
-                        <v-btn
-                            small
-                            class="ma-1"
-                            color="secondary"
-                            @click="loadOrden(item.tipoOrden,item.tipoOrdenView,item.id,item)"
-                            v-if="!isVenta && viewModify(item.created_at)"
-                        >
-                            <v-icon>
-                                mdi-file-document-edit
-                            </v-icon>
-                        </v-btn>
-                        <v-btn
-                            color="error"
-                            class="ma-1"
-                            small
-                            @click="deleted(item.id)"
-                            v-if="item.estado===1 && viewModify(item.created_at)">
-                            <v-icon>
-                                mdi-file-document-remove
-                            </v-icon>
-                        </v-btn>
-                        <v-btn
-                            color="primary"
-                            class="ma-1"
-                            small
-                            @click="loadItem(item)"
-                        >
-                            <v-icon>
-                                mdi-file-document-check
-                            </v-icon>
-                        </v-btn>
-                        <v-btn
-                            color="info"
-                               class="ma-1"
-                               small
-                               @click="loadReposicion(item.tipoOrden,item)"
-                               v-if="[0,2].includes(item.estado) && viewReposicion(item.created_at)">
-                            <v-icon>
-                                mdi-file-document-alert
-                            </v-icon>
-                        </v-btn>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-btn
+                                    small
+                                    class="ma-1"
+                                    color="secondary"
+                                    @click="loadOrden(item.tipoOrden,item.tipoOrdenView,item.id,item)"
+                                    v-if="!isVenta && viewModify(item.created_at)"
+                                    v-on="on"
+                                >
+                                    <v-icon>
+                                        mdi-file-document-edit
+                                    </v-icon>
+                                </v-btn>
+                            </template>
+                            <span>Modificar</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-btn
+                                    color="error"
+                                    class="ma-1"
+                                    small
+                                    @click="deleted(item.id)"
+                                    v-if="item.estado===1 && viewModify(item.created_at)"
+                                    v-on="on"
+                                >
+                                    <v-icon>
+                                        mdi-file-document-remove
+                                    </v-icon>
+                                </v-btn>
+                            </template>
+                            <span>Anular</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-btn
+                                    color="primary"
+                                    class="ma-1"
+                                    small
+                                    @click="loadItem(item)"
+                                    v-on="on"
+                                >
+                                    <v-icon>
+                                        mdi-file-document-check
+                                    </v-icon>
+                                </v-btn>
+                            </template>
+                            <span>Ver Orden</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-btn
+                                    color="info"
+                                    class="ma-1"
+                                    small
+                                    @click="loadReposicion(item.tipoOrden,item)"
+                                    v-if="[0,2].includes(item.estado) && viewReposicion(item.created_at)"
+                                    v-on="on"
+                                >
+                                    <v-icon>
+                                        mdi-file-document-alert
+                                    </v-icon>
+                                </v-btn>
+                            </template>
+                            <span>Reposicion</span>
+                        </v-tooltip>
                     </template>
                 </v-data-table>
             </v-card>

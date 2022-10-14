@@ -134,7 +134,7 @@ export default {
                     this.errors = error
                     console.log(error);
                 }).finally(() => {
-                this.$inertia.get(this.$page.url);
+                this.$inertia.reload();
             })
         }
     }

@@ -12,12 +12,20 @@ class Sucursal extends Model
     public static string $tables = 'sucursales';
     protected $guarded = [];
 
-    public static function getAll(bool $isAdm = False): Collection
+    public static function getAll(bool $all = False): Collection
     {
         $sucursales = new Generic(self::$tables);
-        return !$isAdm
+        return !$all
             ? $sucursales->getAll(['enable' => '1'])
             : $sucursales->getAll();
+    }
+
+    public static function getSelect(bool $all = False): Collection
+    {
+        $sucursales = self::getAll($all);
+        return $sucursales->map(function ($item, $key) {
+            return ['value' => (string)$item->id, 'text' => $item->nombre];
+        });
     }
 
 }

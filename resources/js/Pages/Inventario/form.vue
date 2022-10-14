@@ -109,7 +109,6 @@ export default {
     },
     computed: {
         formTitle() {
-            this.removeValues();
             return this.ingreso ? this.titulo1 : this.titulo2;
         },
     },
@@ -198,8 +197,8 @@ export default {
             axios.post('/inventario/' + ((this.ingreso) ? 'ingreso' : 'egreso'), this.loadFormData(), {headers: {'Content-Type': 'multipart/form-data'}})
                 .then(({data}) => {
                     if (data["status"] === 0) {
+                        this.$inertia.reload()
                         this.closed();
-                        this.$inertia.get(data["path"])
                     } else {
                         this.setErrors(data);
                     }
@@ -212,6 +211,13 @@ export default {
                 this.sending = false;
             })
         },
+    },
+    watch: {
+        dialog(val) {
+            if (val) {
+                this.removeValues();
+            }
+        }
     },
 }
 </script>
