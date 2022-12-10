@@ -185,11 +185,11 @@ export default {
                     submenu: [
                         {
                             Reportes: [
-                                /*{
+                                {
                                     label: 'Mora Clientes',
                                     url: '/admin/reportes/mora',
                                     role: 'admin',
-                                },*/
+                                },
                                 {
                                     label: 'Ordenes',
                                     url: '/admin/reportes/ordenes',
