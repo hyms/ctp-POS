@@ -309,15 +309,12 @@ class ReporteController extends Controller
                     $clientes->add([
                         'nombreResponsable' => $cliente->nombreResponsable,
                         'ordenes' => $ordenes,
-                        /*'fields' => [
-                            'codigoServicio',
-                            'totalDeuda',
-                            [
-                                'key' => 'created_at',
-                                'label' => 'Fecha'
-                            ],
-                            'detalle'
-                        ],*/
+                        'fields' => [
+                              [ 'text'=> 'Codigo', 'value'=> 'codigoServicio' ],
+                              [ 'text'=> 'Total Deuda', 'value'=> 'totalDeuda' ],
+                              [ 'text'=> 'Fecha', 'value'=> 'created_at' ],
+                              [ 'text'=> 'Observaciones', 'value'=> 'observaciones' ],
+                        ],
                         'mora' => $totalCliente
                     ]);
                 }

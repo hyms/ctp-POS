@@ -53,6 +53,116 @@
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
+
+                    <v-dialog id="cliente" v-model="dialogOrdenes" max-width="600">
+                        <v-card>
+                            <v-card-title class="text-h5">
+                                {{ 'Cliente: '+ item.nombreResponsable }}
+                            </v-card-title>
+                            <v-card-text>
+                            <div class="table-responsive">
+                                <v-data-table
+                                    :headers="item.fields"
+                                    :items="item.ordenes"
+                                    :single-expand="true"
+                                    :expanded.sync="expanded"
+                                    item-key="codigoServicio"
+                                    show-expand
+                                    class="elevation-1"
+                                >
+                                    <template v-slot:expanded-item="{ headers, item }">
+                                        <td :colspan="headers.length" class="m-0 p-0">
+                                            <v-card class="mt-3 mb-3">
+                                                    <div class="table-responsive">
+                                                        <v-simple-table class="table">
+                                                            <thead>
+                                                            <tr>
+                                                                <th scope="col">#</th>
+                                                                <th scope="col">Productos</th>
+                                                                <th scope="col">Cant.</th>
+                                                                <th scope="col">Precio</th>
+                                                                <th scope="col">Total</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            <tr v-for="(itemOrden,key) in item.detallesOrden">
+                                                                <td>{{ key + 1 }}</td>
+                                                                <td>{{ getProduct(itemOrden.stock) }}</td>
+                                                                <td>{{ itemOrden.cantidad }}</td>
+                                                                <td>{{ itemOrden.costo }}</td>
+                                                                <td>{{ itemOrden.costo * itemOrden.cantidad }}</td>
+                                                            </tr>
+                                                            </tbody>
+                                                            <tfoot>
+                                                            <tr>
+                                                                <td colspan="4" class="text-right"><strong>Total</strong></td>
+                                                                <td>{{ getTotal(item.detallesOrden) }}</td>
+                                                            </tr>
+                                                            </tfoot>
+                                                        </v-simple-table>
+                                                    </div>
+                                            </v-card>
+                                        </td>
+                                    </template>
+                                </v-data-table>
+<!--                            <b-table
+                                striped
+                                hover
+                                :items="item.ordenes"
+                                :fields="item.fields"
+                                show-empty
+                                small>
+                                <template #empty="scope">
+                                    <p>No existen deudas</p>
+                                </template>
+                                <template v-slot:cell(created_at)="data">
+                                    {{ data.value | moment("DD/MM/YYYY HH:mm") }}
+                                </template>
+
+                                <template #cell(detalle)="row">
+                                    <b-button size="sm" @click="row.toggleDetails" class="mr-2">
+                                        {{ row.detailsShowing ? 'Ocultar' : 'Mostrar' }} Orden
+                                    </b-button>
+                                </template>
+
+                                <template #row-details="row">
+                                    <b-card>
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <thead>
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">Productos</th>
+                                                    <th scope="col">Cant.</th>
+                                                    <th scope="col">Precio</th>
+                                                    <th scope="col">Total</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr v-for="(itemOrden,key) in row.item.detallesOrden">
+                                                    <td>{{ key + 1 }}</td>
+                                                    <td>{{ getProduct(itemOrden.stock) }}</td>
+                                                    <td>{{ itemOrden.cantidad }}</td>
+                                                    <td>{{ itemOrden.costo }}</td>
+                                                    <td>{{ itemOrden.costo * itemOrden.cantidad }}</td>
+                                                </tr>
+                                                </tbody>
+                                                <tfoot>
+                                                <tr>
+                                                    <td colspan="4" class="text-right"><strong>Total</strong></td>
+                                                    <td>{{ getTotal(row.item.detallesOrden) }}</td>
+                                                </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </b-card>
+                                </template>
+                            </b-table>-->
+                            </div>
+                            </v-card-text>
+                        </v-card>
+                    </v-dialog>
+
                     <template v-if="data['table'].length>0">
                         <v-simple-table fixed-header height="60vh">
                             <template v-slot:default>
@@ -78,6 +188,7 @@
                                                         getCantidad(item)
                                                     }}
                                                 </template>
+                                                <template v-else-if="field==='nombreResponsable'"><v-btn @click="loadModal(item)" text color="primary">{{ item[field] }}</v-btn></template>
                                                 <template v-else>{{ item[field] }}</template>
                                             </td>
                                         </template>
@@ -93,21 +204,6 @@
     </v-row>
     <!--    <div class="content-w">
                 <div class="tab-content">
-                    <b-row>
-
-                        <b-col md="4">
-                            <b-card>
-                                <template #header>
-                                    <h5 class="mb-0">Total</h5>
-                                </template>
-                                <b-row>
-                                    <b-col>
-                                        <h2>{{ total }}</h2>
-                                    </b-col>
-                                </b-row>
-                            </b-card>
-                        </b-col>
-                    </b-row>
 
                     <b-card v-if="data['table'].length>0">
                         <template #header>
@@ -251,6 +347,8 @@ export default {
             },
             item: {},
             sending: false,
+            dialogOrdenes:false,
+            expanded: [],
         }
     },
     methods: {
@@ -263,6 +361,7 @@ export default {
         },
         loadModal(item) {
             this.item = item;
+            this.dialogOrdenes=true;
         },
         getTotal(detalle) {
             let total = 0;
