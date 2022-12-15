@@ -74,6 +74,7 @@
                                     </json-excel>
                                 </h3>
                             </v-btn>
+                            <template v-if="data['totales']">
                             <v-menu
                                 :close-on-content-click="false"
                                 offset-y>
@@ -82,7 +83,6 @@
                                            v-on="on"><h3>Por producto</h3>
                                     </v-btn>
                                 </template>
-
                                 <v-card>
                                     <v-card-text>
                                     <v-simple-table>
@@ -108,6 +108,7 @@
                                     </v-card-text>
                                 </v-card>
                             </v-menu>
+                            </template>
                         </v-col>
                     </v-row>
                 </v-card-title>
