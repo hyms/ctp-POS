@@ -74,6 +74,40 @@
                                     </json-excel>
                                 </h3>
                             </v-btn>
+                            <v-menu
+                                :close-on-content-click="false"
+                                offset-y>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn right elevation="1" color="secondary" class="ma-1" v-bind="attrs"
+                                           v-on="on"><h3>Por producto</h3>
+                                    </v-btn>
+                                </template>
+
+                                <v-card>
+                                    <v-card-text>
+                                    <v-simple-table>
+                                        <thead>
+                                        <tr>
+                                        <th></th>
+                                        <th v-for="(value,key) in data['totales']['Egresos']">
+                                            {{key}}
+                                        </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <template v-for="(value,key) in data['totales']">
+                                        <tr>
+                                            <td>{{key}}</td>
+                                            <td v-for="(item,key2) in value">
+                                                {{item}}
+                                            </td>
+                                        </tr>
+                                        </template>
+                                        </tbody>
+                                    </v-simple-table>
+                                    </v-card-text>
+                                </v-card>
+                            </v-menu>
                         </v-col>
                     </v-row>
                 </v-card-title>
@@ -110,7 +144,7 @@ export default {
         request: Object | Array,
         errors: Object,
         data: Object,
-        clientes: Array
+        clientes: Array,
     },
     components: {
         JsonExcel

@@ -701,6 +701,9 @@ class ReporteController extends Controller
             return ['value' => (string)$item->id, 'text' => $item->nombre];
         });
 
+        $totales = collect([]);
+        $totalIngresos = collect([]);
+        $totalEgresos = collect([]);
         $validator = Validator::make($request->all(), [
             'sucursal' => 'required',
             'fechaI' => 'required',
@@ -718,35 +721,51 @@ class ReporteController extends Controller
                 $query->whereIn('stockDestino', $stocksId)
                     ->orWhereIn('stockOrigen', $stocksId);
             })->get();
-            $reporte = $movimientos->map(function ($value, $key) use ($productos, $stocks) {
+            $reporte = $movimientos->map(function ($value, $key) use ($productos, $stocks,$totalEgresos,$totalIngresos) {
                 $producto = $productos->first(function ($item) use ($value) {
                     return $item->id === $value->producto;
                 });
+                if (!isset($totalEgresos[$producto->formato])) {
+                    $totalEgresos[$producto->formato] = 0;
+                }
+
+                if (!isset($totalIngresos[$producto->formato])) {
+                    $totalIngresos[$producto->formato] = 0;
+                }
 
                 $tipoMovimiento = "-";
                 if (!empty($value->stockOrigen)) {
                     $tipoMovimiento = "Egreso";
+                    $totalEgresos[$producto->formato] += $value->cantidad;
                 }
                 if (!empty($value->stockDestino)) {
                     $tipoMovimiento = "Ingreso";
+                    $totalIngresos[$producto->formato] += $value->cantidad;
                 }
                 if(!empty($value->detalleOrden)) {
                     $detalles = DB::table(DetallesOrden::$tables)->where('id', $value->detalleOrden)->get()->first();
                     $orden = DB::table(OrdenesTrabajo::$tables)->where('id', $detalles->ordenTrabajo)->get()->first();
                     $value->observaciones.= " codigo:{$orden->codigoServicio}";
                 }
+
                 return [
                     'producto' => "{$producto->formato} ({$producto->dimension})",
                     'tipoMovimiento' => $tipoMovimiento,
                     'detalle' => $value->observaciones,
+                    'cantidad' => $value->cantidad,
                 ];
             });
+            $totales = [
+                'Egresos'=>$totalEgresos,
+                'Ingresos'=>$totalIngresos
+            ];
             $fields = [
                 ['value' => 'producto', 'text' => 'Producto'],
                 ['value' => 'tipoMovimiento', 'text' => 'Tipo Movimiento'],
                 ['value' => 'detalle', 'text' => 'Detalle'],
+                ['value' => 'cantidad', 'text' => 'Cantidad'],
             ];
-            $data = ['table' => $reporte, 'fields' => $fields];
+            $data = ['table' => $reporte, 'fields' => $fields,'totales'=>$totales];
         }
 
         Inertia::share('titlePage', 'Reporte Movimiento de Inventario');
