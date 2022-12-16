@@ -704,6 +704,7 @@ class ReporteController extends Controller
         $totales = collect([]);
         $totalIngresos = collect([]);
         $totalEgresos = collect([]);
+        $totalSinContar = collect([]);
         $validator = Validator::make($request->all(), [
             'sucursal' => 'required',
             'fechaI' => 'required',
@@ -728,9 +729,11 @@ class ReporteController extends Controller
                 if (!isset($totalEgresos[$producto->formato])) {
                     $totalEgresos[$producto->formato] = 0;
                 }
-
                 if (!isset($totalIngresos[$producto->formato])) {
                     $totalIngresos[$producto->formato] = 0;
+                }
+                if (!isset($totalSinContar[$producto->formato])) {
+                    $totalSinContar[$producto->formato] = 0;
                 }
 
                 $tipoMovimiento = "-";
@@ -755,9 +758,29 @@ class ReporteController extends Controller
                     'cantidad' => $value->cantidad,
                 ];
             });
+            $sucursal = Auth::user()['sucursal'];
+            $fechaI=Carbon::parse($request['fechaI']);
+            $fechaF=Carbon::parse($request['fechaF']);
+            $noConteo = DB::select("select do.*,productos.formato
+from detallesOrden as do
+left join movimientosStock ms on do.id = ms.detalleOrden and ms.created_at between '{$fechaI->startOfDay()->toDateTimeString()}' and '{$fechaF->endOfDay()->toDateTimeString()}'
+inner join stock on do.stock = stock.id
+inner join productos on stock.producto = productos.id
+where do.updated_at between '{$fechaI->startOfDay()->toDateTimeString()}' and '{$fechaF->endOfDay()->toDateTimeString()}'
+  and ms.detalleOrden is null
+and stock.sucursal={$sucursal}");
+            foreach ($noConteo as $item)
+            {
+                if (!isset($totalSinContar[$item->formato])) {
+                    $totalSinContar[$item->formato] = 0;
+                }
+                $totalSinContar[$item->formato]+=$item->cantidad;
+            }
             $totales = [
                 'Egresos'=>$totalEgresos,
-                'Ingresos'=>$totalIngresos
+                'Ingresos'=>$totalIngresos,
+                'NoConteo'=>$totalSinContar,
+                'fields'=>Producto::whereIn('id',$stocks->pluck('producto')->toArray())->get()->pluck('formato')->toArray(),
             ];
             $fields = [
                 ['value' => 'producto', 'text' => 'Producto'],

@@ -75,39 +75,49 @@
                                 </h3>
                             </v-btn>
                             <template v-if="data['totales']">
-                            <v-menu
-                                :close-on-content-click="false"
-                                offset-y>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-btn right elevation="1" color="secondary" class="ma-1" v-bind="attrs"
-                                           v-on="on"><h3>Por producto</h3>
-                                    </v-btn>
-                                </template>
-                                <v-card>
-                                    <v-card-text>
-                                    <v-simple-table>
-                                        <thead>
-                                        <tr>
-                                        <th></th>
-                                        <th v-for="(value,key) in data['totales']['Egresos']">
-                                            {{key}}
-                                        </th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <template v-for="(value,key) in data['totales']">
-                                        <tr>
-                                            <td>{{key}}</td>
-                                            <td v-for="(item,key2) in value">
-                                                {{item}}
-                                            </td>
-                                        </tr>
-                                        </template>
-                                        </tbody>
-                                    </v-simple-table>
-                                    </v-card-text>
-                                </v-card>
-                            </v-menu>
+                                <v-dialog
+                                    v-model="dialog"
+                                >
+
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-btn right elevation="1" color="secondary" class="ma-1" v-bind="attrs"
+                                               v-on="on"><h3>Por producto</h3>
+                                        </v-btn>
+                                    </template>
+                                    <v-card>
+                                        <v-card-title>Resumen por producto</v-card-title>
+                                        <v-divider></v-divider>
+                                        <v-card-text>
+                                            <v-simple-table>
+                                                <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th v-for="(value,key) in data['totales']['fields']">
+                                                        {{ value }}
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <template v-for="(value,key) in data['totales']">
+                                                    <template v-if="key!='fields'">
+                                                        <tr>
+                                                            <td>{{ key }}</td>
+                                                            <td v-for="(valuef,keyf) in data['totales']['fields']">
+                                                                <template v-if="value[valuef]">
+                                                                    {{ value[valuef] }}
+                                                                </template>
+                                                                <template v-else>
+                                                                    0
+                                                                </template>
+                                                            </td>
+                                                        </tr>
+                                                    </template>
+                                                </template>
+                                                </tbody>
+                                            </v-simple-table>
+                                        </v-card-text>
+                                    </v-card>
+                                </v-dialog>
                             </template>
                         </v-col>
                     </v-row>
@@ -134,7 +144,6 @@
 
 <script>
 import Authenticated from '@/Layouts/Authenticated.vue'
-import moment from 'moment';
 import JsonExcel from "vue-json-excel";
 
 export default {
@@ -183,6 +192,7 @@ export default {
             loading: false,
             search: null,
             menuventa: false,
+            dialog:false
         }
     },
     methods: {
