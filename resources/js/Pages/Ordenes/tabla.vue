@@ -264,6 +264,7 @@ export default {
             {value: 'estadoView', text: 'Estado'},
             {value: 'responsable', text: 'Cliente'},
             {value: 'montoVenta', text: 'Monto'},
+            {value: 'montoDeuda', text: 'Monto Deuda'},
             {value: 'created_at', text: 'Fecha Nueva Orden'},
             {value: 'updated_at', text: 'Fecha Pago/Deuda'},
             {value: 'Acciones', text: 'Acciones'}

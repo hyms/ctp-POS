@@ -39,6 +39,15 @@ class OrdenesController extends Controller
             $tipoOrden = $item->tipoOrden;
             $tipoOrden =$tiposSelect->first(function ($value,$id) use ($tipoOrden) { return $value['value']==$tipoOrden;});
             $item->tipoOrdenView =$tipoOrden['text']??'';
+            $totalVenta = 0;
+            $totalPagado = 0;
+            if ($item->estado === 2 || $item->estado === 0) {
+                foreach ($item->detallesOrden as $detalle) {
+                    $totalVenta += $detalle->total;
+                }
+                $totalPagado = $item->montoVenta;
+            }
+            $item->montoDeuda = $totalVenta - $totalPagado;
             return $item;
         });
         $estados = OrdenesTrabajo::estadoCTP();
