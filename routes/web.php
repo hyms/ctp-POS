@@ -170,6 +170,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         ->name('guardarUsuarios');
     Route::delete('user/{id}', [UserController::class, 'borrar'])
         ->name('eliminarUsuarios');
+    Route::get('backup', [UserController::class, 'backup'])
+        ->name('backup');
     //reportes
     Route::get('reportes', [ReporteController::class, 'get'])
         ->name('listaReportes');

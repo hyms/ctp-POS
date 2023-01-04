@@ -252,6 +252,11 @@ export default {
                                     label: 'Usuarios',
                                     url: '/admin/users',
                                     role: 'admin',
+                                },
+                                {
+                                    label: 'respaldo',
+                                    url: '/admin/backup',
+                                    role: 'admin',
                                 }
                             ]
                         },
