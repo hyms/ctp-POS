@@ -63,8 +63,20 @@
                                         </template>
                                         <template v-for="(link2, key2) in Object.values(link)[0]">
                                             <template v-if="getPermission(link2.role)">
-
+                                                <template v-if="link2.newPage===true">
+                                                    <a
+                                                        :key="key2"
+                                                        :href="link2.url"
+                                                        target="_blank"
+                                                        class="v-list-item v-list-item--link theme--dark"
+                                                    >
+                                                        <v-list-item-title>
+                                                        {{ link2.label }}
+                                                        </v-list-item-title>
+                                                    </a>
+                                                </template>
                                                 <Link
+                                                    v-else
                                                     :href="link2.url"
                                                     :key="key2"
                                                     :class="'v-list-item v-list-item--link theme--dark' + (getUrl()===link2.url?' v-list-item--active':'') "
@@ -257,6 +269,7 @@ export default {
                                     label: 'respaldo',
                                     url: '/admin/backup',
                                     role: 'admin',
+                                    newPage:true
                                 }
                             ]
                         },

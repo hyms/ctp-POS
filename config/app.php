@@ -199,6 +199,8 @@ return [
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 
         Meneses\LaravelMpdf\LaravelMpdfServiceProvider::class,
+
+        Spatie\Backup\BackupServiceProvider::class,
     ],
 
     /*
