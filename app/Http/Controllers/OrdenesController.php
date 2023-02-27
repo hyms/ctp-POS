@@ -185,6 +185,7 @@ class OrdenesController extends Controller
             //armar orden
             $orden = array();
             $orden['id'] = $ordenPost['id'];
+            $ordenPost['montoVenta']=round($ordenPost['montoVenta'],2);
             $total = DetallesOrden::getTotal($orden['id'], $ordenPost['detallesOrden']);
             $orden['estado'] = (($ordenPost['montoVenta'] >= $total)) ? 0 : 2;
             $orden['montoVenta'] = $ordenPost['montoVenta'];
@@ -215,6 +216,7 @@ class OrdenesController extends Controller
             //armar orden
             $orden = array();
             $orden['id'] = $ordenPost['id'];
+            $ordenPost['montoVenta']=round($ordenPost['montoVenta'],2);
             $total = DetallesOrden::getTotal($orden['id'], $ordenPost['detallesOrden']);
             $saldo = $total - $ordenPost['montoVenta'];
             $orden['montoVenta'] = $ordenPost['montoVenta'] + $request['monto'];
