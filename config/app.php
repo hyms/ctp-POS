@@ -198,7 +198,7 @@ return [
 
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 
-        Meneses\LaravelMpdf\LaravelMpdfServiceProvider::class,
+//        Meneses\LaravelMpdf\LaravelMpdfServiceProvider::class,
 
         Spatie\Backup\BackupServiceProvider::class,
     ],
@@ -216,7 +216,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
-        'PDF' => Meneses\LaravelMpdf\Facades\LaravelMpdf::class,
+//        'PDF' => Meneses\LaravelMpdf\Facades\LaravelMpdf::class,
     ])->toArray(),
 
 ];
