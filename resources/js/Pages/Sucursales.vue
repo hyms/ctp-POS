@@ -98,13 +98,6 @@ export default {
                     options: this.sucursalOptions,
                     isPadre: 1
                 },
-                central: {
-                    label: 'Central',
-                    value: "",
-                    type: "bool",
-                    state: null,
-                    stateText: null
-                },
                 enable: {
                     label: 'Habilitado',
                     value: "",

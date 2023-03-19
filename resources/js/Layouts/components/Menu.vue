@@ -132,6 +132,11 @@ export default {
                     titulo: 'Agencia',
                     submenu: [
                         {
+                            label: 'Tablero',
+                            url: '/',
+                            role: 'all',
+                        },
+                        {
                             Ordenes: [
                                 {
                                     label: 'Nuevas Ordenes',
@@ -249,7 +254,12 @@ export default {
                             ]
                         },
                         {
-                            Configuracion: [
+                            Configuraciones: [
+                                {
+                                    label: 'Almacenes',
+                                    url: '#',
+                                    role: 'admin',
+                                },
                                 {
                                     label: 'Sucursales',
                                     url: '/admin/sucursales',
