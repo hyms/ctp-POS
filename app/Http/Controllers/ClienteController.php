@@ -35,7 +35,7 @@ class ClienteController extends Controller
             $validator = Validator::make($request->all(), [
                 'sucursal' => 'required',
                 'nombreCompleto' => 'required',
-                'nombreResponsable' => 'required',
+                'nombre' => 'required',
                  'nitCi' => 'required'
             ]);
             if ($validator->fails()) {
@@ -68,9 +68,9 @@ class ClienteController extends Controller
 
     public function buscar($id){
         $clientes = DB::table(Cliente::$tables)
-            ->where('nombreResponsable','like',"%{$id}%")
+            ->where('nombre','like',"%{$id}%")
             ->whereNull('deleted_at')
-            ->select(['nombreResponsable','id','telefono'])
+            ->select(['nombre','id','telefono'])
             ->get();
         return response()->json(["items"=>$clientes]);
     }

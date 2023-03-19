@@ -307,7 +307,7 @@ class ReporteController extends Controller
                 $total += $totalCliente;
                 if ($totalCliente > 0) {
                     $clientes->add([
-                        'nombreResponsable' => $cliente->nombreResponsable,
+                        'nombre' => $cliente->nombre,
                         'ordenes' => $ordenes,
                         'fields' => [
                               [ 'text'=> 'Codigo', 'value'=> 'codigoServicio' ],
@@ -319,7 +319,7 @@ class ReporteController extends Controller
                     ]);
                 }
             }
-            $data = ['table' => $clientes->all(), 'fields' => ['nombreResponsable', 'mora', 'desde', 'hasta', 'cantidad']];
+            $data = ['table' => $clientes->all(), 'fields' => ['nombre', 'mora', 'desde', 'hasta', 'cantidad']];
         }
         Inertia::share('titlePage', 'Mora de Clientes');
         return Inertia::render('Reportes/mora',
@@ -483,7 +483,7 @@ class ReporteController extends Controller
         }
         $sucursales = Sucursal::getAll()->pluck('nombre', 'id');
         $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
-        $clientes = Cliente::getAll($request['sucursal'])->pluck('nombreResponsable', 'id');
+        $clientes = Cliente::getAll($request['sucursal'])->pluck('nombre', 'id');
         $data = ['table' => $movimientos, 'fields' => $fields];
         return Inertia::render('Reportes/clientes',
             [
@@ -594,7 +594,7 @@ class ReporteController extends Controller
                 'tipoOrdenes' => $estadoCTP,
                 'tipoProducto' => $tiposSelect,
                 'clientes' => Cliente::getAll()->map(function ($value) {
-                    return ['value' => (string)$value->id, 'text' => $value->nombreResponsable];
+                    return ['value' => (string)$value->id, 'text' => $value->nombre];
                 }),
                 'request' => $request->all(),
                 'data' => $data,

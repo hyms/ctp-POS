@@ -66,6 +66,7 @@ export default {
             fields:
                 [
                     {value: 'secuencia', text: 'Secuencia'},
+                    {value: 'nombre', text: 'Cliente'},
                     {value: 'detalle', text: 'Detalle'},
                     {value: 'saldo', text: 'Saldo'},
                     {value: 'monto', text: 'Monto'},

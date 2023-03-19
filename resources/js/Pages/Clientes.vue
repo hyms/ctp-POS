@@ -34,7 +34,7 @@ export default {
                 [
                     {
                         text: 'Nombre',
-                        value: 'nombreResponsable'
+                        value: 'nombre'
                     },
                     {
                         text: 'Correo',
@@ -68,8 +68,8 @@ export default {
                     state: null,
                     stateText: null
                 },
-                nombreResponsable: {
-                    label: 'nombreResponsable',
+                nombre: {
+                    label: 'nombre',
                     value: "",
                     type: "text",
                     state: null,

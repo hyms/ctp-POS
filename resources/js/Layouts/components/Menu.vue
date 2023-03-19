@@ -260,7 +260,7 @@ export default {
                                     url: '#',
                                     role: 'admin',
                                 },
-                                {
+                                /*{
                                     label: 'Sucursales',
                                     url: '/admin/sucursales',
                                     role: 'admin',
@@ -269,7 +269,7 @@ export default {
                                     label: 'Cajas',
                                     url: '/admin/cajas',
                                     role: 'admin',
-                                },
+                                },*/
                                 {
                                     label: 'Usuarios',
                                     url: '/admin/users',

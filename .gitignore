@@ -21,4 +21,4 @@ yarn-error.log
 composer.lock
 package-lock.json
 /public/build/
-ctp_stock/
+/ctp_stock/

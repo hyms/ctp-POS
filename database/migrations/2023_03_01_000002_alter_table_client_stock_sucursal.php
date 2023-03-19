@@ -13,7 +13,7 @@ return new class extends Migration {
     public function up()
     {
         Schema::table('clientes', function (Blueprint $table) {
-            $table->dropColumn('nombreNegocio', 'sucursal', 'codigo');
+            $table->dropColumn('nombreNegocio', 'codigo');
             $table->renameColumn('nombreResponsable', 'nombre');
         });
         Schema::table('clientes', function (Blueprint $table) {
