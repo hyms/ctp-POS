@@ -39,7 +39,7 @@ class ClienteController extends Controller
                 'nombreCompleto' => 'required',
                 'nombre' => 'required',
                 'nitCi' => 'required',
-                'code' => 'required|numeric'
+                'code' => 'required|numeric|unique:App\Models\Cliente,code'
             ]);
             if ($validator->fails()) {
                 return response()->json([
