@@ -33,6 +33,10 @@ export default {
             fields:
                 [
                     {
+                        text: 'Codigo',
+                        value: 'code'
+                    },
+                    {
                         text: 'Nombre',
                         value: 'nombre'
                     },
@@ -56,13 +60,6 @@ export default {
             form: {
                 nombreCompleto: {
                     label: 'nombreCompleto',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },
-                nombreNegocio: {
-                    label: 'nombreNegocio',
                     value: "",
                     type: "text",
                     state: null,
@@ -103,7 +100,7 @@ export default {
                     state: null,
                     stateText: null
                 },
-                codigo: {
+                code: {
                     label: 'codigo',
                     value: "",
                     type: "text",

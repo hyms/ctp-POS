@@ -10,6 +10,7 @@ use App\Http\Controllers\ReciboController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SucursalController;
+use App\Http\Controllers\UpgradeController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,9 @@ use Inertia\Inertia;
 //        'phpVersion' => PHP_VERSION,
 //    ]);
 //});
+
+Route::get('/upgrade', [UpgradeController::class, 'index'])->name('upgrade');
+Route::post('/upgrade', [UpgradeController::class, 'upgrade'])->name('upgrade');
 
 Route::get('/', function () {
     return Inertia::render('Dashboard');

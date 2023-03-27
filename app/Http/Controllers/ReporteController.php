@@ -561,10 +561,12 @@ class ReporteController extends Controller
                     $totalDeudaOrden['reposicion'] += $item->totalDeuda ?? 0;
                     $totalPagadoOrden['reposicion'] += $item->totalPagado ?? 0;
                 }
+                $cliente = Cliente::where('id',$item->cliente)->first();
                 $totalesOrden[(string)$item->estado] += 1;
                 return [
                     'codigo' => $item->codigoServicio,
-                    'cliente' => $item->responsable,
+                    'code' => $cliente->code,
+                    'cliente' => $cliente->nombre,
                     'estado' => $item->estado,
                     'venta' => $item->montoVenta * 1,
                     'pagado' => $item->totalPagado * 1,
@@ -574,7 +576,8 @@ class ReporteController extends Controller
                 ];
             });
             $fields = [
-                ['value' => 'codigo', 'text' => 'Codigo'],
+                ['value' => 'codigo', 'text' => 'Codigo Orden'],
+                ['value' => 'code', 'text' => 'Codigo Cliente'],
                 ['value' => 'cliente', 'text' => 'Cliente'],
                 ['value' => 'estado', 'text' => 'Estado'],
                 ['value' => 'venta', 'text' => 'Venta (Bs)'],
