@@ -27,7 +27,7 @@ function submit() {
                 alert.value = true;
             }
         },
-        onFinish: visit => {
+        onFinish: () => {
             form.value.password = ''
             processing.value = false
         }
@@ -40,7 +40,7 @@ function submit() {
     <Layout>
         <div class="auth-wrapper auth-v1">
             <div class="auth-inner">
-                <v-card class="auth-card">
+                <v-card class="auth-card" :elevation="5">
                     <!-- title -->
                     <v-card-title>
                         Bienvenido a xCTP

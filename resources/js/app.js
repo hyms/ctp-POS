@@ -27,7 +27,7 @@ const customLight = {
         info: '#39f',
         success: '#2eb85c',
         warning: '#f9b115',
-    }
+    },
 };
 const vuetify = createVuetify({
     components,

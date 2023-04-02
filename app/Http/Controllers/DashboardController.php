@@ -17,9 +17,7 @@ class DashboardController extends Controller
 {
     function index()
     {
-        $sucursal = Sucursal::find(Auth::user()->sucursal);
-        $user = Auth::user()->nombre.' '.Auth::user()->apellido;
-        return Inertia::render('Dashboard',['usernames'=>$user,'sucursal'=>$sucursal]);
+        return Inertia::render('Dashboard');
     }
 
     //-------------------- General Report dashboard -------------\\
