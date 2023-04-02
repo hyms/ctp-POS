@@ -1,4 +1,5 @@
 <script setup>
+import {Link, router} from '@inertiajs/vue3';
 import {ref} from "vue";
 
 const isDrawerOpen = ref(null);
@@ -161,7 +162,13 @@ const menu = ref([
         ]
     }
 ]);
-
+function linkGet(url){
+    router.visit(url,
+        {
+            method: 'get',
+            preserveScroll: true
+        });
+}
 function getPermission(role) {
     //for (const key in this.$page.props.rolesP) {
     return true;
@@ -193,10 +200,6 @@ function validateMenu(data) {
     //     }
     // }
     // return false;
-}
-
-function consol(item) {
-    console.log(item);
 }
 </script>
 
@@ -245,7 +248,7 @@ function consol(item) {
                                         <v-list-item
                                             v-if="subLink.newPage===true"
                                             :key="key+''+subKey"
-                                            :href="subLink.url"
+                                            @click="linkGet(subLink.url)"
                                             target="_blank"
                                         >
                                             <v-list-item-title>
@@ -255,7 +258,7 @@ function consol(item) {
                                         <v-list-item
                                             v-else
                                             :key="key+''+subKey"
-                                            :href="subLink.url"
+                                            @click="linkGet(subLink.url)"
                                             :active="($page.url === subLink.url)"
                                         >
                                             <v-list-item-title>
@@ -269,7 +272,7 @@ function consol(item) {
                         </template>
                         <template v-else>
                             <v-list-item v-if="getPermission(link.role)"
-                                         :href="link.url"
+                                         @click="linkGet(link.url)"
                                          :active="($page.url === link.url)"
                                          :key="key"
                             >

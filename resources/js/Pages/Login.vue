@@ -20,7 +20,6 @@ function submit() {
     processing.value = true
     router.post('/login', form.value, {
         onSuccess: (page) => {
-            console.log(page);
         },
         onError:(error)=>{
             if (Object.keys(error).length > 0) {
