@@ -1,49 +1,67 @@
 import './bootstrap';
-import '../css/app.css';
 
 import '@mdi/font/css/materialdesignicons.css'
-import Vue from 'vue';
-import Vuetify from 'vuetify'
-import es from 'vuetify/lib/locale/es'
-import vueMoment from 'vue-moment'
+import {createApp, h} from 'vue'
+import 'vuetify/styles'
+import {createVuetify} from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+import {es} from 'vuetify/locale'
 import moment from 'moment'
-import * as momentLocale from 'moment/locale/es'
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+
+// import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 // import 'vuetify/dist/vuetify.min.css'
 
-import {createInertiaApp} from '@inertiajs/inertia-vue';
-import {InertiaProgress} from '@inertiajs/progress';
+moment.locale('es');
 
-createInertiaApp({
-    resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
-    setup({el, App, props, plugin}) {
-        Vue.use(plugin)
-        Vue.use(vueMoment, {moment});
-        Vue.use(Vuetify)
-        Vue.mixin({methods: {route}})
-        new Vue({
-            render: h => h(App, props),
-            vuetify: new Vuetify({
-                icons: {
-                    iconfont: 'mdi',
-                },
-                lang: {locales: {es}, current: 'es'},
-                theme: {
-                    themes: {
-                        light: {
-                            primary: '#007b89',
-                            secondary: '#5e8592',
-                            accent: '#2C384A',
-                            error: '#e55353',
-                            info: '#39f',
-                            success: '#2eb85c',
-                            warning: '#f9b115',
-                        },
-                    },
-                },
-            }),
-        }).$mount(el)
+import {createInertiaApp} from '@inertiajs/vue3'
+
+const customLight = {
+    dark: false,
+    colors: {
+        // background: '#2C384A',
+        surface: '#f4f5f5',
+        primary: '#007b89',
+        secondary: '#5e8592',
+        error: '#e55353',
+        info: '#39f',
+        success: '#2eb85c',
+        warning: '#f9b115',
+    }
+};
+const vuetify = createVuetify({
+    components,
+    directives,
+    locale: {
+        locale: 'es',
+        fallback: 'es',
+        messages: {es}
+    },
+    icons: {
+        defaultSet: 'mdi',
+    },
+    theme: {
+        defaultTheme: 'customLight',
+        themes: {
+            customLight
+        },
     },
 })
 
-InertiaProgress.init({color: '#007b89'});
+createInertiaApp({
+    resolve: name => {
+        const pages = import.meta.glob('./Pages/**/*.vue', {eager: true})
+        return pages[`./Pages/${name}.vue`]
+    },
+    setup({el, App, props, plugin}) {
+        createApp({render: () => h(App, props),})
+            .use(plugin)
+            // .use({moment})
+            .use(vuetify)
+            // .mixin({methods: {route}})
+            .mount(el)
+    },
+    progress: {
+        color: '#007b89',
+    },
+})

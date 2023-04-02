@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\Sucursal;
 use App\Models\User;
+use App\Models\Warehouse;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -99,53 +101,318 @@ class UserController extends Controller
         }
     }
 
-    public function backup()
+        //------------- GET ALL USERS---------\\
+
+    public function index(request $request)
     {
-        /*set_time_limit(300);
-        $tables = DB::select('SHOW TABLES');
-        $str = 'Tables_in_' . env('DB_DATABASE');
+        $Role = Auth::user()->roles()->first();
+        $ShowRecord = Role::findOrFail($Role->id)->exists();
+//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $sqlScript = "";
-        foreach ($tables as $table) {
-            // Prepare SQLscript for creating table structure
-            $row = DB::select("SHOW CREATE TABLE {$table->$str}");
-            $keyCreateTable = "Create Table";
-            $sqlScript .= "\n\n{$row[0]->$keyCreateTable};\n\n";
-
-            $result = DB::table($table->$str)->get();
-            foreach ($result as $row) {
-                $sqlScript .= "INSERT INTO {$table->$str} VALUES(";
-                $columnCount = count((array)$row);
-                $indexColumn = 0;
-                foreach ($row as $item) {
-
-                    $sqlScript = isset($item)
-                        ? $sqlScript . '"' . $item . '"'
-                        : $sqlScript . '""';
-                    if ($indexColumn < ($columnCount - 1)) {
-                        $sqlScript .= ',';
-                    }
-                    $indexColumn++;
-                }
-                $sqlScript .= ");\n";
+        $users = User::where(function ($query) use ($ShowRecord) {
+            if (!$ShowRecord) {
+                return $query->where('id', '=', Auth::user()->id);
             }
+        });
+        $users = $users->get();
+        $warehouses = Warehouse::get(['id', 'name']);
+        $roles = Role::get(['id', 'name']);
+        Inertia::share('titlePage', 'Usuarios');
+        return Inertia::render('Usuarios',
+            ['users' => $users, 'warehouses' => $warehouses, 'roles' => $roles]);
+    }
 
-            $sqlScript .= "\n";
+    //------------- GET USER Auth ---------\\
+
+    public function GetUserAuth(Request $request)
+    {
+        $helpers = new helpers();
+        $user['avatar'] = Auth::user()->avatar;
+        $user['username'] = Auth::user()->username;
+        $user['currency'] = $helpers->Get_Currency();
+        $user['logo'] = Setting::first()->logo;
+        $user['default_language'] = Setting::first()->default_language;
+        $user['footer'] = Setting::first()->footer;
+        $user['developed_by'] = Setting::first()->developed_by;
+        $permissions = Auth::user()->roles()->first()->permissions->pluck('name');
+        $products_alerts = product_warehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
+            ->whereRaw('qte <= stock_alert')
+            ->where('product_warehouse.deleted_at', null)
+            ->count();
+
+        return response()->json([
+            'success' => true,
+            'user' => $user,
+            'notifs' => $products_alerts,
+            'permissions' => $permissions,
+        ]);
+    }
+
+    //------------- GET USER ROLES ---------\\
+
+    public function GetUserRole(Request $request)
+    {
+
+        $roles = Auth::user()->roles()->with('permissions')->first();
+
+        $data = [];
+        if ($roles) {
+            foreach ($roles->permissions as $permission) {
+                $data[] = $permission->name;
+
+            }
+            return response()->json(['success' => true, 'data' => $data]);
         }
 
-        if (!empty($sqlScript)) {
-            // Save the SQL script to a backup file
-            $backup_file_name = public_path() . '/' . (env('DB_DATABASE')) . '_backup.sql';
-            //return $backup_file_name;
-            $fileHandler = fopen($backup_file_name, 'w+');
-            $number_of_lines = fwrite($fileHandler, $sqlScript);
-            fclose($fileHandler);
-        }*/
-        Artisan::call('backup:run --only-db');
-        $directory = env('APP_NAME', 'ctp-backup');
-        $file_path= Storage::disk('public')->files($directory);
-        $file_path = collect($file_path);
-        $file_path = $file_path->last();
-        return Storage::disk('public')->download($file_path,'respaldo.zip');
     }
+
+    //------------- STORE NEW USER ---------\\
+
+    public function store(Request $request)
+    {
+        $this->authorizeForUser($request->user('api'), 'create', User::class);
+        $this->validate($request, [
+            'email' => 'required|unique:users',
+        ], [
+            'email.unique' => 'This Email already taken.',
+        ]);
+        \DB::transaction(function () use ($request) {
+            if ($request->hasFile('avatar')) {
+
+                $image = $request->file('avatar');
+                $filename = rand(11111111, 99999999) . $image->getClientOriginalName();
+
+                $image_resize = Image::make($image->getRealPath());
+                $image_resize->resize(128, 128);
+                $image_resize->save(public_path('/images/avatar/' . $filename));
+
+            } else {
+                $filename = 'no_avatar.png';
+            }
+
+            $User = new User;
+            $User->firstname = $request['firstname'];
+            $User->lastname  = $request['lastname'];
+            $User->username  = $request['username'];
+            $User->email     = $request['email'];
+            $User->phone     = $request['phone'];
+            $User->password  = Hash::make($request['password']);
+            $User->avatar    = $filename;
+            $User->role_id   = $request['role'];
+            $User->is_all_warehouses   = $request['is_all_warehouses'];
+            $User->save();
+
+            $role_user = new role_user;
+            $role_user->user_id = $User->id;
+            $role_user->role_id = $request['role'];
+            $role_user->save();
+
+            if(!$User->is_all_warehouses){
+                $User->assignedWarehouses()->sync($request['assigned_to']);
+            }
+
+        }, 10);
+
+        return response()->json(['success' => true]);
+    }
+
+    //------------ function show -----------\\
+
+    public function show($id){
+        //
+
+    }
+
+    public function edit(Request $request, $id)
+    {
+        $this->authorizeForUser($request->user('api'), 'update', User::class);
+
+        $assigned_warehouses = UserWarehouse::where('user_id', $id)->pluck('warehouse_id')->toArray();
+        $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $assigned_warehouses)->pluck('id')->toArray();
+
+        return response()->json([
+            'assigned_warehouses' => $warehouses,
+        ]);
+    }
+
+    //------------- UPDATE  USER ---------\\
+
+    public function update(Request $request, $id)
+    {
+        $this->authorizeForUser($request->user('api'), 'update', User::class);
+
+        $this->validate($request, [
+            'email' => 'required|email|unique:users',
+            'email' => Rule::unique('users')->ignore($id),
+        ], [
+            'email.unique' => 'This Email already taken.',
+        ]);
+
+        \DB::transaction(function () use ($id ,$request) {
+            $user = User::findOrFail($id);
+            $current = $user->password;
+
+            if ($request->NewPassword != 'null') {
+                if ($request->NewPassword != $current) {
+                    $pass = Hash::make($request->NewPassword);
+                } else {
+                    $pass = $user->password;
+                }
+
+            } else {
+                $pass = $user->password;
+            }
+
+            $currentAvatar = $user->avatar;
+            if ($request->avatar != $currentAvatar) {
+
+                $image = $request->file('avatar');
+                $path = public_path() . '/images/avatar';
+                $filename = rand(11111111, 99999999) . $image->getClientOriginalName();
+
+                $image_resize = Image::make($image->getRealPath());
+                $image_resize->resize(128, 128);
+                $image_resize->save(public_path('/images/avatar/' . $filename));
+
+                $userPhoto = $path . '/' . $currentAvatar;
+                if (file_exists($userPhoto)) {
+                    if ($user->avatar != 'no_avatar.png') {
+                        @unlink($userPhoto);
+                    }
+                }
+            } else {
+                $filename = $currentAvatar;
+            }
+
+            User::whereId($id)->update([
+                'firstname' => $request['firstname'],
+                'lastname' => $request['lastname'],
+                'username' => $request['username'],
+                'email' => $request['email'],
+                'phone' => $request['phone'],
+                'password' => $pass,
+                'avatar' => $filename,
+                'statut' => $request['statut'],
+                'is_all_warehouses' => $request['is_all_warehouses']== 'true' ? 1 : 0,
+                'role_id' => $request['role'],
+
+            ]);
+
+            role_user::where('user_id' , $id)->update([
+                'user_id' => $id,
+                'role_id' => $request['role'],
+            ]);
+
+            $user_saved = User::where('deleted_at', '=', null)->findOrFail($id);
+            $user_saved->assignedWarehouses()->sync($request['assigned_to']);
+
+        }, 10);
+
+        return response()->json(['success' => true]);
+
+    }
+
+
+    //------------- UPDATE PROFILE ---------\\
+
+    public function updateProfile(Request $request)
+    {
+        $id = Auth::user()->id;
+        $user = User::findOrFail($id);
+        $current = $user->password;
+
+        if ($request->NewPassword != 'undefined') {
+            if ($request->NewPassword != $current) {
+                $pass = Hash::make($request->NewPassword);
+            } else {
+                $pass = $user->password;
+            }
+
+        } else {
+            $pass = $user->password;
+        }
+
+        $currentAvatar = $user->avatar;
+        if ($request->avatar != $currentAvatar) {
+
+            $image = $request->file('avatar');
+            $path = public_path() . '/images/avatar';
+            $filename = rand(11111111, 99999999) . $image->getClientOriginalName();
+
+            $image_resize = Image::make($image->getRealPath());
+            $image_resize->resize(128, 128);
+            $image_resize->save(public_path('/images/avatar/' . $filename));
+
+            $userPhoto = $path . '/' . $currentAvatar;
+
+            if (file_exists($userPhoto)) {
+                if ($user->avatar != 'no_avatar.png') {
+                    @unlink($userPhoto);
+                }
+            }
+        } else {
+            $filename = $currentAvatar;
+        }
+
+        User::whereId($id)->update([
+            'firstname' => $request['firstname'],
+            'lastname' => $request['lastname'],
+            'username' => $request['username'],
+            'email' => $request['email'],
+            'phone' => $request['phone'],
+            'password' => $pass,
+            'avatar' => $filename,
+
+        ]);
+
+        return response()->json(['avatar' => $filename, 'user' => $request['username']]);
+
+    }
+
+    //----------- IsActivated (Update Statut User) -------\\
+
+    public function IsActivated(request $request, $id)
+    {
+
+        $this->authorizeForUser($request->user('api'), 'update', User::class);
+
+        $user = Auth::user();
+        if ($request['id'] !== $user->id) {
+            User::whereId($id)->update([
+                'statut' => $request['statut'],
+            ]);
+            return response()->json([
+                'success' => true,
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+            ]);
+        }
+    }
+
+    public function GetPermissions()
+    {
+        $roles = Auth::user()->roles()->with('permissions')->first();
+        $data = [];
+        if ($roles) {
+            foreach ($roles->permissions as $permission) {
+                $item[$permission->name]['slug'] = $permission->name;
+                $item[$permission->name]['id'] = $permission->id;
+
+            }
+            $data[] = $item;
+        }
+        return $data[0];
+
+    }
+
+    //------------- GET USER Auth ---------\\
+
+    public function GetInfoProfile(Request $request)
+    {
+        $data = Auth::user();
+        return response()->json(['success' => true, 'user' => $data]);
+    }
+
 }

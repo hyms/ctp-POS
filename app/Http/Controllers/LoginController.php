@@ -35,16 +35,16 @@ class LoginController extends Controller
      *
      * @return Response
      */
-    public function showLoginForm()
+    public function showLoginForm(): Response
     {
-        return Inertia::render('Auth/Login');
+        return Inertia::render('Login');
     }
-    public function username()
+    public function username(): string
     {
         return 'username';
     }
 
-    public function login(Request $request)
+    public function login(Request $request): \Illuminate\Http\RedirectResponse
     {
         $this->validate($request, [
             'username' => 'required',

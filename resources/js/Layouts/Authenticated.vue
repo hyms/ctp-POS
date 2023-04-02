@@ -1,7 +1,7 @@
 <template>
     <v-app>
-        <Menu>
-        </Menu>
+<!--        <Menu>-->
+<!--        </Menu>-->
         <v-main>
             <v-container fluid>
                 <slot></slot>
@@ -29,11 +29,11 @@
 </template>
 
 <script>
-import Menu from './components/Menu.vue'
+// import Menu from '../../oldjs/components/Menu.vue'
 
 export default {
     components: {
-        Menu,
+        // Menu,
     },
 
 }

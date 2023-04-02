@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CajaController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\OrdenesController;
 use App\Http\Controllers\PDFController;
@@ -39,9 +40,8 @@ use Inertia\Inertia;
 Route::get('/upgrade', [UpgradeController::class, 'index'])->name('upgrade');
 Route::post('/upgrade', [UpgradeController::class, 'upgrade'])->name('upgrade');
 
-Route::get('/', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/',[DashboardController::class, 'index']
+)->middleware(['auth', 'verified'])->name('dashboard');
 
 require __DIR__.'/auth.php';
 
@@ -116,6 +116,17 @@ Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
     ->name('pdfRecibo')->middleware('auth');
 //Admin
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
+    //users
+    Route::get('users', [UserController::class, 'index'])
+        ->name('indexUsers');
+    Route::post('user', [UserController::class, 'post'])
+        ->name('guardarUsuarios');
+    Route::delete('user/{id}', [UserController::class, 'borrar'])
+        ->name('eliminarUsuarios');
+    Route::get('backup', [UserController::class, 'backup'])
+        ->name('backup');
+
+
     //productos
     Route::get('productos', [ProductosController::class, 'getAll'])
         ->name('listaProductos');
@@ -167,15 +178,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('movimientosStock', [StockController::class, 'movimientos'])
         ->name('movimientosStock');
 
-    //users
-    Route::get('users', [UserController::class, 'getAll'])
-        ->name('listaUsuarios');
-    Route::post('user', [UserController::class, 'post'])
-        ->name('guardarUsuarios');
-    Route::delete('user/{id}', [UserController::class, 'borrar'])
-        ->name('eliminarUsuarios');
-    Route::get('backup', [UserController::class, 'backup'])
-        ->name('backup');
+
     //reportes
     Route::get('reportes', [ReporteController::class, 'get'])
         ->name('listaReportes');

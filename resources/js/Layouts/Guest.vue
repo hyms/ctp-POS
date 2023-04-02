@@ -1,7 +1,11 @@
 <template>
-    <v-app>
+    <v-layout>
         <v-main>
-            <slot/>
+            <v-container>
+                <slot/>
+            </v-container>
         </v-main>
-    </v-app>
+    </v-layout>
 </template>
+
+

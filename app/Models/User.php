@@ -35,6 +35,9 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'role_id' => 'integer',
+        'statut' => 'integer',
+        'is_all_warehouses' => 'integer',
     ];
 
     public function getNameAttribute(): string
@@ -62,5 +65,28 @@ class User extends Authenticatable
 
         $first = $roles->firstWhere('value', '=', $id);
         return $first['text']??'';
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+
+    public function assignRole(Role $role)
+    {
+        return $this->roles()->save($role);
+    }
+
+    public function hasRole($role)
+    {
+        if (is_string($role)) {
+            return $this->roles->contains('name', $role);
+        }
+        return !!$role->intersect($this->roles)->count();
+    }
+
+    public function assignedWarehouses()
+    {
+        return $this->belongsToMany('App\Models\Warehouse');
     }
 }
