@@ -80,45 +80,45 @@ const menu = ref([
                 Reportes: [
                     {
                         label: 'Mora Clientes',
-                        url: '/admin/reportes/mora',
+                        url: '/reportes/mora',
                         role: 'admin',
                     },
                     {
                         label: 'Ordenes',
-                        url: '/admin/reportes/ordenes',
+                        url: '/reportes/ordenes',
                         role: 'admin',
                     },
                     {
                         label: 'Auditar',
-                        url: '/admin/reportes/auditar',
+                        url: '/reportes/auditar',
                         role: 'admin',
                     },
                     {
                         label: 'Inventario',
-                        url: '/admin/reportes/inventario',
+                        url: '/reportes/inventario',
                         role: 'admin',
                     },
                 ]
             },
             {
                 label: 'Clientes',
-                url: '/admin/clientes',
+                url: '/clientes',
                 role: 'all',
             },
             {
                 Productos: [
                     {
                         label: 'Productos',
-                        url: '/admin/productos',
+                        url: '/productos',
                         role: 'admin',
                     },
                     {
-                        url: '/admin/tipoProductos',
+                        url: '/tipoProductos',
                         label: 'Tipo Productos',
                         role: 'admin',
                     },
                     {
-                        url: '/admin/stocks',
+                        url: '/stocks',
                         label: 'Stocks',
                         role: 'admin',
                     },
@@ -138,22 +138,22 @@ const menu = ref([
                     },
                     /*{
                         label: 'Sucursales',
-                        url: '/admin/sucursales',
+                        url: '/sucursales',
                         role: 'admin',
                     },
                     {
                         label: 'Cajas',
-                        url: '/admin/cajas',
+                        url: '/cajas',
                         role: 'admin',
                     },*/
                     {
                         label: 'Usuarios',
-                        url: '/admin/users',
+                        url: '/users',
                         role: 'admin',
                     },
                     {
                         label: 'respaldo',
-                        url: '/admin/backup',
+                        url: '/backup',
                         role: 'admin',
                         newPage: true
                     }
@@ -287,7 +287,7 @@ function validateMenu(data) {
 
         </v-navigation-drawer>
         <v-app-bar :elevation="2">
-            <v-app-bar-nav-icon @click="isDrawerOpen = !isDrawerOpen"></v-app-bar-nav-icon>
+            <v-app-bar-nav-icon @click.stop="isDrawerOpen = !isDrawerOpen"></v-app-bar-nav-icon>
 
             <v-toolbar-title>{{ $page.props.titlePage }}</v-toolbar-title>
 

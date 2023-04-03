@@ -47,8 +47,20 @@ require __DIR__.'/auth.php';
 
 Route::get('search/{id}', [ClienteController::class, 'buscar'])
     ->name('buscar');
-//diseño
+
 Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
+
+    //------------------------------- Users --------------------------\\
+    Route::get('users', [UserController::class, 'index']);
+    Route::get('get_user_auth', [UserController::class, 'GetUserAuth']);
+//    Route::resource('users', 'UserController');
+    Route::post('users_switch_activated/{id}', [UserController::class,'IsActivated']);
+    Route::get('Get_user_profile', [UserController::class, 'GetInfoProfile']);
+    Route::put('update_user_profile/{id}', [UserController::class, 'updateProfile']);
+    //------------------------------------------------------------------\\
+
+
+
     Route::get('ordenes', [OrdenesController::class, 'getAll'])
         ->name('listaOrdenes');
     Route::post('orden', [OrdenesController::class, 'post'])
@@ -106,7 +118,6 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('ingresoInventario');
     Route::post('inventario/egreso', [InventarioController::class, 'postEgreso'])
         ->name('egresoInventario');
-});
 //pdfs
 Route::get('ordenPdf/{id}', [PDFController::class, 'getOrdenDiseño'])
     ->name('pdfOrdenD')->middleware('auth');
@@ -115,10 +126,8 @@ Route::get('ordenPdfV/{id}', [PDFController::class, 'getOrdenVenta'])
 Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
     ->name('pdfRecibo')->middleware('auth');
 //Admin
-Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     //users
-    Route::get('users', [UserController::class, 'index'])
-        ->name('indexUsers');
+
     Route::post('user', [UserController::class, 'post'])
         ->name('guardarUsuarios');
     Route::delete('user/{id}', [UserController::class, 'borrar'])

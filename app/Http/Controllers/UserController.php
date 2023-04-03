@@ -373,9 +373,6 @@ class UserController extends Controller
 
     public function IsActivated(request $request, $id)
     {
-
-        $this->authorizeForUser($request->user('api'), 'update', User::class);
-
         $user = Auth::user();
         if ($request['id'] !== $user->id) {
             User::whereId($id)->update([

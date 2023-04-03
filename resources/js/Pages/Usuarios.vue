@@ -1,7 +1,6 @@
 <script setup>
 import {ref} from "vue";
 import Layout from '@/Layouts/Authenticated.vue'
-import GTable from '@/Layouts/genericTable.vue';
 import {VDataTableServer} from 'vuetify/labs/VDataTable'
 
 defineProps({
@@ -12,6 +11,9 @@ defineProps({
 });
 const search = ref("");
 const loading = ref(false);
+const alertType = ref('info');
+const alertMessage = ref('');
+const alert = ref(false);
 const fields = ref([
     {
         title: 'Usuario',
@@ -107,6 +109,44 @@ const form = ref({
 function consol(item) {
     console.log(item)
 }
+
+//------ Checked Status User
+function isChecked(user) {
+    loading.value = true;
+    consol(!!!user.statut);
+    axios.post("users_switch_activated/" + user.id, {
+        statut: !!!user.statut,
+        id: user.id
+    }).then(({data}) => {
+        consol(data);
+        if (data.success) {
+            alert.value = true;
+            alertType.value = "success";
+            if (!!!user.statut) {
+                user.statut = 1;
+                alertMessage.value = "Usuario activado";
+            } else {
+                user.statut = 0;
+                alertMessage.value = "Usuario desactivado";
+            }
+        } else {
+
+            user.statut = 1;
+            alert.value = true;
+            alertType.value = "warning";
+            alertMessage.value = "algo salio mal";
+
+        }
+    }).catch((errors) => {
+        consol(errors);
+        user.statut = 1;
+        alert.value = true;
+        alertType.value = "warning";
+        alertMessage.value = "algo salio mal";
+    }).finally(() => {
+        loading.value = false;
+    });
+}
 </script>
 
 <template>
@@ -121,10 +161,19 @@ function consol(item) {
             hide-details
             class="mb-3"
         ></v-text-field>
-
+        <v-alert
+            closable
+            class="mb-3"
+            v-model="alert"
+            :type="alertType"
+            :text="alertMessage"
+            variant="elevated"
+        >
+        </v-alert>
         <v-data-table-server
             :headers="fields"
             :items="users"
+            :items-length="users.length"
             :search="search"
             density="compact"
             class="elevation-2"
@@ -133,7 +182,7 @@ function consol(item) {
             loading-text="Cargando... "
         >
             <template v-slot:item.statut="{ item }">
-                <v-switch :model-value="!!item.raw.statut" color="primary" @click="consol(!!item.raw.statut)"></v-switch>
+                <v-switch density="compact" hide-details :model-value="!!item.raw.statut" color="primary" @change="isChecked(item.raw)"></v-switch>
             </template>
             <template v-slot:item.accions="{ item }">
                 <div class="row-actions">
