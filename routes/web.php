@@ -52,11 +52,18 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
 
     //------------------------------- Users --------------------------\\
     Route::get('users', [UserController::class, 'index']);
+    Route::get('users/{id}/edit', [UserController::class, 'edit']);
     Route::get('get_user_auth', [UserController::class, 'GetUserAuth']);
 //    Route::resource('users', 'UserController');
     Route::post('users_switch_activated/{id}', [UserController::class,'IsActivated']);
     Route::get('Get_user_profile', [UserController::class, 'GetInfoProfile']);
     Route::put('update_user_profile/{id}', [UserController::class, 'updateProfile']);
+//    Route::post('user', [UserController::class, 'post'])
+//        ->name('guardarUsuarios');
+//    Route::delete('user/{id}', [UserController::class, 'borrar'])
+//        ->name('eliminarUsuarios');
+//    Route::get('backup', [UserController::class, 'backup'])
+//        ->name('backup');
     //------------------------------------------------------------------\\
 
 
@@ -126,14 +133,7 @@ Route::get('ordenPdfV/{id}', [PDFController::class, 'getOrdenVenta'])
 Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
     ->name('pdfRecibo')->middleware('auth');
 //Admin
-    //users
 
-    Route::post('user', [UserController::class, 'post'])
-        ->name('guardarUsuarios');
-    Route::delete('user/{id}', [UserController::class, 'borrar'])
-        ->name('eliminarUsuarios');
-    Route::get('backup', [UserController::class, 'backup'])
-        ->name('backup');
 
 
     //productos

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use App\Models\Sucursal;
 use App\Models\User;
+use App\Models\UserWarehouse;
 use App\Models\Warehouse;
 use Exception;
 use Illuminate\Http\Request;
@@ -225,7 +226,7 @@ class UserController extends Controller
 
     public function edit(Request $request, $id)
     {
-        $this->authorizeForUser($request->user('api'), 'update', User::class);
+//        $this->authorizeForUser($request->user('api'), 'update', User::class);
 
         $assigned_warehouses = UserWarehouse::where('user_id', $id)->pluck('warehouse_id')->toArray();
         $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $assigned_warehouses)->pluck('id')->toArray();
