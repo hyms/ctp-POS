@@ -13,6 +13,7 @@ use App\Http\Controllers\StockController;
 use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\UpgradeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WarehouseController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -56,19 +57,19 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::post('users', [UserController::class, 'store']);
     Route::put('users/{id}', [UserController::class, 'update']);
     Route::get('get_user_auth', [UserController::class, 'GetUserAuth']);
-//    Route::resource('users', 'UserController');
     Route::post('users_switch_activated/{id}', [UserController::class,'IsActivated']);
     Route::get('Get_user_profile', [UserController::class, 'GetInfoProfile']);
     Route::put('update_user_profile/{id}', [UserController::class, 'updateProfile']);
-//    Route::post('user', [UserController::class, 'post'])
-//        ->name('guardarUsuarios');
-//    Route::delete('user/{id}', [UserController::class, 'borrar'])
-//        ->name('eliminarUsuarios');
-//    Route::get('backup', [UserController::class, 'backup'])
-//        ->name('backup');
     //------------------------------------------------------------------\\
 
+    //------------------------------- WAREHOUSES --------------------------\\
 
+    Route::get('warehouses', [WarehouseController::class,'index']);
+    Route::post('warehouses', [WarehouseController::class,'store']);
+    Route::put('warehouses/{id}', [WarehouseController::class,'update']);
+    Route::delete('warehouses/{id}', [WarehouseController::class,'destroy']);
+    Route::post('warehouses/delete/by_selection', [WarehouseController::class,'delete_by_selection']);
+    //------------------------------------------------------------------\\
 
     Route::get('ordenes', [OrdenesController::class, 'getAll'])
         ->name('listaOrdenes');

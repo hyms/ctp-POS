@@ -239,10 +239,10 @@ function New_User() {
 }
 
 //------------------------------ Show Modal (Update User) -------------------------------\\
-function Edit_User(userRaw) {
+function Edit_User(item) {
     reset_Form();
-    Get_Data_Warehouses(userRaw.id);
-    user.value = userRaw;
+    Get_Data_Warehouses(item.id);
+    user.value = item;
     user.value.NewPassword = null;
     editmode.value = true;
     dialog.value = true;

@@ -21,61 +21,6 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
-//    public function getAll()
-//    {
-//        $users = User::all();
-//        $users->transform(function ($item, $key) {
-//            $item->nombreRol = User::getRole($item->role);
-//            $item->nombreSucursal=$item->Sucursales?->nombre;
-//            $item->enableView=($item->enable === 1) ? "Si" : "No" ;
-//            return $item;
-//        });
-//        $sucursales = Sucursal::getAll();
-//        $sucursales = $sucursales->map(function ($item){ return ['value'=>$item->id,'text'=>$item->nombre];});
-//        $roles = User::getRole();
-//        Inertia::share('titlePage', 'Usuarios');
-//        return Inertia::render('Usuarios', ['users' => $users, 'sucursales' => $sucursales, 'roles' => $roles]);
-//    }
-
-    public function post(Request $request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'username' => 'required|min:5',
-                'enable' => 'required',
-                'role' => 'required',
-                'sucursal' => 'required|numeric'
-            ]);
-            if ($validator->fails()) {
-                return response()->json([
-                    'status' => -1,
-                    'errors' => $validator->errors()
-                ]);
-            }
-
-            $usuarios = !empty($request['id'])
-                ? User::find($request['id'])
-                : new User();
-            if (!empty($request['password']) && (strcmp($usuarios->password, $request['password']) !== 0)) {
-                $usuarios->password = Hash::make($request['password']);
-            }
-            unset($request['password']);
-            $usuarios->fill($request->all());
-            $usuarios->save();
-            return response()->json(["status" => 0, 'path' => 'users']);
-        } catch (Exception $error) {
-            Log::error($error->getMessage());
-            return response()->json(["status" => -1,
-                'error' => $error,], 500);
-        }
-    }
-
-    public function borrar($id)
-    {
-        $user = User::find($id);
-        $user->delete();
-        return back()->withInput();
-    }
 
     public function savePush(Request $request)
     {
@@ -376,14 +321,6 @@ class UserController extends Controller
         }
         return $data[0];
 
-    }
-
-    //------------- GET USER Auth ---------\\
-
-    public function GetInfoProfile(Request $request)
-    {
-        $data = Auth::user();
-        return response()->json(['success' => true, 'user' => $data]);
     }
 
 }
