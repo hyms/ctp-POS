@@ -53,6 +53,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     //------------------------------- Users --------------------------\\
     Route::get('users', [UserController::class, 'index']);
     Route::get('users/{id}/edit', [UserController::class, 'edit']);
+    Route::post('users', [UserController::class, 'store']);
+    Route::put('users/{id}', [UserController::class, 'update']);
     Route::get('get_user_auth', [UserController::class, 'GetUserAuth']);
 //    Route::resource('users', 'UserController');
     Route::post('users_switch_activated/{id}', [UserController::class,'IsActivated']);

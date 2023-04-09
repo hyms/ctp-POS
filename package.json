@@ -19,7 +19,7 @@
         "vue-echarts": "^6.5.4",
         "vue-html-to-paper": "^1.4.4",
         "vue-json-excel3": "^0.0.5",
-        "vuetify": "^3.1.12"
+        "vuetify": "^3.1.13"
     },
     "devDependencies": {
         "@mdi/font": "^7.2.96",

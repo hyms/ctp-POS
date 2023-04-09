@@ -5,6 +5,8 @@ import { VDataTableServer } from "vuetify/labs/VDataTable";
 import JsonExcel from "vue-json-excel3";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import ruleForm from "@/rules";
+import { router } from "@inertiajs/vue3";
 
 const props = defineProps({
     users: Array,
@@ -50,39 +52,30 @@ const user = ref({
     NewPassword: null,
     email: "",
     phone: "",
+    ci: "",
     statut: "",
-    role_id: "",
+    role: "",
     is_all_warehouses: 1,
 });
 const assigned_warehouses = ref([]);
-const userRules = ref({
-    firstname: [
-        (v) => !!v || "Nombre es requerido",
-        (v) =>
-            (v && v.length >= 3) || "Nombre tiene que ser mayor 3 caracteres",
-        (v) =>
-            (v && v.length <= 30) || "Nombre tiene que ser menor 30 caracteres",
-    ],
-    lastname: [
-        (v) => !!v || "Apellido es requerido",
-        (v) =>
-            (v && v.length >= 3) || "Apellido tiene que ser mayor 3 caracteres",
-        (v) =>
-            (v && v.length <= 30) ||
-            "Apellido tiene que ser menor 30 caracteres",
-    ],
-    username: "",
-    password: "",
-    NewPassword: null,
-    email: "",
-    phone: "",
-    statut: "",
-    role_id: "",
-    is_all_warehouses: 1,
+const userLabels = ref({
+    firstname: "Nombre",
+    lastname: "Apellido",
+    username: "Usuario",
+    password: "Contraseña",
+    NewPassword: "Nueva Contraseña",
+    email: "Correo",
+    phone: "Telefono",
+    ci: "CI",
+    statut: "Estado",
+    role: "Role",
+    is_all_warehouses: "Todas las sucursales",
 });
+
 //------ Checked Status User
 function isChecked(user) {
     loading.value = true;
+    snackbar.value = false;
     axios
         .post("users_switch_activated/" + user.id, {
             statut: !!!user.statut,
@@ -116,12 +109,6 @@ function isChecked(user) {
         });
 }
 
-function Selected_Warehouse(value) {
-    if (!value.length) {
-        assigned_warehouses.value = [];
-    }
-}
-
 //--------------------------- Users PDF ---------------------------\\
 function Users_PDF() {
     let pdf = new jsPDF("p", "pt");
@@ -138,96 +125,90 @@ function Users_PDF() {
 
 //------------------------ Create User ---------------------------\\
 function Create_User() {
-    var self = this;
-    self.SubmitProcessing = true;
-    self.data.append("firstname", self.user.firstname);
-    self.data.append("lastname", self.user.lastname);
-    self.data.append("username", self.user.username);
-    self.data.append("email", self.user.email);
-    self.data.append("password", self.user.password);
-    self.data.append("phone", self.user.phone);
-    self.data.append("role", self.user.role_id);
-    self.data.append("is_all_warehouses", self.user.is_all_warehouses);
-    self.data.append("avatar", self.user.avatar);
+    loading.value = true;
+    snackbar.value = false;
+    let data = new FormData();
+    data.append("firstname", user.value.firstname);
+    data.append("lastname", user.value.lastname);
+    data.append("username", user.value.username);
+    data.append("email", user.value.email);
+    data.append("password", user.value.password);
+    data.append("phone", user.value.phone);
+    data.append("role", user.value.role);
+    data.append("ci", user.value.ci);
+    data.append("is_all_warehouses", user.value.is_all_warehouses);
 
     // append array assigned_warehouses
-    if (self.assigned_warehouses.length) {
-        for (var i = 0; i < self.assigned_warehouses.length; i++) {
-            self.data.append(
-                "assigned_to[" + i + "]",
-                self.assigned_warehouses[i]
-            );
+    if (assigned_warehouses.value.length) {
+        for (let i = 0; i < assigned_warehouses.value.length; i++) {
+            data.append("assigned_to[" + i + "]", assigned_warehouses.value[i]);
         }
     } else {
-        self.data.append("assigned_to", []);
+        data.append("assigned_to", []);
     }
-
     axios
-        .post("users", self.data)
-        .then((response) => {
-            self.SubmitProcessing = false;
-            Fire.$emit("Event_User");
-
-            this.makeToast(
-                "success",
-                this.$t("Create.TitleUser"),
-                this.$t("Success")
-            );
+        .post("users", data)
+        .then(({ data }) => {
+            snackbar.value = true;
+            snackbarColor.value = "success";
+            snackbarText.value = "Proceso exitoso";
+            router.reload();
+            dialog.value = false;
         })
         .catch((error) => {
-            self.SubmitProcessing = false;
-            if (error.errors.email.length > 0) {
-                self.email_exist = error.errors.email[0];
-            }
-            this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+            console.log(error);
+            snackbar.value = true;
+            snackbarColor.value = "error";
+            snackbarText.value = error;
+        })
+        .finally(() => {
+            loading.value = false;
         });
 }
 
 //----------------------- Update User ---------------------------\\
 function Update_User() {
-    var self = this;
-    self.SubmitProcessing = true;
-    self.data.append("firstname", self.user.firstname);
-    self.data.append("lastname", self.user.lastname);
-    self.data.append("username", self.user.username);
-    self.data.append("email", self.user.email);
-    self.data.append("NewPassword", self.user.NewPassword);
-    self.data.append("phone", self.user.phone);
-    self.data.append("role", self.user.role_id);
-    self.data.append("statut", self.user.statut);
-    self.data.append("is_all_warehouses", self.user.is_all_warehouses);
-    self.data.append("avatar", self.user.avatar);
+    snackbar.value = false;
+    loading.value = true;
+    let data = new FormData();
 
+    data.append("firstname", user.value.firstname);
+    data.append("lastname", user.value.lastname);
+    data.append("username", user.value.username);
+    data.append("email", user.value.email);
+    data.append("NewPassword", user.value.NewPassword);
+    data.append("phone", user.value.phone);
+    data.append("role", user.value.role);
+    data.append("ci", user.value.ci);
+    data.append("statut", user.value.statut);
+    data.append("is_all_warehouses", user.value.is_all_warehouses);
+    console.log(user.value);
     // append array assigned_warehouses
-    if (self.assigned_warehouses.length) {
-        for (var i = 0; i < self.assigned_warehouses.length; i++) {
-            self.data.append(
-                "assigned_to[" + i + "]",
-                self.assigned_warehouses[i]
-            );
+    if (assigned_warehouses.value.length) {
+        for (let i = 0; i < assigned_warehouses.value.length; i++) {
+            data.append("assigned_to[" + i + "]", assigned_warehouses.value[i]);
         }
     } else {
-        self.data.append("assigned_to", []);
+        data.append("assigned_to", []);
     }
-    self.data.append("_method", "put");
-
+    data.append("_method", "put");
     axios
-        .post("users/" + this.user.id, self.data)
-        .then((response) => {
-            this.makeToast(
-                "success",
-                this.$t("Update.TitleUser"),
-                this.$t("Success")
-            );
-            Fire.$emit("Event_User");
-            self.SubmitProcessing = false;
+        .post("users/" + user.value.id, data)
+        .then(({ data }) => {
+            snackbar.value = true;
+            snackbarColor.value = "success";
+            snackbarText.value = "Proceso exitoso";
+            router.reload();
+            dialog.value = false;
         })
         .catch((error) => {
-            if (error.errors.email.length > 0) {
-                self.email_exist = error.errors.email[0];
-            }
-            this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-            self.SubmitProcessing = false;
+            console.log(error);
+            snackbar.value = true;
+            snackbarColor.value = "error";
+            snackbarText.value = error.response.data.message;
+        })
+        .finally(() => {
+            loading.value = false;
         });
 }
 
@@ -242,8 +223,9 @@ function reset_Form() {
         NewPassword: null,
         email: "",
         phone: "",
+        ci: "",
         statut: "",
-        role_id: "",
+        role: "",
         is_all_warehouses: 1,
     };
     assigned_warehouses.value = [];
@@ -279,9 +261,12 @@ function Get_Data_Warehouses(id) {
 //---------------------- modal  ------------------------------\\
 async function onSave() {
     const validate = await form.value.validate();
-    if (validate.valid) {
-        dialog.value = false;
-    }
+    if (validate.valid)
+        if (!editmode.value) {
+            Create_User();
+        } else {
+            Update_User();
+        }
 }
 
 function onClose() {
@@ -296,7 +281,7 @@ function onClose() {
             v-model="snackbar"
             :color="snackbarColor"
             :location="'top right'"
-            :timeout="4000"
+            :timeout="5000"
             elevation="5"
         >
             {{ snackbarText }}
@@ -330,12 +315,17 @@ function onClose() {
                             <!-- First name -->
                             <v-col md="6" sm="12">
                                 <v-text-field
-                                    label="Nombre *"
+                                    :label="userLabels.firstname + ' *'"
                                     v-model="user.firstname"
-                                    placeholder="Nombre"
-                                    :rules="userRules.firstname"
+                                    :placeholder="userLabels.firstname"
+                                    :rules="
+                                        ruleForm.required
+                                            .concat(ruleForm.min3)
+                                            .concat(ruleForm.max30)
+                                    "
                                     variant="outlined"
                                     density="comfortable"
+                                    hide-details="auto"
                                 >
                                 </v-text-field>
                             </v-col>
@@ -343,297 +333,159 @@ function onClose() {
                             <!-- Last name -->
                             <v-col md="6" sm="12">
                                 <v-text-field
-                                    label="Apellido *"
+                                    :label="userLabels.lastname + ' *'"
                                     v-model="user.lastname"
-                                    placeholder="Apellido"
-                                    :rules="userRules.lastname"
+                                    :placeholder="userLabels.lastname"
+                                    :rules="
+                                        ruleForm.required
+                                            .concat(ruleForm.min3)
+                                            .concat(ruleForm.max30)
+                                    "
                                     variant="outlined"
                                     density="comfortable"
+                                    hide-details="auto"
                                 >
                                 </v-text-field>
                             </v-col>
 
-                            <!--                            &lt;!&ndash; Username &ndash;&gt;-->
-                            <!--                            <b-col md="6" sm="12">-->
-                            <!--                                <validation-provider-->
-                            <!--                                    name="username"-->
-                            <!--                                    :rules="{ required: true, min: 3, max: 30 }"-->
-                            <!--                                    v-slot="validationContext"-->
-                            <!--                                >-->
-                            <!--                                    <b-form-group-->
-                            <!--                                        :label="$t('username') + ' ' + '*'"-->
-                            <!--                                    >-->
-                            <!--                                        <b-form-input-->
-                            <!--                                            :state="-->
-                            <!--                                                getValidationState(-->
-                            <!--                                                    validationContext-->
-                            <!--                                                )-->
-                            <!--                                            "-->
-                            <!--                                            aria-describedby="username-feedback"-->
-                            <!--                                            label="username"-->
-                            <!--                                            v-model="user.username"-->
-                            <!--                                            :placeholder="$t('username')"-->
-                            <!--                                        ></b-form-input>-->
-                            <!--                                        <b-form-invalid-feedback-->
-                            <!--                                            id="username-feedback"-->
-                            <!--                                            >{{ validationContext.errors[0] }}-->
-                            <!--                                        </b-form-invalid-feedback>-->
-                            <!--                                    </b-form-group>-->
-                            <!--                                </validation-provider>-->
-                            <!--                            </b-col>-->
+                            <!-- Username -->
+                            <v-col md="6" sm="12">
+                                <v-text-field
+                                    :label="userLabels.username + ' *'"
+                                    v-model="user.username"
+                                    :placeholder="userLabels.username"
+                                    :rules="
+                                        ruleForm.required
+                                            .concat(ruleForm.min3)
+                                            .concat(ruleForm.max30)
+                                    "
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                >
+                                </v-text-field>
+                            </v-col>
 
-                            <!--                            &lt;!&ndash; Phone &ndash;&gt;-->
-                            <!--                            <b-col md="6" sm="12">-->
-                            <!--                                <validation-provider-->
-                            <!--                                    name="Phone"-->
-                            <!--                                    :rules="{ required: true }"-->
-                            <!--                                    v-slot="validationContext"-->
-                            <!--                                >-->
-                            <!--                                    <b-form-group-->
-                            <!--                                        :label="$t('Phone') + ' ' + '*'"-->
-                            <!--                                    >-->
-                            <!--                                        <b-form-input-->
-                            <!--                                            :state="-->
-                            <!--                                                getValidationState(-->
-                            <!--                                                    validationContext-->
-                            <!--                                                )-->
-                            <!--                                            "-->
-                            <!--                                            aria-describedby="Phone-feedback"-->
-                            <!--                                            label="Phone"-->
-                            <!--                                            v-model="user.phone"-->
-                            <!--                                            :placeholder="$t('Phone')"-->
-                            <!--                                        ></b-form-input>-->
-                            <!--                                        <b-form-invalid-feedback-->
-                            <!--                                            id="Phone-feedback"-->
-                            <!--                                            >{{ validationContext.errors[0] }}-->
-                            <!--                                        </b-form-invalid-feedback>-->
-                            <!--                                    </b-form-group>-->
-                            <!--                                </validation-provider>-->
-                            <!--                            </b-col>-->
+                            <!-- Phone -->
+                            <v-col md="6" sm="12">
+                                <v-text-field
+                                    :label="userLabels.phone + ' *'"
+                                    v-model="user.phone"
+                                    :placeholder="userLabels.phone"
+                                    :rules="
+                                        ruleForm.required.concat(
+                                            ruleForm.number
+                                        )
+                                    "
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                >
+                                </v-text-field>
+                            </v-col>
 
-                            <!--                            &lt;!&ndash; Email &ndash;&gt;-->
-                            <!--                            <b-col md="6" sm="12">-->
-                            <!--                                <validation-provider-->
-                            <!--                                    name="Email"-->
-                            <!--                                    :rules="{ required: true }"-->
-                            <!--                                    v-slot="validationContext"-->
-                            <!--                                >-->
-                            <!--                                    <b-form-group-->
-                            <!--                                        :label="$t('Email') + ' ' + '*'"-->
-                            <!--                                    >-->
-                            <!--                                        <b-form-input-->
-                            <!--                                            :state="-->
-                            <!--                                                getValidationState(-->
-                            <!--                                                    validationContext-->
-                            <!--                                                )-->
-                            <!--                                            "-->
-                            <!--                                            aria-describedby="Email-feedback"-->
-                            <!--                                            label="Email"-->
-                            <!--                                            v-model="user.email"-->
-                            <!--                                            :placeholder="$t('Email')"-->
-                            <!--                                        ></b-form-input>-->
-                            <!--                                        <b-form-invalid-feedback-->
-                            <!--                                            id="Email-feedback"-->
-                            <!--                                            >{{ validationContext.errors[0] }}-->
-                            <!--                                        </b-form-invalid-feedback>-->
-                            <!--                                        <b-alert-->
-                            <!--                                            show-->
-                            <!--                                            variant="danger"-->
-                            <!--                                            class="error mt-1"-->
-                            <!--                                            v-if="email_exist != ''"-->
-                            <!--                                            >{{ email_exist }}-->
-                            <!--                                        </b-alert>-->
-                            <!--                                    </b-form-group>-->
-                            <!--                                </validation-provider>-->
-                            <!--                            </b-col>-->
+                            <!-- Email -->
+                            <v-col md="6" sm="12">
+                                <v-text-field
+                                    :label="userLabels.email + ' *'"
+                                    v-model="user.email"
+                                    :placeholder="userLabels.email"
+                                    :rules="ruleForm.required"
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                    type="email"
+                                >
+                                </v-text-field>
+                            </v-col>
 
-                            <!--                            &lt;!&ndash; password &ndash;&gt;-->
-                            <!--                            <b-col md="6" sm="12" v-if="!editmode">-->
-                            <!--                                <validation-provider-->
-                            <!--                                    name="password"-->
-                            <!--                                    :rules="{ required: true, min: 6, max: 14 }"-->
-                            <!--                                    v-slot="validationContext"-->
-                            <!--                                >-->
-                            <!--                                    <b-form-group-->
-                            <!--                                        :label="$t('password') + ' ' + '*'"-->
-                            <!--                                    >-->
-                            <!--                                        <b-form-input-->
-                            <!--                                            :state="-->
-                            <!--                                                getValidationState(-->
-                            <!--                                                    validationContext-->
-                            <!--                                                )-->
-                            <!--                                            "-->
-                            <!--                                            aria-describedby="password-feedback"-->
-                            <!--                                            label="password"-->
-                            <!--                                            type="password"-->
-                            <!--                                            v-model="user.password"-->
-                            <!--                                            :placeholder="$t('password')"-->
-                            <!--                                        ></b-form-input>-->
-                            <!--                                        <b-form-invalid-feedback-->
-                            <!--                                            id="password-feedback"-->
-                            <!--                                            >{{ validationContext.errors[0] }}-->
-                            <!--                                        </b-form-invalid-feedback>-->
-                            <!--                                    </b-form-group>-->
-                            <!--                                </validation-provider>-->
-                            <!--                            </b-col>-->
+                            <!-- password -->
+                            <v-col md="6" sm="12" v-if="!editmode">
+                                <v-text-field
+                                    :label="userLabels.password + ' *'"
+                                    v-model="user.password"
+                                    :placeholder="userLabels.password"
+                                    :rules="
+                                        ruleForm.required
+                                            .concat(ruleForm.min6)
+                                            .concat(ruleForm.max14)
+                                    "
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                    type="password"
+                                >
+                                </v-text-field>
+                            </v-col>
 
-                            <!--                            &lt;!&ndash; role &ndash;&gt;-->
-                            <!--                            <b-col md="6" sm="12" class="mb-3">-->
-                            <!--                                <validation-provider-->
-                            <!--                                    name="role"-->
-                            <!--                                    :rules="{ required: true }"-->
-                            <!--                                >-->
-                            <!--                                    <b-form-group-->
-                            <!--                                        slot-scope="{ valid, errors }"-->
-                            <!--                                        :label="$t('RoleName') + ' ' + '*'"-->
-                            <!--                                    >-->
-                            <!--                                        <v-select-->
-                            <!--                                            :class="{-->
-                            <!--                                                'is-invalid': !!errors.length,-->
-                            <!--                                            }"-->
-                            <!--                                            :state="-->
-                            <!--                                                errors[0]-->
-                            <!--                                                    ? false-->
-                            <!--                                                    : valid-->
-                            <!--                                                    ? true-->
-                            <!--                                                    : null-->
-                            <!--                                            "-->
-                            <!--                                            v-model="user.role_id"-->
-                            <!--                                            :reduce="(label) => label.value"-->
-                            <!--                                            :placeholder="$t('PleaseSelect')"-->
-                            <!--                                            :options="-->
-                            <!--                                                roles.map((roles) => ({-->
-                            <!--                                                    label: roles.name,-->
-                            <!--                                                    value: roles.id,-->
-                            <!--                                                }))-->
-                            <!--                                            "-->
-                            <!--                                        />-->
-                            <!--                                        <b-form-invalid-feedback-->
-                            <!--                                            >{{ errors[0] }}-->
-                            <!--                                        </b-form-invalid-feedback>-->
-                            <!--                                    </b-form-group>-->
-                            <!--                                </validation-provider>-->
-                            <!--                            </b-col>-->
+                            <!-- role -->
+                            <v-col md="6" sm="12" class="mb-3">
+                                <v-select
+                                    v-model="user.role"
+                                    :items="roles"
+                                    :rules="ruleForm.required"
+                                    :label="userLabels.role"
+                                    item-title="title"
+                                    item-value="value"
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                ></v-select>
+                            </v-col>
 
-                            <!--                            &lt;!&ndash; Avatar &ndash;&gt;-->
-                            <!--                            <b-col md="6" sm="12" class="mb-3">-->
-                            <!--                                <validation-provider-->
-                            <!--                                    name="Avatar"-->
-                            <!--                                    ref="Avatar"-->
-                            <!--                                    rules="mimes:image/*|size:200"-->
-                            <!--                                >-->
-                            <!--                                    <b-form-group-->
-                            <!--                                        slot-scope="{ validate, valid, errors }"-->
-                            <!--                                        :label="$t('UserImage')"-->
-                            <!--                                    >-->
-                            <!--                                        <input-->
-                            <!--                                            :state="-->
-                            <!--                                                errors[0]-->
-                            <!--                                                    ? false-->
-                            <!--                                                    : valid-->
-                            <!--                                                    ? true-->
-                            <!--                                                    : null-->
-                            <!--                                            "-->
-                            <!--                                            :class="{-->
-                            <!--                                                'is-invalid': !!errors.length,-->
-                            <!--                                            }"-->
-                            <!--                                            @change="onFileSelected"-->
-                            <!--                                            label="Choose Avatar"-->
-                            <!--                                            type="file"-->
-                            <!--                                        />-->
-                            <!--                                        <b-form-invalid-feedback-->
-                            <!--                                            id="Avatar-feedback"-->
-                            <!--                                            >{{ errors[0] }}-->
-                            <!--                                        </b-form-invalid-feedback>-->
-                            <!--                                    </b-form-group>-->
-                            <!--                                </validation-provider>-->
-                            <!--                            </b-col>-->
+                            <!-- New Password -->
+                            <v-col md="6" v-if="editmode" class="mb-3">
+                                <v-text-field
+                                    :label="userLabels.NewPassword + ' *'"
+                                    v-model="user.NewPassword"
+                                    :placeholder="userLabels.NewPassword"
+                                    :rules="
+                                        ruleForm.min6.concat(ruleForm.max14)
+                                    "
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                    type="password"
+                                >
+                                </v-text-field>
+                            </v-col>
+                            <v-col md="6" sm="12">
+                                <v-text-field
+                                    :label="userLabels.ci"
+                                    v-model="user.ci"
+                                    :placeholder="userLabels.ci"
+                                    :rules="ruleForm.number"
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                >
+                                </v-text-field>
+                            </v-col>
+                            <!-- assigned_warehouses -->
+                            <v-col md="4" sm="4">
+                                <h5>Sucursales Asignadas</h5>
+                            </v-col>
 
-                            <!--                            &lt;!&ndash; New Password &ndash;&gt;-->
-                            <!--                            <b-col md="6" v-if="editmode" class="mb-3">-->
-                            <!--                                <validation-provider-->
-                            <!--                                    name="New password"-->
-                            <!--                                    :rules="{ min: 6, max: 14 }"-->
-                            <!--                                    v-slot="validationContext"-->
-                            <!--                                >-->
-                            <!--                                    <b-form-group :label="$t('Newpassword')">-->
-                            <!--                                        <b-form-input-->
-                            <!--                                            :state="-->
-                            <!--                                                getValidationState(-->
-                            <!--                                                    validationContext-->
-                            <!--                                                )-->
-                            <!--                                            "-->
-                            <!--                                            aria-describedby="Nawpassword-feedback"-->
-                            <!--                                            :placeholder="$t('LeaveBlank')"-->
-                            <!--                                            label="New password"-->
-                            <!--                                            v-model="user.NewPassword"-->
-                            <!--                                        ></b-form-input>-->
-                            <!--                                        <b-form-invalid-feedback-->
-                            <!--                                            id="Nawpassword-feedback"-->
-                            <!--                                            >{{ validationContext.errors[0] }}-->
-                            <!--                                        </b-form-invalid-feedback>-->
-                            <!--                                    </b-form-group>-->
-                            <!--                                </validation-provider>-->
-                            <!--                            </b-col>-->
-
-                            <!--                            &lt;!&ndash; assigned_warehouses &ndash;&gt;-->
-                            <!--                            <b-col md="4" sm="4">-->
-                            <!--                                <h5>{{ $t("Assigned_warehouses") }}</h5>-->
-                            <!--                            </b-col>-->
-
-                            <!--                            <b-col md="8" sm="8">-->
-                            <!--                                <label class="checkbox checkbox-primary mb-3"-->
-                            <!--                                    ><input-->
-                            <!--                                        type="checkbox"-->
-                            <!--                                        v-model="user.is_all_warehouses" />-->
-                            <!--                                    <h5>-->
-                            <!--                                        {{ $t("All_Warehouses") }}-->
-                            <!--                                        <i-->
-                            <!--                                            v-b-tooltip.hover.bottom-->
-                            <!--                                            title="If 'All Warehouses' Selected , User Can access all data for the selected Warehouses"-->
-                            <!--                                            class="text-info font-weight-bold i-Speach-BubbleAsking"-->
-                            <!--                                        ></i>-->
-                            <!--                                    </h5>-->
-                            <!--                                    <span class="checkmark"></span-->
-                            <!--                                ></label>-->
-
-                            <!--                                <b-form-group-->
-                            <!--                                    class="mt-2"-->
-                            <!--                                    :label="$t('Some_warehouses')"-->
-                            <!--                                >-->
-                            <!--                                    <v-select-->
-                            <!--                                        multiple-->
-                            <!--                                        v-model="assigned_warehouses"-->
-                            <!--                                        @input="Selected_Warehouse"-->
-                            <!--                                        :reduce="(label) => label.value"-->
-                            <!--                                        :placeholder="$t('PleaseSelect')"-->
-                            <!--                                        :options="-->
-                            <!--                                            warehouses.map((warehouses) => ({-->
-                            <!--                                                label: warehouses.name,-->
-                            <!--                                                value: warehouses.id,-->
-                            <!--                                            }))-->
-                            <!--                                        "-->
-                            <!--                                    />-->
-                            <!--                                </b-form-group>-->
-                            <!--                            </b-col>-->
-
-                            <!--                            <b-col md="12" class="mt-3">-->
-                            <!--                                <b-button-->
-                            <!--                                    variant="primary"-->
-                            <!--                                    type="submit"-->
-                            <!--                                    :disabled="SubmitProcessing"-->
-                            <!--                                    >{{ $t("submit") }}-->
-                            <!--                                </b-button>-->
-                            <!--                                <div-->
-                            <!--                                    v-once-->
-                            <!--                                    class="typo__p"-->
-                            <!--                                    v-if="SubmitProcessing"-->
-                            <!--                                >-->
-                            <!--                                    <div-->
-                            <!--                                        class="spinner sm spinner-primary mt-3"-->
-                            <!--                                    ></div>-->
-                            <!--                                </div>-->
-                            <!--                            </b-col>-->
+                            <v-col md="8" sm="8">
+                                <v-checkbox
+                                    v-model="user.is_all_warehouses"
+                                    :model-value="!!user.is_all_warehouses"
+                                    :label="userLabels.is_all_warehouses"
+                                    hide-details="auto"
+                                ></v-checkbox>
+                                <v-select
+                                    v-model="assigned_warehouses"
+                                    :items="warehouses"
+                                    label="Algunas sucursales"
+                                    item-title="title"
+                                    item-value="value"
+                                    multiple
+                                    chips
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                ></v-select>
+                            </v-col>
                         </v-row>
                     </v-form>
                 </v-card-text>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Role;
+use App\Models\role_user;
 use App\Models\Sucursal;
 use App\Models\User;
 use App\Models\UserWarehouse;
@@ -20,21 +21,21 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    public function getAll()
-    {
-        $users = User::all();
-        $users->transform(function ($item, $key) {
-            $item->nombreRol = User::getRole($item->role);
-            $item->nombreSucursal=$item->Sucursales?->nombre;
-            $item->enableView=($item->enable === 1) ? "Si" : "No" ;
-            return $item;
-        });
-        $sucursales = Sucursal::getAll();
-        $sucursales = $sucursales->map(function ($item){ return ['value'=>$item->id,'text'=>$item->nombre];});
-        $roles = User::getRole();
-        Inertia::share('titlePage', 'Usuarios');
-        return Inertia::render('Usuarios', ['users' => $users, 'sucursales' => $sucursales, 'roles' => $roles]);
-    }
+//    public function getAll()
+//    {
+//        $users = User::all();
+//        $users->transform(function ($item, $key) {
+//            $item->nombreRol = User::getRole($item->role);
+//            $item->nombreSucursal=$item->Sucursales?->nombre;
+//            $item->enableView=($item->enable === 1) ? "Si" : "No" ;
+//            return $item;
+//        });
+//        $sucursales = Sucursal::getAll();
+//        $sucursales = $sucursales->map(function ($item){ return ['value'=>$item->id,'text'=>$item->nombre];});
+//        $roles = User::getRole();
+//        Inertia::share('titlePage', 'Usuarios');
+//        return Inertia::render('Usuarios', ['users' => $users, 'sucursales' => $sucursales, 'roles' => $roles]);
+//    }
 
     public function post(Request $request)
     {
@@ -102,7 +103,7 @@ class UserController extends Controller
         }
     }
 
-        //------------- GET ALL USERS---------\\
+    //------------- GET ALL USERS---------\\
 
     public function index(request $request)
     {
@@ -116,8 +117,12 @@ class UserController extends Controller
             }
         });
         $users = $users->get();
-        $warehouses = Warehouse::get(['id', 'name']);
-        $roles = Role::get(['id', 'name']);
+        $warehouses = Warehouse::get(['id', 'name'])->map(function ($item, $key) {
+            return ['value' => $item->id, 'title' => $item->name];
+        });
+        $roles = Role::get(['id', 'name'])->map(function ($item, $key) {
+            return ['value' => $item->id, 'title' => $item->name];
+        });
         Inertia::share('titlePage', 'Usuarios');
         return Inertia::render('Usuarios',
             ['users' => $users, 'warehouses' => $warehouses, 'roles' => $roles]);
@@ -171,36 +176,24 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'create', User::class);
-        $this->validate($request, [
-            'email' => 'required|unique:users',
-        ], [
-            'email.unique' => 'This Email already taken.',
-        ]);
-        \DB::transaction(function () use ($request) {
-            if ($request->hasFile('avatar')) {
-
-                $image = $request->file('avatar');
-                $filename = rand(11111111, 99999999) . $image->getClientOriginalName();
-
-                $image_resize = Image::make($image->getRealPath());
-                $image_resize->resize(128, 128);
-                $image_resize->save(public_path('/images/avatar/' . $filename));
-
-            } else {
-                $filename = 'no_avatar.png';
-            }
-
+//        $this->authorizeForUser($request->user('api'), 'create', User::class);
+//        $this->validate($request, [
+//            'email' => 'required|unique:users',
+//        ], [
+//            'email.unique' => 'This Email already taken.',
+//        ]);
+        DB::transaction(function () use ($request) {
             $User = new User;
             $User->firstname = $request['firstname'];
-            $User->lastname  = $request['lastname'];
-            $User->username  = $request['username'];
-            $User->email     = $request['email'];
-            $User->phone     = $request['phone'];
-            $User->password  = Hash::make($request['password']);
-            $User->avatar    = $filename;
-            $User->role_id   = $request['role'];
-            $User->is_all_warehouses   = $request['is_all_warehouses'];
+            $User->lastname = $request['lastname'];
+            $User->username = $request['username'];
+            $User->email = $request['email'];
+            $User->phone = $request['phone'];
+            $User->password = Hash::make($request['password']);
+            $User->role = $request['role'];
+            $User->ci = $request['ci'];
+            $User->is_all_warehouses = $request['is_all_warehouses']?1:0;
+            $User->statut = 1;
             $User->save();
 
             $role_user = new role_user;
@@ -208,7 +201,7 @@ class UserController extends Controller
             $role_user->role_id = $request['role'];
             $role_user->save();
 
-            if(!$User->is_all_warehouses){
+            if (!$User->is_all_warehouses) {
                 $User->assignedWarehouses()->sync($request['assigned_to']);
             }
 
@@ -219,7 +212,8 @@ class UserController extends Controller
 
     //------------ function show -----------\\
 
-    public function show($id){
+    public function show($id)
+    {
         //
 
     }
@@ -240,20 +234,20 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->authorizeForUser($request->user('api'), 'update', User::class);
+//        $this->authorizeForUser($request->user('api'), 'update', User::class);
 
-        $this->validate($request, [
-            'email' => 'required|email|unique:users',
-            'email' => Rule::unique('users')->ignore($id),
-        ], [
-            'email.unique' => 'This Email already taken.',
-        ]);
+//        $this->validate($request, [
+//            'email' => 'required|email|unique:users',
+//            'email' => Rule::unique('users')->ignore($id),
+//        ], [
+//            'email.unique' => 'This Email already taken.',
+//        ]);
 
-        \DB::transaction(function () use ($id ,$request) {
+        DB::transaction(function () use ($id, $request) {
             $user = User::findOrFail($id);
             $current = $user->password;
 
-            if ($request->NewPassword != 'null') {
+            if (!empty($request->NewPassword) || $request->NewPassword!="null") {
                 if ($request->NewPassword != $current) {
                     $pass = Hash::make($request->NewPassword);
                 } else {
@@ -264,47 +258,26 @@ class UserController extends Controller
                 $pass = $user->password;
             }
 
-            $currentAvatar = $user->avatar;
-            if ($request->avatar != $currentAvatar) {
-
-                $image = $request->file('avatar');
-                $path = public_path() . '/images/avatar';
-                $filename = rand(11111111, 99999999) . $image->getClientOriginalName();
-
-                $image_resize = Image::make($image->getRealPath());
-                $image_resize->resize(128, 128);
-                $image_resize->save(public_path('/images/avatar/' . $filename));
-
-                $userPhoto = $path . '/' . $currentAvatar;
-                if (file_exists($userPhoto)) {
-                    if ($user->avatar != 'no_avatar.png') {
-                        @unlink($userPhoto);
-                    }
-                }
-            } else {
-                $filename = $currentAvatar;
-            }
-
             User::whereId($id)->update([
                 'firstname' => $request['firstname'],
                 'lastname' => $request['lastname'],
                 'username' => $request['username'],
                 'email' => $request['email'],
                 'phone' => $request['phone'],
+                'ci' => $request['ci']??'',
                 'password' => $pass,
-                'avatar' => $filename,
                 'statut' => $request['statut'],
-                'is_all_warehouses' => $request['is_all_warehouses']== 'true' ? 1 : 0,
-                'role_id' => $request['role'],
+                'is_all_warehouses' => ($request['is_all_warehouses']=="true") ? 1 : 0,
+                'role' => $request['role'],
 
             ]);
 
-            role_user::where('user_id' , $id)->update([
+            role_user::where('user_id', $id)->update([
                 'user_id' => $id,
                 'role_id' => $request['role'],
             ]);
 
-            $user_saved = User::where('deleted_at', '=', null)->findOrFail($id);
+            $user_saved = User::findOrFail($id);
             $user_saved->assignedWarehouses()->sync($request['assigned_to']);
 
         }, 10);
