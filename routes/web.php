@@ -58,7 +58,7 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::put('users/{id}', [UserController::class, 'update']);
     Route::get('get_user_auth', [UserController::class, 'GetUserAuth']);
     Route::post('users_switch_activated/{id}', [UserController::class,'IsActivated']);
-    Route::get('Get_user_profile', [UserController::class, 'GetInfoProfile']);
+    Route::get('profile', [UserController::class, 'GetInfoProfile']);
     Route::put('update_user_profile/{id}', [UserController::class, 'updateProfile']);
     //------------------------------------------------------------------\\
 

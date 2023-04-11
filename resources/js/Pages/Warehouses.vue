@@ -2,8 +2,6 @@
 import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { VDataTableServer } from "vuetify/labs/VDataTable";
-import JsonExcel from "vue-json-excel3";
-import jsPDF from "jspdf";
 import "jspdf-autotable";
 import ruleForm from "@/rules";
 import { router } from "@inertiajs/vue3";
@@ -143,41 +141,6 @@ function reset_Form() {
     };
 }
 
-//------------------------------- Delete Warehouse ------------------------\\
-function Remove_Warehouse(id) {
-    // this.$swal({
-    //   title: this.$t("Delete.Title"),
-    //   text: this.$t("Delete.Text"),
-    //   type: "warning",
-    //   showCancelButton: true,
-    //   confirmButtonColor: "#3085d6",
-    //   cancelButtonColor: "#d33",
-    //   cancelButtonText: this.$t("Delete.cancelButtonText"),
-    //   confirmButtonText: this.$t("Delete.confirmButtonText")
-    // }).then(result => {
-    //   if (result.value) {
-    //     axios
-    //         .delete("warehouses/" + id)
-    //         .then(() => {
-    //           this.$swal(
-    //               this.$t("Delete.Deleted"),
-    //               this.$t("Delete.WarehouseDeleted"),
-    //               "success"
-    //           );
-    //
-    //           Fire.$emit("Delete_Warehouse");
-    //         })
-    //         .catch(() => {
-    //           this.$swal(
-    //               this.$t("Delete.Failed"),
-    //               this.$t("Delete.Therewassomethingwronge"),
-    //               "warning"
-    //           );
-    //         });
-    //   }
-    // });
-}
-
 //---------------------- modal  ------------------------------\\
 async function onSave() {
     const validate = await form.value.validate();
@@ -197,12 +160,12 @@ function onClose() {
 //---------------------- delete modal  ------------------------------\\
 function Delete_Warehouse(item) {
     reset_Form();
-
     warehouse.value = item;
     dialogDelete.value = true;
 }
 
-function deleteItemConfirm() {
+//------------------------------- Delete Warehouse ------------------------\\
+function Remove_Warehouse() {
     loading.value = true;
     snackbar.value = false;
     axios
@@ -225,7 +188,7 @@ function deleteItemConfirm() {
         });
 }
 
-function closeDelete() {
+function onCloseDelete() {
     reset_Form();
     dialogDelete.value = false;
 }
@@ -253,27 +216,28 @@ function closeDelete() {
         </v-snackbar>
         <v-dialog v-model="dialogDelete" max-width="300px">
             <v-card>
-                <v-card-title class="text-h5 text-center"
-                    >Estas seguro?</v-card-title
-                >
+                <v-card-text class="text-h5 text-center"
+                    >Estas seguro?
+                </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn
-                        variant="outlined"
+                        small
+                        variant="elevated"
+                        color="primary"
+                        class="ma-1"
+                        @click="Remove_Warehouse"
+                        >Si
+                    </v-btn>
+                    <v-btn
+                        variant="elevated"
                         small
                         color="error"
                         class="ma-1"
-                        @click="closeDelete"
-                        >Cancelar</v-btn
-                    >
-                    <v-btn
-                        small
-                        variant="flat"
-                        color="primary"
-                        class="ma-1"
-                        @click="deleteItemConfirm"
-                        >OK</v-btn
-                    >
+                        @click="onCloseDelete"
+                        >Cancelar
+                    </v-btn>
+
                     <v-spacer></v-spacer>
                 </v-card-actions>
             </v-card>
@@ -365,7 +329,7 @@ function closeDelete() {
                     <v-btn
                         size="small"
                         color="primary"
-                        variant="flat"
+                        variant="elevated"
                         class="ma-1"
                         @click="onSave"
                         :loading="loading"
@@ -390,22 +354,6 @@ function closeDelete() {
             </v-col>
             <v-spacer></v-spacer>
             <v-col cols="auto" class="text-right">
-                <v-btn
-                    size="small"
-                    class="ma-1"
-                    variant="outlined"
-                    color="error"
-                    prepend-icon="mdi-file-excel-box"
-                >
-                    <json-excel
-                        :data="props.users"
-                        :fields="jsonFields"
-                        worksheet="Usuarios"
-                        name="usuarios.xls"
-                    >
-                        Exportar
-                    </json-excel>
-                </v-btn>
                 <v-btn
                     size="small"
                     color="primary"

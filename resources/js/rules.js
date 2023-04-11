@@ -1,33 +1,23 @@
 export default {
     required: [(v) => !!v || "Requerido"],
-    max30: [
+    max: (max) => [
         (v) => {
             if (v !== null && v !== undefined && v.length > 0) {
-                return v.length <= 30 || "Tiene que ser menor 30 caracteres";
+                return (
+                    v.length <= max ||
+                    "Tiene que ser menor " + max + " caracteres"
+                );
             }
             return true;
         },
     ],
-    min3: [
+    min: (min) => [
         (v) => {
             if (v !== null && v !== undefined && v.length > 0) {
-                return v.length >= 3 || "Tiene que ser mayor 3 caracteres";
-            }
-            return true;
-        },
-    ],
-    max14: [
-        (v) => {
-            if (v !== null && v !== undefined && v.length > 0) {
-                return v.length <= 14 || "Tiene que ser menor 14 caracteres";
-            }
-            return true;
-        },
-    ],
-    min6: [
-        (v) => {
-            if (v !== null && v !== undefined && v.length > 0) {
-                return v.length >= 6 || "Tiene que ser mayor 6 caracteres";
+                return (
+                    v.length >= min ||
+                    "Tiene que ser mayor " + min + " caracteres"
+                );
             }
             return true;
         },

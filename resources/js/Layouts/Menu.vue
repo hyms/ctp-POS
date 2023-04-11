@@ -1,6 +1,6 @@
 <script setup>
-import { Link, router } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { Link, router, usePage } from "@inertiajs/vue3";
+import { ref, computed } from "vue";
 
 const isDrawerOpen = ref(null);
 const menu = ref([
@@ -60,10 +60,10 @@ const menu = ref([
                 role: "vendor",
             },
             /* {
-           label: 'Reporte cliente',
-           url: '/reportes/cliente',
-           role: 'vendor',
-       },*/
+     label: 'Reporte cliente',
+     url: '/reportes/cliente',
+     role: 'vendor',
+ },*/
         ],
     },
     {
@@ -127,15 +127,15 @@ const menu = ref([
                 role: "admin",
             },
             /*{
-          label: 'Sucursales',
-          url: '/sucursales',
-          role: 'admin',
-      },
-      {
-          label: 'Cajas',
-          url: '/cajas',
-          role: 'admin',
-      },*/
+    label: 'Sucursales',
+    url: '/sucursales',
+    role: 'admin',
+},
+{
+    label: 'Cajas',
+    url: '/cajas',
+    role: 'admin',
+},*/
             {
                 label: "Usuarios",
                 url: "/users",
@@ -151,24 +151,28 @@ const menu = ref([
     },
 ]);
 
-function linkGet(url) {
+const roles = computed(() => usePage().props.rolesP);
+const user = computed(() => usePage().props.user);
+
+function linkVisit(url, type = "get") {
     router.visit(url, {
-        method: "get",
+        method: type,
         preserveScroll: true,
     });
 }
 
 function getPermission(role) {
-    //for (const key in this.$page.props.rolesP) {
-    return true;
-    // for (const [key, item] of Object.entries(this.$page.props.rolesP)) {
-    //     if (key === role) {
-    //         if (item.includes(this.$page.props.user.role)) {
-    //             return true;
-    //         }
-    //     }
-    // }
-    // return false;
+    // console.log(user.value);
+    for (const key in roles.value) {
+        for (const [key, item] of Object.entries(roles.value)) {
+            if (key === role) {
+                if (item.includes(user.value.role)) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 function getAllPermission(data) {
@@ -238,7 +242,7 @@ function validateMenu(data) {
                                     <v-list-item
                                         v-if="subLink.newPage === true"
                                         :key="key + '' + subKey"
-                                        @click="linkGet(subLink.url)"
+                                        @click="linkVisit(subLink.url)"
                                         target="_blank"
                                     >
                                         <v-list-item-title>
@@ -250,7 +254,7 @@ function validateMenu(data) {
                                     <v-list-item
                                         v-else
                                         :key="key + '' + subKey"
-                                        @click="linkGet(subLink.url)"
+                                        @click="linkVisit(subLink.url)"
                                         :active="$page.url === subLink.url"
                                     >
                                         <v-list-item-title>
@@ -266,7 +270,7 @@ function validateMenu(data) {
                     <template v-else>
                         <v-list-item
                             v-if="getPermission(link.role)"
-                            @click="linkGet(link.url)"
+                            @click="linkVisit(link.url)"
                             :active="$page.url === link.url"
                             :key="key"
                         >
@@ -288,15 +292,29 @@ function validateMenu(data) {
             <v-toolbar-title>{{ $page.props.titlePage }}</v-toolbar-title>
 
             <v-spacer></v-spacer>
-            <Link
-                href="/logout"
-                method="post"
-                as="button"
-                class="v-btn v-btn--elevated v-theme--customLight bg-primary v-btn--density-default v-btn--size-default v-btn--variant-elevated"
+            <v-btn
+                color="primary"
+                variant="elevated"
+                prepend-icon="mdi-account"
             >
-                Salir
-                <v-icon right color="white"> mdi-exit-to-app </v-icon>
-            </Link>
+                {{
+                    $page.props.user.firstname + " " + $page.props.user.lastname
+                }}
+
+                <v-menu activator="parent">
+                    <v-list>
+                        <v-list-item
+                            @click="linkVisit('/profile')"
+                            :active="$page.url === '/profile'"
+                        >
+                            <v-list-item-title>Perfil</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item @click="linkVisit('/logout', 'post')">
+                            <v-list-item-title>Salir</v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+            </v-btn>
         </v-app-bar>
     </div>
 </template>

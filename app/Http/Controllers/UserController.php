@@ -69,7 +69,7 @@ class UserController extends Controller
             return ['value' => $item->id, 'title' => $item->name];
         });
         Inertia::share('titlePage', 'Usuarios');
-        return Inertia::render('Usuarios',
+        return Inertia::render('Users',
             ['users' => $users, 'warehouses' => $warehouses, 'roles' => $roles]);
     }
 
@@ -137,7 +137,7 @@ class UserController extends Controller
             $User->password = Hash::make($request['password']);
             $User->role = $request['role'];
             $User->ci = $request['ci'];
-            $User->is_all_warehouses = $request['is_all_warehouses']?1:0;
+            $User->is_all_warehouses = $request['is_all_warehouses'] ? 1 : 0;
             $User->statut = 1;
             $User->save();
 
@@ -192,7 +192,7 @@ class UserController extends Controller
             $user = User::findOrFail($id);
             $current = $user->password;
 
-            if (!empty($request->NewPassword) || $request->NewPassword!="null") {
+            if (!empty($request->NewPassword) || $request->NewPassword != "null") {
                 if ($request->NewPassword != $current) {
                     $pass = Hash::make($request->NewPassword);
                 } else {
@@ -209,10 +209,10 @@ class UserController extends Controller
                 'username' => $request['username'],
                 'email' => $request['email'],
                 'phone' => $request['phone'],
-                'ci' => $request['ci']??'',
+                'ci' => $request['ci'] ?? '',
                 'password' => $pass,
                 'statut' => $request['statut'],
-                'is_all_warehouses' => ($request['is_all_warehouses']=="true") ? 1 : 0,
+                'is_all_warehouses' => ($request['is_all_warehouses'] == "true") ? 1 : 0,
                 'role' => $request['role'],
 
             ]);
@@ -240,7 +240,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $current = $user->password;
 
-        if ($request->NewPassword != 'undefined') {
+        if (!empty($request->NewPassword) && $request->NewPassword != 'undefined') {
             if ($request->NewPassword != $current) {
                 $pass = Hash::make($request->NewPassword);
             } else {
@@ -251,40 +251,16 @@ class UserController extends Controller
             $pass = $user->password;
         }
 
-        $currentAvatar = $user->avatar;
-        if ($request->avatar != $currentAvatar) {
-
-            $image = $request->file('avatar');
-            $path = public_path() . '/images/avatar';
-            $filename = rand(11111111, 99999999) . $image->getClientOriginalName();
-
-            $image_resize = Image::make($image->getRealPath());
-            $image_resize->resize(128, 128);
-            $image_resize->save(public_path('/images/avatar/' . $filename));
-
-            $userPhoto = $path . '/' . $currentAvatar;
-
-            if (file_exists($userPhoto)) {
-                if ($user->avatar != 'no_avatar.png') {
-                    @unlink($userPhoto);
-                }
-            }
-        } else {
-            $filename = $currentAvatar;
-        }
-
         User::whereId($id)->update([
             'firstname' => $request['firstname'],
             'lastname' => $request['lastname'],
-            'username' => $request['username'],
+//            'username' => $request['username'],
             'email' => $request['email'],
             'phone' => $request['phone'],
             'password' => $pass,
-            'avatar' => $filename,
-
         ]);
 
-        return response()->json(['avatar' => $filename, 'user' => $request['username']]);
+        return response()->json(['user' => $request['username']]);
 
     }
 
@@ -321,6 +297,15 @@ class UserController extends Controller
         }
         return $data[0];
 
+    }
+
+    //------------- GET USER Auth ---------\\
+
+    public function GetInfoProfile(Request $request)
+    {
+        $data = Auth::user();
+        Inertia::share('titlePage', 'Perfil');
+        return Inertia::render('Profile', ['user' => $data]);
     }
 
 }

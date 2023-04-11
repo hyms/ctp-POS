@@ -38,7 +38,7 @@ class HandleInertiaRequests extends Middleware
             'appName' => config('app.name'),
 //            'auth' => [
             'user' => $request->user(),
-//                    ->only('id', 'name', 'email', 'role', 'telefono', 'sucursal'),
+//                    ->only('id', 'firstname', 'lastname', 'role', 'telefono', 'sucursal'),
 //            ],
             'ziggy' => function () {
                 return (new Ziggy)->toArray();

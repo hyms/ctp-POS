@@ -320,8 +320,8 @@ function onClose() {
                                     :placeholder="userLabels.firstname"
                                     :rules="
                                         ruleForm.required
-                                            .concat(ruleForm.min3)
-                                            .concat(ruleForm.max30)
+                                            .concat(ruleForm.min(3))
+                                            .concat(ruleForm.max(30))
                                     "
                                     variant="outlined"
                                     density="comfortable"
@@ -338,8 +338,8 @@ function onClose() {
                                     :placeholder="userLabels.lastname"
                                     :rules="
                                         ruleForm.required
-                                            .concat(ruleForm.min3)
-                                            .concat(ruleForm.max30)
+                                            .concat(ruleForm.min(3))
+                                            .concat(ruleForm.max(30))
                                     "
                                     variant="outlined"
                                     density="comfortable"
@@ -356,8 +356,8 @@ function onClose() {
                                     :placeholder="userLabels.username"
                                     :rules="
                                         ruleForm.required
-                                            .concat(ruleForm.min3)
-                                            .concat(ruleForm.max30)
+                                            .concat(ruleForm.min(3))
+                                            .concat(ruleForm.max(30))
                                     "
                                     variant="outlined"
                                     density="comfortable"
@@ -394,7 +394,7 @@ function onClose() {
                                     variant="outlined"
                                     density="comfortable"
                                     hide-details="auto"
-                                    type="email"
+                                    type="mail"
                                 >
                                 </v-text-field>
                             </v-col>
@@ -407,8 +407,8 @@ function onClose() {
                                     :placeholder="userLabels.password"
                                     :rules="
                                         ruleForm.required
-                                            .concat(ruleForm.min6)
-                                            .concat(ruleForm.max14)
+                                            .concat(ruleForm.min(6))
+                                            .concat(ruleForm.max(14))
                                     "
                                     variant="outlined"
                                     density="comfortable"
@@ -440,7 +440,7 @@ function onClose() {
                                     v-model="user.NewPassword"
                                     :placeholder="userLabels.NewPassword"
                                     :rules="
-                                        ruleForm.min6.concat(ruleForm.max14)
+                                        ruleForm.min(6).concat(ruleForm.max(14))
                                     "
                                     variant="outlined"
                                     density="comfortable"
