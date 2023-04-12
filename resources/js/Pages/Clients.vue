@@ -13,6 +13,7 @@ const props = defineProps({
 });
 //declare variable
 const form = ref(null);
+const formPayDue = ref(null);
 const search = ref("");
 const loading = ref(false);
 const alertType = ref("info");
@@ -21,8 +22,12 @@ const alert = ref(false);
 const snackbar = ref(false);
 const snackbarText = ref("");
 const snackbarColor = ref("info");
-const dialog = ref(false);
 const editmode = ref(false);
+const dialog = ref(false);
+const dialogDelete = ref(false);
+const dialogImport = ref(false);
+const dialogPayDue = ref(false);
+const dialogDetail = ref(false);
 
 const SubmitProcessing = ref(false);
 const ImportProcessing = ref(false);
@@ -75,33 +80,31 @@ const fields = ref([
     { title: "Acciones", key: "actions" },
 ]);
 
-//------------- Submit Validation Create & Edit Customer
-function Submit_Customer() {
-    // this.$refs.Create_Customer.validate().then((success) => {
-    //     if (!success) {
-    //         this.makeToast(
-    //             "danger",
-    //             this.$t("Please_fill_the_form_correctly"),
-    //             this.$t("Failed")
-    //         );
-    //     } else {
-    //         if (!this.editmode) {
-    //             this.Create_Client();
-    //         } else {
-    //             this.Update_Client();
-    //         }
-    //     }
-    // });
+//---------------------- modal  ------------------------------\\
+async function onSave() {
+    const validate = await form.value.validate();
+    if (validate.valid)
+        if (!editmode.value) {
+            Create_Warehouse();
+        } else {
+            Update_Warehouse();
+        }
+}
+
+function onClose() {
+    dialog.value = false;
+    reset_Form();
 }
 
 //----------------------------------- Show import Client -------------------------------\\
 function Show_import_clients() {
-    // this.$bvModal.show("importClients");
+  dialogImport.value = true;
 }
 
 //------------------------------ Event Import clients -------------------------------\\
 function onFileSelected(e) {
     import_clients.value = "";
+    snackbar.value = false;
     let file = e.target.files[0];
     let errorFilesize;
 
@@ -109,21 +112,18 @@ function onFileSelected(e) {
         // 1 mega = 1,048,576 Bytes
         errorFilesize = false;
     } else {
-        this.makeToast(
-            "danger",
-            this.$t("file_size_must_be_less_than_1_mega"),
-            this.$t("Failed")
-        );
+        snackbar.value = true;
+            snackbarColor.value = "error";
+            snackbarText.value = error.response.data.message;
     }
 
     if (errorFilesize === false) {
-        this.import_clients = file;
+        import_clients.value = file;
     }
 }
 
 //----------------------------------------Submit  import clients-----------------\\
 function Submit_import() {
-    // Start the progress bar.
     loading.value = true;
     let data = new FormData();
     data.append("clients", import_clients.value);
@@ -150,14 +150,14 @@ function Submit_import() {
 //----------------------------------- Show Details Client -------------------------------\\
 function showDetails(item) {
     client.value = item;
-    // Fire.$emit("Get_Details_customers");
+    dialogDetail.value = true;
 }
 
 //------------------------------ Show Modal (create Client) -------------------------------\\
 function New_Client() {
     reset_Form();
     editmode.value = false;
-    // dialog.value = true;
+    dialog.value = true;
 }
 
 //------------------------------ Show Modal (Edit Client) -------------------------------\\
@@ -166,7 +166,7 @@ function Edit_Client(item) {
     reset_Form();
     client.value = item;
     editmode.value = true;
-    // dialog.value = true;
+    dialog.value = true;
 }
 
 //---------------------------------------- Create new Client -------------------------------\\
@@ -204,14 +204,14 @@ function Create_Client() {
 function Update_Client() {
     loading.value = true;
     axios
-        .put("clients/" + this.client.id, {
-            name: this.client.name,
-            email: this.client.email,
-            phone: this.client.phone,
-            tax_number: this.client.tax_number,
-            country: this.client.country,
-            city: this.client.city,
-            adresse: this.client.adresse,
+        .put("clients/" + client.value.id, {
+            name: client.value.name,
+            email: client.value.email,
+            phone: client.value.phone,
+            tax_number: client.value.tax_number,
+            country: client.value.country,
+            city: client.value.city,
+            adresse: client.value.adresse,
         })
         .then(({ data }) => {
             snackbar.value = true;
@@ -247,57 +247,22 @@ function reset_Form() {
 
 //------------------------------- Remove Client -------------------------------\\
 function Remove_Client(id) {
-    // this.$swal({
-    //     title: this.$t("Delete.Title"),
-    //     text: this.$t("Delete.Text"),
-    //     type: "warning",
-    //     showCancelButton: true,
-    //     confirmButtonColor: "#3085d6",
-    //     cancelButtonColor: "#d33",
-    //     cancelButtonText: this.$t("Delete.cancelButtonText"),
-    //     confirmButtonText: this.$t("Delete.confirmButtonText"),
-    // }).then((result) => {
-    //     if (result.value) {
-    //         axios
-    //             .delete("clients/" + id)
-    //             .then(() => {
-    //                 this.$swal(
-    //                     this.$t("Delete.Deleted"),
-    //                     this.$t("Delete.CustomerDeleted"),
-    //                     "success"
-    //                 );
-    //                 Fire.$emit("Delete_Customer");
-    //             })
-    //             .catch(() => {
-    //                 this.$swal(
-    //                     this.$t("Delete.Failed"),
-    //                     this.$t("Delete.ClientError"),
-    //                     "warning"
-    //                 );
-    //             });
-    //     }
-    // });
-}
-
-//---- Delete Clients by selection
-
-function delete_by_selected() {
-    axios
-        .post("clients/delete/by_selection", {
-            selectedIds: this.selectedIds,
-        })
-        .then(({ data }) => {
+    loading.value = true;
+    snackbar.value = false;
+             axios
+                 .delete("clients/" + id)
+               .then(({ data }) => {
             snackbar.value = true;
             snackbarColor.value = "success";
-            snackbarText.value = "Proceso exitoso";
+            snackbarText.value = "Borrado exitoso";
             router.reload();
-            dialog.value = false;
+            dialogDelete.value = false;
         })
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
             snackbarColor.value = "error";
-            snackbarText.value = error;
+            snackbarText.value = error.response.data.message;
         })
         .finally(() => {
             loading.value = false;
@@ -306,44 +271,39 @@ function delete_by_selected() {
 
 //------ Validate Form Submit_Payment_sell_due
 function Submit_Payment_sell_due() {
-    // this.$refs.ref_pay_due.validate().then((success) => {
-    //     if (!success) {
-    //         this.makeToast(
-    //             "danger",
-    //             this.$t("Please_fill_the_form_correctly"),
-    //             this.$t("Failed")
-    //         );
-    //     } else if (this.payment.amount > this.payment.due) {
-    //         this.makeToast(
-    //             "warning",
-    //             this.$t("Paying_amount_is_greater_than_Total_Due"),
-    //             this.$t("Warning")
-    //         );
-    //         this.payment.amount = 0;
-    //     } else {
-    //         this.Submit_Pay_due();
-    //     }
-    // });
+snackbar.value = false;
+ const validate = await formPayDue.value.validate();
+    if (!validate.valid)
+       {
+        snackbar.value = true;
+            snackbarColor.value = "error";
+            snackbarText.value = "Por favor llene correctamente los campos";
+       }
+       else if (payment.value.amount > payment.value.due){
+       payment.value.amount = 0;}
+       else{
+       Submit_Pay_due();
+       }
 }
 
 //---------- keyup paid Amount
 
 function Verified_paidAmount() {
-    if (isNaN(this.payment.amount)) {
-        this.payment.amount = 0;
-    } else if (this.payment.amount > this.payment.due) {
-        this.makeToast(
-            "warning",
-            this.$t("Paying_amount_is_greater_than_Total_Due"),
-            this.$t("Warning")
+snackbar.value = false;
+    if (isNaN(payment.value.amount)) {
+        payment.value.amount = 0;
+    } else if (payment.value.amount > payment.value.due) {
+     snackbar.value = true;
+            snackbarColor.value = "warning";
+            snackbarText.value = "El pago no puede ser mayor a la deuda";
         );
-        this.payment.amount = 0;
+        payment.value.amount = 0;
     }
 }
 
 //-------------------------------- reset_Form_payment-------------------------------\\
 function reset_Form_payment() {
-    this.payment = {
+    payment.value = {
         client_id: "",
         client_name: "",
         date: "",
@@ -356,13 +316,13 @@ function reset_Form_payment() {
 
 //------------------------------ Show Modal Pay_due-------------------------------\\
 function Pay_due(row) {
-    this.reset_Form_payment();
-    this.payment.client_id = row.id;
-    this.payment.client_name = row.name;
-    this.payment.due = row.due;
-    this.payment.date = new Date().toISOString().slice(0, 10);
+    reset_Form_payment();
+    payment.value.client_id = row.id;
+    payment.value.client_name = row.name;
+    payment.value.due = row.due;
+    payment.value.date = new Date().toISOString().slice(0, 10);
     setTimeout(() => {
-        this.$bvModal.show("modal_Pay_due");
+        dialogPayDue.value=true;
     }, 500);
 }
 
@@ -382,27 +342,29 @@ function print_it() {
 
 //---------------------------------------- Submit_Pay_due-------------------------------\\
 function Submit_Pay_due() {
-    this.paymentProcessing = true;
+    loading.value=true;
     axios
         .post("clients_pay_due", {
-            client_id: this.payment.client_id,
-            amount: this.payment.amount,
-            notes: this.payment.notes,
-            Reglement: this.payment.Reglement,
+            client_id: payment.value.client_id,
+            amount: payment.value.amount,
+            notes: payment.value.notes,
+            Reglement: payment.value.Reglement,
         })
-        .then((response) => {
-            Fire.$emit("Event_pay_due");
-
-            this.makeToast(
-                "success",
-                this.$t("Create.TitlePayment"),
-                this.$t("Success")
-            );
-            this.paymentProcessing = false;
+         .then(({ data }) => {
+            snackbar.value = true;
+            snackbarColor.value = "success";
+            snackbarText.value = "Proceso exitoso";
+            router.reload();
+            dialogDelete.value = false;
         })
         .catch((error) => {
-            this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-            this.paymentProcessing = false;
+            console.log(error);
+            snackbar.value = true;
+            snackbarColor.value = "error";
+            snackbarText.value = error.response.data.message;
+        })
+        .finally(() => {
+            loading.value = false;
         });
 }
 
@@ -410,26 +372,22 @@ function Submit_Pay_due() {
 
 //------ Validate Form Submit_Payment_sell_return_due
 function Submit_Payment_sell_return_due() {
-    this.$refs.ref_pay_return_due.validate().then((success) => {
-        if (!success) {
-            this.makeToast(
-                "danger",
-                this.$t("Please_fill_the_form_correctly"),
-                this.$t("Failed")
-            );
-        } else if (
-            this.payment_return.amount > this.payment_return.return_Due
-        ) {
-            this.makeToast(
-                "warning",
-                this.$t("Paying_amount_is_greater_than_Total_Due"),
-                this.$t("Warning")
-            );
-            this.payment_return.amount = 0;
-        } else {
-            this.Submit_Pay_return_due();
-        }
-    });
+snackbar.value = false;
+ const validate = await formPayDue.value.validate();
+    if (!validate.valid)
+       {
+        snackbar.value = true;
+            snackbarColor.value = "error";
+            snackbarText.value = "Por favor llene correctamente los campos";
+       }
+       else if (payment.value.amount > payment.value.due){
+        snackbar.value = true;
+            snackbarColor.value = "error";
+            snackbarText.value = "el monto es mayor a la deuda";
+       payment.value.amount = 0;}
+       else{
+       Submit_Pay_return_due();
+       }
 }
 
 //---------- keyup paid Amount
