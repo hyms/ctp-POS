@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\Setting;
 use App\utils\helpers;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
@@ -13,51 +14,23 @@ use App\Models\SaleReturn;
 use App\Models\PaymentSaleReturns;
 use App\Models\Sale;
 use App\Models\PaymentSale;
-use DB;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
-class ClientController extends BaseController
+class ClientController extends Controller
 {
 
     //------------- Get ALL Customers -------------\\
 
     public function index(request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'view', Client::class);
+//        $this->authorizeForUser($request->user('api'), 'view', Client::class);
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
-        // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-        $order = $request->SortField;
-        $dir = $request->SortType;
-        $helpers = new helpers();
+
         // Filter fields With Params to retrieve
-        $columns = array(0 => 'name', 1 => 'code', 2 => 'phone', 3 => 'email');
-        $param = array(0 => 'like', 1 => 'like', 2 => 'like', 3 => 'like');
-        $data = array();
-        $clients = Client::where('deleted_at', '=', null);
-
-        //Multiple Filter
-        $Filtred = $helpers->filter($clients, $columns, $param, $request)
-        // Search With Multiple Param
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('search'), function ($query) use ($request) {
-                    return $query->where('name', 'LIKE', "%{$request->search}%")
-                        ->orWhere('code', 'LIKE', "%{$request->search}%")
-                        ->orWhere('phone', 'LIKE', "%{$request->search}%")
-                        ->orWhere('email', 'LIKE', "%{$request->search}%");
-                });
-            });
-        $totalRows = $Filtred->count();
-        if($perPage == "-1"){
-            $perPage = $totalRows;
-        }
-        $clients = $Filtred->offset($offSet)
-            ->limit($perPage)
-            ->orderBy($order, $dir)
+        $clients = Client::where('deleted_at', '=', null)
             ->get();
-
+        $data = collect();
         foreach ($clients as $client) {
 
             $item['total_amount'] = DB::table('sales')
@@ -93,15 +66,15 @@ class ClientController extends BaseController
             $item['country'] = $client->country;
             $item['city'] = $client->city;
             $item['adresse'] = $client->adresse;
-            $data[] = $item;
+            $data->add($item);
         }
 
         $company_info = Setting::where('deleted_at', '=', null)->first();
 
-        return response()->json([
+        Inertia::share('titlePage', 'Clientes');
+        return Inertia::render('Clients',[
             'clients' => $data,
             'company_info' => $company_info,
-            'totalRows' => $totalRows,
         ]);
     }
 
@@ -109,7 +82,7 @@ class ClientController extends BaseController
 
     public function store(Request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'create', Client::class);
+//        $this->authorizeForUser($request->user('api'), 'create', Client::class);
 
         $this->validate($request, [
             'name' => 'required',
@@ -140,7 +113,7 @@ class ClientController extends BaseController
 
     public function update(Request $request, $id)
     {
-        $this->authorizeForUser($request->user('api'), 'update', Client::class);
+//        $this->authorizeForUser($request->user('api'), 'update', Client::class);
         
         $this->validate($request, [
             'name' => 'required',
@@ -164,7 +137,7 @@ class ClientController extends BaseController
 
     public function destroy(Request $request, $id)
     {
-        $this->authorizeForUser($request->user('api'), 'delete', Client::class);
+//        $this->authorizeForUser($request->user('api'), 'delete', Client::class);
 
         Client::whereId($id)->update([
             'deleted_at' => Carbon::now(),
@@ -279,7 +252,7 @@ class ClientController extends BaseController
 
      public function clients_pay_due(Request $request)
      {
-         $this->authorizeForUser($request->user('api'), 'pay_due', Client::class);
+//         $this->authorizeForUser($request->user('api'), 'pay_due', Client::class);
         
          if($request['amount'] > 0){
             $client_sales_due = Sale::where('deleted_at', '=', null)
@@ -330,7 +303,7 @@ class ClientController extends BaseController
 
     public function pay_sale_return_due(Request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'pay_sale_return_due', Client::class);
+//        $this->authorizeForUser($request->user('api'), 'pay_sale_return_due', Client::class);
         
         if($request['amount'] > 0){
             $client_sell_return_due = SaleReturn::where('deleted_at', '=', null)

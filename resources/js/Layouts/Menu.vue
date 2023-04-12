@@ -92,7 +92,7 @@ const menu = ref([
     },
     {
         label: "Clientes",
-        url: "/clientes",
+        url: "/clients",
         role: "all",
     },
     {
@@ -112,11 +112,6 @@ const menu = ref([
                 label: "Stocks",
                 role: "admin",
             },
-            // {
-            //     url: 'movimientosStock',
-            //     label: 'Movimientos',
-            //     role: 'admin',
-            // },
         ],
     },
     {
@@ -126,16 +121,6 @@ const menu = ref([
                 url: "/warehouses",
                 role: "admin",
             },
-            /*{
-    label: 'Sucursales',
-    url: '/sucursales',
-    role: 'admin',
-},
-{
-    label: 'Cajas',
-    url: '/cajas',
-    role: 'admin',
-},*/
             {
                 label: "Usuarios",
                 url: "/users",

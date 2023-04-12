@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CajaController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventarioController;
@@ -68,8 +69,22 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::post('warehouses', [WarehouseController::class,'store']);
     Route::put('warehouses/{id}', [WarehouseController::class,'update']);
     Route::delete('warehouses/{id}', [WarehouseController::class,'destroy']);
-    Route::post('warehouses/delete/by_selection', [WarehouseController::class,'delete_by_selection']);
+//    Route::post('warehouses/delete/by_selection', [WarehouseController::class,'delete_by_selection']);
     //------------------------------------------------------------------\\
+
+    //------------------------------- CLIENTS --------------------------\\
+    Route::get('clients', [ClientController::class,'index']);
+    Route::post('clients', [ClientController::class,'store']);
+    Route::put('clients/{id}', [ClientController::class,'update']);
+    Route::delete('clients/{id}', [ClientController::class,'destroy']);
+    Route::post('clients/import/csv', [ClientController::class,'import_clients']);
+    Route::get('get_clients_without_paginate', [ClientController::class,'Get_Clients_Without_Paginate']);
+//    Route::post('clients/delete/by_selection', [ClientController::class,'delete_by_selection']);
+    Route::post('clients_pay_due', [ClientController::class,'clients_pay_due']);
+    Route::post('clients_pay_return_due', [ClientController::class,'destpay_sale_return_dueroy']);
+    //------------------------------------------------------------------\\
+
+
 
     Route::get('ordenes', [OrdenesController::class, 'getAll'])
         ->name('listaOrdenes');
@@ -159,13 +174,6 @@ Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
         ->name('guardarSucursal');
     Route::delete('sucursal/{id}', [SucursalController::class, 'borrar'])
         ->name('eliminarSucursal');
-//clientes
-    Route::get('clientes', [ClienteController::class, 'getAll'])
-        ->name('listaClientes');
-    Route::post('cliente', [ClienteController::class, 'post'])
-        ->name('guardarCliente');
-    Route::delete('cliente/{id}', [ClienteController::class, 'borrar'])
-        ->name('eliminarCliente');
 
 //cajas
     Route::get('cajas', [CajaController::class, 'getAll'])

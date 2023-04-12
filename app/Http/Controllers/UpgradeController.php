@@ -83,37 +83,37 @@ class UpgradeController extends Controller
 //            });
 //            Log::info("finish user_warehouse migration");
 
-            $items = collect([
-                ['value' => 1, 'text' => 'sadmin'],
-                ['value' => 2, 'text' => 'dueño'],
-                ['value' => 3, 'text' => 'venta'],
-                ['value' => 4, 'text' => 'operario']
-            ]);
-            $items->each(function ($item) {
-                $id = DB::table('roles')->insertGetId([
-                    'id' => $item['value'],
-                    'name' => $item['text'],
-                    'label' => Str::of($item['text'])->ucfirst(),
-                    'status' => ($item['value'] == 1) ? 1 : 0,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ]);
-            });
-            Log::info("finish roles migration");
-
-            $id = DB::table('role_user')->insertGetId([
-                'user_id' => 1,
-                'role_id' => 1,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
-            $id = DB::table('role_user')->insertGetId([
-                'user_id' => 8,
-                'role_id' => 2,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
-            Log::info("finish role_user migration");
+//            $items = collect([
+//                ['value' => 1, 'text' => 'sadmin'],
+//                ['value' => 2, 'text' => 'dueño'],
+//                ['value' => 3, 'text' => 'venta'],
+//                ['value' => 4, 'text' => 'operario']
+//            ]);
+//            $items->each(function ($item) {
+//                $id = DB::table('roles')->insertGetId([
+//                    'id' => $item['value'],
+//                    'name' => $item['text'],
+//                    'label' => Str::of($item['text'])->ucfirst(),
+//                    'status' => ($item['value'] == 1) ? 1 : 0,
+//                    'created_at' => Carbon::now(),
+//                    'updated_at' => Carbon::now(),
+//                ]);
+//            });
+//            Log::info("finish roles migration");
+//
+//            $id = DB::table('role_user')->insertGetId([
+//                'user_id' => 1,
+//                'role_id' => 1,
+//                'created_at' => Carbon::now(),
+//                'updated_at' => Carbon::now(),
+//            ]);
+//            $id = DB::table('role_user')->insertGetId([
+//                'user_id' => 8,
+//                'role_id' => 2,
+//                'created_at' => Carbon::now(),
+//                'updated_at' => Carbon::now(),
+//            ]);
+//            Log::info("finish role_user migration");
 
         } catch (Exception $ex) {
             $errors = $ex->getMessage();
