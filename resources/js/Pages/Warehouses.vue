@@ -30,7 +30,7 @@ const fields = ref([
     { title: "Tefono", key: "mobile" },
     { title: "Ciudad", key: "city" },
     { title: "Correo", key: "email" },
-    { title: "Acciones", key: "accions" },
+    { title: "Acciones", key: "actions" },
 ]);
 const jsonFields = ref({
     Nombre: "name",
@@ -367,19 +367,17 @@ function onCloseDelete() {
         </v-row>
         <v-row>
             <v-col>
-                <v-data-table-server
-                    :headers="fields"
-                    :items="warehouses"
-                    :items-length="warehouses.length"
-                    :loading="loading"
-                    :search="search"
-                    class="elevation-2"
-                    density="compact"
-                    loading-text="Cargando... "
-                    no-data-text="No existen datos a mostrar"
-                >
-                    <template v-slot:item.accions="{ item }">
-                        <div class="row-actions">
+                <v-skeleton-loader :loading="loading" boilerplate type="table">
+                    <v-data-table
+                        :headers="fields"
+                        :items="warehouses"
+                        :search="search"
+                        class="elevation-2"
+                        density="compact"
+                        loading-text="Cargando... "
+                        no-data-text="No existen datos a mostrar"
+                    >
+                        <template v-slot:item.actions="{ item }">
                             <v-btn
                                 class="ma-1"
                                 color="primary"
@@ -398,12 +396,9 @@ function onCloseDelete() {
                                 @click="Delete_Warehouse(item.raw)"
                             >
                             </v-btn>
-                        </div>
-                    </template>
-                    <template v-slot:column.name="{ column }">
-                        {{ column.title.toUpperCase() }}
-                    </template>
-                </v-data-table-server>
+                        </template>
+                    </v-data-table>
+                </v-skeleton-loader>
             </v-col>
         </v-row>
     </Layout>

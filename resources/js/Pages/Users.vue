@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import { VDataTableServer } from "vuetify/labs/VDataTable";
 import JsonExcel from "vue-json-excel3";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -34,7 +33,7 @@ const fields = ref([
     { title: "Nombre", key: "firstname" },
     { title: "Telefono", key: "phone" },
     { title: "Estado", key: "statut" },
-    { title: "Acciones", key: "accions" },
+    { title: "Acciones", key: "actions" },
 ]);
 const jsonFields = ref({
     Usuario: "username",
@@ -568,28 +567,27 @@ function onClose() {
         </v-row>
         <v-row>
             <v-col>
-                <v-data-table-server
-                    :headers="fields"
-                    :items="users"
-                    :items-length="users.length"
-                    :loading="loading"
-                    :search="search"
-                    class="elevation-2"
-                    density="compact"
-                    loading-text="Cargando... "
-                    no-data-text="No existen datos a mostrar"
-                >
-                    <template v-slot:item.statut="{ item }">
-                        <v-switch
-                            :model-value="!!item.raw.statut"
-                            color="primary"
-                            density="compact"
-                            hide-details
-                            @change="isChecked(item.raw)"
-                        ></v-switch>
-                    </template>
-                    <template v-slot:item.accions="{ item }">
-                        <div class="row-actions">
+                <v-skeleton-loader :loading="loading" boilerplate type="table">
+                    <v-data-table
+                        :headers="fields"
+                        :items="users"
+                        :search="search"
+                        class="elevation-2"
+                        density="compact"
+                        loading-text="Cargando... "
+                        no-data-text="No existen datos a mostrar"
+                        item-value="name"
+                    >
+                        <template v-slot:item.statut="{ item }">
+                            <v-switch
+                                :model-value="!!item.raw.statut"
+                                color="primary"
+                                density="compact"
+                                hide-details
+                                @change="isChecked(item.raw)"
+                            ></v-switch>
+                        </template>
+                        <template v-slot:item.actions="{ item }">
                             <v-btn
                                 class="ma-1"
                                 color="primary"
@@ -599,12 +597,9 @@ function onClose() {
                                 @click="Edit_User(item.raw)"
                             >
                             </v-btn>
-                        </div>
-                    </template>
-                    <template v-slot:column.name="{ column }">
-                        {{ column.title.toUpperCase() }}
-                    </template>
-                </v-data-table-server>
+                        </template>
+                    </v-data-table>
+                </v-skeleton-loader>
             </v-col>
         </v-row>
     </Layout>

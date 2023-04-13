@@ -287,7 +287,7 @@ function validateMenu(data) {
                 }}
 
                 <v-menu activator="parent">
-                    <v-list>
+                    <v-list nav density="compact">
                         <v-list-item
                             @click="linkVisit('/profile')"
                             :active="$page.url === '/profile'"
