@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import JsonExcel from "vue-json-excel3";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
+import Snackbar from "@/Layouts/snackbar.vue";
+import ExportBtn from "@/Layouts/ExportBtn.vue";
+
 import ruleForm from "@/rules";
 import { router } from "@inertiajs/vue3";
 
@@ -104,22 +104,10 @@ function isChecked(user) {
             snackbarText.value = "algo salio mal";
         })
         .finally(() => {
-            loading.value = false;
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
         });
-}
-
-//--------------------------- Users PDF ---------------------------\\
-function Users_PDF() {
-    let pdf = new jsPDF("p", "pt");
-    let columns = [
-        { title: "Nombre", dataKey: "firstname" },
-        { title: "Apellido", dataKey: "lastname" },
-        { title: "Usuario", dataKey: "username" },
-        { title: "Telefono", dataKey: "phone" },
-    ];
-    pdf.autoTable(columns, props.users);
-    pdf.text("Lista de Usuarios", 40, 25);
-    pdf.save("Lista_Usuarios.pdf");
 }
 
 //------------------------ Create User ---------------------------\\
@@ -161,7 +149,9 @@ function Create_User() {
             snackbarText.value = error;
         })
         .finally(() => {
-            loading.value = false;
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
         });
 }
 
@@ -181,7 +171,6 @@ function Update_User() {
     data.append("ci", user.value.ci);
     data.append("statut", user.value.statut);
     data.append("is_all_warehouses", user.value.is_all_warehouses);
-    console.log(user.value);
     // append array assigned_warehouses
     if (assigned_warehouses.value.length) {
         for (let i = 0; i < assigned_warehouses.value.length; i++) {
@@ -207,7 +196,9 @@ function Update_User() {
             snackbarText.value = error.response.data.message;
         })
         .finally(() => {
-            loading.value = false;
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
         });
 }
 
@@ -275,25 +266,12 @@ function onClose() {
 </script>
 
 <template>
-    <Layout>
-        <v-snackbar
-            v-model="snackbar"
-            :color="snackbarColor"
-            :location="'top right'"
-            :timeout="5000"
-            elevation="5"
-        >
-            {{ snackbarText }}
-            <template v-slot:actions>
-                <v-btn
-                    @click="snackbar = false"
-                    icon="mdi-close"
-                    size="x-small"
-                    variant="tonal"
-                >
-                </v-btn>
-            </template>
-        </v-snackbar>
+    <Layout :loading="loading">
+        <Snackbar
+            :snackbar="snackbar"
+            :snackbar-color="snackbarColor"
+            :snackbar-text="snackbarText"
+        ></Snackbar>
         <v-dialog
             v-model="dialog"
             max-width="600px"
@@ -528,32 +506,11 @@ function onClose() {
             </v-col>
             <v-spacer></v-spacer>
             <v-col cols="auto" class="text-right">
-                <v-btn
-                    @click="Users_PDF()"
-                    size="small"
-                    class="ma-1"
-                    variant="outlined"
-                    color="success"
-                    prepend-icon="mdi-file-pdf-box"
-                >
-                    PDF
-                </v-btn>
-                <v-btn
-                    size="small"
-                    class="ma-1"
-                    variant="outlined"
-                    color="error"
-                    prepend-icon="mdi-file-excel-box"
-                >
-                    <json-excel
-                        :data="props.users"
-                        :fields="jsonFields"
-                        worksheet="Usuarios"
-                        name="usuarios.xls"
-                    >
-                        Exportar
-                    </json-excel>
-                </v-btn>
+                <ExportBtn
+                    :data="users"
+                    :fields="jsonFields"
+                    name-file="Usuarios"
+                ></ExportBtn>
                 <v-btn
                     size="small"
                     color="primary"
@@ -567,39 +524,37 @@ function onClose() {
         </v-row>
         <v-row>
             <v-col>
-                <v-skeleton-loader :loading="loading" boilerplate type="table">
-                    <v-data-table
-                        :headers="fields"
-                        :items="users"
-                        :search="search"
-                        class="elevation-2"
-                        density="compact"
-                        loading-text="Cargando... "
-                        no-data-text="No existen datos a mostrar"
-                        item-value="name"
-                    >
-                        <template v-slot:item.statut="{ item }">
-                            <v-switch
-                                :model-value="!!item.raw.statut"
-                                color="primary"
-                                density="compact"
-                                hide-details
-                                @change="isChecked(item.raw)"
-                            ></v-switch>
-                        </template>
-                        <template v-slot:item.actions="{ item }">
-                            <v-btn
-                                class="ma-1"
-                                color="primary"
-                                icon="mdi-pencil"
-                                size="x-small"
-                                variant="outlined"
-                                @click="Edit_User(item.raw)"
-                            >
-                            </v-btn>
-                        </template>
-                    </v-data-table>
-                </v-skeleton-loader>
+                <v-data-table
+                    :headers="fields"
+                    :items="users"
+                    :search="search"
+                    class="elevation-2"
+                    density="compact"
+                    loading-text="Cargando... "
+                    no-data-text="No existen datos a mostrar"
+                    item-value="name"
+                >
+                    <template v-slot:item.statut="{ item }">
+                        <v-switch
+                            :model-value="!!item.raw.statut"
+                            color="primary"
+                            density="compact"
+                            hide-details
+                            @change="isChecked(item.raw)"
+                        ></v-switch>
+                    </template>
+                    <template v-slot:item.actions="{ item }">
+                        <v-btn
+                            class="ma-1"
+                            color="primary"
+                            icon="mdi-pencil"
+                            size="x-small"
+                            variant="outlined"
+                            @click="Edit_User(item.raw)"
+                        >
+                        </v-btn>
+                    </template>
+                </v-data-table>
             </v-col>
         </v-row>
     </Layout>

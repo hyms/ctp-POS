@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
+import Snackbar from "@/Layouts/snackbar.vue";
+import ExportBtn from "@/Layouts/ExportBtn.vue";
 import JsonExcel from "vue-json-excel3";
 import ruleForm from "@/rules";
 import { router } from "@inertiajs/vue3";
@@ -56,20 +58,32 @@ const import_clients = ref("");
 const client = ref({
     id: "",
     name: "",
+    company_name: "",
     code: "",
     email: "",
     phone: "",
     country: "",
     city: "",
     adresse: "",
-    tax_number: "",
+    nit_ci: "",
+});
+const clientLabel = ref({
+    name: "Nombre",
+    company_name: "Nombre de Empresa",
+    code: "Codigo",
+    email: "Correo",
+    phone: "Telefono",
+    city: "Ciudad",
+    adresse: "Direccion",
+    nit_ci: "NIT",
 });
 
 const fields = ref([
     { title: "Codigo", key: "code" },
-    { title: "Nombre", key: "name" },
+    // { title: "Nombre", key: "name" },
+    { title: "Nombre de Empresa", key: "company_name" },
     { title: "Telefono", key: "phone" },
-    { title: "NIT", key: "tax_number" },
+    { title: "NIT", key: "nit_ci" },
     { title: "Deuda Total", key: "due" },
     { title: "Deuda Total Devolucion", key: "return_Due" },
     { title: "Acciones", key: "actions" },
@@ -77,8 +91,9 @@ const fields = ref([
 const jsonFields = ref({
     Codigo: "code",
     Nombre: "name",
+    Nombre_Empresa: "company_name",
     Telefono: "phone",
-    Nit: "tax_number",
+    Nit: "nit_ci",
     Correo: "email",
     Deuda_Total: "due",
     Deuda_Total_Devolucion: "return_Due",
@@ -89,9 +104,9 @@ async function onSave() {
     const validate = await form.value.validate();
     if (validate.valid)
         if (!editmode.value) {
-            Create_Warehouse();
+            Create_Client();
         } else {
-            Update_Warehouse();
+            Update_Client();
         }
 }
 
@@ -147,7 +162,9 @@ function Submit_import() {
             snackbarText.value = error;
         })
         .finally(() => {
-            loading.value = false;
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
         });
 }
 
@@ -176,12 +193,14 @@ function Edit_Client(item) {
 //---------------------------------------- Create new Client -------------------------------\\
 function Create_Client() {
     loading.value = true;
+    snackbar.value = false;
     axios
         .post("clients", {
             name: client.value.name,
+            company_name: client.value.company_name,
             email: client.value.email,
             phone: client.value.phone,
-            tax_number: client.value.tax_number,
+            nit_ci: client.value.nit_ci,
             country: client.value.country,
             city: client.value.city,
             adresse: client.value.adresse,
@@ -200,19 +219,23 @@ function Create_Client() {
             snackbarText.value = error;
         })
         .finally(() => {
-            loading.value = false;
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
         });
 }
 
 //----------------------------------- Update Client -------------------------------\\
 function Update_Client() {
     loading.value = true;
+    snackbar.value = false;
     axios
         .put("clients/" + client.value.id, {
             name: client.value.name,
+            company_name: client.value.company_name,
             email: client.value.email,
             phone: client.value.phone,
-            tax_number: client.value.tax_number,
+            nit_ci: client.value.nit_ci,
             country: client.value.country,
             city: client.value.city,
             adresse: client.value.adresse,
@@ -231,7 +254,9 @@ function Update_Client() {
             snackbarText.value = error;
         })
         .finally(() => {
-            loading.value = false;
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
         });
 }
 
@@ -240,21 +265,22 @@ function reset_Form() {
     client.value = {
         id: "",
         name: "",
+        company_name: "",
         email: "",
         phone: "",
         country: "",
-        tax_number: "",
+        nit_ci: "",
         city: "",
         adresse: "",
     };
 }
 
 //------------------------------- Remove Client -------------------------------\\
-function Remove_Client(id) {
+function Remove_Client() {
     loading.value = true;
     snackbar.value = false;
     axios
-        .delete("clients/" + id)
+        .delete("clients/" + client.value.id)
         .then(({ data }) => {
             snackbar.value = true;
             snackbarColor.value = "success";
@@ -269,10 +295,20 @@ function Remove_Client(id) {
             snackbarText.value = error.response.data.message;
         })
         .finally(() => {
-            loading.value = false;
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
         });
 }
-
+function onCloseDelete() {
+    reset_Form();
+    dialogDelete.value = false;
+}
+function Delete_Client(item) {
+    reset_Form();
+    client.value = item;
+    dialogDelete.value = true;
+}
 //------ Validate Form Submit_Payment_sell_due
 async function Submit_Payment_sell_due() {
     snackbar.value = false;
@@ -344,6 +380,7 @@ function print_it() {
 //---------------------------------------- Submit_Pay_due-------------------------------\\
 function Submit_Pay_due() {
     loading.value = true;
+    snackbar.value = false;
     axios
         .post("clients_pay_due", {
             client_id: payment.value.client_id,
@@ -365,7 +402,9 @@ function Submit_Pay_due() {
             snackbarText.value = error.response.data.message;
         })
         .finally(() => {
-            loading.value = false;
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
         });
 }
 
@@ -482,31 +521,19 @@ function formatNumber(number, dec) {
     while (formated.length < dec) formated += "0";
     return `${value[0]}.${formated}`;
 }
+
 function consol(item) {
     console.log(item);
 }
 </script>
 
 <template>
-    <layout>
-        <v-snackbar
-            v-model="snackbar"
-            :color="snackbarColor"
-            :location="'top right'"
-            :timeout="5000"
-            elevation="5"
-        >
-            {{ snackbarText }}
-            <template v-slot:actions>
-                <v-btn
-                    @click="snackbar = false"
-                    icon="mdi-close"
-                    size="x-small"
-                    variant="tonal"
-                >
-                </v-btn>
-            </template>
-        </v-snackbar>
+    <layout :loading="loading">
+        <snackbar
+            :snackbar="snackbar"
+            :snackbar-text="snackbarText"
+            :snackbar-color="snackbarColor"
+        ></snackbar>
         <!-- Modal Show Import Clients -->
         <v-dialog v-model="dialogImport" max-width="600px" scrollable>
             <v-card>
@@ -524,15 +551,14 @@ function consol(item) {
                         <v-row>
                             <!-- File -->
                             <v-col md="12" sm="12" class="mb-3">
-                                <v-text-field
+                                <v-file-input
+                                    accept="csv/*"
                                     label="Elige el archivo"
-                                    variant="outlined"
+                                    variant="solo"
                                     density="comfortable"
                                     hide-details="auto"
-                                    type="file"
                                     @change="onFileSelected"
-                                >
-                                </v-text-field>
+                                ></v-file-input>
                             </v-col>
 
                             <v-col md="6" sm="12">
@@ -578,8 +604,8 @@ function consol(item) {
                                                     density="compact"
                                                     size="small"
                                                     color="success"
-                                                    >campo requerido</v-btn
-                                                >
+                                                    >campo requerido
+                                                </v-btn>
                                             </th>
                                         </tr>
                                         <tr>
@@ -624,6 +650,255 @@ function consol(item) {
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <!-- Modal Show Customer Details -->
+        <v-dialog v-model="dialogDetail" max-width="600px" scrollable>
+            <v-card>
+                <v-toolbar
+                    border
+                    density="comfortable"
+                    title="Detalle del Cliente"
+                ></v-toolbar>
+                <v-card-text>
+                    <v-table density="compact" hover>
+                        <tbody>
+                            <tr>
+                                <!-- Customer Code -->
+                                <td>{{ clientLabel.code }}</td>
+                                <td>{{ client.code }}</td>
+                            </tr>
+                            <tr>
+                                <!-- Customer Company Name -->
+                                <td>{{ clientLabel.company_name }}</td>
+                                <td>{{ client.company_name }}</td>
+                            </tr>
+                            <tr>
+                                <!-- Customer Name -->
+                                <td>{{ clientLabel.name }}</td>
+                                <td>{{ client.name }}</td>
+                            </tr>
+                            <tr>
+                                <!-- Customer Phone -->
+                                <td>{{ clientLabel.phone }}</td>
+                                <td>{{ client.phone }}</td>
+                            </tr>
+                            <tr>
+                                <!-- Customer Email -->
+                                <td>{{ clientLabel.email }}</td>
+                                <td>{{ client.email }}</td>
+                            </tr>
+                            <tr>
+                                <!-- Customer City -->
+                                <td>{{ clientLabel.city }}</td>
+                                <td>{{ client.city }}</td>
+                            </tr>
+                            <tr>
+                                <!-- Customer Adress -->
+                                <td>{{ clientLabel.adresse }}</td>
+                                <td>{{ client.adresse }}</td>
+                            </tr>
+                            <tr>
+                                <!-- Tax Number -->
+                                <td>{{ clientLabel.nit_ci }}</td>
+                                <td>{{ client.nit_ci }}</td>
+                            </tr>
+
+                            <tr>
+                                <!-- Total_Sale_Due -->
+                                <td>Total Deuda</td>
+                                <td>
+                                    Bs
+                                    {{ client.due }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <!-- Total_Sell_Return_Due -->
+                                <td>Total Deuda de Devolucion</td>
+                                <td>
+                                    Bs
+                                    {{ client.return_Due }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </v-table>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        variant="elevated"
+                        color="primary"
+                        class="ma-1"
+                        @click="dialogDetail = false"
+                    >
+                        Cerrar
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <!-- Modal Create & Edit Customer -->
+        <v-dialog
+            v-model="dialog"
+            max-width="600px"
+            scrollable
+            @update:modelValue="dialog === false ? reset_Form() : dialog"
+        >
+            <v-card>
+                <v-toolbar
+                    density="comfortable"
+                    border
+                    :title="(editmode ? 'Editar ' : 'Añadir ') + 'Cliente'"
+                ></v-toolbar>
+                <v-card-text>
+                    <v-form @submit.prevent="onSave" ref="form">
+                        <v-row>
+                            <!-- Customer Name -->
+                            <v-col md="6" sm="12">
+                                <v-text-field
+                                    :label="clientLabel.name + ' *'"
+                                    v-model="client.name"
+                                    :placeholder="clientLabel.name"
+                                    :rules="ruleForm.required"
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                >
+                                </v-text-field>
+                            </v-col>
+
+                            <!-- Customer Company_name -->
+                            <v-col md="6" sm="12">
+                                <v-text-field
+                                    :label="clientLabel.company_name"
+                                    v-model="client.company_name"
+                                    :placeholder="clientLabel.company_name"
+                                    :rules="ruleForm.required"
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                >
+                                </v-text-field>
+                            </v-col>
+
+                            <!-- Customer Email -->
+                            <v-col md="6" sm="12">
+                                <v-text-field
+                                    :label="clientLabel.email"
+                                    v-model="client.email"
+                                    :placeholder="clientLabel.email"
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                >
+                                </v-text-field>
+                            </v-col>
+
+                            <!-- Customer Phone -->
+                            <v-col md="6" sm="12">
+                                <v-text-field
+                                    :label="clientLabel.phone"
+                                    v-model="client.phone"
+                                    :placeholder="clientLabel.phone"
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                >
+                                </v-text-field>
+                            </v-col>
+
+                            <!-- Customer City -->
+                            <v-col md="6" sm="12">
+                                <v-text-field
+                                    :label="clientLabel.city"
+                                    v-model="client.city"
+                                    :placeholder="clientLabel.city"
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                >
+                                </v-text-field>
+                            </v-col>
+
+                            <!-- Customer Tax Number -->
+                            <v-col md="6" sm="12">
+                                <v-text-field
+                                    :label="clientLabel.nit_ci"
+                                    v-model="client.nit_ci"
+                                    :placeholder="clientLabel.nit_ci"
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                ></v-text-field>
+                            </v-col>
+
+                            <!-- Customer Adress -->
+                            <v-col md="12" sm="12">
+                                <v-textarea
+                                    rows="4"
+                                    :label="clientLabel.adresse"
+                                    v-model="client.adresse"
+                                    :placeholder="clientLabel.adresse"
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                ></v-textarea>
+                            </v-col>
+                        </v-row>
+                    </v-form>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        size="small"
+                        variant="outlined"
+                        color="error"
+                        class="ma-1"
+                        @click="onClose"
+                    >
+                        Cancelar
+                    </v-btn>
+                    <v-btn
+                        size="small"
+                        color="primary"
+                        variant="flat"
+                        class="ma-1"
+                        @click="onSave"
+                        :loading="loading"
+                        :disabled="loading"
+                    >
+                        Guardar
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <!-- Modal Remove Customer -->
+        <v-dialog v-model="dialogDelete" max-width="300px">
+            <v-card>
+                <v-card-text class="text-h5 text-center"
+                    >Estas seguro?
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        small
+                        variant="elevated"
+                        color="primary"
+                        class="ma-1"
+                        @click="Remove_Client"
+                        >Si
+                    </v-btn>
+                    <v-btn
+                        variant="elevated"
+                        small
+                        color="error"
+                        class="ma-1"
+                        @click="onCloseDelete"
+                        >Cancelar
+                    </v-btn>
+
+                    <v-spacer></v-spacer>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         <v-row align="center">
             <v-col>
                 <v-text-field
@@ -638,32 +913,21 @@ function consol(item) {
             </v-col>
             <v-spacer></v-spacer>
             <v-col cols="auto" class="text-right">
-                <v-btn
-                    size="small"
-                    class="ma-1"
-                    variant="outlined"
-                    color="error"
-                    prepend-icon="mdi-file-excel-box"
-                >
-                    <json-excel
-                        :data="props.clients"
-                        :fields="jsonFields"
-                        worksheet="Clientes"
-                        name="clientes.xls"
-                    >
-                        Exportar
-                    </json-excel>
-                </v-btn>
-                <v-btn
-                    @click="Show_import_clients()"
-                    size="small"
-                    class="ma-1"
-                    color="info"
-                    variant="elevated"
-                    prepend-icon="mdi-download"
-                >
-                    Importar
-                </v-btn>
+                <ExportBtn
+                    :data="clients"
+                    :fields="jsonFields"
+                    name-file="Clientes"
+                ></ExportBtn>
+                <!--                <v-btn-->
+                <!--                    @click="Show_import_clients()"-->
+                <!--                    size="small"-->
+                <!--                    class="ma-1"-->
+                <!--                    color="info"-->
+                <!--                    variant="elevated"-->
+                <!--                    prepend-icon="mdi-download"-->
+                <!--                >-->
+                <!--                    Importar-->
+                <!--                </v-btn>-->
                 <v-btn
                     size="small"
                     color="primary"
@@ -677,256 +941,75 @@ function consol(item) {
         </v-row>
         <v-row>
             <v-col>
-                <v-skeleton-loader :loading="loading" boilerplate type="table">
-                    <v-data-table
-                        :headers="fields"
-                        :items="clients"
-                        :search="search"
-                        class="elevation-2"
-                        density="compact"
-                        no-data-text="No existen datos a mostrar"
-                    >
-                        <template v-slot:item.actions="{ item }">
-                            <v-menu>
-                                <template v-slot:activator="{ props }">
-                                    <v-btn
-                                        v-bind="props"
-                                        class="ma-1"
-                                        icon="mdi-dots-vertical"
-                                        color="primary"
-                                        size="x-small"
-                                        variant="elevated"
-                                    >
-                                    </v-btn>
-                                </template>
-                                <v-list nav density="compact">
-                                    <v-list-item
-                                        v-if="item.raw.due > 0"
-                                        @click="Pay_due(item.raw)"
-                                        prepend-icon="mdi-dollar"
-                                    >
-                                        Pagar todas la deudas a la vez
-                                    </v-list-item>
+                <v-data-table
+                    :headers="fields"
+                    :items="clients"
+                    :search="search"
+                    class="elevation-2"
+                    density="compact"
+                    no-data-text="No existen datos a mostrar"
+                >
+                    <template v-slot:item.actions="{ item }">
+                        <v-menu>
+                            <template v-slot:activator="{ props }">
+                                <v-btn
+                                    v-bind="props"
+                                    class="ma-1"
+                                    icon="mdi-dots-vertical"
+                                    color="primary"
+                                    size="x-small"
+                                    variant="elevated"
+                                >
+                                </v-btn>
+                            </template>
+                            <v-list nav density="compact">
+                                <v-list-item
+                                    v-if="item.raw.due > 0"
+                                    @click="Pay_due(item.raw)"
+                                    prepend-icon="mdi-dollar"
+                                >
+                                    Pagar todas la deudas a la vez
+                                </v-list-item>
 
-                                    <v-list-item
-                                        v-if="item.raw.return_Due > 0"
-                                        @click="Pay_return_due(item.raw)"
-                                        prepend-icon="mdi-dollar"
-                                    >
-                                        Pagar todas la deudas de devolucion a la
-                                        vez
-                                    </v-list-item>
+                                <v-list-item
+                                    v-if="item.raw.return_Due > 0"
+                                    @click="Pay_return_due(item.raw)"
+                                    prepend-icon="mdi-dollar"
+                                >
+                                    Pagar todas la deudas de devolucion a la vez
+                                </v-list-item>
 
-                                    <v-list-item
-                                        @click="showDetails(item.raw)"
-                                        prepend-icon="mdi-eye"
-                                    >
-                                        Detalles del cliente
-                                    </v-list-item>
+                                <v-list-item
+                                    @click="showDetails(item.raw)"
+                                    prepend-icon="mdi-eye"
+                                >
+                                    Detalles del cliente
+                                </v-list-item>
 
-                                    <v-list-item
-                                        @click="Edit_Client(item.raw)"
-                                        prepend-icon="mdi-pencil"
-                                    >
-                                        Editar Cliente
-                                    </v-list-item>
+                                <v-list-item
+                                    @click="Edit_Client(item.raw)"
+                                    prepend-icon="mdi-pencil"
+                                >
+                                    Editar Cliente
+                                </v-list-item>
 
-                                    <v-list-item
-                                        @click="Remove_Client(item.raw)"
-                                        prepend-icon="mdi-delete"
-                                    >
-                                        Eliminar Cliente
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
-                        </template>
-                    </v-data-table>
-                </v-skeleton-loader>
+                                <v-list-item
+                                    @click="Delete_Client(item.raw)"
+                                    prepend-icon="mdi-delete"
+                                >
+                                    Eliminar Cliente
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </template>
+                </v-data-table>
             </v-col>
         </v-row>
     </layout>
-    <!--    <div class="main-content">-->
-    <!--        <div-->
-    <!--            v-if="isLoading"-->
-    <!--            class="loading_page spinner spinner-primary mr-3"-->
-    <!--        ></div>-->
-    <!--        <div v-else>-->
-    <!--            <vue-good-table-->
-    <!--                mode="remote"-->
-    <!--                :columns="columns"-->
-    <!--                :totalRows="totalRows"-->
-    <!--                :rows="clients"-->
-    <!--                @on-page-change="onPageChange"-->
-    <!--                @on-per-page-change="onPerPageChange"-->
-    <!--                @on-sort-change="onSortChange"-->
-    <!--                @on-search="onSearch"-->
-    <!--                :search-options="{-->
-    <!--                    enabled: true,-->
-    <!--                    placeholder: $t('Search_this_table'),-->
-    <!--                }"-->
-    <!--                :select-options="{-->
-    <!--                    enabled: true,-->
-    <!--                    clearSelectionText: '',-->
-    <!--                }"-->
-    <!--                @on-selected-rows-change="selectionChanged"-->
-    <!--                :pagination-options="{-->
-    <!--                    enabled: true,-->
-    <!--                    mode: 'records',-->
-    <!--                    nextLabel: 'next',-->
-    <!--                    prevLabel: 'prev',-->
-    <!--                }"-->
-    <!--                :styleClass="-->
-    <!--                    showDropdown-->
-    <!--                        ? 'tableOne table-hover vgt-table full-height'-->
-    <!--                        : 'tableOne table-hover vgt-table non-height'-->
-    <!--                "-->
-    <!--            >-->
-    <!--                <div slot="table-actions" class="mt-2 mb-3">-->
-    <!--                    <v-btn-->
-    <!--                        variant="outline-info m-1"-->
-    <!--                        size="sm"-->
-    <!--                        v-b-toggle.sidebar-right-->
-    <!--                    >-->
-    <!--                        <i class="i-Filter-2"></i>-->
-    <!--                        {{ $t("Filter") }}-->
-    <!--                    </v-btn>-->
-    <!--                    <v-btn-->
-    <!--                        @click="clients_PDF()"-->
-    <!--                        size="sm"-->
-    <!--                        variant="outline-success m-1"-->
-    <!--                    >-->
-    <!--                        <i class="i-File-Copy"></i> PDF-->
-    <!--                    </v-btn>-->
-    <!--                    <vue-excel-xlsx-->
-    <!--                        class="btn btn-sm btn-outline-danger ripple m-1"-->
-    <!--                        :data="clients"-->
-    <!--                        :columns="columns"-->
-    <!--                        :file-name="'clients'"-->
-    <!--                        :file-type="'xlsx'"-->
-    <!--                        :sheet-name="'clients'"-->
-    <!--                    >-->
-    <!--                        <i class="i-File-Excel"></i> EXCEL-->
-    <!--                    </vue-excel-xlsx>-->
-
-    <!--                </div>-->
-
-    <!--                <template slot="table-row" slot-scope="props">-->
-    <!--                    <span v-if="props.column.field == 'actions'">-->
-    <!--                        <div>-->
-    <!--                            <b-dropdown-->
-    <!--                                id="dropdown-right"-->
-    <!--                                variant="link"-->
-    <!--                                text="right align"-->
-    <!--                                toggle-class="text-decoration-none"-->
-    <!--                                size="lg"-->
-    <!--                                right-->
-    <!--                                no-caret-->
-    <!--                            >-->
-    <!--                                <template-->
-    <!--                                    v-slot:button-content-->
-    <!--                                    class="_r_btn border-0"-->
-    <!--                                >-->
-    <!--                                    <span-->
-    <!--                                        class="_dot _r_block-dot bg-dark"-->
-    <!--                                    ></span>-->
-    <!--                                    <span-->
-    <!--                                        class="_dot _r_block-dot bg-dark"-->
-    <!--                                    ></span>-->
-    <!--                                    <span-->
-    <!--                                        class="_dot _r_block-dot bg-dark"-->
-    <!--                                    ></span>-->
-    <!--                                </template>-->
-
-    <!--                            </b-dropdown>-->
-    <!--                        </div>-->
-    <!--                    </span>-->
-    <!--                </template>-->
-    <!--            </vue-good-table>-->
-    <!--        </div>-->
-
-    <!--        &lt;!&ndash; Multiple filters &ndash;&gt;-->
-    <!--        <b-sidebar-->
-    <!--            id="sidebar-right"-->
-    <!--            :title="$t('Filter')"-->
-    <!--            bg-variant="white"-->
-    <!--            right-->
-    <!--            shadow-->
-    <!--        >-->
-    <!--            <div class="px-3 py-2">-->
-    <!--                <v-row>-->
-    <!--                    &lt;!&ndash; Code Customer   &ndash;&gt;-->
-    <!--                    <v-col md="12">-->
-    <!--                        <v-form-group :label="$t('CustomerCode')">-->
-    <!--                            <v-form-input-->
-    <!--                                label="Code"-->
-    <!--                                :placeholder="$t('SearchByCode')"-->
-    <!--                                v-model="Filter_Code"-->
-    <!--                            ></v-form-input>-->
-    <!--                        </v-form-group>-->
-    <!--                    </v-col>-->
-
-    <!--                    &lt;!&ndash; Name Customer   &ndash;&gt;-->
-    <!--                    <v-col md="12">-->
-    <!--                        <v-form-group :label="$t('CustomerName')">-->
-    <!--                            <v-form-input-->
-    <!--                                label="Name"-->
-    <!--                                :placeholder="$t('SearchByName')"-->
-    <!--                                v-model="Filter_Name"-->
-    <!--                            ></v-form-input>-->
-    <!--                        </v-form-group>-->
-    <!--                    </v-col>-->
-
-    <!--                    &lt;!&ndash; Phone Customer   &ndash;&gt;-->
-    <!--                    <v-col md="12">-->
-    <!--                        <v-form-group :label="$t('Phone')">-->
-    <!--                            <v-form-input-->
-    <!--                                label="Phone"-->
-    <!--                                :placeholder="$t('SearchByPhone')"-->
-    <!--                                v-model="Filter_Phone"-->
-    <!--                            ></v-form-input>-->
-    <!--                        </v-form-group>-->
-    <!--                    </v-col>-->
-
-    <!--                    &lt;!&ndash; Email Customer   &ndash;&gt;-->
-    <!--                    <v-col md="12">-->
-    <!--                        <v-form-group :label="$t('Email')">-->
-    <!--                            <v-form-input-->
-    <!--                                label="Email"-->
-    <!--                                :placeholder="$t('SearchByEmail')"-->
-    <!--                                v-model="Filter_Email"-->
-    <!--                            ></v-form-input>-->
-    <!--                        </v-form-group>-->
-    <!--                    </v-col>-->
-
-    <!--                    <v-col md="6" sm="12">-->
-    <!--                        <v-btn-->
-    <!--                            @click="Get_Clients(serverParams.page)"-->
-    <!--                            variant="primary m-1"-->
-    <!--                            size="sm"-->
-    <!--                            block-->
-    <!--                        >-->
-    <!--                            <i class="i-Filter-2"></i>-->
-    <!--                            {{ $t("Filter") }}-->
-    <!--                        </v-btn>-->
-    <!--                    </v-col>-->
-    <!--                    <v-col md="6" sm="12">-->
-    <!--                        <v-btn-->
-    <!--                            @click="Reset_Filter()"-->
-    <!--                            variant="danger m-1"-->
-    <!--                            size="sm"-->
-    <!--                            block-->
-    <!--                        >-->
-    <!--                            <i class="i-Power-2"></i>-->
-    <!--                            {{ $t("Reset") }}-->
-    <!--                        </v-btn>-->
-    <!--                    </v-col>-->
-    <!--                </v-row>-->
-    <!--            </div>-->
-    <!--        </b-sidebar>-->
 
     <!--        &lt;!&ndash; Modal Pay_due&ndash;&gt;-->
     <!--        <validation-observer ref="ref_pay_due">-->
-    <!--            <b-modal hide-footer size="md" id="modal_Pay_due" title="Pay Due">-->
+    <!--            <v-dialog hide-footer size="md" id="modal_Pay_due" title="Pay Due">-->
     <!--                <v-form @submit.prevent="Submit_Payment_sell_due">-->
     <!--                    <v-row>-->
     <!--                        &lt;!&ndash; Paying Amount  &ndash;&gt;-->
@@ -1055,12 +1138,12 @@ function consol(item) {
     <!--                        </v-col>-->
     <!--                    </v-row>-->
     <!--                </v-form>-->
-    <!--            </b-modal>-->
+    <!--            </v-dialog>-->
     <!--        </validation-observer>-->
 
     <!--        &lt;!&ndash; Modal Pay_return_Due&ndash;&gt;-->
     <!--        <validation-observer ref="ref_pay_return_due">-->
-    <!--            <b-modal-->
+    <!--            <v-dialog-->
     <!--                hide-footer-->
     <!--                size="md"-->
     <!--                id="modal_Pay_return_due"-->
@@ -1196,11 +1279,11 @@ function consol(item) {
     <!--                        </v-col>-->
     <!--                    </v-row>-->
     <!--                </v-form>-->
-    <!--            </b-modal>-->
+    <!--            </v-dialog>-->
     <!--        </validation-observer>-->
 
     <!--        &lt;!&ndash; Modal Show Customer_Invoice&ndash;&gt;-->
-    <!--        <b-modal-->
+    <!--        <v-dialog-->
     <!--            hide-footer-->
     <!--            size="sm"-->
     <!--            scrollable-->
@@ -1273,10 +1356,10 @@ function consol(item) {
     <!--                <i class="i-Billing"></i>-->
     <!--                {{ $t("print") }}-->
     <!--            </button>-->
-    <!--        </b-modal>-->
+    <!--        </v-dialog>-->
 
     <!--        &lt;!&ndash; Modal Show_invoice_return&ndash;&gt;-->
-    <!--        <b-modal-->
+    <!--        <v-dialog-->
     <!--            hide-footer-->
     <!--            size="sm"-->
     <!--            scrollable-->
@@ -1351,203 +1434,5 @@ function consol(item) {
     <!--                <i class="i-Billing"></i>-->
     <!--                {{ $t("print") }}-->
     <!--            </button>-->
-    <!--        </b-modal>-->
-
-    <!--        &lt;!&ndash; Modal Create & Edit Customer &ndash;&gt;-->
-    <!--        <validation-observer ref="Create_Customer">-->
-    <!--            <b-modal-->
-    <!--                hide-footer-->
-    <!--                size="lg"-->
-    <!--                id="New_Customer"-->
-    <!--                :title="editmode ? $t('Edit') : $t('Add')"-->
-    <!--            >-->
-    <!--                <v-form @submit.prevent="Submit_Customer">-->
-    <!--                    <v-row>-->
-    <!--                        &lt;!&ndash; Customer Name &ndash;&gt;-->
-    <!--                        <v-col md="6" sm="12">-->
-    <!--                            <validation-provider-->
-    <!--                                name="Name Customer"-->
-    <!--                                :rules="{ required: true }"-->
-    <!--                                v-slot="validationContext"-->
-    <!--                            >-->
-    <!--                                <v-form-group-->
-    <!--                                    :label="$t('CustomerName') + ' ' + '*'"-->
-    <!--                                >-->
-    <!--                                    <v-form-input-->
-    <!--                                        :state="-->
-    <!--                                            getValidationState(-->
-    <!--                                                validationContext-->
-    <!--                                            )-->
-    <!--                                        "-->
-    <!--                                        aria-describedby="name-feedback"-->
-    <!--                                        label="name"-->
-    <!--                                        :placeholder="$t('CustomerName')"-->
-    <!--                                        v-model="client.name"-->
-    <!--                                    ></v-form-input>-->
-    <!--                                    <v-form-invalid-feedback id="name-feedback"-->
-    <!--                                        >{{ validationContext.errors[0] }}-->
-    <!--                                    </v-form-invalid-feedback>-->
-    <!--                                </v-form-group>-->
-    <!--                            </validation-provider>-->
-    <!--                        </v-col>-->
-
-    <!--                        &lt;!&ndash; Customer Email &ndash;&gt;-->
-    <!--                        <v-col md="6" sm="12">-->
-    <!--                            <v-form-group :label="$t('Email')">-->
-    <!--                                <v-form-input-->
-    <!--                                    label="email"-->
-    <!--                                    v-model="client.email"-->
-    <!--                                    :placeholder="$t('Email')"-->
-    <!--                                ></v-form-input>-->
-    <!--                            </v-form-group>-->
-    <!--                        </v-col>-->
-
-    <!--                        &lt;!&ndash; Customer Phone &ndash;&gt;-->
-    <!--                        <v-col md="6" sm="12">-->
-    <!--                            <v-form-group :label="$t('Phone')">-->
-    <!--                                <v-form-input-->
-    <!--                                    label="Phone"-->
-    <!--                                    v-model="client.phone"-->
-    <!--                                    :placeholder="$t('Phone')"-->
-    <!--                                ></v-form-input>-->
-    <!--                            </v-form-group>-->
-    <!--                        </v-col>-->
-
-    <!--                        &lt;!&ndash; Customer Country &ndash;&gt;-->
-    <!--                        <v-col md="6" sm="12">-->
-    <!--                            <v-form-group :label="$t('Country')">-->
-    <!--                                <v-form-input-->
-    <!--                                    label="Country"-->
-    <!--                                    v-model="client.country"-->
-    <!--                                    :placeholder="$t('Country')"-->
-    <!--                                ></v-form-input>-->
-    <!--                            </v-form-group>-->
-    <!--                        </v-col>-->
-
-    <!--                        &lt;!&ndash; Customer City &ndash;&gt;-->
-    <!--                        <v-col md="6" sm="12">-->
-    <!--                            <v-form-group :label="$t('City')">-->
-    <!--                                <v-form-input-->
-    <!--                                    label="City"-->
-    <!--                                    v-model="client.city"-->
-    <!--                                    :placeholder="$t('City')"-->
-    <!--                                ></v-form-input>-->
-    <!--                            </v-form-group>-->
-    <!--                        </v-col>-->
-
-    <!--                        &lt;!&ndash; Customer Tax Number &ndash;&gt;-->
-    <!--                        <v-col md="6" sm="12">-->
-    <!--                            <v-form-group :label="$t('Tax_Number')">-->
-    <!--                                <v-form-input-->
-    <!--                                    label="Tax Number"-->
-    <!--                                    v-model="client.tax_number"-->
-    <!--                                    :placeholder="$t('Tax_Number')"-->
-    <!--                                ></v-form-input>-->
-    <!--                            </v-form-group>-->
-    <!--                        </v-col>-->
-
-    <!--                        &lt;!&ndash; Customer Adress &ndash;&gt;-->
-    <!--                        <v-col md="12" sm="12">-->
-    <!--                            <v-form-group :label="$t('Adress')">-->
-    <!--                                <textarea-->
-    <!--                                    label="Adress"-->
-    <!--                                    class="form-control"-->
-    <!--                                    rows="4"-->
-    <!--                                    v-model="client.adresse"-->
-    <!--                                    :placeholder="$t('Adress')"-->
-    <!--                                ></textarea>-->
-    <!--                            </v-form-group>-->
-    <!--                        </v-col>-->
-
-    <!--                        <v-col md="12" class="mt-3">-->
-    <!--                            <v-btn-->
-    <!--                                variant="primary"-->
-    <!--                                type="submit"-->
-    <!--                                :disabled="SubmitProcessing"-->
-    <!--                                >{{ $t("submit") }}-->
-    <!--                            </v-btn>-->
-    <!--                            <div v-once class="typo__p" v-if="SubmitProcessing">-->
-    <!--                                <div-->
-    <!--                                    class="spinner sm spinner-primary mt-3"-->
-    <!--                                ></div>-->
-    <!--                            </div>-->
-    <!--                        </v-col>-->
-    <!--                    </v-row>-->
-    <!--                </v-form>-->
-    <!--            </b-modal>-->
-    <!--        </validation-observer>-->
-
-    <!--        &lt;!&ndash; Modal Show Customer Details &ndash;&gt;-->
-    <!--        <b-modal-->
-    <!--            ok-only-->
-    <!--            size="md"-->
-    <!--            id="showDetails"-->
-    <!--            :title="$t('CustomerDetails')"-->
-    <!--        >-->
-    <!--            <v-row>-->
-    <!--                <v-col lg="12" md="12" sm="12" class="mt-3">-->
-    <!--                    <table class="table table-striped table-md">-->
-    <!--                        <tbody>-->
-    <!--                            <tr>-->
-    <!--                                &lt;!&ndash; Customer Code &ndash;&gt;-->
-    <!--                                <td>{{ $t("CustomerCode") }}</td>-->
-    <!--                                <th>{{ client.code }}</th>-->
-    <!--                            </tr>-->
-    <!--                            <tr>-->
-    <!--                                &lt;!&ndash; Customer Name &ndash;&gt;-->
-    <!--                                <td>{{ $t("CustomerName") }}</td>-->
-    <!--                                <th>{{ client.name }}</th>-->
-    <!--                            </tr>-->
-    <!--                            <tr>-->
-    <!--                                &lt;!&ndash; Customer Phone &ndash;&gt;-->
-    <!--                                <td>{{ $t("Phone") }}</td>-->
-    <!--                                <th>{{ client.phone }}</th>-->
-    <!--                            </tr>-->
-    <!--                            <tr>-->
-    <!--                                &lt;!&ndash; Customer Email &ndash;&gt;-->
-    <!--                                <td>{{ $t("Email") }}</td>-->
-    <!--                                <th>{{ client.email }}</th>-->
-    <!--                            </tr>-->
-    <!--                            <tr>-->
-    <!--                                &lt;!&ndash; Customer country &ndash;&gt;-->
-    <!--                                <td>{{ $t("Country") }}</td>-->
-    <!--                                <th>{{ client.country }}</th>-->
-    <!--                            </tr>-->
-    <!--                            <tr>-->
-    <!--                                &lt;!&ndash; Customer City &ndash;&gt;-->
-    <!--                                <td>{{ $t("City") }}</td>-->
-    <!--                                <th>{{ client.city }}</th>-->
-    <!--                            </tr>-->
-    <!--                            <tr>-->
-    <!--                                &lt;!&ndash; Customer Adress &ndash;&gt;-->
-    <!--                                <td>{{ $t("Adress") }}</td>-->
-    <!--                                <th>{{ client.adresse }}</th>-->
-    <!--                            </tr>-->
-    <!--                            <tr>-->
-    <!--                                &lt;!&ndash; Tax Number &ndash;&gt;-->
-    <!--                                <td>{{ $t("Tax_Number") }}</td>-->
-    <!--                                <th>{{ client.tax_number }}</th>-->
-    <!--                            </tr>-->
-
-    <!--                            <tr>-->
-    <!--                                &lt;!&ndash; Total_Sale_Due &ndash;&gt;-->
-    <!--                                <td>{{ $t("Total_Sale_Due") }}</td>-->
-    <!--                                <th>-->
-    <!--                                    {{ currentUser.currency }} {{ client.due }}-->
-    <!--                                </th>-->
-    <!--                            </tr>-->
-
-    <!--                            <tr>-->
-    <!--                                &lt;!&ndash; Total_Sell_Return_Due &ndash;&gt;-->
-    <!--                                <td>{{ $t("Total_Sell_Return_Due") }}</td>-->
-    <!--                                <th>-->
-    <!--                                    {{ currentUser.currency }}-->
-    <!--                                    {{ client.return_Due }}-->
-    <!--                                </th>-->
-    <!--                            </tr>-->
-    <!--                        </tbody>-->
-    <!--                    </table>-->
-    <!--                </v-col>-->
-    <!--            </v-row>-->
-    <!--        </b-modal>-->
+    <!--        </v-dialog>-->
 </template>

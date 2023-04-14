@@ -60,10 +60,10 @@ class ClientController extends Controller
             $item['id'] = $client->id;
             $item['name'] = $client->name;
             $item['phone'] = $client->phone;
-            $item['tax_number'] = $client->tax_number;
+            $item['nit_ci'] = $client->nit_ci;
             $item['code'] = $client->code;
             $item['email'] = $client->email;
-            $item['country'] = $client->country;
+            $item['company_name'] = $client->company_name;
             $item['city'] = $client->city;
             $item['adresse'] = $client->adresse;
             $data->add($item);
@@ -92,12 +92,12 @@ class ClientController extends Controller
         Client::create([
             'name' => $request['name'],
             'code' => $this->getNumberOrder(),
-            'adresse' => $request['adresse'],
-            'phone' => $request['phone'],
-            'email' => $request['email'],
-            'country' => $request['country'],
-            'city' => $request['city'],
-            'tax_number' => $request['tax_number'],
+            'adresse' => $request['adresse']??'',
+            'phone' => $request['phone']??'',
+            'email' => $request['email']??'',
+            'company_name' => $request['company_name']??'',
+            'city' => $request['city']??'',
+            'nit_ci' => $request['nit_ci']??'',
         ]);
         return response()->json(['success' => true]);
     }
@@ -122,12 +122,12 @@ class ClientController extends Controller
 
         Client::whereId($id)->update([
             'name' => $request['name'],
-            'adresse' => $request['adresse'],
-            'phone' => $request['phone'],
-            'email' => $request['email'],
-            'country' => $request['country'],
-            'city' => $request['city'],
-            'tax_number' => $request['tax_number'],
+            'adresse' => $request['adresse']??'',
+            'phone' => $request['phone']??'',
+            'email' => $request['email']??'',
+            'company_name' => $request['company_name']??'',
+            'city' => $request['city']??'',
+            'nit_ci' => $request['nit_ci']??'',
         ]);
         return response()->json(['success' => true]);
 
@@ -227,12 +227,12 @@ class ClientController extends Controller
                     Client::create([
                         'name' => $value['name'],
                         'code' => $this->getNumberOrder(),
-                        'adresse' => $value['adresse'] == '' ? null : $value['adresse'],
-                        'phone' => $value['phone'] == '' ? null : $value['phone'],
-                        'email' => $value['email'] == '' ? null : $value['email'],
-                        'country' => $value['country'] == '' ? null : $value['country'],
-                        'city' => $value['city'] == '' ? null : $value['city'],
-                        'tax_number' => $value['tax_number'] == '' ? null : $value['tax_number'],
+                        'adresse' => $value['adresse'],
+                        'phone' => $value['phone'],
+                        'email' => $value['email'],
+                        'company_name' => $value['company_name'],
+                        'city' => $value['city'],
+                        'nit_ci' => $value['nit_ci'],
                     ]);
 
                 }

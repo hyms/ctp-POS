@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
+import Snackbar from "@/Layouts/snackbar.vue";
 import { VDataTableServer } from "vuetify/labs/VDataTable";
 import "jspdf-autotable";
 import ruleForm from "@/rules";
@@ -95,7 +96,9 @@ function Create_Warehouse() {
             snackbarText.value = error.response.data.message;
         })
         .finally(() => {
-            loading.value = false;
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
         });
 }
 
@@ -125,7 +128,9 @@ function Update_Warehouse() {
             snackbarText.value = error.response.data.message;
         })
         .finally(() => {
-            loading.value = false;
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
         });
 }
 
@@ -184,7 +189,9 @@ function Remove_Warehouse() {
             snackbarText.value = error.response.data.message;
         })
         .finally(() => {
-            loading.value = false;
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
         });
 }
 
@@ -195,25 +202,13 @@ function onCloseDelete() {
 </script>
 
 <template>
-    <Layout>
-        <v-snackbar
-            v-model="snackbar"
-            :color="snackbarColor"
-            :location="'top right'"
-            :timeout="5000"
-            elevation="5"
-        >
-            {{ snackbarText }}
-            <template v-slot:actions>
-                <v-btn
-                    @click="snackbar = false"
-                    icon="mdi-close"
-                    size="x-small"
-                    variant="tonal"
-                >
-                </v-btn>
-            </template>
-        </v-snackbar>
+    <Layout :loading="loading">
+        <snackbar
+            :snackbar="snackbar"
+            :snackbar-color="snackbarColor"
+            :snackbar-text="snackbarText"
+        ></snackbar>
+
         <v-dialog v-model="dialogDelete" max-width="300px">
             <v-card>
                 <v-card-text class="text-h5 text-center"
