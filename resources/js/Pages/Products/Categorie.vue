@@ -1,469 +1,342 @@
-<template>
-  <div class="main-content">
-    <breadcumb :page="$t('Categories')" :folder="$t('Products')"/>
+<script setup>
+import { ref } from "vue";
+import Layout from "@/Layouts/Authenticated.vue";
+import Snackbar from "@/Components/snackbar.vue";
+import ruleForm from "@/rules";
+import { router } from "@inertiajs/vue3";
 
-    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>
-    <b-card class="wrapper" v-if="!isLoading">
-      <vue-good-table
-        mode="remote"
-        :columns="columns"
-        :totalRows="totalRows"
-        :rows="categories"
-        @on-page-change="onPageChange"
-        @on-per-page-change="onPerPageChange"
-        @on-sort-change="onSortChange"
-        @on-search="onSearch"
-        :search-options="{
-        enabled: true,
-        placeholder: $t('Search_this_table'),  
-      }"
-        :select-options="{ 
-          enabled: true ,
-          clearSelectionText: '',
-        }"
-        @on-selected-rows-change="selectionChanged"
-        :pagination-options="{
-        enabled: true,
-        mode: 'records',
-        nextLabel: 'next',
-        prevLabel: 'prev',
-      }"
-        styleClass="table-hover tableOne vgt-table"
-      >
-        <div slot="selected-row-actions">
-          <button class="btn btn-danger btn-sm" @click="delete_by_selected()">{{$t('Del')}}</button>
-        </div>
-        <div slot="table-actions" class="mt-2 mb-3">
-          <b-button
-            @click="New_category()"
-            class="btn-rounded"
-            variant="btn btn-primary btn-icon m-1"
-          >
-            <i class="i-Add"></i>
-            {{$t('Add')}}
-          </b-button>
-        </div>
+const props = defineProps({
+    categories: Array,
+    errors: Object,
+});
 
-        <template slot="table-row" slot-scope="props">
-          <span v-if="props.column.field == 'actions'">
-            <a @click="Edit_category(props.row)" title="Edit" v-b-tooltip.hover>
-              <i class="i-Edit text-25 text-success"></i>
-            </a>
-            <a title="Delete" v-b-tooltip.hover @click="Remove_Category(props.row.id)">
-              <i class="i-Close-Window text-25 text-danger"></i>
-            </a>
-          </span>
-        </template>
-      </vue-good-table>
-    </b-card>
+//declare variable
+const form = ref(null);
+const search = ref("");
+const loading = ref(false);
+const snackbar = ref(false);
+const snackbarText = ref("");
+const snackbarColor = ref("info");
+const dialog = ref(false);
+const dialogDelete = ref(false);
+const editmode = ref(false);
 
-    <validation-observer ref="Create_Category">
-      <b-modal hide-footer size="md" id="New_Category" :title="editmode?$t('Edit'):$t('Add')">
-        <b-form @submit.prevent="Submit_Category">
-          <b-row>
-            <!-- Code category -->
-            <b-col md="12">
-              <validation-provider
-                name="Code category"
-                :rules="{ required: true}"
-                v-slot="validationContext"
-              >
-                <b-form-group :label="$t('Codecategorie') + ' ' + '*'">
-                  <b-form-input
-                    :placeholder="$t('Enter_Code_category')"
-                    :state="getValidationState(validationContext)"
-                    aria-describedby="Code-feedback"
-                    label="Code"
-                    v-model="category.code"
-                  ></b-form-input>
-                  <b-form-invalid-feedback id="Code-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
-                </b-form-group>
-              </validation-provider>
-            </b-col>
+const fields = ref([
+    { title: "Nombre", key: "name" },
+    { title: "Codigo", key: "code" },
+    { title: "Acciones", key: "actions" },
+]);
+const category = ref({
+    id: "",
+    name: "",
+    code: "",
+});
+const categoryLabels = ref({
+    name: "Nombre",
+    code: "Codigo",
+});
 
-            <!-- Name category -->
-            <b-col md="12">
-              <validation-provider
-                name="Name category"
-                :rules="{ required: true}"
-                v-slot="validationContext"
-              >
-                <b-form-group :label="$t('Namecategorie') + ' ' + '*'">
-                  <b-form-input
-                    :placeholder="$t('Enter_name_category')"
-                    :state="getValidationState(validationContext)"
-                    aria-describedby="Name-feedback"
-                    label="Name"
-                    v-model="category.name"
-                  ></b-form-input>
-                  <b-form-invalid-feedback id="Name-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
-                </b-form-group>
-              </validation-provider>
-            </b-col>
-
-             <b-col md="12" class="mt-3">
-                <b-button variant="primary" type="submit"  :disabled="SubmitProcessing">{{$t('submit')}}</b-button>
-                  <div v-once class="typo__p" v-if="SubmitProcessing">
-                    <div class="spinner sm spinner-primary mt-3"></div>
-                  </div>
-            </b-col>
-
-          </b-row>
-        </b-form>
-      </b-modal>
-    </validation-observer>
-  </div>
-</template>
-
-
-<script>
-import NProgress from "nprogress";
-
-export default {
-  metaInfo: {
-    title: "Category"
-  },
-  data() {
-    return {
-      isLoading: true,
-      SubmitProcessing:false,
-      serverParams: {
-        columnFilters: {},
-        sort: {
-          field: "id",
-          type: "desc"
-        },
-        page: 1,
-        perPage: 10
-      },
-      selectedIds: [],
-      totalRows: "",
-      search: "",
-      limit: "10",
-      categories: [],
-      editmode: false,
-
-      category: {
-        id: "",
-        name: "",
-        code: ""
-      }
-    };
-  },
-  computed: {
-    columns() {
-      return [
-        {
-          label: this.$t("Codecategorie"),
-          field: "code",
-          tdClass: "text-left",
-          thClass: "text-left"
-        },
-        {
-          label: this.$t("Namecategorie"),
-          field: "name",
-          tdClass: "text-left",
-          thClass: "text-left"
-        },
-        {
-          label: this.$t("Action"),
-          field: "actions",
-          html: true,
-          tdClass: "text-right",
-          thClass: "text-right",
-          sortable: false
-        }
-      ];
-    }
-  },
-
-  methods: {
-    //---- update Params Table
-    updateParams(newProps) {
-      this.serverParams = Object.assign({}, this.serverParams, newProps);
-    },
-
-    //---- Event Page Change
-    onPageChange({ currentPage }) {
-      if (this.serverParams.page !== currentPage) {
-        this.updateParams({ page: currentPage });
-        this.Get_Categories(currentPage);
-      }
-    },
-
-    //---- Event Per Page Change
-    onPerPageChange({ currentPerPage }) {
-      if (this.limit !== currentPerPage) {
-        this.limit = currentPerPage;
-        this.updateParams({ page: 1, perPage: currentPerPage });
-        this.Get_Categories(1);
-      }
-    },
-
-    //---- Event Select Rows
-    selectionChanged({ selectedRows }) {
-      this.selectedIds = [];
-      selectedRows.forEach((row, index) => {
-        this.selectedIds.push(row.id);
-      });
-    },
-
-    //---- Event on Sort Change
-    onSortChange(params) {
-      this.updateParams({
-        sort: {
-          type: params[0].type,
-          field: params[0].field
-        }
-      });
-      this.Get_Categories(this.serverParams.page);
-    },
-
-    //---- Event on Search
-
-    onSearch(value) {
-      this.search = value.searchTerm;
-      this.Get_Categories(this.serverParams.page);
-    },
-
-    //---- Validation State Form
-
-    getValidationState({ dirty, validated, valid = null }) {
-      return dirty || validated ? valid : null;
-    },
-
-    //------------- Submit Validation Create & Edit Category
-    Submit_Category() {
-      this.$refs.Create_Category.validate().then(success => {
-        if (!success) {
-          this.makeToast(
-            "danger",
-            this.$t("Please_fill_the_form_correctly"),
-            this.$t("Failed")
-          );
+//------------- Submit Validation Create & Edit Category
+async function Submit_Category() {
+    const validate = await form.value.validate();
+    if (validate.valid)
+        if (!editmode.value) {
+            Create_Category();
         } else {
-          if (!this.editmode) {
-            this.Create_Category();
-          } else {
-            this.Update_Category();
-          }
+            Update_Category();
         }
-      });
-    },
+}
 
-    //------ Toast
-    makeToast(variant, msg, title) {
-      this.$root.$bvToast.toast(msg, {
-        title: title,
-        variant: variant,
-        solid: true
-      });
-    },
+//------------------------------ Modal  (create category) -------------------------------\\
+function New_category() {
+    reset_Form();
+    editmode.value = false;
+    dialog.value = true;
+}
+function onClose() {
+    dialog.value = false;
+    reset_Form();
+}
+//------------------------------ Modal (Update category) -------------------------------\\
+function Edit_category(item) {
+    reset_Form();
+    category.value = item;
+    editmode.value = true;
+    dialog.value = true;
+}
 
-    //------------------------------ Modal  (create category) -------------------------------\\
-    New_category() {
-      this.reset_Form();
-      this.editmode = false;
-      this.$bvModal.show("New_Category");
-    },
-
-    //------------------------------ Modal (Update category) -------------------------------\\
-    Edit_category(category) {
-      this.Get_Categories(this.serverParams.page);
-      this.reset_Form();
-      this.category = category;
-      this.editmode = true;
-      this.$bvModal.show("New_Category");
-    },
-
-    //--------------------------Get ALL Categories & Sub category ---------------------------\\
-
-    Get_Categories(page) {
-      // Start the progress bar.
-      NProgress.start();
-      NProgress.set(0.1);
-      axios
-        .get(
-          "categories?page=" +
-            page +
-            "&SortField=" +
-            this.serverParams.sort.field +
-            "&SortType=" +
-            this.serverParams.sort.type +
-            "&search=" +
-            this.search +
-            "&limit=" +
-            this.limit
-        )
-        .then(response => {
-          this.categories = response.data.categories;
-          this.totalRows = response.data.totalRows;
-
-          // Complete the animation of theprogress bar.
-          NProgress.done();
-          this.isLoading = false;
-        })
-        .catch(response => {
-          // Complete the animation of theprogress bar.
-          NProgress.done();
-          setTimeout(() => {
-            this.isLoading = false;
-          }, 500);
-        });
-    },
-
-    //----------------------------------Create new Category ----------------\\
-    Create_Category() {
-      this.SubmitProcessing = true;
-      axios
+//----------------------------------Create new Category ----------------\\
+function Create_Category() {
+    loading.value = true;
+    snackbar.value = false;
+    axios
         .post("categories", {
-          name: this.category.name,
-          code: this.category.code
+            name: category.value.name,
+            code: category.value.code,
         })
-        .then(response => {
-          this.SubmitProcessing = false;
-          Fire.$emit("Event_Category");
-          this.makeToast(
-            "success",
-            this.$t("Create.TitleCat"),
-            this.$t("Success")
-          );
+        .then(({ data }) => {
+            snackbar.value = true;
+            snackbarColor.value = "success";
+            snackbarText.value = "Proceso exitoso";
+            router.reload();
+            dialog.value = false;
         })
-        .catch(error => {
-          this.SubmitProcessing = false;
-          this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+        .catch((error) => {
+            console.log(error);
+            snackbar.value = true;
+            snackbarColor.value = "error";
+            snackbarText.value = error.response.data.message;
+        })
+        .finally(() => {
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
         });
-    },
+}
 
-    //---------------------------------- Update Category ----------------\\
-    Update_Category() {
-      this.SubmitProcessing = true;
-      axios
-        .put("categories/" + this.category.id, {
-          name: this.category.name,
-          code: this.category.code
+//---------------------------------- Update Category ----------------\\
+function Update_Category() {
+    loading.value = true;
+    snackbar.value = false;
+    axios
+        .put("categories/" + category.value.id, {
+            name: category.value.name,
+            code: category.value.code,
         })
-        .then(response => {
-          this.SubmitProcessing = false;
-          Fire.$emit("Event_Category");
-          this.makeToast(
-            "success",
-            this.$t("Update.TitleCat"),
-            this.$t("Success")
-          );
+        .then(({ data }) => {
+            snackbar.value = true;
+            snackbarColor.value = "success";
+            snackbarText.value = "Proceso exitoso";
+            router.reload();
+            dialog.value = false;
         })
-        .catch(error => {
-          this.SubmitProcessing = false;
-          this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+        .catch((error) => {
+            console.log(error);
+            snackbar.value = true;
+            snackbarColor.value = "error";
+            snackbarText.value = error.response.data.message;
+        })
+        .finally(() => {
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
         });
-    },
+}
 
-    //--------------------------- reset Form ----------------\\
+//--------------------------- reset Form ----------------\\
 
-    reset_Form() {
-      this.category = {
+function reset_Form() {
+    category.value = {
         id: "",
         name: "",
-        code: ""
-      };
-    },
+        code: "",
+    };
+}
 
-    //--------------------------- Remove Category----------------\\
-    Remove_Category(id) {
-      this.$swal({
-        title: this.$t("Delete.Title"),
-        text: this.$t("Delete.Text"),
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        cancelButtonText: this.$t("Delete.cancelButtonText"),
-        confirmButtonText: this.$t("Delete.confirmButtonText")
-      }).then(result => {
-        if (result.value) {
-          axios
-            .delete("categories/" + id)
-            .then(() => {
-              this.$swal(
-                this.$t("Delete.Deleted"),
-                this.$t("Delete.CatDeleted"),
-                "success"
-              );
+//---------------------- delete modal  ------------------------------\\
+function Delete_Category(item) {
+    reset_Form();
+    category.value = item;
+    dialogDelete.value = true;
+}
 
-              Fire.$emit("Delete_Category");
-            })
-            .catch(() => {
-              this.$swal(
-                this.$t("Delete.Failed"),
-                this.$t("Delete.Therewassomethingwronge"),
-                "warning"
-              );
-            });
-        }
-      });
-    },
+function onCloseDelete() {
+    reset_Form();
+    dialogDelete.value = false;
+}
 
-    //---- Delete category by selection
-
-    delete_by_selected() {
-      this.$swal({
-        title: this.$t("Delete.Title"),
-        text: this.$t("Delete.Text"),
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        cancelButtonText: this.$t("Delete.cancelButtonText"),
-        confirmButtonText: this.$t("Delete.confirmButtonText")
-      }).then(result => {
-        if (result.value) {
-          // Start the progress bar.
-          NProgress.start();
-          NProgress.set(0.1);
-          axios
-            .post("categories/delete/by_selection", {
-              selectedIds: this.selectedIds
-            })
-            .then(() => {
-              this.$swal(
-                this.$t("Delete.Deleted"),
-                this.$t("Delete.CatDeleted"),
-                "success"
-              );
-
-              Fire.$emit("Delete_Category");
-            })
-            .catch(() => {
-              // Complete the animation of theprogress bar.
-              setTimeout(() => NProgress.done(), 500);
-              this.$swal(
-                this.$t("Delete.Failed"),
-                this.$t("Delete.Therewassomethingwronge"),
-                "warning"
-              );
-            });
-        }
-      });
-    }
-  }, //end Methods
-
-  //----------------------------- Created function-------------------
-
-  created: function() {
-    this.Get_Categories(1);
-
-    Fire.$on("Event_Category", () => {
-      setTimeout(() => {
-        this.Get_Categories(this.serverParams.page);
-        this.$bvModal.hide("New_Category");
-      }, 500);
-    });
-
-    Fire.$on("Delete_Category", () => {
-      setTimeout(() => {
-        this.Get_Categories(this.serverParams.page);
-      }, 500);
-    });
-  }
-};
+//--------------------------- Remove Category----------------\\
+function Remove_Category() {
+    loading.value = true;
+    snackbar.value = false;
+    axios
+        .delete("categories/" + category.value.id)
+        .then(({ data }) => {
+            snackbar.value = true;
+            snackbarColor.value = "success";
+            snackbarText.value = "Borrado exitoso";
+            router.reload();
+            dialogDelete.value = false;
+        })
+        .catch((error) => {
+            console.log(error);
+            snackbar.value = true;
+            snackbarColor.value = "error";
+            snackbarText.value = error.response.data.message;
+        })
+        .finally(() => {
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
+        });
+}
 </script>
+<template>
+    <Layout :loading="loading">
+        <snackbar
+            :snackbar="snackbar"
+            :snackbar-color="snackbarColor"
+            :snackbar-text="snackbarText"
+        ></snackbar>
+        <v-dialog v-model="dialogDelete" max-width="300px">
+            <v-card>
+                <v-card-text class="text-h5 text-center"
+                    >Estas seguro?
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        small
+                        variant="elevated"
+                        color="primary"
+                        class="ma-1"
+                        @click="Remove_Category"
+                        >Si
+                    </v-btn>
+                    <v-btn
+                        variant="elevated"
+                        small
+                        color="error"
+                        class="ma-1"
+                        @click="onCloseDelete"
+                        >Cancelar
+                    </v-btn>
+
+                    <v-spacer></v-spacer>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog
+            v-model="dialog"
+            max-width="400px"
+            scrollable
+            @update:modelValue="dialog === false ? reset_Form() : dialog"
+        >
+            <v-card>
+                <v-toolbar
+                    border
+                    density="comfortable"
+                    :title="(editmode ? 'Modificar' : 'Nueva') + ' Categoria'"
+                >
+                </v-toolbar>
+
+                <v-card-text>
+                    <v-form ref="form">
+                        <v-row>
+                            <!-- Code category -->
+                            <v-col md="12">
+                                <v-text-field
+                                    :label="categoryLabels.code + ' *'"
+                                    v-model="category.code"
+                                    :placeholder="categoryLabels.code"
+                                    :rules="ruleForm.required"
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                >
+                                </v-text-field>
+                            </v-col>
+
+                            <!-- Name category -->
+                            <v-col md="12">
+                                <v-text-field
+                                    :label="categoryLabels.name + ' *'"
+                                    v-model="category.name"
+                                    :placeholder="categoryLabels.name"
+                                    :rules="ruleForm.required"
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                >
+                                </v-text-field>
+                            </v-col>
+                        </v-row>
+                    </v-form>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        size="small"
+                        variant="outlined"
+                        color="error"
+                        class="ma-1"
+                        @click="onClose"
+                    >
+                        Cancelar
+                    </v-btn>
+                    <v-btn
+                        size="small"
+                        color="primary"
+                        variant="elevated"
+                        class="ma-1"
+                        @click="Submit_Category"
+                        :loading="loading"
+                        :disabled="loading"
+                    >
+                        Guardar
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <v-row align="center">
+            <v-col>
+                <v-text-field
+                    v-model="search"
+                    prepend-icon="mdi-magnify"
+                    density="compact"
+                    hide-details
+                    label="Buscar"
+                    single-line
+                    variant="underlined"
+                ></v-text-field>
+            </v-col>
+            <v-spacer></v-spacer>
+            <v-col cols="auto" class="text-right">
+                <v-btn
+                    size="small"
+                    color="primary"
+                    class="ma-1"
+                    prepend-icon="mdi-account-plus"
+                    @click="New_category"
+                >
+                    Añadir
+                </v-btn>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <v-data-table
+                    :headers="fields"
+                    :items="categories"
+                    :search="search"
+                    hover
+                    class="elevation-2"
+                    density="compact"
+                    no-data-text="No existen datos a mostrar"
+                >
+                    <template v-slot:item.actions="{ item }">
+                        <v-btn
+                            class="ma-1"
+                            color="primary"
+                            icon="mdi-pencil"
+                            size="x-small"
+                            variant="outlined"
+                            @click="Edit_category(item.raw)"
+                        >
+                        </v-btn>
+                        <v-btn
+                            class="ma-1"
+                            color="error"
+                            icon="mdi-delete"
+                            size="x-small"
+                            variant="outlined"
+                            @click="Delete_Category(item.raw)"
+                        >
+                        </v-btn>
+                    </template>
+                </v-data-table>
+            </v-col>
+        </v-row>
+    </Layout>
+</template>

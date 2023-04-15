@@ -20,11 +20,9 @@ class WarehouseController extends Controller
     {
 //        $this->authorizeForUser($request->user('api'), 'view', Warehouse::class);
 
-        // How many items do you want to display.
-
         $warehouses = Warehouse::get();
         Inertia::share('titlePage', 'Almacenes');
-        return Inertia::render('Warehouses',
+        return Inertia::render('Settings/Warehouses',
             ['warehouses' => $warehouses]);
     }
 

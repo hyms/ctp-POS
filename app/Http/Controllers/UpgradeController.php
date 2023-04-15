@@ -114,6 +114,19 @@ class UpgradeController extends Controller
 //                'updated_at' => Carbon::now(),
 //            ]);
 //            Log::info("finish role_user migration");
+            $items = DB::table('tipoProducto')->get();
+            $items->each(function ($item) {
+                $id = DB::table('categories')->insertGetId([
+                    'id' => $item->id,
+                    'code' => $item->codigo,
+                    'name' => $item->nombre,
+                    'created_at' => $item->created_at,
+                    'updated_at' => $item->updated_at,
+                    'deleted_at' => $item->deleted_at,
+                ]);
+            });
+
+            Log::info("finish categories migration");
 
         } catch (Exception $ex) {
             $errors = $ex->getMessage();

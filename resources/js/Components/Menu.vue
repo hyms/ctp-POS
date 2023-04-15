@@ -109,12 +109,12 @@ const menu = ref([
             },
             {
                 label: "Categorias",
-                url: "/products/Categories",
+                url: "/products/categories",
                 role: "admin",
             },
             {
                 label: "Unidades",
-                url: "/products/Units",
+                url: "/products/units",
                 role: "admin",
             },
             // {

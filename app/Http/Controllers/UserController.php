@@ -69,7 +69,7 @@ class UserController extends Controller
             return ['value' => $item->id, 'title' => $item->name];
         });
         Inertia::share('titlePage', 'Usuarios');
-        return Inertia::render('Users',
+        return Inertia::render('People/Users',
             ['users' => $users, 'warehouses' => $warehouses, 'roles' => $roles]);
     }
 

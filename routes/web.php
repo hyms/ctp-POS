@@ -2,8 +2,7 @@
 
 use App\Http\Controllers\CajaController;
 
-use App\Http\Controllers\ClienteController;
-
+use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\OrdenesController;
 use App\Http\Controllers\PDFController;
@@ -19,9 +18,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ClientController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,15 +31,6 @@ use Inertia\Inertia;
 |
 */
 
-//Route::get('/', function () {
-//    return Inertia::render('Welcome', [
-//        'canLogin' => Route::has('login'),
-//        'canRegister' => Route::has('register'),
-//        'laravelVersion' => Application::VERSION,
-//        'phpVersion' => PHP_VERSION,
-//    ]);
-//});
-
 Route::get('/upgrade', [UpgradeController::class, 'index'])->name('upgrade');
 Route::post('/upgrade', [UpgradeController::class, 'upgrade'])->name('upgrade');
 
@@ -51,8 +39,6 @@ Route::get('/',[DashboardController::class, 'index']
 
 require __DIR__.'/auth.php';
 
-Route::get('search/{id}', [ClienteController::class, 'buscar'])
-    ->name('buscar');
 
 Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
 
@@ -98,10 +84,17 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::get('get_product_detail/{id}', [ProductsController::class,'Get_Products_Details']);
     Route::get('get_products_stock_alerts', [ProductsController::class,'Products_Alert']);
     Route::get('barcode_create_page', [ProductsController::class,'Get_element_barcode']);
-    Route::post('products/delete/by_selection', [ProductsController::class,'delete_by_selection']);
     //------------------------------------------------------------------\\
 
 
+    Route::prefix('products')->group(function () {
+        //------------------------------- Category --------------------------\\
+        Route::get('/categories', [CategorieController::class, 'index']);
+        Route::post('/categories', [CategorieController::class, 'store']);
+        Route::put('/categories/{id}', [CategorieController::class, 'update']);
+        Route::delete('/categories/{id}', [CategorieController::class, 'destroy']);
+        //------------------------------------------------------------------\\
+    });
 
 
     Route::get('ordenes', [OrdenesController::class, 'getAll'])
@@ -423,11 +416,7 @@ Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
     Route::post('products/delete/by_selection', 'ProductsController@delete_by_selection');
 
 
-    //------------------------------- Category --------------------------\\
-    //------------------------------------------------------------------\\
 
-    Route::resource('categories', 'CategorieController');
-    Route::post('categories/delete/by_selection', 'CategorieController@delete_by_selection');
 
     //------------------------------- Units --------------------------\\
     //------------------------------------------------------------------\\

@@ -2,8 +2,6 @@
 import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
-import { VDataTableServer } from "vuetify/labs/VDataTable";
-import "jspdf-autotable";
 import ruleForm from "@/rules";
 import { router } from "@inertiajs/vue3";
 
@@ -16,9 +14,6 @@ const props = defineProps({
 const form = ref(null);
 const search = ref("");
 const loading = ref(false);
-const alertType = ref("info");
-const alertText = ref("");
-const alert = ref(false);
 const snackbar = ref(false);
 const snackbarText = ref("");
 const snackbarColor = ref("info");
@@ -33,12 +28,7 @@ const fields = ref([
     { title: "Correo", key: "email" },
     { title: "Acciones", key: "actions" },
 ]);
-const jsonFields = ref({
-    Nombre: "name",
-    Tefono: "mobile",
-    Ciudad: "city",
-    Correo: "email",
-});
+
 //form
 const warehouse = ref({
     id: "",
@@ -112,7 +102,6 @@ function Update_Warehouse() {
             mobile: warehouse.value.mobile,
             email: warehouse.value.email,
             city: warehouse.value.city,
-            _method: "put",
         })
         .then(({ data }) => {
             snackbar.value = true;
@@ -362,38 +351,36 @@ function onCloseDelete() {
         </v-row>
         <v-row>
             <v-col>
-                <v-skeleton-loader :loading="loading" boilerplate type="table">
-                    <v-data-table
-                        :headers="fields"
-                        :items="warehouses"
-                        :search="search"
-                        hover
-                        class="elevation-2"
-                        density="compact"
-                        no-data-text="No existen datos a mostrar"
-                    >
-                        <template v-slot:item.actions="{ item }">
-                            <v-btn
-                                class="ma-1"
-                                color="primary"
-                                icon="mdi-pencil"
-                                size="x-small"
-                                variant="outlined"
-                                @click="Edit_Warehouse(item.raw)"
-                            >
-                            </v-btn>
-                            <v-btn
-                                class="ma-1"
-                                color="error"
-                                icon="mdi-delete"
-                                size="x-small"
-                                variant="outlined"
-                                @click="Delete_Warehouse(item.raw)"
-                            >
-                            </v-btn>
-                        </template>
-                    </v-data-table>
-                </v-skeleton-loader>
+                <v-data-table
+                    :headers="fields"
+                    :items="warehouses"
+                    :search="search"
+                    hover
+                    class="elevation-2"
+                    density="compact"
+                    no-data-text="No existen datos a mostrar"
+                >
+                    <template v-slot:item.actions="{ item }">
+                        <v-btn
+                            class="ma-1"
+                            color="primary"
+                            icon="mdi-pencil"
+                            size="x-small"
+                            variant="outlined"
+                            @click="Edit_Warehouse(item.raw)"
+                        >
+                        </v-btn>
+                        <v-btn
+                            class="ma-1"
+                            color="error"
+                            icon="mdi-delete"
+                            size="x-small"
+                            variant="outlined"
+                            @click="Delete_Warehouse(item.raw)"
+                        >
+                        </v-btn>
+                    </template>
+                </v-data-table>
             </v-col>
         </v-row>
     </Layout>

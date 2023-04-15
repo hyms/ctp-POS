@@ -25,9 +25,7 @@ class ClientController extends Controller
     public function index(request $request)
     {
 //        $this->authorizeForUser($request->user('api'), 'view', Client::class);
-        // How many items do you want to display.
 
-        // Filter fields With Params to retrieve
         $clients = Client::where('deleted_at', '=', null)
             ->get();
         $data = collect();
@@ -72,7 +70,7 @@ class ClientController extends Controller
         $company_info = Setting::where('deleted_at', '=', null)->first();
 
         Inertia::share('titlePage', 'Clientes');
-        return Inertia::render('Clients',[
+        return Inertia::render('People/Clients',[
             'clients' => $data,
             'company_info' => $company_info,
         ]);
@@ -144,22 +142,6 @@ class ClientController extends Controller
         ]);
         return response()->json(['success' => true]);
     }
-
-    //-------------- Delete by selection  ---------------\\
-
-    public function delete_by_selection(Request $request)
-    {
-        $this->authorizeForUser($request->user('api'), 'delete', Client::class);
-        $selectedIds = $request->selectedIds;
-
-        foreach ($selectedIds as $Client_id) {
-            Client::whereId($Client_id)->update([
-                'deleted_at' => Carbon::now(),
-            ]);
-        }
-        return response()->json(['success' => true]);
-    }
-
 
     //------------- get Number Order Customer -------------\\
 
