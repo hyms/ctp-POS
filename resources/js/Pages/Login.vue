@@ -1,7 +1,7 @@
 <script setup>
-import {ref} from 'vue';
-import Layout from '@/Layouts/Guest.vue';
-import {router} from "@inertiajs/vue3";
+import { ref } from "vue";
+import Layout from "@/Layouts/Guest.vue";
+import { router } from "@inertiajs/vue3";
 
 defineProps({
     canResetPassword: Boolean,
@@ -9,31 +9,28 @@ defineProps({
 });
 
 const form = ref({
-    username: '',
-    password: '',
-    remember: false
+    username: "",
+    password: "",
+    remember: false,
 });
 const processing = ref(false);
 const alert = ref(false);
 
 function submit() {
-    processing.value = true
-    router.post('/login', form.value, {
-        onSuccess: (page) => {
-        },
-        onError:(error)=>{
+    processing.value = true;
+    router.post("/login", form.value, {
+        onSuccess: (page) => {},
+        onError: (error) => {
             if (Object.keys(error).length > 0) {
                 alert.value = true;
             }
         },
         onFinish: () => {
-            form.value.password = ''
-            processing.value = false
-        }
-    })
-
+            form.value.password = "";
+            processing.value = false;
+        },
+    });
 }
-
 </script>
 <template>
     <Layout>
@@ -41,9 +38,7 @@ function submit() {
             <div class="auth-inner">
                 <v-card class="auth-card" :elevation="5">
                     <!-- title -->
-                    <v-card-title>
-                        Bienvenido a xCTP
-                    </v-card-title>
+                    <v-card-title> Bienvenido a xCTP </v-card-title>
                     <v-card-subtitle>
                         Por favor ingresa tu usuario y contraseña
                     </v-card-subtitle>
@@ -57,7 +52,9 @@ function submit() {
                             type="error"
                         >
                             <ul class="text-sm">
-                                <li v-for="(error, key) in errors" :key="key">{{ error }}</li>
+                                <li v-for="(error, key) in errors" :key="key">
+                                    {{ error }}
+                                </li>
                             </ul>
                         </v-alert>
                         <form @submit.prevent="submit">
@@ -82,7 +79,9 @@ function submit() {
                                 ></v-text-field>
                             </div>
 
-                            <div class="d-flex align-center justify-space-between flex-wrap">
+                            <div
+                                class="d-flex align-center justify-space-between flex-wrap"
+                            >
                                 <v-checkbox
                                     label="Remember Me"
                                     hide-details
@@ -97,7 +96,8 @@ function submit() {
                                 color="primary"
                                 type="submit"
                                 :loading="processing"
-                                :disabled="processing">
+                                :disabled="processing"
+                            >
                                 Ingresar
                                 <template v-slot:loader>
                                     <span>Ingresando...</span>
@@ -173,5 +173,4 @@ function submit() {
         }
     }
 }
-
 </style>

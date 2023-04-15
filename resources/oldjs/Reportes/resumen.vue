@@ -1,5 +1,5 @@
 <template>
-<!--    <div class="content-w">
+    <!--    <div class="content-w">
         <div class="content-box">
             <Menu :active="0"></Menu>
             <div class="tab-content">
@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated.vue'
+import Authenticated from "@/Layouts/Authenticated.vue";
 import Menu from "./menuReportes.vue";
 
 export default {
@@ -82,27 +82,27 @@ export default {
         fechaF: String,
     },
     components: {
-        Menu
+        Menu,
     },
     data() {
         return {
             form: {
                 fechaI: {
-                    label: 'Desde',
+                    label: "Desde",
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
                 fechaF: {
-                    label: 'Hasta',
+                    label: "Hasta",
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
             },
-        }
+        };
     },
     methods: {
         enviar() {
@@ -110,8 +110,8 @@ export default {
             for (const key in this.form) {
                 form[key] = this.form[key].value;
             }
-            this.$inertia.get('/admin/reportes/resumen', form)
+            this.$inertia.get("/admin/reportes/resumen", form);
         },
     },
-}
+};
 </script>

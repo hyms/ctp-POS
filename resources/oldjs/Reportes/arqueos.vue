@@ -1,5 +1,5 @@
 <template>
-<!--    <div class="content-w">
+    <!--    <div class="content-w">
         <div class="content-box">
             <Menu :active="2"></Menu>
             <div class="tab-content">
@@ -125,7 +125,7 @@
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated.vue'
+import Authenticated from "@/Layouts/Authenticated.vue";
 import Menu from "./menuReportes.vue";
 
 export default {
@@ -142,46 +142,52 @@ export default {
         cajas: Array,
         dia: String,
     },
-    components:{
-        Menu
+    components: {
+        Menu,
     },
     data() {
         return {
             form: {
                 fechaI: {
-                    label: 'Desde',
+                    label: "Desde",
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
                 fechaF: {
-                    label: 'Hasta',
+                    label: "Hasta",
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
             },
-            total: 0
-        }
+            total: 0,
+        };
     },
     methods: {
         getTotal() {
-            let monto = this.saldo + this.ventas + this.deudas + this.recibos[1] + this.cajas[0] - this.recibos[0] - this.cajas[1];
-            if (this.arqueo.monto)
-                return -this.arqueo.monto
+            let monto =
+                this.saldo +
+                this.ventas +
+                this.deudas +
+                this.recibos[1] +
+                this.cajas[0] -
+                this.recibos[0] -
+                this.cajas[1];
+            if (this.arqueo.monto) return -this.arqueo.monto;
             return monto;
         },
         enviar() {
             let form = {};
-            for(const key in this.form){
+            for (const key in this.form) {
                 form[key] = this.form[key].value;
             }
-            this.$inertia.get('/admin/reportes/arqueos', form)
+            this.$inertia.get("/admin/reportes/arqueos", form);
         },
-    }
-}
+    },
+};
 </script>
 <style>
 .text-small {

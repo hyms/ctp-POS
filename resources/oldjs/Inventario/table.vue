@@ -4,7 +4,7 @@
             <formStock
                 :dialog="dialog"
                 :productos="productos"
-                :ingreso="typeInventario===2"
+                :ingreso="typeInventario === 2"
                 :productos-sell="productosSell()"
                 @close="close"
             ></formStock>
@@ -21,7 +21,9 @@
                                 left
                             >
                                 Saldos
-                                <v-icon right>mdi-clipboard-list-outline</v-icon>
+                                <v-icon right
+                                    >mdi-clipboard-list-outline</v-icon
+                                >
                             </v-btn>
                         </template>
                         <v-card>
@@ -29,23 +31,27 @@
                                 <v-simple-table>
                                     <template v-slot:default>
                                         <thead>
-                                        <tr>
-                                            <th class="text-left">
-                                                Producto
-                                            </th>
-                                            <th class="text-left">
-                                                Cantidad
-                                            </th>
-                                        </tr>
+                                            <tr>
+                                                <th class="text-left">
+                                                    Producto
+                                                </th>
+                                                <th class="text-left">
+                                                    Cantidad
+                                                </th>
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                        <tr
-                                            v-for="item in productos"
-                                            :key="item.name"
-                                        >
-                                            <td>{{ item.formato }} ({{ item.dimension }})</td>
-                                            <td>{{ item.cantidad }}</td>
-                                        </tr>
+                                            <tr
+                                                v-for="item in productos"
+                                                :key="item.name"
+                                            >
+                                                <td>
+                                                    {{ item.formato }} ({{
+                                                        item.dimension
+                                                    }})
+                                                </td>
+                                                <td>{{ item.cantidad }}</td>
+                                            </tr>
                                         </tbody>
                                     </template>
                                 </v-simple-table>
@@ -53,7 +59,10 @@
                         </v-card>
                     </v-dialog>
                     <v-spacer class="d-inline"></v-spacer>
-                    <formSearch :report="report" :productosSelect="productosSelect"></formSearch>
+                    <formSearch
+                        :report="report"
+                        :productosSelect="productosSelect"
+                    ></formSearch>
                 </v-col>
             </v-row>
             <v-row>
@@ -63,7 +72,12 @@
                             <v-card-title>
                                 {{ item.title }}
                                 <v-spacer></v-spacer>
-                                <v-btn outlined color="primary" small @click="loadForm(item.typeInventario)">
+                                <v-btn
+                                    outlined
+                                    color="primary"
+                                    small
+                                    @click="loadForm(item.typeInventario)"
+                                >
                                     Nuevo
                                     <v-icon right> mdi-plus-thick</v-icon>
                                 </v-btn>
@@ -108,16 +122,16 @@ export default {
             alert: false,
             sending: false,
             sendingF: false,
-            emptyText: 'No existen datos a mostrar',
+            emptyText: "No existen datos a mostrar",
             editedIndex: -1,
             editedItem: {},
             typeInventario: 0,
-        }
+        };
     },
     components: {
         genericTable,
         formSearch,
-        formStock
+        formStock,
     },
     methods: {
         openDialogFilter(typeInventario) {
@@ -129,8 +143,8 @@ export default {
             this.dialogFilter = false;
         },
         searchItems() {
-            let form = {}
-            form['typeInventario'] = this.typeInventario;
+            let form = {};
+            form["typeInventario"] = this.typeInventario;
             for (let key in this.formFiltro) {
                 form[key] = this.formFiltro[key].value;
             }
@@ -138,7 +152,7 @@ export default {
             this.$inertia.get(this.$page.url, form, {
                 onFinish() {
                     this.sendingF = false;
-                }
+                },
             });
         },
         loadForm(typeInventario) {
@@ -147,16 +161,16 @@ export default {
         },
         productosSell() {
             let sell = [];
-                for (let key in this.productos) {
-                    sell[key] = {
-                        id: this.productos[key].id,
-                        cantidad: 0,
-                        costo: this.productos[key].precioUnidad,
-                        producto: this.productos[key].producto
-                    };
-                }
+            for (let key in this.productos) {
+                sell[key] = {
+                    id: this.productos[key].id,
+                    cantidad: 0,
+                    costo: this.productos[key].precioUnidad,
+                    producto: this.productos[key].producto,
+                };
+            }
             return sell;
         },
     },
-}
+};
 </script>

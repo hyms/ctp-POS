@@ -4,10 +4,17 @@
             <v-card>
                 <v-card-title>
                     <v-row>
-                        <template v-for="(item,key) in form">
+                        <template v-for="(item, key) in form">
                             <v-col cols="4">
                                 <v-text-field
-                                    v-if="['text','password','date','email'].includes(item.type)"
+                                    v-if="
+                                        [
+                                            'text',
+                                            'password',
+                                            'date',
+                                            'email',
+                                        ].includes(item.type)
+                                    "
                                     :id="key"
                                     v-model="item.value"
                                     outlined
@@ -18,7 +25,7 @@
                                     :label="item.label"
                                 ></v-text-field>
                                 <v-select
-                                    v-if="item.type==='select'"
+                                    v-if="item.type === 'select'"
                                     :id="key"
                                     v-model="item.value"
                                     item-text="text"
@@ -35,17 +42,22 @@
                         <v-col>
                             <v-row>
                                 <v-col>
-                                    <v-btn left color="primary" @click="sended"
-                                           :loading="sending" :disabled="sending">
+                                    <v-btn
+                                        left
+                                        color="primary"
+                                        @click="sended"
+                                        :loading="sending"
+                                        :disabled="sending"
+                                    >
                                         Consultar
-                                        <v-icon right>
-                                            mdi-poll
-                                        </v-icon>
+                                        <v-icon right> mdi-poll </v-icon>
                                     </v-btn>
                                 </v-col>
                                 <v-spacer></v-spacer>
                                 <v-col align="right">
-                                    <v-btn right elevation="1" color="secondary"><h3>Total: {{ total }}</h3></v-btn>
+                                    <v-btn right elevation="1" color="secondary"
+                                        ><h3>Total: {{ total }}</h3></v-btn
+                                    >
                                 </v-col>
                             </v-row>
                         </v-col>
@@ -53,59 +65,136 @@
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
-
-                    <v-dialog id="cliente" v-model="dialogOrdenes" max-width="600">
+                    <v-dialog
+                        id="cliente"
+                        v-model="dialogOrdenes"
+                        max-width="600"
+                    >
                         <v-card>
                             <v-card-title class="text-h5">
-                                {{ 'Cliente: '+ item.nombre }}
+                                {{ "Cliente: " + item.nombre }}
                             </v-card-title>
                             <v-card-text>
-                            <div class="table-responsive">
-                                <v-data-table
-                                    :headers="item.fields"
-                                    :items="item.ordenes"
-                                    :single-expand="true"
-                                    :expanded.sync="expanded"
-                                    item-key="codigoServicio"
-                                    show-expand
-                                    class="elevation-1"
-                                >
-                                    <template v-slot:expanded-item="{ headers, item }">
-                                        <td :colspan="headers.length" class="m-0 p-0">
-                                            <v-card class="mt-3 mb-3">
-                                                    <div class="table-responsive">
-                                                        <v-simple-table class="table">
+                                <div class="table-responsive">
+                                    <v-data-table
+                                        :headers="item.fields"
+                                        :items="item.ordenes"
+                                        :single-expand="true"
+                                        :expanded.sync="expanded"
+                                        item-key="codigoServicio"
+                                        show-expand
+                                        class="elevation-1"
+                                    >
+                                        <template
+                                            v-slot:expanded-item="{
+                                                headers,
+                                                item,
+                                            }"
+                                        >
+                                            <td
+                                                :colspan="headers.length"
+                                                class="m-0 p-0"
+                                            >
+                                                <v-card class="mt-3 mb-3">
+                                                    <div
+                                                        class="table-responsive"
+                                                    >
+                                                        <v-simple-table
+                                                            class="table"
+                                                        >
                                                             <thead>
-                                                            <tr>
-                                                                <th scope="col">#</th>
-                                                                <th scope="col">Productos</th>
-                                                                <th scope="col">Cant.</th>
-                                                                <th scope="col">Precio</th>
-                                                                <th scope="col">Total</th>
-                                                            </tr>
+                                                                <tr>
+                                                                    <th
+                                                                        scope="col"
+                                                                    >
+                                                                        #
+                                                                    </th>
+                                                                    <th
+                                                                        scope="col"
+                                                                    >
+                                                                        Productos
+                                                                    </th>
+                                                                    <th
+                                                                        scope="col"
+                                                                    >
+                                                                        Cant.
+                                                                    </th>
+                                                                    <th
+                                                                        scope="col"
+                                                                    >
+                                                                        Precio
+                                                                    </th>
+                                                                    <th
+                                                                        scope="col"
+                                                                    >
+                                                                        Total
+                                                                    </th>
+                                                                </tr>
                                                             </thead>
                                                             <tbody>
-                                                            <tr v-for="(itemOrden,key) in item.detallesOrden">
-                                                                <td>{{ key + 1 }}</td>
-                                                                <td>{{ getProduct(itemOrden.stock) }}</td>
-                                                                <td>{{ itemOrden.cantidad }}</td>
-                                                                <td>{{ itemOrden.costo }}</td>
-                                                                <td>{{ itemOrden.costo * itemOrden.cantidad }}</td>
-                                                            </tr>
+                                                                <tr
+                                                                    v-for="(
+                                                                        itemOrden,
+                                                                        key
+                                                                    ) in item.detallesOrden"
+                                                                >
+                                                                    <td>
+                                                                        {{
+                                                                            key +
+                                                                            1
+                                                                        }}
+                                                                    </td>
+                                                                    <td>
+                                                                        {{
+                                                                            getProduct(
+                                                                                itemOrden.stock
+                                                                            )
+                                                                        }}
+                                                                    </td>
+                                                                    <td>
+                                                                        {{
+                                                                            itemOrden.cantidad
+                                                                        }}
+                                                                    </td>
+                                                                    <td>
+                                                                        {{
+                                                                            itemOrden.costo
+                                                                        }}
+                                                                    </td>
+                                                                    <td>
+                                                                        {{
+                                                                            itemOrden.costo *
+                                                                            itemOrden.cantidad
+                                                                        }}
+                                                                    </td>
+                                                                </tr>
                                                             </tbody>
                                                             <tfoot>
-                                                            <tr>
-                                                                <td colspan="4" class="text-right"><strong>Total</strong></td>
-                                                                <td>{{ getTotal(item.detallesOrden) }}</td>
-                                                            </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        colspan="4"
+                                                                        class="text-right"
+                                                                    >
+                                                                        <strong
+                                                                            >Total</strong
+                                                                        >
+                                                                    </td>
+                                                                    <td>
+                                                                        {{
+                                                                            getTotal(
+                                                                                item.detallesOrden
+                                                                            )
+                                                                        }}
+                                                                    </td>
+                                                                </tr>
                                                             </tfoot>
                                                         </v-simple-table>
                                                     </div>
-                                            </v-card>
-                                        </td>
-                                    </template>
-                                </v-data-table>
-<!--                            <b-table
+                                                </v-card>
+                                            </td>
+                                        </template>
+                                    </v-data-table>
+                                    <!--                            <b-table
                                 striped
                                 hover
                                 :items="item.ordenes"
@@ -158,42 +247,78 @@
                                     </b-card>
                                 </template>
                             </b-table>-->
-                            </div>
+                                </div>
                             </v-card-text>
                         </v-card>
                     </v-dialog>
 
-                    <template v-if="data['table'].length>0">
+                    <template v-if="data['table'].length > 0">
                         <v-simple-table fixed-header height="60vh">
                             <template v-slot:default>
                                 <thead>
-                                <tr>
-                                    <template v-for="field in data['fields']">
-                                        <th>
-                                            <span class="text-uppercase">{{ field }}</span>
-                                        </th>
-                                    </template>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <template
-                                    v-for="(item,key) in data['table']"
-                                >
                                     <tr>
-                                        <template v-for="field in data['fields']">
-                                            <td>
-                                                <template v-if="field==='desde'">{{ getDesde(item) }}</template>
-                                                <template v-else-if="field==='hasta'">{{ getHasta(item) }}</template>
-                                                <template v-else-if="field==='cantidad'">{{
-                                                        getCantidad(item)
-                                                    }}
-                                                </template>
-                                                <template v-else-if="field==='nombre'"><v-btn @click="loadModal(item)" text color="primary">{{ item[field] }}</v-btn></template>
-                                                <template v-else>{{ item[field] }}</template>
-                                            </td>
+                                        <template
+                                            v-for="field in data['fields']"
+                                        >
+                                            <th>
+                                                <span class="text-uppercase">{{
+                                                    field
+                                                }}</span>
+                                            </th>
                                         </template>
                                     </tr>
-                                </template>
+                                </thead>
+                                <tbody>
+                                    <template
+                                        v-for="(item, key) in data['table']"
+                                    >
+                                        <tr>
+                                            <template
+                                                v-for="field in data['fields']"
+                                            >
+                                                <td>
+                                                    <template
+                                                        v-if="field === 'desde'"
+                                                        >{{
+                                                            getDesde(item)
+                                                        }}</template
+                                                    >
+                                                    <template
+                                                        v-else-if="
+                                                            field === 'hasta'
+                                                        "
+                                                        >{{
+                                                            getHasta(item)
+                                                        }}</template
+                                                    >
+                                                    <template
+                                                        v-else-if="
+                                                            field === 'cantidad'
+                                                        "
+                                                        >{{ getCantidad(item) }}
+                                                    </template>
+                                                    <template
+                                                        v-else-if="
+                                                            field === 'nombre'
+                                                        "
+                                                        ><v-btn
+                                                            @click="
+                                                                loadModal(item)
+                                                            "
+                                                            text
+                                                            color="primary"
+                                                            >{{
+                                                                item[field]
+                                                            }}</v-btn
+                                                        ></template
+                                                    >
+                                                    <template v-else>{{
+                                                        item[field]
+                                                    }}</template>
+                                                </td>
+                                            </template>
+                                        </tr>
+                                    </template>
                                 </tbody>
                             </template>
                         </v-simple-table>
@@ -305,8 +430,8 @@
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated.vue'
-import moment from 'moment';
+import Authenticated from "@/Layouts/Authenticated.vue";
+import moment from "moment";
 
 export default {
     layout: Authenticated,
@@ -324,7 +449,7 @@ export default {
         return {
             form: {
                 sucursal: {
-                    label: 'Sucursal',
+                    label: "Sucursal",
                     value: "",
                     type: "select",
                     state: null,
@@ -332,24 +457,25 @@ export default {
                     options: this.sucursales,
                 },
                 fechaI: {
-                    label: 'Fecha Inicio',
+                    label: "Fecha Inicio",
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
-                }, fechaF: {
-                    label: 'Fecha Fin',
+                    stateText: null,
+                },
+                fechaF: {
+                    label: "Fecha Fin",
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
             },
             item: {},
             sending: false,
-            dialogOrdenes:false,
+            dialogOrdenes: false,
             expanded: [],
-        }
+        };
     },
     methods: {
         sended() {
@@ -357,11 +483,11 @@ export default {
             for (let key in this.form) {
                 form[key] = this.form[key].value;
             }
-            this.$inertia.get('/admin/reportes/mora', form)
+            this.$inertia.get("/admin/reportes/mora", form);
         },
         loadModal(item) {
             this.item = item;
-            this.dialogOrdenes=true;
+            this.dialogOrdenes = true;
         },
         getTotal(detalle) {
             let total = 0;
@@ -383,7 +509,7 @@ export default {
                 }
             }
             if (item) {
-                return item.formato + ' (' + item.dimension + ')';
+                return item.formato + " (" + item.dimension + ")";
             }
             return "";
         },
@@ -407,7 +533,7 @@ export default {
         },
         getCantidad(item) {
             return item.ordenes.length;
-        }
+        },
     },
     created() {
         for (let key in this.request) {
@@ -416,6 +542,6 @@ export default {
         for (let key in this.errors) {
             this.form[key].state = false;
         }
-    }
-}
+    },
+};
 </script>

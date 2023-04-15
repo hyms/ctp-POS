@@ -4,10 +4,17 @@
             <v-card>
                 <v-card-title>
                     <v-row>
-                        <template v-for="(item,key) in form">
+                        <template v-for="(item, key) in form">
                             <v-col cols="4">
                                 <v-text-field
-                                    v-if="['text','password','date','email'].includes(item.type)"
+                                    v-if="
+                                        [
+                                            'text',
+                                            'password',
+                                            'date',
+                                            'email',
+                                        ].includes(item.type)
+                                    "
                                     :id="key"
                                     v-model="item.value"
                                     outlined
@@ -18,7 +25,7 @@
                                     :label="item.label"
                                 ></v-text-field>
                                 <v-select
-                                    v-if="item.type==='select'"
+                                    v-if="item.type === 'select'"
                                     :id="key"
                                     v-model="item.value"
                                     item-text="text"
@@ -31,7 +38,7 @@
                                     :label="item.label"
                                 ></v-select>
                                 <v-autocomplete
-                                    v-if="item.type==='search'"
+                                    v-if="item.type === 'search'"
                                     v-model="item.value"
                                     :items="clientes"
                                     item-text="text"
@@ -47,16 +54,18 @@
                         <v-col>
                             <v-row>
                                 <v-col>
-                                    <v-btn left color="primary" @click="sended"
-                                           :loading="sending" :disabled="sending">
+                                    <v-btn
+                                        left
+                                        color="primary"
+                                        @click="sended"
+                                        :loading="sending"
+                                        :disabled="sending"
+                                    >
                                         Consultar
-                                        <v-icon right>
-                                            mdi-poll
-                                        </v-icon>
+                                        <v-icon right> mdi-poll </v-icon>
                                     </v-btn>
                                 </v-col>
                                 <v-spacer></v-spacer>
-
                             </v-row>
                         </v-col>
                     </v-row>
@@ -66,95 +75,172 @@
                     <v-row>
                         <v-col>
                             <h5>Resumen</h5>
-                            <v-menu
-                                :close-on-content-click="false"
-                                offset-y>
+                            <v-menu :close-on-content-click="false" offset-y>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-btn right elevation="1" color="secondary" class="ma-1" v-bind="attrs"
-                                           v-on="on"><h3>Total Venta: {{ getTotalMonto(totals['venta']) }}</h3>
+                                    <v-btn
+                                        right
+                                        elevation="1"
+                                        color="secondary"
+                                        class="ma-1"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                        ><h3>
+                                            Total Venta:
+                                            {{ getTotalMonto(totals["venta"]) }}
+                                        </h3>
                                     </v-btn>
                                 </template>
 
                                 <v-card>
                                     <v-list>
-                                        <v-list-item v-for="(value,key) in totals['venta']">
+                                        <v-list-item
+                                            v-for="(value, key) in totals[
+                                                'venta'
+                                            ]"
+                                        >
                                             <v-list-item-content>
-                                                <v-list-item-title>{{ key }}</v-list-item-title>
+                                                <v-list-item-title>{{
+                                                    key
+                                                }}</v-list-item-title>
                                             </v-list-item-content>
                                             <v-list-item-action>
-                                                <v-list-item-action-text><h2>{{ value }}</h2></v-list-item-action-text>
+                                                <v-list-item-action-text
+                                                    ><h2>
+                                                        {{ value }}
+                                                    </h2></v-list-item-action-text
+                                                >
                                             </v-list-item-action>
                                         </v-list-item>
                                     </v-list>
                                 </v-card>
                             </v-menu>
-                            <v-menu
-                                :close-on-content-click="false"
-                                offset-y>
+                            <v-menu :close-on-content-click="false" offset-y>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-btn right elevation="1" color="secondary" class="ma-1" v-bind="attrs"
-                                           v-on="on"><h3>Total Deuda: {{ getTotalMonto(totals['deuda']) }}</h3>
+                                    <v-btn
+                                        right
+                                        elevation="1"
+                                        color="secondary"
+                                        class="ma-1"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                        ><h3>
+                                            Total Deuda:
+                                            {{ getTotalMonto(totals["deuda"]) }}
+                                        </h3>
                                     </v-btn>
                                 </template>
 
                                 <v-card>
                                     <v-list>
-                                        <v-list-item v-for="(value,key) in totals['deuda']">
+                                        <v-list-item
+                                            v-for="(value, key) in totals[
+                                                'deuda'
+                                            ]"
+                                        >
                                             <v-list-item-content>
-                                                <v-list-item-title>{{ key }}</v-list-item-title>
+                                                <v-list-item-title>{{
+                                                    key
+                                                }}</v-list-item-title>
                                             </v-list-item-content>
                                             <v-list-item-action>
-                                                <v-list-item-action-text><h2>{{ value }}</h2></v-list-item-action-text>
+                                                <v-list-item-action-text
+                                                    ><h2>
+                                                        {{ value }}
+                                                    </h2></v-list-item-action-text
+                                                >
                                             </v-list-item-action>
                                         </v-list-item>
                                     </v-list>
                                 </v-card>
                             </v-menu>
-                            <v-menu
-                                :close-on-content-click="false"
-                                offset-y>
+                            <v-menu :close-on-content-click="false" offset-y>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-btn right elevation="1" color="secondary" class="ma-1" v-bind="attrs"
-                                           v-on="on"><h3>Total Pagado: {{ getTotalMonto(totals['pagado']) }}</h3>
+                                    <v-btn
+                                        right
+                                        elevation="1"
+                                        color="secondary"
+                                        class="ma-1"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                        ><h3>
+                                            Total Pagado:
+                                            {{
+                                                getTotalMonto(totals["pagado"])
+                                            }}
+                                        </h3>
                                     </v-btn>
                                 </template>
 
                                 <v-card>
                                     <v-list>
-                                        <v-list-item v-for="(value,key) in totals['pagado']">
+                                        <v-list-item
+                                            v-for="(value, key) in totals[
+                                                'pagado'
+                                            ]"
+                                        >
                                             <v-list-item-content>
-                                                <v-list-item-title>{{ key }}</v-list-item-title>
+                                                <v-list-item-title>{{
+                                                    key
+                                                }}</v-list-item-title>
                                             </v-list-item-content>
                                             <v-list-item-action>
-                                                <v-list-item-action-text><h2>{{ value }}</h2></v-list-item-action-text>
+                                                <v-list-item-action-text
+                                                    ><h2>
+                                                        {{ value }}
+                                                    </h2></v-list-item-action-text
+                                                >
                                             </v-list-item-action>
                                         </v-list-item>
                                     </v-list>
                                 </v-card>
                             </v-menu>
-                            <v-menu
-                                :close-on-content-click="false"
-                                offset-y>
+                            <v-menu :close-on-content-click="false" offset-y>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-btn right elevation="1" color="secondary" class="ma-1" v-bind="attrs"
-                                           v-on="on"><h3># Ordenes: {{ getTotalMonto(totals['ordenes']) }}</h3>
+                                    <v-btn
+                                        right
+                                        elevation="1"
+                                        color="secondary"
+                                        class="ma-1"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                        ><h3>
+                                            # Ordenes:
+                                            {{
+                                                getTotalMonto(totals["ordenes"])
+                                            }}
+                                        </h3>
                                     </v-btn>
                                 </template>
 
                                 <v-card>
                                     <v-list>
-                                        <v-list-item v-for="(value,key) in totals['ordenes']">
+                                        <v-list-item
+                                            v-for="(value, key) in totals[
+                                                'ordenes'
+                                            ]"
+                                        >
                                             <v-list-item-content>
-                                                <v-list-item-title>{{ key }}</v-list-item-title>
+                                                <v-list-item-title>{{
+                                                    key
+                                                }}</v-list-item-title>
                                             </v-list-item-content>
                                             <v-list-item-action>
-                                                <v-list-item-action-text><h2>{{ value }}</h2></v-list-item-action-text>
+                                                <v-list-item-action-text
+                                                    ><h2>
+                                                        {{ value }}
+                                                    </h2></v-list-item-action-text
+                                                >
                                             </v-list-item-action>
                                         </v-list-item>
                                     </v-list>
                                 </v-card>
                             </v-menu>
-                            <v-btn right elevation="1" color="secondary" class="ma-1">
+                            <v-btn
+                                right
+                                elevation="1"
+                                color="secondary"
+                                class="ma-1"
+                            >
                                 <h3>
                                     <json-excel :data="data['table']">
                                         Exportar
@@ -173,10 +259,10 @@
                     no-data-text="No hay datos para mostrar"
                     mobile-breakpoint="540"
                 >
-                    <template v-slot:item.created_at="{item}">
+                    <template v-slot:item.created_at="{ item }">
                         {{ item.created_at | moment("DD/MM/YYYY HH:mm") }}
                     </template>
-                    <template v-slot:item.updated_at="{item}">
+                    <template v-slot:item.updated_at="{ item }">
                         {{ item.updated_at | moment("DD/MM/YYYY HH:mm") }}
                     </template>
                 </v-data-table>
@@ -186,8 +272,8 @@
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated.vue'
-import moment from 'moment';
+import Authenticated from "@/Layouts/Authenticated.vue";
+import moment from "moment";
 import JsonExcel from "vue-json-excel";
 
 export default {
@@ -200,16 +286,16 @@ export default {
         errors: Object,
         data: Object,
         totals: Object,
-        clientes: Array
+        clientes: Array,
     },
     components: {
-        JsonExcel
+        JsonExcel,
     },
     data() {
         return {
             form: {
                 sucursal: {
-                    label: 'Sucursales',
+                    label: "Sucursales",
                     value: "",
                     type: "select",
                     state: null,
@@ -217,29 +303,29 @@ export default {
                     options: this.sucursales,
                 },
                 fechaI: {
-                    label: 'Fecha desde',
+                    label: "Fecha desde",
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
                 fechaF: {
-                    label: 'Fecha hasta',
+                    label: "Fecha hasta",
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
 
                 cliente: {
-                    label: 'Cliente',
+                    label: "Cliente",
                     value: "",
                     type: "search",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
                 tipoOrden: {
-                    label: 'Tipo de orden',
+                    label: "Tipo de orden",
                     value: "",
                     type: "select",
                     state: null,
@@ -247,7 +333,7 @@ export default {
                     options: this.tipoProducto,
                 },
                 estado: {
-                    label: 'Estado',
+                    label: "Estado",
                     value: "",
                     type: "select",
                     state: null,
@@ -262,16 +348,16 @@ export default {
             loading: false,
             search: null,
             menuventa: false,
-        }
+        };
     },
     methods: {
         sended() {
-            this.sending = true
+            this.sending = true;
             let form = {};
             for (let key in this.form) {
                 form[key] = this.form[key].value;
             }
-            this.$inertia.get('/admin/reportes/ordenes', form)
+            this.$inertia.get("/admin/reportes/ordenes", form);
             this.sending = false;
         },
         loadModal(item) {
@@ -289,17 +375,17 @@ export default {
             return total;
         },
         getTotalMonto(items) {
-            let total = 0
+            let total = 0;
             for (let value of Object.values(items)) {
-                total += value
+                total += value;
             }
-            return total
-        }
+            return total;
+        },
     },
     created() {
         for (let key in this.request) {
             this.form[key].value = this.request[key];
         }
     },
-}
+};
 </script>

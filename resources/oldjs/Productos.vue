@@ -5,18 +5,16 @@
         :basePath="'producto'"
         :fields="fields"
         :title="'Productos'"
-
         :titleForm="'Producto'"
         :form="form"
         :urlPost="'/admin/producto'"
-
     >
     </generic-table>
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated.vue'
-import GenericTable from '@/../../oldjs/components/genericTable.vue';
+import Authenticated from "@/Layouts/Authenticated.vue";
+import GenericTable from "@/../../oldjs/components/genericTable.vue";
 
 export default {
     layout: Authenticated,
@@ -30,62 +28,60 @@ export default {
     },
     data() {
         return {
-            fields:
-                [
-                    {
-                        text: 'Codigo',
-                        value: 'codigo'
-                    },
-                    {
-                        text: 'Nombre',
-                        value: 'formato',
-                    },
-                    {
-                        text: 'Detalle',
-                        value: 'dimension',
-                    },
-                    {
-                        text: 'Tipo Producto',
-                        value: 'productoTipoView',
-                    },
-                    {
-                        text: 'Acciones',
-                        value: 'Acciones'
-                    },
-                ],
+            fields: [
+                {
+                    text: "Codigo",
+                    value: "codigo",
+                },
+                {
+                    text: "Nombre",
+                    value: "formato",
+                },
+                {
+                    text: "Detalle",
+                    value: "dimension",
+                },
+                {
+                    text: "Tipo Producto",
+                    value: "productoTipoView",
+                },
+                {
+                    text: "Acciones",
+                    value: "Acciones",
+                },
+            ],
             form: {
                 codigo: {
-                    label: 'Codigo',
+                    label: "Codigo",
                     value: "",
                     type: "text",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
                 formato: {
-                    label: 'Nombre',
+                    label: "Nombre",
                     value: "",
                     type: "text",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
                 dimension: {
-                    label: 'Detalle',
+                    label: "Detalle",
                     value: "",
                     type: "text",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
                 productoTipo: {
-                    label: 'Tipo Producto',
+                    label: "Tipo Producto",
                     value: "",
                     type: "group-check",
                     state: null,
                     stateText: null,
-                    options: this.tipoProducto
-                }
+                    options: this.tipoProducto,
+                },
             },
-        }
+        };
     },
-}
+};
 </script>
-

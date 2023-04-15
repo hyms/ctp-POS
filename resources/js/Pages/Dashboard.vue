@@ -1,5 +1,5 @@
 <script setup>
-import Layout from '@/Layouts/Authenticated.vue'
+import Layout from "@/Layouts/Authenticated.vue";
 </script>
 
 <template>
@@ -7,7 +7,9 @@ import Layout from '@/Layouts/Authenticated.vue'
         <v-row>
             <v-col>
                 <v-card>
-                    <v-card-title><h4>Bienvenido a tu Tablero</h4></v-card-title>
+                    <v-card-title
+                        ><h4>Bienvenido a tu Tablero</h4></v-card-title
+                    >
                     <v-card-subtitle></v-card-subtitle>
                 </v-card>
             </v-col>

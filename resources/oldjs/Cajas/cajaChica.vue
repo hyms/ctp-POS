@@ -10,13 +10,12 @@
         :titleForm="'Registro de Caja Chica'"
         :form="form"
         :urlPost="'/cajaDebito'"
-
     >
     </generic-table>
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated.vue'
+import Authenticated from "@/Layouts/Authenticated.vue";
 import genericTable from "@/../components/genericTable.vue";
 
 export default {
@@ -25,44 +24,44 @@ export default {
         registros: Array,
         credito: Boolean,
         report: Object,
-        errors: Object
+        errors: Object,
     },
     components: {
-        genericTable
+        genericTable,
     },
     data() {
         return {
             fields: [
                 {
-                    text: 'Detalle',
-                    value: 'observaciones'
+                    text: "Detalle",
+                    value: "observaciones",
                 },
                 {
-                    text: 'Monto',
-                    value: 'monto'
+                    text: "Monto",
+                    value: "monto",
                 },
                 {
-                    text: 'Fecha',
-                    value: 'created_at'
+                    text: "Fecha",
+                    value: "created_at",
                 },
             ],
             form: {
                 observaciones: {
-                    label: 'Descripcion',
+                    label: "Descripcion",
                     value: "",
                     type: "textarea",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
                 monto: {
-                    label: 'monto',
+                    label: "monto",
                     value: "",
                     type: "text",
                     state: null,
-                    stateText: null
-                }
+                    stateText: null,
+                },
             },
-        }
+        };
     },
-}
+};
 </script>

@@ -1,5 +1,5 @@
 <script setup>
-import Menu from "@/Layouts/Menu.vue";
+import Menu from "@/Components/Menu.vue";
 import moment from "moment";
 import { ref } from "vue";
 

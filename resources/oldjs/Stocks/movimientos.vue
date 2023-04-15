@@ -1,5 +1,5 @@
 <template>
-<!--    <div class="content-w">
+    <!--    <div class="content-w">
         <div class="content-box">
             <div class="tab-content">
                 <div class="m-b-20">
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated.vue'
+import Authenticated from "@/Layouts/Authenticated.vue";
 
 export default {
     layout: Authenticated,
@@ -56,42 +56,40 @@ export default {
         sucursales: Array,
         errors: Object,
     },
-    components: {
-    },
+    components: {},
     data() {
         return {
             isNew: true,
-            titulo: 'Movimientos',
-            textoVacio: 'No existen Movimientos',
-            fields:
-                [
-                    'producto',
-                    {
-                        label: 'Origen',
-                        key: 'soSucursal'
-                    },
-                    {
-                        label: 'Destino',
-                        key: 'sdSucursal'
-                    },
-                    'cantidad',
-                    'nombre',
-                    'apellido',
-                    'observaciones',
-                    {
-                        label: 'Fecha',
-                        key: 'updated_at'
-                    }
-                ],
+            titulo: "Movimientos",
+            textoVacio: "No existen Movimientos",
+            fields: [
+                "producto",
+                {
+                    label: "Origen",
+                    key: "soSucursal",
+                },
+                {
+                    label: "Destino",
+                    key: "sdSucursal",
+                },
+                "cantidad",
+                "nombre",
+                "apellido",
+                "observaciones",
+                {
+                    label: "Fecha",
+                    key: "updated_at",
+                },
+            ],
             itemRow: {},
             totalRows: 1,
             currentPage: 1,
             perPage: 20,
-        }
+        };
     },
     methods: {
         getSucursal(value) {
-            let nombre = '';
+            let nombre = "";
             for (let key in this.sucursales) {
                 if (value === this.sucursales[key].id) {
                     nombre = this.sucursales[key].nombre;
@@ -100,19 +98,22 @@ export default {
             return nombre;
         },
         getProducto(value) {
-            let nombre = '';
+            let nombre = "";
             for (let key in this.productos) {
                 if (value === this.productos[key].id) {
-                    nombre = this.productos[key].formato + ' (' + this.productos[key].dimension + ')';
+                    nombre =
+                        this.productos[key].formato +
+                        " (" +
+                        this.productos[key].dimension +
+                        ")";
                 }
             }
             return nombre;
-        }
+        },
     },
     mounted() {
         // Set the initial number of items
-        this.totalRows = this.movimientos.length
+        this.totalRows = this.movimientos.length;
     },
-}
+};
 </script>
-

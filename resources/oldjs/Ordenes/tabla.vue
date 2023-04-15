@@ -9,7 +9,7 @@
                 :tipo="tipoProductoFiltro"
                 :title="titleForm"
                 :dialog="dialogOrden"
-                v-if="typeReport===0"
+                v-if="typeReport === 0"
                 @close="close()"
             ></formOrden>
             <delete-item
@@ -37,10 +37,15 @@
             ></item-reposicion>
             <v-card>
                 <v-card-title>
-                    <template v-if="typeReport===0" v-for="(tipoProducto,key) in tiposProductos">
+                    <template
+                        v-if="typeReport === 0"
+                        v-for="(tipoProducto, key) in tiposProductos"
+                    >
                         <v-btn
                             :key="key"
-                            @click="loadOrden(tipoProducto.id,tipoProducto.nombre)"
+                            @click="
+                                loadOrden(tipoProducto.id, tipoProducto.nombre)
+                            "
                             color="primary"
                             small
                             elevation="1"
@@ -52,7 +57,7 @@
                     <formSearch
                         :report="report"
                         :estados="estados"
-                        v-if="typeReport===1"
+                        v-if="typeReport === 1"
                         :tiposSelect="tiposSelect"
                     ></formSearch>
                     <template v-if="report.total">
@@ -66,11 +71,12 @@
                     :items="ordenes"
                     :headers="fields"
                     :no-data-text="emptyText"
-                    mobile-breakpoint="540">
-                    <template v-slot:item.created_at="{item}">
+                    mobile-breakpoint="540"
+                >
+                    <template v-slot:item.created_at="{ item }">
                         {{ item.created_at | moment("DD/MM/YYYY HH:mm") }}
                     </template>
-                    <template v-slot:item.updated_at="{item}">
+                    <template v-slot:item.updated_at="{ item }">
                         {{ item.updated_at | moment("DD/MM/YYYY HH:mm") }}
                     </template>
                     <template v-slot:item.Acciones="{ item }">
@@ -80,13 +86,20 @@
                                     small
                                     class="ma-1"
                                     color="secondary"
-                                    @click="loadOrden(item.tipoOrden,item.tipoOrdenView,item.id,item)"
-                                    v-if="!isVenta && viewModify(item.created_at)"
+                                    @click="
+                                        loadOrden(
+                                            item.tipoOrden,
+                                            item.tipoOrdenView,
+                                            item.id,
+                                            item
+                                        )
+                                    "
+                                    v-if="
+                                        !isVenta && viewModify(item.created_at)
+                                    "
                                     v-on="on"
                                 >
-                                    <v-icon>
-                                        mdi-file-document-edit
-                                    </v-icon>
+                                    <v-icon> mdi-file-document-edit </v-icon>
                                 </v-btn>
                             </template>
                             <span>Modificar</span>
@@ -98,12 +111,13 @@
                                     class="ma-1"
                                     small
                                     @click="deleted(item.id)"
-                                    v-if="item.estado===1 && viewModify(item.created_at)"
+                                    v-if="
+                                        item.estado === 1 &&
+                                        viewModify(item.created_at)
+                                    "
                                     v-on="on"
                                 >
-                                    <v-icon>
-                                        mdi-file-document-remove
-                                    </v-icon>
+                                    <v-icon> mdi-file-document-remove </v-icon>
                                 </v-btn>
                             </template>
                             <span>Anular</span>
@@ -117,9 +131,7 @@
                                     @click="loadItem(item)"
                                     v-on="on"
                                 >
-                                    <v-icon>
-                                        mdi-file-document-check
-                                    </v-icon>
+                                    <v-icon> mdi-file-document-check </v-icon>
                                 </v-btn>
                             </template>
                             <span>Ver Orden</span>
@@ -130,13 +142,16 @@
                                     color="info"
                                     class="ma-1"
                                     small
-                                    @click="loadReposicion(item.tipoOrden,item)"
-                                    v-if="[0,2].includes(item.estado) && viewReposicion(item.created_at)"
+                                    @click="
+                                        loadReposicion(item.tipoOrden, item)
+                                    "
+                                    v-if="
+                                        [0, 2].includes(item.estado) &&
+                                        viewReposicion(item.created_at)
+                                    "
                                     v-on="on"
                                 >
-                                    <v-icon>
-                                        mdi-file-document-alert
-                                    </v-icon>
+                                    <v-icon> mdi-file-document-alert </v-icon>
                                 </v-btn>
                             </template>
                             <span>Reposicion</span>
@@ -149,19 +164,19 @@
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated.vue'
-import formOrden from './form.vue'
-import itemOrden from './item.vue'
-import itemReposicion from './itemReposicion.vue'
-import formSearch from './formSearch.vue'
+import Authenticated from "@/Layouts/Authenticated.vue";
+import formOrden from "./form.vue";
+import itemOrden from "./item.vue";
+import itemReposicion from "./itemReposicion.vue";
+import formSearch from "./formSearch.vue";
 import deleteItem from "@/../components/deleteItem.vue";
-import moment from 'moment'
+import moment from "moment";
 
 export default {
     layout: Authenticated,
     data() {
         return {
-            emptyText: 'No existen Ordenes',
+            emptyText: "No existen Ordenes",
             deleteText: "Anular",
             titleForm: "",
             tipoProductoFiltro: null,
@@ -173,8 +188,8 @@ export default {
             dialogDelete: false,
             dialogItem: false,
             dialogReposicion: false,
-            baseDeletePath: "orden"
-        }
+            baseDeletePath: "orden",
+        };
     },
     props: {
         ordenes: Array,
@@ -197,15 +212,15 @@ export default {
     },
     methods: {
         loadOrden(tipo, title, id = -1, item = null) {
-            this.loadDialog(tipo, title, id, item)
+            this.loadDialog(tipo, title, id, item);
             this.dialogOrden = true;
         },
         loadItem(item) {
-            this.loadDialog(null, "", item.id, item)
+            this.loadDialog(null, "", item.id, item);
             this.dialogItem = true;
         },
         loadReposicion(tipoOrden, item) {
-            this.loadDialog(tipoOrden, "", item.id, item)
+            this.loadDialog(tipoOrden, "", item.id, item);
             this.dialogReposicion = true;
         },
         loadDialog(tipo, title, id, item) {
@@ -223,13 +238,13 @@ export default {
             this.dialogItem = false;
             this.dialogReposicion = false;
             this.$nextTick(() => {
-                this.editedIndex = -1
-                this.editedItem = Object.assign({}, {})
-            })
+                this.editedIndex = -1;
+                this.editedItem = Object.assign({}, {});
+            });
         },
         deleted(id) {
-            this.editedIndex = id
-            this.dialogDelete = true
+            this.editedIndex = id;
+            this.dialogDelete = true;
         },
         productosSell() {
             let sell = [];
@@ -240,7 +255,7 @@ export default {
                         id: this.productos[tipoProducto][key].id,
                         cantidad: 0,
                         costo: this.productos[tipoProducto][key].precioUnidad,
-                        producto: this.productos[tipoProducto][key].producto
+                        producto: this.productos[tipoProducto][key].producto,
                     };
                 }
             }
@@ -249,34 +264,36 @@ export default {
         viewModify(date) {
             const today = moment();
             date = moment(date);
-            return moment(today).isSame(date, 'day');
+            return moment(today).isSame(date, "day");
         },
         viewReposicion(limitDay) {
             const today = moment();
-            limitDay = moment(limitDay).add(this.reposicion, 'days');
-            return moment(limitDay).isSameOrAfter(today, 'day');
+            limitDay = moment(limitDay).add(this.reposicion, "days");
+            return moment(limitDay).isSameOrAfter(today, "day");
         },
     },
     created() {
-        this.fields = this.isVenta ? [
-            {value: 'tipoOrdenView', text: 'Tipo Orden'},
-            {value: 'codigoServicio', text: 'Codigo'},
-            {value: 'estadoView', text: 'Estado'},
-            {value: 'responsable', text: 'Cliente'},
-            {value: 'montoVenta', text: 'Monto'},
-            {value: 'montoDeuda', text: 'Monto Deuda'},
-            {value: 'created_at', text: 'Fecha Nueva Orden'},
-            {value: 'updated_at', text: 'Fecha Pago/Deuda'},
-            {value: 'Acciones', text: 'Acciones'}
-        ] : [
-            {value: 'tipoOrdenView', text: 'Tipo Orden'},
-            {value: 'codigoServicio', text: 'Codigo'},
-            {value: 'estadoView', text: 'Estado'},
-            {value: 'responsable', text: 'Cliente'},
-            {value: 'telefono', text: 'Telefono'},
-            {value: 'created_at', text: 'Fecha'},
-            {value: 'Acciones', text: 'Acciones'}
-        ];
+        this.fields = this.isVenta
+            ? [
+                  { value: "tipoOrdenView", text: "Tipo Orden" },
+                  { value: "codigoServicio", text: "Codigo" },
+                  { value: "estadoView", text: "Estado" },
+                  { value: "responsable", text: "Cliente" },
+                  { value: "montoVenta", text: "Monto" },
+                  { value: "montoDeuda", text: "Monto Deuda" },
+                  { value: "created_at", text: "Fecha Nueva Orden" },
+                  { value: "updated_at", text: "Fecha Pago/Deuda" },
+                  { value: "Acciones", text: "Acciones" },
+              ]
+            : [
+                  { value: "tipoOrdenView", text: "Tipo Orden" },
+                  { value: "codigoServicio", text: "Codigo" },
+                  { value: "estadoView", text: "Estado" },
+                  { value: "responsable", text: "Cliente" },
+                  { value: "telefono", text: "Telefono" },
+                  { value: "created_at", text: "Fecha" },
+                  { value: "Acciones", text: "Acciones" },
+              ];
     },
-}
+};
 </script>

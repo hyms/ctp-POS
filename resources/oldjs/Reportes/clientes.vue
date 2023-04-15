@@ -1,5 +1,5 @@
 <template>
-<!--    <div class="content-w">
+    <!--    <div class="content-w">
         <div class="content-box">
             <Menu :active="6" v-if="admin"></Menu>
             <div class="row" v-else>
@@ -128,7 +128,7 @@
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated.vue'
+import Authenticated from "@/Layouts/Authenticated.vue";
 import Menu from "./menuReportes.vue";
 import itemOrden from "../Ordenes/item.vue";
 
@@ -151,45 +151,45 @@ export default {
         return {
             form: {
                 fechaI: {
-                    label: 'Fecha Inicio',
+                    label: "Fecha Inicio",
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
                 fechaF: {
-                    label: 'Fecha Final',
+                    label: "Fecha Final",
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
                 sucursal: {
-                    label: 'Sucursal',
+                    label: "Sucursal",
                     value: "",
                     type: "select",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
                 cliente: {
-                    label: 'Cliente',
+                    label: "Cliente",
                     value: "",
                     type: "select",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
             },
             itemRow: {},
-        }
+        };
     },
     methods: {
         enviar() {
             let form = {};
-            form['fechaI'] = this.form.fechaI.value;
-            form['cliente'] = this.form.cliente.value;
-            form['fechaF'] = this.form.fechaF.value;
+            form["fechaI"] = this.form.fechaI.value;
+            form["cliente"] = this.form.cliente.value;
+            form["fechaF"] = this.form.fechaF.value;
             if (this.admin) {
-                form['sucursal'] = this.form.sucursal.value;
+                form["sucursal"] = this.form.sucursal.value;
             }
             this.$inertia.get(window.location.pathname, form);
         },
@@ -201,11 +201,10 @@ export default {
     },
     mounted() {
         for (const key in this.form) {
-            if (this.request[key] !== undefined && this.request[key] !== '') {
+            if (this.request[key] !== undefined && this.request[key] !== "") {
                 this.form[key].value = this.request[key];
             }
         }
     },
-
-}
+};
 </script>

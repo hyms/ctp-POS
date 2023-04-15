@@ -1,5 +1,5 @@
 <template>
-<!--    <div class="content-w">
+    <!--    <div class="content-w">
         <div class="content-box">
             <div class="row">
                 <div class="col-sm-12">
@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated.vue'
+import Authenticated from "@/Layouts/Authenticated.vue";
 
 export default {
     layout: Authenticated,
@@ -120,32 +120,38 @@ export default {
         return {
             form: {
                 fecha: {
-                    label: 'Fecha',
+                    label: "Fecha",
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
             },
-            total: 0
-        }
+            total: 0,
+        };
     },
     methods: {
         getTotal() {
-            let monto = this.saldo + this.ventas + this.deudas + this.recibos[1] + this.cajas[0] - this.recibos[0] - this.cajas[1];
-            if (this.arqueo.monto)
-                return -this.arqueo.monto
+            let monto =
+                this.saldo +
+                this.ventas +
+                this.deudas +
+                this.recibos[1] +
+                this.cajas[0] -
+                this.recibos[0] -
+                this.cajas[1];
+            if (this.arqueo.monto) return -this.arqueo.monto;
             return monto;
         },
         enviar() {
             let form = {};
-            for(let key in this.form){
+            for (let key in this.form) {
                 form[key] = this.form[key].value;
             }
-            this.$inertia.get('/arqueo', form)
+            this.$inertia.get("/arqueo", form);
         },
-    }
-}
+    },
+};
 </script>
 <style>
 .text-small {

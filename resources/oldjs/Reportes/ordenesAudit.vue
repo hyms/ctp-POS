@@ -4,10 +4,17 @@
             <v-card>
                 <v-card-title>
                     <v-row>
-                        <template v-for="(item,key) in form">
+                        <template v-for="(item, key) in form">
                             <v-col cols="4">
                                 <v-text-field
-                                    v-if="['text','password','date','email'].includes(item.type)"
+                                    v-if="
+                                        [
+                                            'text',
+                                            'password',
+                                            'date',
+                                            'email',
+                                        ].includes(item.type)
+                                    "
                                     :id="key"
                                     v-model="item.value"
                                     outlined
@@ -18,7 +25,7 @@
                                     :label="item.label"
                                 ></v-text-field>
                                 <v-select
-                                    v-if="item.type==='select'"
+                                    v-if="item.type === 'select'"
                                     :id="key"
                                     v-model="item.value"
                                     item-text="text"
@@ -31,7 +38,7 @@
                                     :label="item.label"
                                 ></v-select>
                                 <v-autocomplete
-                                    v-if="item.type==='search'"
+                                    v-if="item.type === 'search'"
                                     v-model="item.value"
                                     :items="clientes"
                                     item-text="text"
@@ -47,16 +54,18 @@
                         <v-col>
                             <v-row>
                                 <v-col>
-                                    <v-btn left color="primary" @click="sended"
-                                           :loading="sending" :disabled="sending">
+                                    <v-btn
+                                        left
+                                        color="primary"
+                                        @click="sended"
+                                        :loading="sending"
+                                        :disabled="sending"
+                                    >
                                         Consultar
-                                        <v-icon right>
-                                            mdi-poll
-                                        </v-icon>
+                                        <v-icon right> mdi-poll </v-icon>
                                     </v-btn>
                                 </v-col>
                                 <v-spacer></v-spacer>
-
                             </v-row>
                         </v-col>
                     </v-row>
@@ -66,7 +75,12 @@
                     <v-row>
                         <v-col>
                             <h5>Resumen</h5>
-                            <v-btn right elevation="1" color="secondary" class="ma-1">
+                            <v-btn
+                                right
+                                elevation="1"
+                                color="secondary"
+                                class="ma-1"
+                            >
                                 <h3>
                                     <json-excel :data="data['table']">
                                         Exportar
@@ -75,44 +89,84 @@
                                 </h3>
                             </v-btn>
                             <template v-if="data['totales']">
-                                <v-dialog
-                                    v-model="dialog"
-                                >
-
+                                <v-dialog v-model="dialog">
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-btn right elevation="1" color="secondary" class="ma-1" v-bind="attrs"
-                                               v-on="on"><h3>Por producto</h3>
+                                        <v-btn
+                                            right
+                                            elevation="1"
+                                            color="secondary"
+                                            class="ma-1"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            ><h3>Por producto</h3>
                                         </v-btn>
                                     </template>
                                     <v-card>
-                                        <v-card-title>Resumen por producto</v-card-title>
+                                        <v-card-title
+                                            >Resumen por producto</v-card-title
+                                        >
                                         <v-divider></v-divider>
                                         <v-card-text>
                                             <v-simple-table>
                                                 <thead>
-                                                <tr>
-                                                    <th></th>
-                                                    <th v-for="(value,key) in data['totales']['fields']">
-                                                        {{ value }}
-                                                    </th>
-                                                </tr>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th
+                                                            v-for="(
+                                                                value, key
+                                                            ) in data[
+                                                                'totales'
+                                                            ]['fields']"
+                                                        >
+                                                            {{ value }}
+                                                        </th>
+                                                    </tr>
                                                 </thead>
                                                 <tbody>
-                                                <template v-for="(value,key) in data['totales']">
-                                                    <template v-if="key!='fields'">
-                                                        <tr>
-                                                            <td>{{ key }}</td>
-                                                            <td v-for="(valuef,keyf) in data['totales']['fields']">
-                                                                <template v-if="value[valuef]">
-                                                                    {{ value[valuef] }}
-                                                                </template>
-                                                                <template v-else>
-                                                                    0
-                                                                </template>
-                                                            </td>
-                                                        </tr>
+                                                    <template
+                                                        v-for="(
+                                                            value, key
+                                                        ) in data['totales']"
+                                                    >
+                                                        <template
+                                                            v-if="
+                                                                key != 'fields'
+                                                            "
+                                                        >
+                                                            <tr>
+                                                                <td>
+                                                                    {{ key }}
+                                                                </td>
+                                                                <td
+                                                                    v-for="(
+                                                                        valuef,
+                                                                        keyf
+                                                                    ) in data[
+                                                                        'totales'
+                                                                    ]['fields']"
+                                                                >
+                                                                    <template
+                                                                        v-if="
+                                                                            value[
+                                                                                valuef
+                                                                            ]
+                                                                        "
+                                                                    >
+                                                                        {{
+                                                                            value[
+                                                                                valuef
+                                                                            ]
+                                                                        }}
+                                                                    </template>
+                                                                    <template
+                                                                        v-else
+                                                                    >
+                                                                        0
+                                                                    </template>
+                                                                </td>
+                                                            </tr>
+                                                        </template>
                                                     </template>
-                                                </template>
                                                 </tbody>
                                             </v-simple-table>
                                         </v-card-text>
@@ -130,10 +184,10 @@
                     no-data-text="No hay datos para mostrar"
                     mobile-breakpoint="540"
                 >
-                    <template v-slot:item.created_at="{item}">
+                    <template v-slot:item.created_at="{ item }">
                         {{ item.created_at | moment("DD/MM/YYYY HH:mm") }}
                     </template>
-                    <template v-slot:item.updated_at="{item}">
+                    <template v-slot:item.updated_at="{ item }">
                         {{ item.updated_at | moment("DD/MM/YYYY HH:mm") }}
                     </template>
                 </v-data-table>
@@ -143,7 +197,7 @@
 </template>
 
 <script>
-import Authenticated from '@/Layouts/Authenticated.vue'
+import Authenticated from "@/Layouts/Authenticated.vue";
 import JsonExcel from "vue-json-excel";
 
 export default {
@@ -157,13 +211,13 @@ export default {
         clientes: Array,
     },
     components: {
-        JsonExcel
+        JsonExcel,
     },
     data() {
         return {
             form: {
                 sucursal: {
-                    label: 'Sucursales',
+                    label: "Sucursales",
                     value: "",
                     type: "select",
                     state: null,
@@ -171,18 +225,18 @@ export default {
                     options: this.sucursales,
                 },
                 fechaI: {
-                    label: 'Fecha desde',
+                    label: "Fecha desde",
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
                 fechaF: {
-                    label: 'Fecha hasta',
+                    label: "Fecha hasta",
                     value: "",
                     type: "date",
                     state: null,
-                    stateText: null
+                    stateText: null,
                 },
             },
             item: {},
@@ -192,17 +246,17 @@ export default {
             loading: false,
             search: null,
             menuventa: false,
-            dialog:false
-        }
+            dialog: false,
+        };
     },
     methods: {
         sended() {
-            this.sending = true
+            this.sending = true;
             let form = {};
             for (let key in this.form) {
                 form[key] = this.form[key].value;
             }
-            this.$inertia.get(this.$page.url, form)
+            this.$inertia.get(this.$page.url, form);
             this.sending = false;
         },
         loadModal(item) {
@@ -220,17 +274,17 @@ export default {
             return total;
         },
         getTotalMonto(items) {
-            let total = 0
+            let total = 0;
             for (let value of Object.values(items)) {
-                total += value
+                total += value;
             }
-            return total
-        }
+            return total;
+        },
     },
     created() {
         for (let key in this.request) {
             this.form[key].value = this.request[key];
         }
     },
-}
+};
 </script>
