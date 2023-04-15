@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\CajaController;
-
 use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\OrdenesController;
@@ -13,6 +11,7 @@ use App\Http\Controllers\StockController;
 use App\Http\Controllers\SucursalController;
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UnitsController;
 use App\Http\Controllers\UpgradeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
@@ -89,10 +88,19 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
 
     Route::prefix('products')->group(function () {
         //------------------------------- Category --------------------------\\
-        Route::get('/categories', [CategorieController::class, 'index']);
-        Route::post('/categories', [CategorieController::class, 'store']);
-        Route::put('/categories/{id}', [CategorieController::class, 'update']);
-        Route::delete('/categories/{id}', [CategorieController::class, 'destroy']);
+        Route::get('categories', [CategorieController::class, 'index']);
+        Route::post('categories', [CategorieController::class, 'store']);
+        Route::put('categories/{id}', [CategorieController::class, 'update']);
+        Route::delete('categories/{id}', [CategorieController::class, 'destroy']);
+        //------------------------------------------------------------------\\
+
+        //------------------------------- Units --------------------------\\
+        Route::get('units', [UnitsController::class, 'index']);
+        Route::post('units', [UnitsController::class, 'store']);
+        Route::put('units/{id}', [UnitsController::class, 'update']);
+        Route::delete('units/{id}', [UnitsController::class, 'destroy']);
+        Route::get('get_sub_units_by_base', [UnitsController::class, 'Get_Units_SubBase']);
+        Route::get('get_units', [UnitsController::class, 'Get_sales_units']);
         //------------------------------------------------------------------\\
     });
 
@@ -119,18 +127,6 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('reposicion');
     Route::post('reposicion', [OrdenesController::class, 'postRepocision'])
         ->name('reposicionGuardar');
-    Route::get('arqueo', [CajaController::class, 'arqueo'])
-        ->name('arqueo');
-    Route::get('cajaDebito', [CajaController::class, 'getDebito'])
-        ->name('getDebito');
-    Route::get('cajaCredito', [CajaController::class, 'getCredito'])
-        ->name('getCredito');
-    Route::post('cajaDebito', [CajaController::class, 'debito'])
-        ->name('debito');
-    Route::post('cajaCredito', [CajaController::class, 'credito'])
-        ->name('credito');
-    Route::delete('cajaMovimiento', [CajaController::class, 'borrarMovimiento'])
-        ->name('cajaMovimiento');
     Route::delete('recibo/{id}', [ReciboController::class, 'borrar'])
         ->name('recibosBorrar');
     Route::post('recibo', [ReciboController::class, 'post'])
@@ -418,12 +414,7 @@ Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
 
 
 
-    //------------------------------- Units --------------------------\\
-    //------------------------------------------------------------------\\
 
-    Route::resource('units', 'UnitsController');
-    Route::get('get_sub_units_by_base', 'UnitsController@Get_Units_SubBase');
-    Route::get('get_units', 'UnitsController@Get_sales_units');
 
     //------------------------------- Brands--------------------------\\
     //------------------------------------------------------------------\\
