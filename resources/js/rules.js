@@ -30,6 +30,14 @@ export default {
             return true;
         },
     ],
+    numberWithDecimal: [
+        (v) => {
+            if (v !== null && v !== undefined && v.length > 0) {
+                return /^\d*\.?\d*$/.test(v) || "Solo numeros";
+            }
+            return true;
+        },
+    ],
     alpha: [
         (v) => {
             if (v !== null && v !== undefined && v.length > 0) {

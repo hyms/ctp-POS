@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\CategorieController;
+use App\Http\Controllers\SalesTypeController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\OrdenesController;
 use App\Http\Controllers\PDFController;
@@ -61,6 +61,13 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
 //    Route::post('warehouses/delete/by_selection', [WarehouseController::class,'delete_by_selection']);
     //------------------------------------------------------------------\\
 
+    //------------------------------- sales type --------------------------\\
+    Route::get('sales_types', [SalesTypeController::class, 'index']);
+    Route::post('sales_types', [SalesTypeController::class, 'store']);
+    Route::put('sales_types/{id}', [SalesTypeController::class, 'update']);
+    Route::delete('sales_types/{id}', [SalesTypeController::class, 'destroy']);
+    //------------------------------------------------------------------\\
+
     //------------------------------- CLIENTS --------------------------\\
     Route::get('clients', [ClientController::class,'index']);
     Route::post('clients', [ClientController::class,'store']);
@@ -88,10 +95,10 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
 
     Route::prefix('products')->group(function () {
         //------------------------------- Category --------------------------\\
-        Route::get('categories', [CategorieController::class, 'index']);
-        Route::post('categories', [CategorieController::class, 'store']);
-        Route::put('categories/{id}', [CategorieController::class, 'update']);
-        Route::delete('categories/{id}', [CategorieController::class, 'destroy']);
+        Route::get('categories', [SalesTypeController::class, 'index']);
+        Route::post('categories', [SalesTypeController::class, 'store']);
+        Route::put('categories/{id}', [SalesTypeController::class, 'update']);
+        Route::delete('categories/{id}', [SalesTypeController::class, 'destroy']);
         //------------------------------------------------------------------\\
 
         //------------------------------- Units --------------------------\\

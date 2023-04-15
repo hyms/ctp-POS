@@ -6,10 +6,10 @@ import ruleForm from "@/rules";
 import { router } from "@inertiajs/vue3";
 
 const props = defineProps({
-    units: Array,
-    units_base: Array,
+    sales_types: Array,
     errors: Object,
 });
+
 //declare variable
 const form = ref(null);
 const search = ref("");
@@ -20,91 +20,59 @@ const snackbarColor = ref("info");
 const dialog = ref(false);
 const dialogDelete = ref(false);
 const editmode = ref(false);
-const show_operator = ref(false);
 
 const fields = ref([
     { title: "Nombre", key: "name" },
-    { title: "Nombre corto", key: "ShortName" },
-    { title: "Unidad base", key: "base_unit" },
-    { title: "Operador", key: "operator" },
-    { title: "Valor de Operacion", key: "operator_value" },
+    { title: "Codigo", key: "code" },
     { title: "Acciones", key: "actions" },
 ]);
-const unit = ref({
+const sales_type = ref({
     id: "",
     name: "",
-    ShortName: "",
-    base_unit: "",
-    base_unit_name: "",
-    operator: "*",
-    operator_value: 1,
+    code: "",
 });
-const unitLabels = ref({
+const sales_typeLabels = ref({
     name: "Nombre",
-    ShortName: "Nombre corto",
-    base_unit: "Unidad base",
-    base_unit_name: "Nombre unidad base",
-    operator: "Operador",
-    operator_value: "Valor de Operacion",
+    code: "Codigo",
 });
 
-//------------- Submit Validation Create & Edit Unit
-async function Submit_Unit() {
+//------------- Submit Validation Create & Edit SalesType
+async function Submit_SalesType() {
     const validate = await form.value.validate();
     if (validate.valid)
         if (!editmode.value) {
-            Create_Unit();
+            Create_SalesType();
         } else {
-            Update_Unit();
+            Update_SalesType();
         }
 }
 
-//------------------------------ Modal (create Unit) -------------------------------\\
-function New_Unit() {
+//------------------------------ Modal  (create SalesType) -------------------------------\\
+function New_SalesType() {
     reset_Form();
-    show_operator.value = false;
     editmode.value = false;
     dialog.value = true;
 }
-
 function onClose() {
     dialog.value = false;
     reset_Form();
 }
-
-//------------------------------ Modal (Update Unit) -------------------------------\\
-function Edit_Unit(item) {
+//------------------------------ Modal (Update SalesType) -------------------------------\\
+function Edit_SalesType(item) {
     reset_Form();
-    unit.value = item;
-    show_operator.value = unit.value.base_unit !== "";
+    sales_type.value = item;
     editmode.value = true;
     dialog.value = true;
 }
 
-function Selected_Base_Unit(value) {
-    show_operator.value = value != null;
-}
-
-//---------------------------------------- Set To Strings-------------------------\\
-function setToStrings() {
-    // Simply replaces null values with strings=''
-    if (unit.value.base_unit === null) {
-        unit.value.base_unit = "";
-    }
-}
-
-//---------------- Send Request with axios ( Create Unit) --------------------\\
-function Create_Unit() {
+//----------------------------------Create new SalesType ----------------\\
+function Create_SalesType() {
     loading.value = true;
     snackbar.value = false;
-    setToStrings();
     axios
-        .post("units", {
-            name: unit.value.name,
-            ShortName: unit.value.ShortName,
-            base_unit: unit.value.base_unit,
-            operator: unit.value.operator,
-            operator_value: unit.value.operator_value,
+        .post("sales_types", {
+            name: sales_type.value.name,
+            code: sales_type.value.code,
         })
         .then(({ data }) => {
             snackbar.value = true;
@@ -126,18 +94,14 @@ function Create_Unit() {
         });
 }
 
-//--------------- Send Request with axios ( Update Unit) --------------------\\
-function Update_Unit() {
+//---------------------------------- Update SalesType ----------------\\
+function Update_SalesType() {
     loading.value = true;
     snackbar.value = false;
-    setToStrings();
     axios
-        .put("units/" + unit.value.id, {
-            name: unit.value.name,
-            ShortName: unit.value.ShortName,
-            base_unit: unit.value.base_unit,
-            operator: unit.value.operator,
-            operator_value: unit.value.operator_value,
+        .put("sales_types/" + sales_type.value.id, {
+            name: sales_type.value.name,
+            code: sales_type.value.code,
         })
         .then(({ data }) => {
             snackbar.value = true;
@@ -159,23 +123,20 @@ function Update_Unit() {
         });
 }
 
-//------------------------------ reset Form ------------------------------\\
+//--------------------------- reset Form ----------------\\
+
 function reset_Form() {
-    unit.value = {
+    sales_type.value = {
         id: "",
         name: "",
-        ShortName: "",
-        base_unit: "",
-        base_unit_name: "",
-        operator: "*",
-        operator_value: 1,
+        code: "",
     };
 }
 
 //---------------------- delete modal  ------------------------------\\
-function Delete_item(item) {
+function Delete_SalesType(item) {
     reset_Form();
-    unit.value = item;
+    sales_type.value = item;
     dialogDelete.value = true;
 }
 
@@ -184,10 +145,12 @@ function onCloseDelete() {
     dialogDelete.value = false;
 }
 
-//--------------------------------- Remove Unit --------------------\\
-function Remove_Unit() {
+//--------------------------- Remove SalesType----------------\\
+function Remove_SalesType() {
+    loading.value = true;
+    snackbar.value = false;
     axios
-        .delete("units/" + unit.value.id)
+        .delete("sales_types/" + sales_type.value.id)
         .then(({ data }) => {
             snackbar.value = true;
             snackbarColor.value = "success";
@@ -227,7 +190,7 @@ function Remove_Unit() {
                         variant="elevated"
                         color="primary"
                         class="ma-1"
-                        @click="Remove_Unit"
+                        @click="Remove_SalesType"
                         >Si
                     </v-btn>
                     <v-btn
@@ -253,93 +216,34 @@ function Remove_Unit() {
                 <v-toolbar
                     border
                     density="comfortable"
-                    :title="(editmode ? 'Modificar' : 'Nueva') + ' Unidad'"
+                    :title="(editmode ? 'Modificar' : 'Nueva') + ' Categoria'"
                 >
                 </v-toolbar>
 
                 <v-card-text>
                     <v-form ref="form">
                         <v-row>
-                            <!-- Name -->
+                            <!-- Code SalesType -->
                             <v-col md="12">
                                 <v-text-field
-                                    :label="unitLabels.name + ' *'"
-                                    v-model="unit.name"
-                                    :placeholder="unitLabels.name"
-                                    :rules="
-                                        ruleForm.required.concat(
-                                            ruleForm.max(15)
-                                        )
-                                    "
+                                    :label="sales_typeLabels.code + ' *'"
+                                    v-model="sales_type.code"
+                                    :placeholder="sales_typeLabels.code"
+                                    :rules="ruleForm.required"
                                     variant="outlined"
                                     density="comfortable"
                                     hide-details="auto"
                                 >
                                 </v-text-field>
-                            </v-col>
-                            <!-- ShortName -->
-                            <v-col md="12">
-                                <v-text-field
-                                    :label="unitLabels.ShortName + ' *'"
-                                    v-model="unit.ShortName"
-                                    :placeholder="unitLabels.ShortName"
-                                    :rules="
-                                        ruleForm.required.concat(
-                                            ruleForm.max(15)
-                                        )
-                                    "
-                                    variant="outlined"
-                                    density="comfortable"
-                                    hide-details="auto"
-                                >
-                                </v-text-field>
-                            </v-col>
-                            <!-- Base unit -->
-                            <v-col md="12">
-                                <v-select
-                                    @update:modelValue="Selected_Base_Unit"
-                                    v-model="unit.base_unit"
-                                    :items="units_base"
-                                    :label="unitLabels.base_unit"
-                                    item-title="title"
-                                    item-value="value"
-                                    variant="outlined"
-                                    density="comfortable"
-                                    hide-details="auto"
-                                    clearable
-                                ></v-select>
-                            </v-col>
-                            <!-- operator  -->
-                            <v-col md="12" v-if="show_operator">
-                                <v-select
-                                    v-model="unit.operator"
-                                    :items="[
-                                        {
-                                            title: 'Multiplicar (*)',
-                                            value: '*',
-                                        },
-                                        { title: 'Dividir (/)', value: '/' },
-                                    ]"
-                                    :label="unitLabels.operator"
-                                    item-title="title"
-                                    item-value="value"
-                                    variant="outlined"
-                                    density="comfortable"
-                                    hide-details="auto"
-                                ></v-select>
                             </v-col>
 
-                            <!-- Operation Value -->
-                            <v-col md="12" v-if="show_operator">
+                            <!-- Name SalesType -->
+                            <v-col md="12">
                                 <v-text-field
-                                    :label="unitLabels.operator_value + ' *'"
-                                    v-model="unit.operator_value"
-                                    :placeholder="unitLabels.operator_value"
-                                    :rules="
-                                        ruleForm.required.concat(
-                                            ruleForm.numberWithDecimal
-                                        )
-                                    "
+                                    :label="sales_typeLabels.name + ' *'"
+                                    v-model="sales_type.name"
+                                    :placeholder="sales_typeLabels.name"
+                                    :rules="ruleForm.required"
                                     variant="outlined"
                                     density="comfortable"
                                     hide-details="auto"
@@ -365,7 +269,7 @@ function Remove_Unit() {
                         color="primary"
                         variant="elevated"
                         class="ma-1"
-                        @click="Submit_Unit"
+                        @click="Submit_SalesType"
                         :loading="loading"
                         :disabled="loading"
                     >
@@ -394,7 +298,7 @@ function Remove_Unit() {
                     color="primary"
                     class="ma-1"
                     prepend-icon="mdi-account-plus"
-                    @click="New_Unit"
+                    @click="New_SalesType"
                 >
                     Añadir
                 </v-btn>
@@ -404,7 +308,7 @@ function Remove_Unit() {
             <v-col>
                 <v-data-table
                     :headers="fields"
-                    :items="units"
+                    :items="sales_types"
                     :search="search"
                     hover
                     class="elevation-2"
@@ -418,7 +322,7 @@ function Remove_Unit() {
                             icon="mdi-pencil"
                             size="x-small"
                             variant="outlined"
-                            @click="Edit_Unit(item.raw)"
+                            @click="Edit_SalesType(item.raw)"
                         >
                         </v-btn>
                         <v-btn
@@ -427,7 +331,7 @@ function Remove_Unit() {
                             icon="mdi-delete"
                             size="x-small"
                             variant="outlined"
-                            @click="Delete_item(item.raw)"
+                            @click="Delete_SalesType(item.raw)"
                         >
                         </v-btn>
                     </template>

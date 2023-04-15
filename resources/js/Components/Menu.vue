@@ -132,6 +132,11 @@ const menu = ref([
     {
         Configuraciones: [
             {
+                label: "Tipos de venta",
+                url: "/sales_types",
+                role: "admin",
+            },
+            {
                 label: "Almacenes",
                 url: "/warehouses",
                 role: "admin",

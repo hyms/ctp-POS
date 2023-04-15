@@ -56,4 +56,9 @@ class Sale extends Model
         return $this->belongsTo('App\Models\Warehouse');
     }
 
+    public function sales_type()
+    {
+        return $this->belongsTo('App\Models\SalesType');
+    }
+
 }
