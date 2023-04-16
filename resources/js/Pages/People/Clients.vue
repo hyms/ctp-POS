@@ -3,7 +3,6 @@ import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
-import JsonExcel from "vue-json-excel3";
 import ruleForm from "@/rules";
 import { router } from "@inertiajs/vue3";
 
@@ -27,12 +26,10 @@ const dialogImport = ref(false);
 const dialogPayDue = ref(false);
 const dialogDetail = ref(false);
 
-const SubmitProcessing = ref(false);
 const ImportProcessing = ref(false);
 const paymentProcessing = ref(false);
 const payment_return_Processing = ref(false);
 
-const showDropdown = ref(false);
 const payment = ref({
     client_id: "",
     client_name: "",
@@ -51,7 +48,6 @@ const payment_return = ref({
     notes: "",
     Reglement: "",
 });
-const company_info = ref({});
 const selectedIds = ref([]);
 
 const import_clients = ref("");

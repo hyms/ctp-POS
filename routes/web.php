@@ -81,7 +81,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     //------------------------------------------------------------------\\
 
     //------------------------------- PRODUCTS --------------------------\\
-    Route::get('products', [ProductsController::class,'index']);
+    Route::get('products/store', [ProductsController::class,'item']);
+    Route::get('products/list', [ProductsController::class,'index']);
     Route::post('products', [ProductsController::class,'store']);
     Route::put('products/{id}', [ProductsController::class,'update']);
     Route::delete('products/{id}', [ProductsController::class,'destroy']);
@@ -189,15 +190,6 @@ Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
     Route::delete('sucursal/{id}', [SucursalController::class, 'borrar'])
         ->name('eliminarSucursal');
 
-//cajas
-    Route::get('cajas', [CajaController::class, 'getAll'])
-        ->name('listaCajas');
-    Route::get('movimientosCajas', [CajaController::class, 'getMovimientos'])
-        ->name('movimientosCajas');
-    Route::post('caja', [CajaController::class, 'post'])
-        ->name('guardarCaja');
-    Route::delete('caja/{id}', [CajaController::class, 'borrar'])
-        ->name('eliminarCaja');
     //stocks
     Route::get('stocks', [StockController::class, 'getAll'])
         ->name('listaStocks');
@@ -379,17 +371,6 @@ Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
        Route::get("get_employees_by_company", "hrm\CoreController@Get_employees_by_company");
 
     });
-
-
-    //------------------------------- CLIENTS --------------------------\\
-    //------------------------------------------------------------------\\
-
-    Route::resource('clients', 'ClientController');
-    Route::post('clients/import/csv', 'ClientController@import_clients');
-    Route::get('get_clients_without_paginate', 'ClientController@Get_Clients_Without_Paginate');
-    Route::post('clients/delete/by_selection', 'ClientController@delete_by_selection');
-    Route::post('clients_pay_due', 'ClientController@clients_pay_due');
-    Route::post('clients_pay_return_due', 'ClientController@pay_sale_return_due');
 
     //------------------------------- Providers --------------------------\\
     //--------------------------------------------------------------------\\

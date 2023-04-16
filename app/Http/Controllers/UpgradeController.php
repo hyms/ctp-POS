@@ -125,26 +125,80 @@ class UpgradeController extends Controller
 //                    'deleted_at' => $item->deleted_at,
 //                ]);
 //            });
-            $id = DB::table('units')->insertGetId([
-                'name' => 'placa',
-                'ShortName' => 'placa',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
-            $id = DB::table('units')->insertGetId([
-                'name' => 'bidon',
-                'ShortName' => 'bidon',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
-            $id = DB::table('units')->insertGetId([
-                'name' => 'impresion',
-                'ShortName' => 'imp',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
-            Log::info("finish categories migration");
+//            Log::info("finish categories migration");
+//
+//            $id = DB::table('units')->insertGetId([
+//                'name' => 'placa',
+//                'ShortName' => 'placa',
+//                'created_at' => Carbon::now(),
+//                'updated_at' => Carbon::now(),
+//            ]);
+//            $id = DB::table('units')->insertGetId([
+//                'name' => 'bidon',
+//                'ShortName' => 'bidon',
+//                'created_at' => Carbon::now(),
+//                'updated_at' => Carbon::now(),
+//            ]);
+//            $id = DB::table('units')->insertGetId([
+//                'name' => 'impresion',
+//                'ShortName' => 'imp',
+//                'created_at' => Carbon::now(),
+//                'updated_at' => Carbon::now(),
+//            ]);
+//            Log::info("finish units migration");
 
+//                        $items = DB::table('tipoProducto')->get();
+//            $items->each(function ($item) {
+//                $id = DB::table('sales_type')->insertGetId([
+//                    'id' => $item->id,
+//                    'code' => $item->codigo,
+//                    'name' => $item->nombre,
+//                    'created_at' => $item->created_at,
+//                    'updated_at' => $item->updated_at,
+//                    'deleted_at' => $item->deleted_at,
+//                ]);
+//            });
+//            Log::info("finish sales_type migration");
+
+//            $items = DB::table('tipoProducto')->get();
+//            $items->each(function ($item) {
+//                $id = DB::table('sales_type')->insertGetId([
+//                    'id' => $item->id,
+//                    'code' => $item->codigo,
+//                    'name' => $item->nombre,
+//                    'created_at' => $item->created_at,
+//                    'updated_at' => $item->updated_at,
+//                    'deleted_at' => $item->deleted_at,
+//                ]);
+//            });
+//            Log::info("finish sales_type migration");
+
+            $items = DB::table('productos')->get();
+            $items->each(function ($item) {
+
+                $id = DB::table('products')->insertGetId([
+                    'id' => $item->id,
+                    'code' => $item->codigo,
+                    'name' => $item->formato,
+                    'cost' => 0,
+                    'price' => 0,
+                    'category_id' => $item->tipo??1,
+                    'unit_id' => 1,
+                    'unit_sale_id' => 1,
+                    'unit_purchase_id' => 1,
+                    'TaxNet' => 0,
+                    'tax_method' => '1',
+                    'note' => $item->dimension,
+                    'stock_alert' => 0,
+                    'is_variant' => 0,
+                    'not_selling' => 0,
+                    'is_active' => 1,
+                    'created_at' => $item->created_at,
+                    'updated_at' => $item->updated_at,
+                    'deleted_at' => $item->deleted_at,
+                ]);
+            });
+            Log::info("finish products migration");
         } catch (Exception $ex) {
             $errors = $ex->getMessage();
         }

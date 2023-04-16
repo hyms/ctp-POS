@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\UserWarehouse;
-use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -19,20 +18,25 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 
 class ProductsController extends Controller
 {
+    //------------ Get form view --------------\\
+    public function item(request $request)
+    {
+        Inertia::share('titlePage', 'Producto');
+        return Inertia::render('Products/Categorie',[
+//            'warehouses' => $warehouses,
+//            'categories' => $categories,
+        ]);
+    }
 
     //------------ Get ALL Products --------------\\
 
     public function index(request $request)
     {
 //        $this->authorizeForUser($request->user('api'), 'view', Product::class);
-        // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = Request::get('page', 1);
-        // Start displaying items from this number;
-
         $products = Product::with('unit', 'category')
             ->where('deleted_at', '=', null)
             ->get();
@@ -42,9 +46,9 @@ class ProductsController extends Controller
             $item['id'] = $product->id;
             $item['code'] = $product->code;
             $item['name'] = $product->name;
-            $item['category'] = $product['category']->name;
-            $item['brand'] = $product['brand'] ? $product['brand']->name : 'N/D';
-            $item['unit'] = $product['unit']->ShortName;
+            $item['category'] = $product->category?->name;
+//            $item['brand'] = $product['brand'] ? $product['brand']->name : 'N/D';
+            $item['unit'] = $product->unit?->ShortName;
             $item['price'] = $product->price;
 
             $product_warehouse_data = product_warehouse::where('product_id', $product->id)
@@ -72,9 +76,8 @@ class ProductsController extends Controller
         }
 
         $categories = Category::where('deleted_at', null)->get(['id', 'name']);
-        $brands = Brand::where('deleted_at', null)->get(['id', 'name']);
-
-        return response()->json([
+        Inertia::share('titlePage', 'Productos');
+        return Inertia::render('Products/Index_Products',[
             'warehouses' => $warehouses,
             'categories' => $categories,
             'products' => $data,
@@ -114,7 +117,7 @@ class ProductsController extends Controller
                 $Product->Type_barcode = $request['Type_barcode'];
                 $Product->price = $request['price'];
                 $Product->category_id = $request['category_id'];
-                $Product->brand_id = $request['brand_id'];
+//                $Product->brand_id = $request['brand_id'];
                 $Product->TaxNet = $request['TaxNet'] ? $request['TaxNet'] : 0;
                 $Product->tax_method = $request['tax_method'];
                 $Product->note = $request['note'];
@@ -212,7 +215,7 @@ class ProductsController extends Controller
                 $Product->Type_barcode = $request['Type_barcode'];
                 $Product->price = $request['price'];
                 $Product->category_id = $request['category_id'];
-                $Product->brand_id = $request['brand_id'] == 'null' ? Null : $request['brand_id'];
+//                $Product->brand_id = $request['brand_id'] == 'null' ? Null : $request['brand_id'];
                 $Product->TaxNet = $request['TaxNet'];
                 $Product->tax_method = $request['tax_method'];
                 $Product->note = $request['note'];
@@ -411,44 +414,6 @@ class ProductsController extends Controller
 
     }
 
-    //-------------- Delete by selection  ---------------\\
-
-//    public function delete_by_selection(Request $request)
-//    {
-//        $this->authorizeForUser($request->user('api'), 'delete', Product::class);
-//
-//        \DB::transaction(function () use ($request) {
-//            $selectedIds = $request->selectedIds;
-//            foreach ($selectedIds as $product_id) {
-//
-//                $Product = Product::findOrFail($product_id);
-//                $Product->deleted_at = Carbon::now();
-//                $Product->save();
-//
-//                foreach (explode(',', $Product->image) as $img) {
-//                    $pathIMG = public_path() . '/images/products/' . $img;
-//                    if (file_exists($pathIMG)) {
-//                        if ($img != 'no-image.png') {
-//                            @unlink($pathIMG);
-//                        }
-//                    }
-//                }
-//
-//                product_warehouse::where('product_id', $product_id)->update([
-//                    'deleted_at' => Carbon::now(),
-//                ]);
-//
-//                ProductVariant::where('product_id', $product_id)->update([
-//                    'deleted_at' => Carbon::now(),
-//                ]);
-//            }
-//
-//        }, 10);
-//
-//        return response()->json(['success' => true]);
-//
-//    }
-
 
     //--------------  Show Product Details ---------------\\
 
@@ -473,7 +438,7 @@ class ProductsController extends Controller
         $item['name'] = $Product->name;
         $item['note'] = $Product->note;
         $item['category'] = $Product['category']->name;
-        $item['brand'] = $Product['brand'] ? $Product['brand']->name : 'N/D';
+//        $item['brand'] = $Product['brand'] ? $Product['brand']->name : 'N/D';
         $item['unit'] = $Product['unit']->ShortName;
         $item['price'] = $Product->price;
         $item['cost'] = $Product->cost;
@@ -761,11 +726,9 @@ class ProductsController extends Controller
 //        $this->authorizeForUser($request->user('api'), 'create', Product::class);
 
         $categories = Category::where('deleted_at', null)->get(['id', 'name']);
-        $brands = Brand::where('deleted_at', null)->get(['id', 'name']);
         $units = Unit::where('deleted_at', null)->where('base_unit', null)->get();
         return response()->json([
             'categories' => $categories,
-            'brands' => $brands,
             'units' => $units,
         ]);
 
@@ -813,18 +776,6 @@ class ProductsController extends Controller
             }
         } else {
             $item['category_id'] = '';
-        }
-
-        if ($Product->brand_id) {
-            if (Brand::where('id', $Product->brand_id)
-                ->where('deleted_at', '=', null)
-                ->first()) {
-                $item['brand_id'] = $Product->brand_id;
-            } else {
-                $item['brand_id'] = '';
-            }
-        } else {
-            $item['brand_id'] = '';
         }
 
         if ($Product->unit_id) {
@@ -900,7 +851,6 @@ class ProductsController extends Controller
 
         $data = $item;
         $categories = Category::where('deleted_at', null)->get(['id', 'name']);
-        $brands = Brand::where('deleted_at', null)->get(['id', 'name']);
 
         $product_units = Unit::where('id', $Product->unit_id)
             ->orWhere('base_unit', $Product->unit_id)
@@ -915,7 +865,6 @@ class ProductsController extends Controller
         return response()->json([
             'product' => $data,
             'categories' => $categories,
-            'brands' => $brands,
             'units' => $units,
             'units_sub' => $product_units,
         ]);
@@ -969,12 +918,6 @@ class ProductsController extends Controller
                             ->orWhere(['name' => $value['unit']])->first();
                         $unit_id = $unit->id;
 
-                        if ($value['brand'] != 'N/A' && $value['brand'] != '') {
-                            $brand = Brand::firstOrCreate(['name' => $value['brand']]);
-                            $brand_id = $brand->id;
-                        } else {
-                            $brand_id = null;
-                        }
                         $Product = new Product;
                         $Product->name = $value['name'] == '' ? null : $value['name'];
                         $Product->code = $value['code'] == '' ? '11111111' : $value['code'];
@@ -982,7 +925,6 @@ class ProductsController extends Controller
                         $Product->price = $value['price'];
                         $Product->cost = $value['cost'];
                         $Product->category_id = $category_id;
-                        $Product->brand_id = $brand_id;
                         $Product->TaxNet = 0;
                         $Product->tax_method = 1;
                         $Product->note = $value['note'] ? $value['note'] : '';
