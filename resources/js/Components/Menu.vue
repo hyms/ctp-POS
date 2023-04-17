@@ -3,100 +3,28 @@ import { Link, router, usePage } from "@inertiajs/vue3";
 import { ref, computed } from "vue";
 
 const isDrawerOpen = ref(null);
-const menu = ref([
+
+const menuItems = ref([
     {
         label: "Tablero",
         url: "/",
         role: "all",
-    },
-    {
-        Ordenes: [
-            {
-                label: "Nuevas Ordenes",
-                url: "/ordenes",
-                role: "desing",
-            },
-            {
-                label: "Buscar Ordenes",
-                url: "/realizados",
-                role: "desing",
-            },
-        ],
-    },
-    {
-        Recibos: [
-            {
-                label: "Egresos",
-                url: "/recibosEgreso",
-                role: "vendor",
-            },
-            {
-                label: "Ingresos",
-                url: "/recibosIngreso",
-                role: "vendor",
-            },
-        ],
-    },
-    {
-        label: "Caja Chica",
-        url: "/cajaDebito",
-        role: "vendor",
-    },
-    {
-        label: "Inventario",
-        url: "/inventario",
-        role: "vendor",
-    },
-    {
-        reportes: [
-            {
-                label: "Registro Diario",
-                url: "/reportes/placas",
-                role: "vendor",
-            },
-            {
-                label: "Rendicion Diaria",
-                url: "/reportes/diario",
-                role: "vendor",
-            },
-            /* {
-     label: 'Reporte cliente',
-     url: '/reportes/cliente',
-     role: 'vendor',
- },*/
-        ],
-    },
-    {
-        Reportes: [
-            {
-                label: "Mora Clientes",
-                url: "/reportes/mora",
-                role: "admin",
-            },
-            {
-                label: "Ordenes",
-                url: "/reportes/ordenes",
-                role: "admin",
-            },
-            {
-                label: "Auditar",
-                url: "/reportes/auditar",
-                role: "admin",
-            },
-            {
-                label: "Inventario",
-                url: "/reportes/inventario",
-                role: "admin",
-            },
-        ],
+        icon:'',
+        subItems:[],
     },
     {
         label: "Clientes",
         url: "/clients",
         role: "all",
+        icon:'',
+        subItems:[],
     },
     {
-        Productos: [
+        label: "Productos",
+        url: "",
+        role: "all",
+        icon:'',
+        subItems:[
             {
                 label: "Añadir Productos",
                 url: "/products/create",
@@ -118,9 +46,13 @@ const menu = ref([
                 role: "admin",
             },
         ],
-    },
+    },    
     {
-        Configuraciones: [
+        label: "Configuraciones",
+        url: "",
+        role: "admin",
+        icon:'',
+        subItems:[
             {
                 label: "Tipos de venta",
                 url: "/sales_types",
@@ -140,11 +72,13 @@ const menu = ref([
                 label: "respaldo",
                 url: "/backup",
                 role: "admin",
-                newPage: true,
+                //newPage: true,
             },
         ],
     },
+    
 ]);
+
 
 const roles = computed(() => usePage().props.rolesP);
 const user = computed(() => usePage().props.user);
@@ -213,45 +147,29 @@ function validateMenu(data) {
 
             <v-divider></v-divider>
             <v-list nav density="compact">
-                <template v-for="(link, key) in menu">
-                    <template v-if="Object.values(link).length === 1">
+                <template v-for="(link, key) in menuItems">
+                    <template v-if="Object.values(link.subItems).length > 0">
                         <v-list-group
-                            v-if="getAllPermission(Object.values(link)[0])"
-                            :value="Object.values(link)[0]"
+                            v-if="getAllPermission(Object.values(link.subItems))"
+                            :value="link.label"
                             :key="key"
                         >
                             <template v-slot:activator="{ props }">
                                 <v-list-item v-bind="props">
                                     <v-list-item-title>
                                         <span class="text-capitalize">{{
-                                            Object.keys(link)[0]
+                                           link.label
                                         }}</span>
                                     </v-list-item-title>
                                 </v-list-item>
                             </template>
                             <template
-                                v-for="(subLink, subKey) in Object.values(
-                                    link
-                                )[0]"
+                                v-for="(subLink, subKey) in Object.values(link.subItems)"
                             >
                                 <template v-if="getPermission(subLink.role)">
                                     <v-list-item
-                                        v-if="subLink.newPage === true"
                                         :key="key + '' + subKey"
                                         @click="linkVisit(subLink.url)"
-                                        target="_blank"
-                                    >
-                                        <v-list-item-title>
-                                            <span class="text-capitalize">{{
-                                                subLink.label
-                                            }}</span>
-                                        </v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item
-                                        v-else
-                                        :key="key + '' + subKey"
-                                        @click="linkVisit(subLink.url)"
-                                        :active="$page.url === subLink.url"
                                     >
                                         <v-list-item-title>
                                             <span class="text-capitalize">{{
