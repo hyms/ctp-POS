@@ -111,8 +111,8 @@ return new class extends Migration {
             $table->foreignId('product_id')->constrained('products');
             $table->foreignId('warehouse_id')->constrained('warehouses');
             $table->foreignId('product_variant_id')->nullable()->constrained('product_variants');
-            $table->float('qty', 10, 0);
-            $table->float('price', 10, 0)->nullable();
+            $table->float('qty', 10, 0)->default(0);
+            $table->float('price', 10, 0)->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

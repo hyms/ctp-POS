@@ -99,12 +99,12 @@ const menu = ref([
         Productos: [
             {
                 label: "Añadir Productos",
-                url: "/products/store",
+                url: "/products/create",
                 role: "admin",
             },
             {
                 label: "Listar Productos",
-                url: "/productos/list",
+                url: "/products/list",
                 role: "admin",
             },
             {
@@ -117,16 +117,6 @@ const menu = ref([
                 url: "/products/units",
                 role: "admin",
             },
-            // {
-            //     url: "/tipoProductos",
-            //     label: "Tipo Productos",
-            //     role: "admin",
-            // },
-            // {
-            //     url: "/stocks",
-            //     label: "Stocks",
-            //     role: "admin",
-            // },
         ],
     },
     {

@@ -4,7 +4,6 @@ use App\Http\Controllers\SalesTypeController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\OrdenesController;
 use App\Http\Controllers\PDFController;
-use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\ReciboController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\StockController;
@@ -81,14 +80,16 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     //------------------------------------------------------------------\\
 
     //------------------------------- PRODUCTS --------------------------\\
-    Route::get('products/store', [ProductsController::class,'item']);
+    Route::get('products/create', [ProductsController::class,'create']);
+    Route::get('products/edit/{id}', [ProductsController::class,'edit']);
+
     Route::get('products/list', [ProductsController::class,'index']);
     Route::post('products', [ProductsController::class,'store']);
     Route::put('products/{id}', [ProductsController::class,'update']);
     Route::delete('products/{id}', [ProductsController::class,'destroy']);
     Route::post('products/import/csv', [ProductsController::class,'import_products']);
     Route::get('get_Products_by_warehouse/{id}', [ProductsController::class,'Products_by_Warehouse']);
-    Route::get('get_product_detail/{id}', [ProductsController::class,'Get_Products_Details']);
+    Route::get('products/detail/{id}', [ProductsController::class,'Get_Products_Details']);
     Route::get('get_products_stock_alerts', [ProductsController::class,'Products_Alert']);
     Route::get('barcode_create_page', [ProductsController::class,'Get_element_barcode']);
     //------------------------------------------------------------------\\
@@ -167,21 +168,6 @@ Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
     ->name('pdfRecibo')->middleware('auth');
 //Admin
 
-
-
-    //productos
-    Route::get('productos', [ProductosController::class, 'getAll'])
-        ->name('listaProductos');
-    Route::post('producto', [ProductosController::class, 'post'])
-        ->name('guardarProducto');
-    Route::delete('producto/{id}', [ProductosController::class, 'borrar'])
-        ->name('eliminarProducto');
-    Route::get('tipoProductos', [ProductosController::class, 'tipos'])
-        ->name('tipoProductos');
-    Route::post('tipoProductos', [ProductosController::class, 'tiposPost'])
-        ->name('tipoProductosP');
-    Route::delete('tipoProductos/{id}', [ProductosController::class, 'borrarTipo'])
-        ->name('tipoProductosD');
     //sucursales
     Route::get('sucursales', [SucursalController::class, 'getAll'])
         ->name('listaSucursales');

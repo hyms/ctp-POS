@@ -18,7 +18,7 @@ class product_warehouse extends Model
     protected $casts = [
         'product_id' => 'integer',
         'warehouse_id' => 'integer',
-        'qte' => 'double',
+        'qty' => 'double',
     ];
 
     public function warehouse()

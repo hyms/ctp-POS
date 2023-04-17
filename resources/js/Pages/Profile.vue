@@ -3,6 +3,7 @@ import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router } from "@inertiajs/vue3";
 import ruleForm from "@/rules";
+import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
     user: Object,
@@ -38,17 +39,17 @@ async function Submit_Profile() {
 //------------------ Update Profile ----------------------\\
 function Update_Profile() {
     loading.value = true;
+    snackbar.value = false;
     // Start the progress bar.
-    let data = new FormData();
-    data.append("firstname", props.user.firstname);
-    data.append("lastname", props.user.lastname);
-    data.append("email", props.user.email);
-    data.append("NewPassword", props.user.NewPassword);
-    data.append("phone", props.user.phone);
-    data.append("_method", "put");
 
     axios
-        .post("update_user_profile/" + props.user.id, data)
+        .put("/update_user_profile/" + props.user.id, {
+            firstname: props.user.firstname,
+            lastname: props.user.lastname,
+            email: props.user.email,
+            NewPassword: props.user.NewPassword,
+            phone: props.user.phone,
+        })
         .then(({ data }) => {
             snackbar.value = true;
             snackbarColor.value = "success";
@@ -62,30 +63,21 @@ function Update_Profile() {
             snackbarText.value = error.response.data.message;
         })
         .finally(() => {
-            loading.value = false;
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
         });
 }
 </script>
 <template>
-    <Layout>
-        <v-snackbar
-            v-model="snackbar"
-            :color="snackbarColor"
-            :location="'top right'"
-            :timeout="5000"
-            elevation="5"
+    <Layout :loading="loading">
+        <snackbar
+            :snackbar="snackbar"
+            :snackbarColor="snackbarColor"
+            :snackbarText="snackbarText"
         >
-            {{ snackbarText }}
-            <template v-slot:actions>
-                <v-btn
-                    @click="snackbar = false"
-                    icon="mdi-close"
-                    size="x-small"
-                    variant="tonal"
-                >
-                </v-btn>
-            </template>
-        </v-snackbar>
+        </snackbar>
+
         <v-card>
             <v-card-text>
                 <!--  Profile -->
@@ -180,6 +172,7 @@ function Update_Profile() {
                                 type="submit"
                                 color="primary"
                                 :loading="loading"
+                                :disabled="loading"
                                 >Guardar
                             </v-btn>
                         </v-col>

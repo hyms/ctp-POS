@@ -214,7 +214,7 @@ function Remove_Product() {
                     color="primary"
                     class="ma-1"
                     prepend-icon="mdi-account-plus"
-                    @click="router.visit('/products/store')"
+                    @click="router.visit('/products/create')"
                 >
                     Añadir
                 </v-btn>
@@ -239,7 +239,7 @@ function Remove_Product() {
                             size="x-small"
                             variant="outlined"
                             @click="
-                                router.visit('/productos/detail/' + item.raw.id)
+                                router.visit('/products/detail/' + item.raw.id)
                             "
                         >
                         </v-btn>
@@ -250,7 +250,7 @@ function Remove_Product() {
                             size="x-small"
                             variant="outlined"
                             @click="
-                                router.visit('/productos/edit/' + item.raw.id)
+                                router.visit('/products/edit/' + item.raw.id)
                             "
                         >
                         </v-btn>

@@ -27,7 +27,7 @@ const props = defineProps({ loading: Boolean });
             </v-container>
         </v-main>
 
-        <v-footer app color="transparent" height="56">
+        <v-footer app border>
             <div class="boxed-container w-full">
                 <div class="mx-6 d-flex justify-space-between">
                     <span>
