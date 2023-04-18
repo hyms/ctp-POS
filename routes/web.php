@@ -82,7 +82,6 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     //------------------------------- PRODUCTS --------------------------\\
     Route::get('products/create', [ProductsController::class,'create']);
     Route::get('products/edit/{id}', [ProductsController::class,'edit']);
-
     Route::get('products/list', [ProductsController::class,'index']);
     Route::post('products', [ProductsController::class,'store']);
     Route::put('products/{id}', [ProductsController::class,'update']);
@@ -113,6 +112,17 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         //------------------------------------------------------------------\\
     });
 
+     
+       //------------------------------- Adjustments --------------------------\\
+      Route::get('adjustments/create', [AdjustmentController::class,'create']);
+    Route::get('adjustments/edit/{id}', [AdjustmentController::class,'edit']);
+    Route::get('adjustments/list', [AdjustmentController::class,'index']);
+    Route::post('adjustments', [AdjustmentController::class,'store']);
+    Route::put('adjustments/{id}', [AdjustmentController::class,'update']);
+    Route::delete('adjustments/{id}', [AdjustmentController::class,'destroy']);
+    Route::get('adjustments/detail/{id}', [AdjustmentController::class,'Adjustment_detail']);
+ //------------------------------------------------------------------\\
+     
 
     Route::get('ordenes', [OrdenesController::class, 'getAll'])
         ->name('listaOrdenes');
@@ -374,39 +384,7 @@ Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
     Route::get('pos/get_products_pos', 'PosController@GetProductsByParametre');
     Route::get('pos/data_create_pos', 'PosController@GetELementPos');
 
-    //------------------------------- PRODUCTS --------------------------\\
-    //------------------------------------------------------------------\\
-
-    Route::resource('products', 'ProductsController');
-    Route::post('products/import/csv', 'ProductsController@import_products');
-    Route::get('get_Products_by_warehouse/{id}', 'ProductsController@Products_by_Warehouse');
-    Route::get('get_product_detail/{id}', 'ProductsController@Get_Products_Details');
-    Route::get('get_products_stock_alerts', 'ProductsController@Products_Alert');
-    Route::get('barcode_create_page', 'ProductsController@Get_element_barcode');
-    Route::post('products/delete/by_selection', 'ProductsController@delete_by_selection');
-
-
-
-
-
-
-    //------------------------------- Brands--------------------------\\
-    //------------------------------------------------------------------\\
-    Route::resource('brands', 'BrandsController');
-    Route::post('brands/delete/by_selection', 'BrandsController@delete_by_selection');
-
-    //------------------------------- Currencies --------------------------\\
-    //------------------------------------------------------------------\\
-
-    Route::resource('currencies', 'CurrencyController');
-    Route::post('currencies/delete/by_selection', 'CurrencyController@delete_by_selection');
-
-
-    //------------------------------- WAREHOUSES --------------------------\\
-
-    Route::resource('warehouses', 'WarehouseController');
-    Route::post('warehouses/delete/by_selection', 'WarehouseController@delete_by_selection');
-
+  
     //------------------------------- PURCHASES --------------------------\\
     //------------------------------------------------------------------\\
 
@@ -510,27 +488,13 @@ Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
     Route::post('payment/returns_purchase/send/email', 'PaymentPurchaseReturnsController@SendEmail');
     Route::post('payment/returns_purchase/send/sms', 'PaymentPurchaseReturnsController@Send_SMS');
 
-    //------------------------------- Adjustments --------------------------\\
-    //------------------------------------------------------------------\\
-
-    Route::resource('adjustments', 'AdjustmentController');
-    Route::get('adjustments/detail/{id}', 'AdjustmentController@Adjustment_detail');
-    Route::post('adjustments/delete/by_selection', 'AdjustmentController@delete_by_selection');
-
+   
     //------------------------------- Transfers --------------------------\\
     //--------------------------------------------------------------------\\
     Route::resource('transfers', 'TransferController');
     Route::post('transfers/delete/by_selection', 'TransferController@delete_by_selection');
 
-    //------------------------------- Users --------------------------\\
-    //------------------------------------------------------------------\\
-
-    Route::get('get_user_auth', 'UserController@GetUserAuth');
-    Route::resource('users', 'UserController');
-    Route::put('users_switch_activated/{id}', 'UserController@IsActivated');
-    Route::get('Get_user_profile', 'UserController@GetInfoProfile');
-    Route::put('update_user_profile/{id}', 'UserController@updateProfile');
-
+   
     //------------------------------- Permission Groups user -----------\\
     //------------------------------------------------------------------\\
 
@@ -546,22 +510,7 @@ Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
     Route::put('pos_settings/{id}', 'SettingsController@update_pos_settings');
     Route::get('get_pos_Settings', 'SettingsController@get_pos_Settings');
 
-    //------------------------------- Mail Settings ------------------------\\
-
-    Route::put('update_config_mail/{id}', 'MailSettingsController@update_config_mail');
-    Route::get('get_config_mail', 'MailSettingsController@get_config_mail');
-
-    //------------------------------- SMS Settings ------------------------\\
-
-    Route::get('get_sms_config', 'Sms_SettingsController@get_sms_config');
-    Route::post('update_twilio_config', 'Sms_SettingsController@update_twilio_config');
-    Route::post('update_nexmo_config', 'Sms_SettingsController@update_nexmo_config');
-
-    //------------------------------- Payment_gateway Settings ------------------------\\
-
-    Route::post('payment_gateway', 'Payment_gateway_SettingsController@Update_payment_gateway');
-    Route::get('get_payment_gateway', 'Payment_gateway_SettingsController@Get_payment_gateway');
-
+   
     //------------------------------- Update Settings ------------------------\\
 
     Route::get('get_version_info', 'UpdateController@get_version_info');
