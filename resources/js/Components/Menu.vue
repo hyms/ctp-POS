@@ -1,30 +1,29 @@
 <script setup>
-import { Link, router, usePage } from "@inertiajs/vue3";
-import { ref, computed } from "vue";
+import { router, usePage } from "@inertiajs/vue3";
+import { ref, computed, onMounted } from "vue";
 
 const isDrawerOpen = ref(null);
-
 const menuItems = ref([
     {
         label: "Tablero",
         url: "/",
         role: "all",
-        icon:'',
-        subItems:[],
+        icon: "",
+        subItems: [],
     },
     {
         label: "Clientes",
         url: "/clients",
         role: "all",
-        icon:'',
-        subItems:[],
+        icon: "",
+        subItems: [],
     },
     {
         label: "Productos",
         url: "",
         role: "all",
-        icon:'',
-        subItems:[
+        icon: "",
+        subItems: [
             {
                 label: "Añadir Productos",
                 url: "/products/create",
@@ -46,13 +45,13 @@ const menuItems = ref([
                 role: "admin",
             },
         ],
-    },    
+    },
     {
         label: "Configuraciones",
         url: "",
         role: "admin",
-        icon:'',
-        subItems:[
+        icon: "",
+        subItems: [
             {
                 label: "Tipos de venta",
                 url: "/sales_types",
@@ -76,18 +75,18 @@ const menuItems = ref([
             },
         ],
     },
-    
 ]);
-
 
 const roles = computed(() => usePage().props.rolesP);
 const user = computed(() => usePage().props.user);
+const open = ref([]);
 
-function linkVisit(url, type = "get") {
+// const url = computed(() => usePage().url);
+
+function linkVisit(url, label, type = "get") {
     router.visit(url, {
         method: type,
-        preserveScroll: true,
-        replace: true,
+        preserveState: true,
     });
 }
 
@@ -115,15 +114,19 @@ function getAllPermission(data) {
     return false;
 }
 
-function validateMenu(data) {
-    return true;
-    // for (let value of data) {
-    //     if (this.$page.url === value.url) {
-    //         return true;
-    //     }
-    // }
-    // return false;
-}
+onMounted(() => {
+    router.on("success", (event) => {
+        for (let item of menuItems.value) {
+            if (item.subItems.length > 0) {
+                for (let subItem of item.subItems) {
+                    if (event.detail.page.url === subItem.url) {
+                        open.value = [item.label];
+                    }
+                }
+            }
+        }
+    });
+});
 </script>
 
 <template>
@@ -146,30 +149,37 @@ function validateMenu(data) {
             </template>
 
             <v-divider></v-divider>
-            <v-list nav density="compact">
+            <v-list nav density="compact" :opened="open">
                 <template v-for="(link, key) in menuItems">
-                    <template v-if="Object.values(link.subItems).length > 0">
+                    <template v-if="link.subItems.length > 0">
                         <v-list-group
-                            v-if="getAllPermission(Object.values(link.subItems))"
-                            :value="link.label"
+                            v-if="getAllPermission(link.subItems)"
                             :key="key"
+                            :value="link.label"
                         >
                             <template v-slot:activator="{ props }">
                                 <v-list-item v-bind="props">
                                     <v-list-item-title>
                                         <span class="text-capitalize">{{
-                                           link.label
+                                            link.label
                                         }}</span>
                                     </v-list-item-title>
                                 </v-list-item>
                             </template>
                             <template
-                                v-for="(subLink, subKey) in Object.values(link.subItems)"
+                                v-for="(subLink, subKey) in link.subItems"
                             >
                                 <template v-if="getPermission(subLink.role)">
                                     <v-list-item
                                         :key="key + '' + subKey"
-                                        @click="linkVisit(subLink.url)"
+                                        @click="
+                                            linkVisit(
+                                                subLink.url,
+                                                subLink.label
+                                            )
+                                        "
+                                        :active="$page.url === subLink.url"
+                                        :value="subLink.label"
                                     >
                                         <v-list-item-title>
                                             <span class="text-capitalize">{{
@@ -184,9 +194,10 @@ function validateMenu(data) {
                     <template v-else>
                         <v-list-item
                             v-if="getPermission(link.role)"
-                            @click="linkVisit(link.url)"
+                            @click="linkVisit(link.url, link.label)"
                             :active="$page.url === link.url"
                             :key="key"
+                            :value="link.label"
                         >
                             <v-list-item-title>
                                 <span class="text-capitalize">{{
@@ -218,12 +229,14 @@ function validateMenu(data) {
                 <v-menu activator="parent">
                     <v-list nav density="compact">
                         <v-list-item
-                            @click="linkVisit('/profile')"
+                            @click="linkVisit('/profile', 'profile')"
                             :active="$page.url === '/profile'"
                         >
                             <v-list-item-title>Perfil</v-list-item-title>
                         </v-list-item>
-                        <v-list-item @click="linkVisit('/logout', 'post')">
+                        <v-list-item
+                            @click="linkVisit('/logout', 'logout', 'post')"
+                        >
                             <v-list-item-title>Salir</v-list-item-title>
                         </v-list-item>
                     </v-list>
