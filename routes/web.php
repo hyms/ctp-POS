@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdjustmentController;
 use App\Http\Controllers\SalesTypeController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\OrdenesController;
@@ -32,10 +33,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/upgrade', [UpgradeController::class, 'index'])->name('upgrade');
 Route::post('/upgrade', [UpgradeController::class, 'upgrade'])->name('upgrade');
 
-Route::get('/',[DashboardController::class, 'index']
+Route::get('/', [DashboardController::class, 'index']
 )->middleware(['auth', 'verified'])->name('dashboard');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 
 Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
@@ -46,17 +47,17 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::post('users', [UserController::class, 'store']);
     Route::put('users/{id}', [UserController::class, 'update']);
     Route::get('get_user_auth', [UserController::class, 'GetUserAuth']);
-    Route::post('users_switch_activated/{id}', [UserController::class,'IsActivated']);
+    Route::post('users_switch_activated/{id}', [UserController::class, 'IsActivated']);
     Route::get('profile', [UserController::class, 'GetInfoProfile']);
     Route::put('update_user_profile/{id}', [UserController::class, 'updateProfile']);
     //------------------------------------------------------------------\\
 
     //------------------------------- WAREHOUSES --------------------------\\
 
-    Route::get('warehouses', [WarehouseController::class,'index']);
-    Route::post('warehouses', [WarehouseController::class,'store']);
-    Route::put('warehouses/{id}', [WarehouseController::class,'update']);
-    Route::delete('warehouses/{id}', [WarehouseController::class,'destroy']);
+    Route::get('warehouses', [WarehouseController::class, 'index']);
+    Route::post('warehouses', [WarehouseController::class, 'store']);
+    Route::put('warehouses/{id}', [WarehouseController::class, 'update']);
+    Route::delete('warehouses/{id}', [WarehouseController::class, 'destroy']);
 //    Route::post('warehouses/delete/by_selection', [WarehouseController::class,'delete_by_selection']);
     //------------------------------------------------------------------\\
 
@@ -68,29 +69,29 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     //------------------------------------------------------------------\\
 
     //------------------------------- CLIENTS --------------------------\\
-    Route::get('clients', [ClientController::class,'index']);
-    Route::post('clients', [ClientController::class,'store']);
-    Route::put('clients/{id}', [ClientController::class,'update']);
-    Route::delete('clients/{id}', [ClientController::class,'destroy']);
-    Route::post('clients/import/csv', [ClientController::class,'import_clients']);
-    Route::get('get_clients_without_paginate', [ClientController::class,'Get_Clients_Without_Paginate']);
+    Route::get('clients', [ClientController::class, 'index']);
+    Route::post('clients', [ClientController::class, 'store']);
+    Route::put('clients/{id}', [ClientController::class, 'update']);
+    Route::delete('clients/{id}', [ClientController::class, 'destroy']);
+    Route::post('clients/import/csv', [ClientController::class, 'import_clients']);
+    Route::get('get_clients_without_paginate', [ClientController::class, 'Get_Clients_Without_Paginate']);
 //    Route::post('clients/delete/by_selection', [ClientController::class,'delete_by_selection']);
-    Route::post('clients_pay_due', [ClientController::class,'clients_pay_due']);
-    Route::post('clients_pay_return_due', [ClientController::class,'destpay_sale_return_dueroy']);
+    Route::post('clients_pay_due', [ClientController::class, 'clients_pay_due']);
+    Route::post('clients_pay_return_due', [ClientController::class, 'destpay_sale_return_dueroy']);
     //------------------------------------------------------------------\\
 
     //------------------------------- PRODUCTS --------------------------\\
-    Route::get('products/create', [ProductsController::class,'create']);
-    Route::get('products/edit/{id}', [ProductsController::class,'edit']);
-    Route::get('products/list', [ProductsController::class,'index']);
-    Route::post('products', [ProductsController::class,'store']);
-    Route::put('products/{id}', [ProductsController::class,'update']);
-    Route::delete('products/{id}', [ProductsController::class,'destroy']);
-    Route::post('products/import/csv', [ProductsController::class,'import_products']);
-    Route::get('get_Products_by_warehouse/{id}', [ProductsController::class,'Products_by_Warehouse']);
-    Route::get('products/detail/{id}', [ProductsController::class,'Get_Products_Details']);
-    Route::get('get_products_stock_alerts', [ProductsController::class,'Products_Alert']);
-    Route::get('barcode_create_page', [ProductsController::class,'Get_element_barcode']);
+    Route::get('products/create', [ProductsController::class, 'create']);
+    Route::get('products/edit/{id}', [ProductsController::class, 'edit']);
+    Route::get('products/list', [ProductsController::class, 'index']);
+    Route::post('products', [ProductsController::class, 'store']);
+    Route::put('products/{id}', [ProductsController::class, 'update']);
+    Route::delete('products/{id}', [ProductsController::class, 'destroy']);
+    Route::post('products/import/csv', [ProductsController::class, 'import_products']);
+    Route::get('get_Products_by_warehouse/{id}', [ProductsController::class, 'Products_by_Warehouse']);
+    Route::get('products/detail/{id}', [ProductsController::class, 'Get_Products_Details']);
+    Route::get('get_products_stock_alerts', [ProductsController::class, 'Products_Alert']);
+    Route::get('barcode_create_page', [ProductsController::class, 'Get_element_barcode']);
     //------------------------------------------------------------------\\
 
 
@@ -112,17 +113,17 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         //------------------------------------------------------------------\\
     });
 
-     
-       //------------------------------- Adjustments --------------------------\\
-      Route::get('adjustments/create', [AdjustmentController::class,'create']);
-    Route::get('adjustments/edit/{id}', [AdjustmentController::class,'edit']);
-    Route::get('adjustments/list', [AdjustmentController::class,'index']);
-    Route::post('adjustments', [AdjustmentController::class,'store']);
-    Route::put('adjustments/{id}', [AdjustmentController::class,'update']);
-    Route::delete('adjustments/{id}', [AdjustmentController::class,'destroy']);
-    Route::get('adjustments/detail/{id}', [AdjustmentController::class,'Adjustment_detail']);
- //------------------------------------------------------------------\\
-     
+
+    //------------------------------- Adjustments --------------------------\\
+    Route::get('adjustments/create', [AdjustmentController::class, 'create']);
+    Route::get('adjustments/edit/{id}', [AdjustmentController::class, 'edit']);
+    Route::get('adjustments/list', [AdjustmentController::class, 'index']);
+    Route::post('adjustments', [AdjustmentController::class, 'store']);
+    Route::put('adjustments/{id}', [AdjustmentController::class, 'update']);
+    Route::delete('adjustments/{id}', [AdjustmentController::class, 'destroy']);
+    Route::get('adjustments/detail/{id}', [AdjustmentController::class, 'Adjustment_detail']);
+    //------------------------------------------------------------------\\
+
 
     Route::get('ordenes', [OrdenesController::class, 'getAll'])
         ->name('listaOrdenes');
@@ -160,46 +161,15 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         ->name('diarioReportes');
     Route::get('reportes/cliente', [ReporteController::class, 'cliente'])
         ->name('clienteReportes');
-    //inventario
-    Route::get('inventario/saldos', [InventarioController::class, 'saldo'])
-        ->name('saldoInventario');
-    Route::get('inventario', [InventarioController::class, 'get'])
-        ->name('inventario');
-    Route::post('inventario/ingreso', [InventarioController::class, 'postIngreso'])
-        ->name('ingresoInventario');
-    Route::post('inventario/egreso', [InventarioController::class, 'postEgreso'])
-        ->name('egresoInventario');
+
 //pdfs
-Route::get('ordenPdf/{id}', [PDFController::class, 'getOrdenDiseño'])
-    ->name('pdfOrdenD')->middleware('auth');
-Route::get('ordenPdfV/{id}', [PDFController::class, 'getOrdenVenta'])
-    ->name('pdfOrdenV')->middleware('auth');
-Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
-    ->name('pdfRecibo')->middleware('auth');
+    Route::get('ordenPdf/{id}', [PDFController::class, 'getOrdenDiseño'])
+        ->name('pdfOrdenD')->middleware('auth');
+    Route::get('ordenPdfV/{id}', [PDFController::class, 'getOrdenVenta'])
+        ->name('pdfOrdenV')->middleware('auth');
+    Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
+        ->name('pdfRecibo')->middleware('auth');
 //Admin
-
-    //sucursales
-    Route::get('sucursales', [SucursalController::class, 'getAll'])
-        ->name('listaSucursales');
-    Route::post('sucursal', [SucursalController::class, 'post'])
-        ->name('guardarSucursal');
-    Route::delete('sucursal/{id}', [SucursalController::class, 'borrar'])
-        ->name('eliminarSucursal');
-
-    //stocks
-    Route::get('stocks', [StockController::class, 'getAll'])
-        ->name('listaStocks');
-    Route::delete('stock/{id}', [StockController::class, 'borrar'])
-        ->name('eliminarStock');
-    Route::post('stockEnable', [StockController::class, 'enableStock'])
-        ->name('enablestock');
-    Route::post('stockPrice', [StockController::class, 'priceStock'])
-        ->name('priceStock');
-    Route::post('stockAmount', [StockController::class, 'amountStock'])
-        ->name('amountStock');
-    Route::get('movimientosStock', [StockController::class, 'movimientos'])
-        ->name('movimientosStock');
-
 
     //reportes
     Route::get('reportes', [ReporteController::class, 'get'])

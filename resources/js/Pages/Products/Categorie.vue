@@ -178,34 +178,12 @@ function Remove_Category() {
             :snackbar-color="snackbarColor"
             :snackbar-text="snackbarText"
         ></snackbar>
-        <v-dialog v-model="dialogDelete" max-width="300px">
-            <v-card>
-                <v-card-text class="text-h5 text-center"
-                    >Estas seguro?
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        small
-                        variant="elevated"
-                        color="primary"
-                        class="ma-1"
-                        @click="Remove_Category"
-                        >Si
-                    </v-btn>
-                    <v-btn
-                        variant="elevated"
-                        small
-                        color="error"
-                        class="ma-1"
-                        @click="onCloseDelete"
-                        >Cancelar
-                    </v-btn>
-
-                    <v-spacer></v-spacer>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+        <delete_-category
+            :model="dialogDelete"
+            :on-save="Remove_Category"
+            :on-close="onCloseDelete"
+        >
+        </delete_-category>
         <v-dialog
             v-model="dialog"
             max-width="400px"

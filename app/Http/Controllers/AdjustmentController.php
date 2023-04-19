@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
-class AdjustmentController extends BaseController
+class AdjustmentController extends Controller
 {
 
     //------------ Show All Adjustement  -----------\\
@@ -273,8 +273,8 @@ class AdjustmentController extends BaseController
 
         //get warehouses assigned to user
         $warehouses = $this->getWarehouses();
-
-        return response()->json(['warehouses' => $warehouses]);
+        Inertia::share('titlePage', 'Ajustes en stock');
+        return Inertia::render('Adjustment/Form_Adjustment', ['warehouses' => $warehouses]);
     }
 
     //-------------Show Form Edit Adjustment-----------\\

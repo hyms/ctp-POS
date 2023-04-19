@@ -19,6 +19,24 @@ const menuItems = ref([
         subItems: [],
     },
     {
+        label: "Ajustes",
+        url: "",
+        role: "all",
+        icon: "",
+        subItems: [
+            {
+                label: "Crear Ajuste",
+                url: "/adjustments/create",
+                role: "admin",
+            },
+            {
+                label: "Listar Ajustes",
+                url: "/adjustments/list",
+                role: "admin",
+            },
+        ],
+    },
+    {
         label: "Productos",
         url: "",
         role: "all",

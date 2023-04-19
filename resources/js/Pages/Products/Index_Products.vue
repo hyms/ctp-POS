@@ -4,6 +4,7 @@ import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
 import { router } from "@inertiajs/vue3";
+import DeleteDialog from "@/Components/DeleteDialog.vue";
 
 const props = defineProps({
     warehouses: Array,
@@ -121,6 +122,7 @@ function Delete_Item(item) {
     dialogDelete.value = true;
 }
 function Remove_Product() {
+    snackbar.value = false;
     axios
         .delete("/products/" + product.value.id)
         .then(({ data }) => {
@@ -151,35 +153,11 @@ function Remove_Product() {
             :snackbar-color="snackbarColor"
         ></snackbar>
         <!-- Modal Remove Product -->
-        <v-dialog v-model="dialogDelete" max-width="300px">
-            <v-card>
-                <v-card-text class="text-h5 text-center"
-                    >Estas seguro?
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        small
-                        variant="elevated"
-                        color="primary"
-                        class="ma-1"
-                        @click="Remove_Product"
-                        >Si
-                    </v-btn>
-                    <v-btn
-                        variant="elevated"
-                        small
-                        color="error"
-                        class="ma-1"
-                        @click="onCloseDelete"
-                        >Cancelar
-                    </v-btn>
-
-                    <v-spacer></v-spacer>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-
+        <delete-dialog
+            :model="dialogDelete"
+            :on-save="Remove_Product"
+            :on-close="onCloseDelete"
+        ></delete-dialog>
         <v-row align="center">
             <v-col>
                 <v-text-field
