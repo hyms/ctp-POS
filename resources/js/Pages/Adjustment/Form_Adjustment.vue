@@ -19,7 +19,6 @@ const snackbarText = ref("");
 const snackbarColor = ref("info");
 const focused = ref(false);
 const search_input = ref("");
-const product_filter = ref([]);
 const timer = ref(null);
 const products = ref([]);
 const details = ref([]);
@@ -50,46 +49,25 @@ const product_autocomplete = ref("");
 const editmode = ref(false);
 const search = ref("");
 
-watch(search_input, (val) => {
-    val && val !== product_filter.value && querySelections(val);
-});
-
 function querySelections(val) {
+    search_input.value = val;
     loadingFilter.value = true;
-    if (timer.value) {
-        clearTimeout(timer.value);
-        timer.value = null;
-    }
-
-    if (search_input.value.length < 1) {
-        return (product_filter.value = []);
-    }
 
     if (
         adjustmentForm.value.warehouse_id !== "" &&
         adjustmentForm.value.warehouse_id != null
     ) {
-        timer.value = setTimeout(() => {
-            const product_filter = products.value.filter(
-                (product) => product.code === search_input.value
-            );
-            if (product_filter.length === 1) {
-                SearchProduct(product_filter[0]);
-            } else {
-                product_filter.value = products.value.filter((product) => {
-                    return (
-                        product.name
-                            .toLowerCase()
-                            .includes(search_input.value.toLowerCase()) ||
-                        product.code
-                            .toLowerCase()
-                            .includes(search_input.value.toLowerCase())
-                    );
-                });
+        let product_filter = [];
+        for (let item of products.value) {
+            if (search_input.value === item.id) {
+                product_filter = item;
+                break;
             }
-            loadingFilter.value = false;
-        }, 800);
+        }
+        if (Object.keys(product_filter).length > 0)
+            SearchProduct(product_filter);
     }
+    loadingFilter.value = false;
 }
 
 //---------------- Submit Search Product-----------------\\
@@ -98,39 +76,42 @@ function SearchProduct(result) {
     product.value = {};
     if (
         details.value.length > 0 &&
-        details.value.some((detail) => detail.code === result.code)
+        details.value.some((detail) => detail.name === result.name)
     ) {
         snackbar.value = true;
         snackbarText.value = "Ya esta añadido";
         snackbarColor.value = "warning";
     } else {
         product.value.code = result.code;
-        product.value.current = result.qty;
-        product.value.quantity = result.qty < 1 ? result.qty : 1;
+        product.value.current = result.qte ?? 0;
+        product.value.quantity =
+            product.value.current < 1 ? product.value.current : 1;
         product.value.product_variant_id = result.product_variant_id;
-        Get_Product_Details(result.id);
+        product.value.product_id = result.id;
+        product.value.name = result.name;
+        product.value.type = "add";
+        product.value.unit = result.unit;
+        add_product();
     }
     search_input.value = "";
-    product_autocomplete.value = "";
-    product_filter.value = [];
-}
-
-//---------------------- Event Get Value Search ------------------------------\\
-function getResultValue(result) {
-    return result.code + " " + "(" + result.name + ")";
 }
 
 //
 //------------- Submit Validation Create Adjustment
-function Submit_Adjustment() {
-    // form.validate();
-    Create_Adjustment();
+async function Submit_Adjustment() {
+    const validate = await form.value.validate();
+    if (validate.valid)
+        if (editmode.value) {
+            // Edit_Product();
+        } else {
+            Create_Adjustment();
+        }
 }
 
 //---------------------- Event Select Warehouse ------------------------------\\
 function Selected_Warehouse(value) {
     search_input.value = "";
-    product_filter.value = [];
+    product.value = [];
     Get_Products_By_Warehouse(value);
 }
 
@@ -138,7 +119,7 @@ function Selected_Warehouse(value) {
 
 function Get_Products_By_Warehouse(id) {
     axios
-        .get("get_Products_by_warehouse/" + id + "?stock=" + 0)
+        .get("/get_Products_by_warehouse/" + id + "?stock=" + 0)
         .then((response) => {
             products.value = response.data;
         })
@@ -157,6 +138,7 @@ function add_product() {
 
 //-----------------------------------Verified QTY ------------------------------\\
 function Verified_Qty(detail, id) {
+    snackbar.value = false;
     for (let i = 0; i < details.value.length; i++) {
         if (details.value[i].detail_id === id) {
             if (isNaN(detail.quantity)) {
@@ -164,11 +146,9 @@ function Verified_Qty(detail, id) {
             }
 
             if (detail.type == "sub" && detail.quantity > detail.current) {
-                this.makeToast(
-                    "warning",
-                    this.$t("LowStock"),
-                    this.$t("Warning")
-                );
+                snackbar.value = true;
+                snackbarText.value = "Queda poco Stock";
+                snackbarColor.value = "warning";
                 details.value[i].quantity = detail.current;
             } else {
                 details.value[i].quantity = detail.quantity;
@@ -181,17 +161,17 @@ function Verified_Qty(detail, id) {
 function increment(detail, id) {
     snackbar.value = false;
     for (let i = 0; i < details.value.length; i++) {
-        if (details.value[i].detail_id == id) {
-            if (detail.type == "sub") {
+        if (details.value[i].detail_id === id) {
+            if (detail.type === "sub") {
                 if (detail.quantity + 1 > detail.current) {
                     snackbar.value = true;
                     snackbarText.value = "Queda poco Stock";
                     snackbarColor.value = "warning";
                 } else {
-                    this.formatNumber(details.value[i].quantity++, 2);
+                    formatNumber(details.value[i].quantity++, 2);
                 }
             } else {
-                this.formatNumber(details.value[i].quantity++, 2);
+                formatNumber(details.value[i].quantity++, 2);
             }
         }
     }
@@ -199,18 +179,19 @@ function increment(detail, id) {
 
 //----------------------------------- Decrement QTY ------------------------------\\
 function decrement(detail, id) {
+    snackbar.value = false;
     for (let i = 0; i < details.value.length; i++) {
-        if (details.value[i].detail_id == id) {
+        if (details.value[i].detail_id === id) {
             if (detail.quantity - 1 > 0) {
                 if (
-                    detail.type == "sub" &&
+                    detail.type === "sub" &&
                     detail.quantity - 1 > detail.current
                 ) {
                     snackbar.value = true;
                     snackbarText.value = "Queda poco Stock";
                     snackbarColor.value = "warning";
                 } else {
-                    this.formatNumber(details.value[i].quantity--, 2);
+                    formatNumber(details.value[i].quantity--, 2);
                 }
             }
         }
@@ -272,7 +253,7 @@ function Create_Adjustment() {
         loading.value = true;
         snackbar.value = false;
         axios
-            .post("adjustments", {
+            .post("/adjustments", {
                 warehouse_id: adjustmentForm.value.warehouse_id,
                 date: adjustmentForm.value.date,
                 notes: adjustmentForm.value.notes,
@@ -308,7 +289,7 @@ function detail_order_id() {
 //---------------------------------Get Product Details ------------------------\\
 
 function Get_Product_Details(product_id) {
-    axios.get("products/" + product_id).then(({ data }) => {
+    axios.get("/products/detail/" + product_id).then(({ data }) => {
         product.value.product_id = data.id;
         product.value.name = data.name;
         product.value.type = "add";
@@ -345,215 +326,230 @@ onMounted(() => {
 <template>
     <Layout :loading="loading">
         <snackbar
-            :snackbar="snackbar"
+            v-model="snackbar"
             :snackbarColor="snackbarColor"
             :snackbarText="snackbarText"
         >
         </snackbar>
-        <v-form @submit.prevent="Submit_Adjustment">
+        <v-form ref="form">
             <v-row>
-                <v-col lg="12" md="12" sm="12">
+                <v-col lg="12" cols="12" sm="12">
                     <v-card>
-                        <v-row>
-                            <!-- warehouse -->
-                            <v-col md="6" class="mb-3">
-                                <!--                  <validation-provider name="warehouse" :rules="{ required: true}">-->
-                                <!--                    <v-form-group slot-scope="{ valid, errors }" :label="$t('warehouse') + ' ' + '*'">-->
-                                <!--                      <v-select-->
-                                <!--                        :class="{'is-invalid': !!errors.length}"-->
-                                <!--                        :state="errors[0] ? false : (valid ? true : null)"-->
-                                <!--                        :disabled="details.length > 0"-->
-                                <!--                        @input="Selected_Warehouse"-->
-                                <!--                        v-model="adjustment.warehouse_id"-->
-                                <!--                        :reduce="label => label.value"-->
-                                <!--                        :placeholder="$t('Choose_Warehouse')"-->
-                                <!--                        :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
-                                <!--                      />-->
-                                <!--                      <v-form-invalid-feedback>{{ errors[0] }}</v-form-invalid-feedback>-->
-                                <!--                    </v-form-group>-->
-                                <!--                  </validation-provider>-->
-                            </v-col>
+                        <v-card-text>
+                            <v-row>
+                                <!-- warehouse -->
+                                <v-col cols="12" md="6">
+                                    <v-select
+                                        @update:modelValue="Selected_Warehouse"
+                                        v-model="adjustmentForm.warehouse_id"
+                                        :items="warehouses"
+                                        :label="adjustmentLabel.warehouse_id"
+                                        item-title="title"
+                                        item-value="value"
+                                        variant="outlined"
+                                        density="comfortable"
+                                        hide-details="auto"
+                                        clearable
+                                        :rules="ruleForm.required"
+                                        :disabled="details.length > 0"
+                                    ></v-select>
+                                </v-col>
 
-                            <!-- date  -->
-                            <v-col lg="6" md="6" sm="12">
-                                <!--                  <validation-provider-->
-                                <!--                    name="date"-->
-                                <!--                    :rules="{ required: true}"-->
-                                <!--                    v-slot="validationContext"-->
-                                <!--                  >-->
-                                <!--                    <v-form-group :label="$t('date') + ' ' + '*'">-->
-                                <!--                      <v-form-input-->
-                                <!--                        :state="getValidationState(validationContext)"-->
-                                <!--                        aria-describedby="date-feedback"-->
-                                <!--                        type="date"-->
-                                <!--                        v-model="adjustment.date"-->
-                                <!--                      ></v-form-input>-->
-                                <!--                      <v-form-invalid-feedback-->
-                                <!--                        id="OrderTax-feedback"-->
-                                <!--                      >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-                                <!--                    </v-form-group>-->
-                                <!--                  </validation-provider>-->
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <!-- Product -->
-                            <v-col md="12" class="mb-5">
-                                <v-autocomplete
-                                    v-model="product_autocomplete"
-                                    v-model:search="search_input"
-                                    :loading="loadingFilter"
-                                    :items="product_filter"
-                                    class="mx-4"
-                                    density="comfortable"
-                                    hide-no-data
-                                    hide-details
-                                    label="Producto"
-                                ></v-autocomplete>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <!-- Products -->
-                            <v-col md="12">
-                                <v-table>
-                                    <thead class="bg-gray-300">
-                                        <tr>
-                                            <th scope="col">#</th>
-                                            <th scope="col">Codigo</th>
-                                            <th scope="col">Producto</th>
-                                            <th scope="col">En Stock</th>
-                                            <th scope="col">Cantidad</th>
-                                            <th scope="col">Tipo</th>
-                                            <th scope="col" class="text-center">
-                                                <i class="fa fa-trash"></i>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-if="details.length <= 0">
-                                            <td colspan="7">
-                                                No hay datos disponibles
-                                            </td>
-                                        </tr>
-                                        <tr
-                                            v-for="detail in details"
-                                            :key="detail.detail_id"
-                                        >
-                                            <td>{{ detail.detail_id }}</td>
-                                            <td>{{ detail.code }}</td>
-                                            <td>({{ detail.name }})</td>
-                                            <td>
-                                                <span
-                                                    class="badge badge-outline-warning"
-                                                    >{{ detail.current }}
-                                                    {{ detail.unit }}</span
+                                <!-- date  -->
+                                <v-col cols="12" lg="6">
+                                    <!--                  <validation-provider-->
+                                    <!--                    name="date"-->
+                                    <!--                    :rules="{ required: true}"-->
+                                    <!--                    v-slot="validationContext"-->
+                                    <!--                  >-->
+                                    <!--                    <v-form-group :label="$t('date') + ' ' + '*'">-->
+                                    <!--                      <v-form-input-->
+                                    <!--                        :state="getValidationState(validationContext)"-->
+                                    <!--                        aria-describedby="date-feedback"-->
+                                    <!--                        type="date"-->
+                                    <!--                        v-model="adjustment.date"-->
+                                    <!--                      ></v-form-input>-->
+                                    <!--                      <v-form-invalid-feedback-->
+                                    <!--                        id="OrderTax-feedback"-->
+                                    <!--                      >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
+                                    <!--                    </v-form-group>-->
+                                    <!--                  </validation-provider>-->
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <!-- Product -->
+                                <v-col cols="12">
+                                    <v-autocomplete
+                                        @update:modelValue="querySelections"
+                                        :loading="loadingFilter"
+                                        :items="products"
+                                        :model-value="search_input"
+                                        item-title="name"
+                                        item-value="id"
+                                        density="comfortable"
+                                        hide-no-data
+                                        hide-details
+                                        label="Añadir Producto"
+                                        :disabled="products.length == 0"
+                                        clearable
+                                    ></v-autocomplete>
+                                </v-col>
+                                <!-- Products -->
+                                <v-col cols="12">
+                                    <v-table>
+                                        <thead class="bg-gray-300">
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Codigo</th>
+                                                <th scope="col">Producto</th>
+                                                <th scope="col">En Stock</th>
+                                                <th scope="col">Cantidad</th>
+                                                <th scope="col">Tipo</th>
+                                                <th
+                                                    scope="col"
+                                                    class="text-center"
                                                 >
-                                            </td>
-                                            <td>
-                                                <div class="quantity">
-                                                    <!--                                                    <v-input-group>-->
-                                                    <!--                                                        <v-input-group-prepend>-->
-                                                    <!--                                                            <span-->
-                                                    <!--                                                                class="btn btn-primary btn-sm"-->
-                                                    <!--                                                                @click="-->
-                                                    <!--                                                                    decrement(-->
-                                                    <!--                                                                        detail,-->
-                                                    <!--                                                                        detail.detail_id-->
-                                                    <!--                                                                    )-->
-                                                    <!--                                                                "-->
-                                                    <!--                                                                >-</span-->
-                                                    <!--                                                            >-->
-                                                    <!--                                                        </v-input-group-prepend>-->
-
-                                                    <!--                                                        <input-->
-                                                    <!--                                                            class="form-control"-->
-                                                    <!--                                                            @keyup="-->
-                                                    <!--                                                                Verified_Qty(-->
-                                                    <!--                                                                    detail,-->
-                                                    <!--                                                                    detail.detail_id-->
-                                                    <!--                                                                )-->
-                                                    <!--                                                            "-->
-                                                    <!--                                                            :min="0.0"-->
-                                                    <!--                                                            :max="-->
-                                                    <!--                                                                detail.current-->
-                                                    <!--                                                            "-->
-                                                    <!--                                                            v-model.number="-->
-                                                    <!--                                                                detail.quantity-->
-                                                    <!--                                                            "-->
-                                                    <!--                                                        />-->
-                                                    <!--                                                        <v-input-group-append>-->
-                                                    <!--                                                            <span-->
-                                                    <!--                                                                class="btn btn-primary btn-sm"-->
-                                                    <!--                                                                @click="-->
-                                                    <!--                                                                    increment(-->
-                                                    <!--                                                                        detail,-->
-                                                    <!--                                                                        detail.detail_id-->
-                                                    <!--                                                                    )-->
-                                                    <!--                                                                "-->
-                                                    <!--                                                                >+</span-->
-                                                    <!--                                                            >-->
-                                                    <!--                                                        </v-input-group-append>-->
-                                                    <!--                                                    </v-input-group>-->
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <!--                                                <select-->
-                                                <!--                                                    v-model="detail.type"-->
-                                                <!--                                                    @change="-->
-                                                <!--                                                        Verified_Qty(-->
-                                                <!--                                                            detail,-->
-                                                <!--                                                            detail.detail_id-->
-                                                <!--                                                        )-->
-                                                <!--                                                    "-->
-                                                <!--                                                    type="text"-->
-                                                <!--                                                    required-->
-                                                <!--                                                    class="form-control"-->
-                                                <!--                                                >-->
-                                                <!--                                                    <option value="add">-->
-                                                <!--                                                        {{ $t("Addition") }}-->
-                                                <!--                                                    </option>-->
-                                                <!--                                                    <option value="sub">-->
-                                                <!--                                                        {{ $t("Subtraction") }}-->
-                                                <!--                                                    </option>-->
-                                                <!--                                                </select>-->
-                                            </td>
-                                            <td>
-                                                <a
-                                                    @click="
-                                                        Remove_Product(
-                                                            detail.detail_id
-                                                        )
-                                                    "
-                                                    class="btn btn-icon btn-sm"
-                                                    title="Delete"
-                                                >
-                                                    <i
-                                                        class="i-Close-Window text-25 text-danger"
-                                                    ></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </v-table>
-                            </v-col>
-                            <v-col md="12">
-                                <!--                  <v-form-group :label="$t('Note')" class="mt-4">-->
-                                <!--                    <textarea-->
-                                <!--                      v-model="adjustment.notes"-->
-                                <!--                      rows="4"-->
-                                <!--                      class="form-control"-->
-                                <!--                      :placeholder="$t('Afewwords')"-->
-                                <!--                    ></textarea>-->
-                                <!--                  </v-form-group>-->
-                            </v-col>
-                            <v-col md="12">
-                                <!--                  <v-form-group>-->
-                                <!--                     <v-button variant="primary" :disabled="SubmitProcessing" @click="Submit_Adjustment">{{$t('submit')}}</v-button>-->
-                                <!--                      <div v-once class="typo__p" v-if="SubmitProcessing">-->
-                                <!--                        <div class="spinner sm spinner-primary mt-3"></div>-->
-                                <!--                      </div>-->
-                                <!--                  </v-form-group>-->
-                            </v-col>
-                        </v-row>
+                                                    <i class="fa fa-trash"></i>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-if="details.length <= 0">
+                                                <td colspan="7">
+                                                    No hay datos disponibles
+                                                </td>
+                                            </tr>
+                                            <tr
+                                                v-for="detail in details"
+                                                :key="detail.detail_id"
+                                            >
+                                                <td>
+                                                    {{ detail.detail_id }}
+                                                </td>
+                                                <td>{{ detail.code }}</td>
+                                                <td>({{ detail.name }})</td>
+                                                <td class="text-center">
+                                                    <v-chip
+                                                        color="primary"
+                                                        size="small"
+                                                    >
+                                                        {{ detail.current }}
+                                                        {{ detail.unit }}
+                                                    </v-chip>
+                                                </td>
+                                                <td>
+                                                    <v-text-field
+                                                        variant="outlined"
+                                                        density="compact"
+                                                        hide-details="auto"
+                                                        :rules="ruleForm.number"
+                                                        v-model="
+                                                            detail.quantity
+                                                        "
+                                                        @keyup="
+                                                            Verified_Qty(
+                                                                detail,
+                                                                detail.detail_id
+                                                            )
+                                                        "
+                                                        :min="0.0"
+                                                        :max="detail.current"
+                                                    >
+                                                        <template v-slot:append>
+                                                            <v-icon
+                                                                color="secundary"
+                                                                @click="
+                                                                    increment(
+                                                                        detail,
+                                                                        detail.detail_id
+                                                                    )
+                                                                "
+                                                            >
+                                                                mdi-plus-box
+                                                            </v-icon>
+                                                        </template>
+                                                        <template
+                                                            v-slot:prepend
+                                                        >
+                                                            <v-icon
+                                                                color="secundary"
+                                                                @click="
+                                                                    decrement(
+                                                                        detail,
+                                                                        detail.detail_id
+                                                                    )
+                                                                "
+                                                            >
+                                                                mdi-minus-box
+                                                            </v-icon>
+                                                        </template>
+                                                    </v-text-field>
+                                                </td>
+                                                <td>
+                                                    <v-select
+                                                        v-model="detail.type"
+                                                        :items="[
+                                                            {
+                                                                title: 'Añadir',
+                                                                value: 'add',
+                                                            },
+                                                            {
+                                                                title: 'Quitar',
+                                                                value: 'sub',
+                                                            },
+                                                        ]"
+                                                        item-title="title"
+                                                        item-value="value"
+                                                        variant="outlined"
+                                                        density="compact"
+                                                        hide-details="auto"
+                                                    ></v-select>
+                                                </td>
+                                                <td>
+                                                    <v-btn
+                                                        class="ma-1"
+                                                        color="error"
+                                                        icon="mdi-delete"
+                                                        size="x-small"
+                                                        variant="elevated"
+                                                        @click="
+                                                            Remove_Product(
+                                                                detail.detail_id
+                                                            )
+                                                        "
+                                                    >
+                                                    </v-btn>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </v-table>
+                                </v-col>
+                                <v-col cols="12">
+                                    <v-textarea
+                                        rows="4"
+                                        :label="adjustmentLabel.notes"
+                                        v-model="adjustmentForm.notes"
+                                        :placeholder="adjustmentLabel.notes"
+                                        variant="outlined"
+                                        density="comfortable"
+                                        hide-details="auto"
+                                    ></v-textarea>
+                                </v-col>
+                            </v-row>
+                            <v-row class="mt-3">
+                                <v-col cols="12">
+                                    <v-btn
+                                        variant="elevated"
+                                        type="submit"
+                                        color="primary"
+                                        :loading="loading"
+                                        :disabled="loading"
+                                        @click="Submit_Adjustment"
+                                        >Guardar
+                                    </v-btn>
+                                </v-col>
+                            </v-row>
+                        </v-card-text>
                     </v-card>
                 </v-col>
             </v-row>

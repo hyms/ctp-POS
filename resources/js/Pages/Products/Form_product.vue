@@ -185,7 +185,7 @@ onMounted(() => {
 <template>
     <Layout :loading="loading">
         <snackbar
-            :snackbar="snackbar"
+            v-model="snackbar"
             :snackbarColor="snackbarColor"
             :snackbarText="snackbarText"
         >
@@ -194,9 +194,9 @@ onMounted(() => {
         <v-card>
             <v-card-text>
                 <v-form @submit.prevent="Submit_Product" ref="form">
-                    <v-row>
+                    <v-row class="mt-3">
                         <!-- Name -->
-                        <v-col md="6">
+                        <v-col cols="12" md="6">
                             <v-text-field
                                 :label="productLabel.name + ' *'"
                                 v-model="productForm.name"
@@ -210,7 +210,7 @@ onMounted(() => {
                         </v-col>
 
                         <!-- Code Product"-->
-                        <v-col md="6">
+                        <v-col cols="12" md="6">
                             <v-text-field
                                 :label="productLabel.code + ' *'"
                                 v-model="productForm.code"
@@ -224,7 +224,7 @@ onMounted(() => {
                         </v-col>
 
                         <!-- Category -->
-                        <v-col md="6">
+                        <v-col cols="12" md="6">
                             <v-select
                                 v-model="productForm.category_id"
                                 :items="categories"
@@ -240,7 +240,7 @@ onMounted(() => {
                         </v-col>
 
                         <!-- Product Cost -->
-                        <v-col md="6">
+                        <v-col cols="12" md="6">
                             <v-text-field
                                 :label="productLabel.cost + ' *'"
                                 v-model="productForm.cost"
@@ -258,7 +258,7 @@ onMounted(() => {
                         </v-col>
 
                         <!-- Product Price -->
-                        <v-col md="6">
+                        <v-col cols="12" md="6">
                             <v-text-field
                                 :label="productLabel.price + ' *'"
                                 v-model="productForm.price"
@@ -276,7 +276,7 @@ onMounted(() => {
                         </v-col>
 
                         <!-- Unit Product -->
-                        <v-col md="6">
+                        <v-col cols="12" md="6">
                             <v-select
                                 @update:modelValue="Selected_Unit"
                                 v-model="productForm.unit_id"
@@ -293,7 +293,7 @@ onMounted(() => {
                         </v-col>
 
                         <!-- Unit Sale -->
-                        <v-col md="6">
+                        <v-col cols="12" md="6">
                             <v-select
                                 v-model="productForm.unit_sale_id"
                                 :items="
@@ -314,7 +314,7 @@ onMounted(() => {
                         </v-col>
                         <!---->
                         <!-- Unit Purchase -->
-                        <v-col md="6">
+                        <v-col cols="12" md="6">
                             <v-select
                                 v-model="productForm.unit_purchase_id"
                                 :items="
@@ -335,7 +335,7 @@ onMounted(() => {
                         </v-col>
                         <!---->
                         <!-- Stock Alert -->
-                        <v-col md="6">
+                        <v-col cols="12" md="6">
                             <v-text-field
                                 :label="productLabel.stock_alert"
                                 v-model="productForm.stock_alert"
@@ -349,7 +349,7 @@ onMounted(() => {
                         </v-col>
                         <!---->
 
-                        <v-col md="12">
+                        <v-col cols="12">
                             <v-textarea
                                 rows="4"
                                 :label="productLabel.note"
@@ -362,15 +362,15 @@ onMounted(() => {
                         </v-col>
                         <!---->
                         <!-- Multiple Variants -->
-                        <v-col md="12">
+                        <v-col cols="12">
                             <v-checkbox
                                 v-model="productForm.is_variant"
                                 :label="productLabel.is_variant"
-                                density="comfortable"
+                                density="compact"
                                 hide-details="auto"
                             ></v-checkbox>
                         </v-col>
-                        <v-col md="12" v-show="productForm.is_variant">
+                        <v-col cols="12" v-if="productForm.is_variant">
                             <vue3-tags-input
                                 :tags="variants"
                                 placeholder="+ añadir"
@@ -379,17 +379,17 @@ onMounted(() => {
                         </v-col>
 
                         <!-- This_Product_Not_For_Selling -->
-                        <v-col md="12">
+                        <v-col cols="12">
                             <v-checkbox
                                 v-model="productForm.not_selling"
                                 :label="productLabel.not_selling"
-                                density="comfortable"
+                                density="compact"
                                 hide-details="auto"
                             ></v-checkbox>
                         </v-col>
                     </v-row>
-                    <v-row>
-                        <v-col md="12" class="mt-3">
+                    <v-row class="mt-3">
+                        <v-col cols="12">
                             <v-btn
                                 variant="elevated"
                                 type="submit"

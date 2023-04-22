@@ -13,16 +13,12 @@ const props = defineProps({
         :location="'top right'"
         :timeout="5000"
         elevation="5"
+        @input="$emit('update:modelValue', $event.target.value)"
+        :close-on-content-click="true"
     >
         {{ snackbarText }}
         <template v-slot:actions>
-            <v-btn
-                @click="snackbar = false"
-                icon="mdi-close"
-                size="x-small"
-                variant="tonal"
-            >
-            </v-btn>
+            <v-btn icon="mdi-close" size="x-small" variant="tonal"> </v-btn>
         </template>
     </v-snackbar>
 </template>

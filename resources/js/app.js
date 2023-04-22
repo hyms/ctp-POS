@@ -20,14 +20,14 @@ import { createInertiaApp } from "@inertiajs/vue3";
 const customLight = {
     dark: false,
     colors: {
-        // background: '#2C384A',
-        surface: "#f4f5f5",
-        primary: "#007b89",
+        // background: "#2C384A",
+        surface: "#f7f7f7",
+        primary: "#3c858d",
         secondary: "#5e8592",
-        error: "#e55353",
+        error: "#e75f5f",
         info: "#39f",
-        success: "#2eb85c",
-        warning: "#f9b115",
+        success: "#4fbb73",
+        warning: "#ffc340",
     },
 };
 const vuetify = createVuetify({

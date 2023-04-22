@@ -33,7 +33,7 @@ function print_product() {
 <template>
     <Layout :loading="loading">
         <snackbar
-            :snackbar="snackbar"
+            v-model="snackbar"
             :snackbarColor="snackbarColor"
             :snackbarText="snackbarText"
         >

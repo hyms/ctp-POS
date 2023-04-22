@@ -167,10 +167,10 @@ function Remove_Adjustment() {
                                             {{ detail.unit }}
                                         </td>
                                         <td v-if="detail.type == 'add'">
-                                            Adicion
+                                            Añadido
                                         </td>
                                         <td v-else-if="detail.type == 'sub'">
-                                            Sustraccion
+                                            Quitado
                                         </td>
                                     </tr>
                                 </tbody>

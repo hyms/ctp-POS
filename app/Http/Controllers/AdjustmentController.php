@@ -94,12 +94,12 @@ class AdjustmentController extends Controller
                     if ($value['type'] == "add") {
                         $product_warehouse->qty += $value['quantity'];
                     } else {
-                        $product_warehouse->qte -= $value['quantity'];
+                        $product_warehouse->qty -= $value['quantity'];
                     }
                     $product_warehouse->save();
                 }
             }
-            AdjustmentDetail::insert($orderDetails);
+            AdjustmentDetail::insert($orderDetails->all());
         }, 10);
 
         return response()->json(['success' => true]);
