@@ -1,16 +1,24 @@
 <?php
 
 use App\Http\Controllers\AdjustmentController;
+use App\Http\Controllers\BackupController;
+use App\Http\Controllers\CategorieController;
+use App\Http\Controllers\CategoryExpenseController;
+use App\Http\Controllers\ExpensesController;
+use App\Http\Controllers\PaymentPurchaseReturnsController;
+use App\Http\Controllers\PaymentPurchasesController;
+use App\Http\Controllers\PaymentSaleReturnsController;
+use App\Http\Controllers\PaymentSalesController;
+use App\Http\Controllers\PurchasesController;
+use App\Http\Controllers\PurchasesReturnController;
+use App\Http\Controllers\QuotationsController;
+use App\Http\Controllers\SalesController;
+use App\Http\Controllers\SalesReturnController;
 use App\Http\Controllers\SalesTypeController;
-use App\Http\Controllers\InventarioController;
-use App\Http\Controllers\OrdenesController;
-use App\Http\Controllers\PDFController;
-use App\Http\Controllers\ReciboController;
-use App\Http\Controllers\ReporteController;
-use App\Http\Controllers\StockController;
-use App\Http\Controllers\SucursalController;
+use App\Http\Controllers\SettingsController;
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TransferController;
 use App\Http\Controllers\UnitsController;
 use App\Http\Controllers\UpgradeController;
 use App\Http\Controllers\UserController;
@@ -91,16 +99,15 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::get('get_Products_by_warehouse/{id}', [ProductsController::class, 'Products_by_Warehouse']);
     Route::get('products/detail/{id}', [ProductsController::class, 'Get_Products_Details']);
     Route::get('get_products_stock_alerts', [ProductsController::class, 'Products_Alert']);
-    Route::get('barcode_create_page', [ProductsController::class, 'Get_element_barcode']);
     //------------------------------------------------------------------\\
 
 
     Route::prefix('products')->group(function () {
         //------------------------------- Category --------------------------\\
-        Route::get('categories', [SalesTypeController::class, 'index']);
-        Route::post('categories', [SalesTypeController::class, 'store']);
-        Route::put('categories/{id}', [SalesTypeController::class, 'update']);
-        Route::delete('categories/{id}', [SalesTypeController::class, 'destroy']);
+        Route::get('categories', [CategorieController::class, 'index']);
+        Route::post('categories', [CategorieController::class, 'store']);
+        Route::put('categories/{id}', [CategorieController::class, 'update']);
+        Route::delete('categories/{id}', [CategorieController::class, 'destroy']);
         //------------------------------------------------------------------\\
 
         //------------------------------- Units --------------------------\\
@@ -113,89 +120,87 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         //------------------------------------------------------------------\\
     });
 
+    Route::prefix('adjustments')->group(function () {
+        //------------------------------- Adjustments --------------------------\\
+        Route::get('/create', [AdjustmentController::class, 'create']);
+        Route::get('/edit/{id}', [AdjustmentController::class, 'edit']);
+        Route::get('/list', [AdjustmentController::class, 'index']);
+        Route::post('/', [AdjustmentController::class, 'store']);
+        Route::put('/{id}', [AdjustmentController::class, 'update']);
+        Route::delete('/{id}', [AdjustmentController::class, 'destroy']);
+        Route::get('/detail/{id}', [AdjustmentController::class, 'Adjustment_detail']);
+        //------------------------------------------------------------------\\
+    });
 
-    //------------------------------- Adjustments --------------------------\\
-    Route::get('adjustments/create', [AdjustmentController::class, 'create']);
-    Route::get('adjustments/edit/{id}', [AdjustmentController::class, 'edit']);
-    Route::get('adjustments/list', [AdjustmentController::class, 'index']);
-    Route::post('adjustments', [AdjustmentController::class, 'store']);
-    Route::put('adjustments/{id}', [AdjustmentController::class, 'update']);
-    Route::delete('adjustments/{id}', [AdjustmentController::class, 'destroy']);
-    Route::get('adjustments/detail/{id}', [AdjustmentController::class, 'Adjustment_detail']);
+    //-------------------------- Clear Cache ---------------------------
+    Route::get("clear_cache", [SettingsController::class, 'Clear_Cache']);
+
+    //------------------------------- Expenses --------------------------\\
+    Route::get('expenses', [ExpensesController::class, 'index']);
+    Route::post('expenses', [ExpensesController::class, 'store']);
+    Route::put('expenses/{id}', [ExpensesController::class, 'update']);
+    Route::delete('expenses/{id}', [ExpensesController::class, 'destroy']);
     //------------------------------------------------------------------\\
 
+    //------------------------------- Expenses Category--------------------------\\
+    Route::get('expenses_category', [CategoryExpenseController::class, 'index']);
+    Route::post('expenses_category', [CategoryExpenseController::class, 'store']);
+    Route::put('expenses_category/{id}', [CategoryExpenseController::class, 'update']);
+    Route::delete('expenses_category/{id}', [CategoryExpenseController::class, 'destroy']);
+    //------------------------------------------------------------------\\
 
-    Route::get('ordenes', [OrdenesController::class, 'getAll'])
-        ->name('listaOrdenes');
-    Route::post('orden', [OrdenesController::class, 'post'])
-        ->name('guardarOrden');
-    Route::post('orden/quemado', [OrdenesController::class, 'quemado'])
-        ->name('guardarOrdenQ');
-    Route::post('ordenVenta', [OrdenesController::class, 'postVenta'])
-        ->name('guardarOrdenV');
-    Route::post('ordenDeuda', [OrdenesController::class, 'postDeuda'])
-        ->name('guardarOrdenD');
-    Route::delete('orden/{id}', [OrdenesController::class, 'borrar'])
-        ->name('borrarOrden');
-    Route::get('espera', [OrdenesController::class, 'getAllVenta'])
-        ->name('listaOrdenesV');
-    Route::get('mora', [OrdenesController::class, 'getAllMora'])
-        ->name('listaOrdenesM');
-    Route::get('realizados', [OrdenesController::class, 'getListVenta'])
-        ->name('reporteOrden');
-    Route::get('reposicion', [OrdenesController::class, 'newReposition'])
-        ->name('reposicion');
-    Route::post('reposicion', [OrdenesController::class, 'postRepocision'])
-        ->name('reposicionGuardar');
-    Route::delete('recibo/{id}', [ReciboController::class, 'borrar'])
-        ->name('recibosBorrar');
-    Route::post('recibo', [ReciboController::class, 'post'])
-        ->name('guardarRecibo');
-    Route::get('recibosIngreso', [ReciboController::class, 'getIngreso'])
-        ->name('recibosI');
-    Route::get('recibosEgreso', [ReciboController::class, 'getEgreso'])
-        ->name('recibosE');
-    Route::get('reportes/placas', [ReporteController::class, 'placasV'])
-        ->name('listaReportesPlacas');
-    Route::get('reportes/diario', [ReporteController::class, 'rendicionDiaria'])
-        ->name('diarioReportes');
-    Route::get('reportes/cliente', [ReporteController::class, 'cliente'])
-        ->name('clienteReportes');
+    //-------------------------------  Sales --------------------------\\
+    Route::get('sales', [SalesController::class, 'index']);
+    Route::post('sales', [SalesController::class, 'store']);
+    Route::put('sales/{id}', [SalesController::class, 'update']);
+    Route::delete('sales/{id}', [SalesController::class, 'destroy']);
+    Route::get('convert_to_sale_data/{id}', [SalesController::class, 'Elemens_Change_To_Sale']);
+    Route::get('get_payments_by_sale/{id}', [SalesController::class, 'Payments_Sale']);
+    Route::post('sales_send_email', [SalesController::class, 'Send_Email']);
+//    Route::post('sales_send_sms',[SalesController::class, 'Send_SMS']);
+    Route::get('get_Products_by_sale/{id}', [SalesController::class, 'get_Products_by_sale']);
+    //------------------------------------------------------------------\\
 
-//pdfs
-    Route::get('ordenPdf/{id}', [PDFController::class, 'getOrdenDiseño'])
-        ->name('pdfOrdenD')->middleware('auth');
-    Route::get('ordenPdfV/{id}', [PDFController::class, 'getOrdenVenta'])
-        ->name('pdfOrdenV')->middleware('auth');
-    Route::get('reciboPdf/{id}', [PDFController::class, 'getRecibo'])
-        ->name('pdfRecibo')->middleware('auth');
-//Admin
+    //------------------------------- Transfers --------------------------\\
+    Route::get('transfers', [TransferController::class, 'index']);
+    Route::post('transfers', [TransferController::class, 'store']);
+    Route::put('transfers/{id}', [TransferController::class, 'update']);
+    Route::delete('transfers/{id}', [TransferController::class, 'destroy']);
+    //--------------------------------------------------------------------\\
 
-    //reportes
-    Route::get('reportes', [ReporteController::class, 'get'])
-        ->name('listaReportes');
-    Route::get('reportes/placas', [ReporteController::class, 'placasA'])
-        ->name('listaReportesA');
-    Route::get('reportes/placasE', [ReporteController::class, 'exportPlacas'])
-        ->name('listaReportesE');
-    Route::get('reportes/arqueos', [ReporteController::class, 'arqueos'])
-        ->name('listaArqueos');
-    Route::get('reportes/cajas', [ReporteController::class, 'cajas'])
-        ->name('listaReportesCajas');
-    Route::get('reportes/resumen', [ReporteController::class, 'resumen']);
-    Route::get('reportes/mora', [ReporteController::class, 'clientes']);
-    Route::get('reportes/rendicion', [ReporteController::class, 'rendicionDiariaAdm']);
-    Route::get('reportes/ordenes', [ReporteController::class, 'ordenes']);
-    Route::get('reportes/auditar', [ReporteController::class, 'ordenesAudit']);
-    Route::get('reportes/inventario', [ReporteController::class, 'movimientosInventario']);
+
+    //------------------------------- Settings ------------------------\\
+    Route::get('settings', [SettingsController::class, 'index']);
+    Route::post('settings', [SettingsController::class, 'store']);
+    Route::put('settings/{id}', [SettingsController::class, 'update']);
+    Route::delete('settings/{id}', [SettingsController::class, 'destroy']);
+    Route::get('get_Settings_data', [SettingsController::class, 'getSettings']);
+    Route::put('pos_settings/{id}', [SettingsController::class, 'update_pos_settings']);
+    Route::get('get_pos_Settings', [SettingsController::class, 'get_pos_Settings']);
+    //------------------------------------------------------------------\\
+
+    //------------------------------- Backup --------------------------\\
+    Route::get("get_backup", [BackupController::class, 'Get_Backup']);
+    Route::get("generate_new_backup", [BackupController::class, 'Generate_Backup']);
+    Route::delete("delete_backup/{name}", [BackupController::class, 'Delete_Backup']);
+    //------------------------------------------------------------------\\
+
+    //-------------------------------  Print & PDF ------------------------\\
+    Route::get('sale_pdf/{id}', [SalesController::class, 'Sale_PDF']);
+    Route::get('quote_pdf/{id}', [QuotationsController::class, 'Quotation_pdf']);
+    Route::get('purchase_pdf/{id}', [PurchasesController::class, 'Purchase_pdf']);
+    Route::get('return_sale_pdf/{id}', [SalesReturnController::class, 'Return_pdf']);
+    Route::get('return_purchase_pdf/{id}', [PurchasesReturnController::class, 'Return_pdf']);
+    Route::get('payment_purchase_pdf/{id}', [PaymentPurchasesController::class, 'Payment_purchase_pdf']);
+    Route::get('payment_return_sale_pdf/{id}', [PaymentSaleReturnsController::class, 'payment_return']);
+    Route::get('payment_return_purchase_pdf/{id}', [PaymentPurchaseReturnsController::class, 'payment_return']);
+    Route::get('payment_sale_pdf/{id}', [PaymentSalesController::class, 'payment_sale']);
+    Route::get('sales_print_invoice/{id}', [SalesController::class, 'Print_Invoice_POS']);
+    //------------------------------------------------------------------\\
 
 });
-
-
 /*
- * //-------------------------- Clear Cache ---------------------------
 
-    Route::get("clear_cache", "SettingsController@Clear_Cache");
 
     //-------------------------- Reports ---------------------------
 
@@ -374,16 +379,6 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::post('payment_purchase_send_email', 'PaymentPurchasesController@SendEmail');
     Route::post('payment_purchase_send_sms', 'PaymentPurchasesController@Send_SMS');
 
-    //-------------------------------  Sales --------------------------\\
-    //------------------------------------------------------------------\\
-
-    Route::resource('sales', 'SalesController');
-    Route::get('convert_to_sale_data/{id}', 'SalesController@Elemens_Change_To_Sale');
-    Route::get('get_payments_by_sale/{id}', 'SalesController@Payments_Sale');
-    Route::post('sales_send_email', 'SalesController@Send_Email');
-    Route::post('sales_send_sms', 'SalesController@Send_SMS');
-    Route::post('sales_delete_by_selection', 'SalesController@delete_by_selection');
-    Route::get('get_Products_by_sale/{id}', 'SalesController@get_Products_by_sale');
 
     //-------------------------------  Shipments --------------------------\\
     //------------------------------------------------------------------\\
@@ -399,18 +394,6 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::post('payment_sale_send_email', 'PaymentSalesController@SendEmail');
     Route::post('payment_sale_send_sms', 'PaymentSalesController@Send_SMS');
 
-    //------------------------------- Expenses --------------------------\\
-    //------------------------------------------------------------------\\
-
-    Route::resource('expenses', 'ExpensesController');
-    Route::post('expenses_delete_by_selection', 'ExpensesController@delete_by_selection');
-
-
-    //------------------------------- Expenses Category--------------------------\\
-    //------------------------------------------------------------------\\
-
-    Route::resource('expenses_category', 'CategoryExpenseController');
-    Route::post('expenses_category_delete_by_selection', 'CategoryExpenseController@delete_by_selection');
 
 
     //------------------------------- Quotations --------------------------\\
@@ -459,10 +442,6 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::post('payment/returns_purchase/send/sms', 'PaymentPurchaseReturnsController@Send_SMS');
 
    
-    //------------------------------- Transfers --------------------------\\
-    //--------------------------------------------------------------------\\
-    Route::resource('transfers', 'TransferController');
-    Route::post('transfers/delete/by_selection', 'TransferController@delete_by_selection');
 
    
     //------------------------------- Permission Groups user -----------\\
@@ -473,39 +452,12 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::post('roles/delete/by_selection', 'PermissionsController@delete_by_selection');
 
 
-    //------------------------------- Settings ------------------------\\
-    //------------------------------------------------------------------\\
-    Route::resource('settings', 'SettingsController');
-    Route::get('get_Settings_data', 'SettingsController@getSettings');
-    Route::put('pos_settings/{id}', 'SettingsController@update_pos_settings');
-    Route::get('get_pos_Settings', 'SettingsController@get_pos_Settings');
-
-   
     //------------------------------- Update Settings ------------------------\\
 
     Route::get('get_version_info', 'UpdateController@get_version_info');
 
-    //------------------------------- Backup --------------------------\\
-    //------------------------------------------------------------------\\
-
-    Route::get("get_backup", "BackupController@Get_Backup");
-    Route::get("generate_new_backup", "BackupController@Generate_Backup");
-    Route::delete("delete_backup/{name}", "BackupController@Delete_Backup");
 
 });
 
-    //-------------------------------  Print & PDF ------------------------\\
-    //------------------------------------------------------------------\\
-
-    Route::get('sale_pdf/{id}', 'SalesController@Sale_PDF');
-    Route::get('quote_pdf/{id}', 'QuotationsController@Quotation_pdf');
-    Route::get('purchase_pdf/{id}', 'PurchasesController@Purchase_pdf');
-    Route::get('return_sale_pdf/{id}', 'SalesReturnController@Return_pdf');
-    Route::get('return_purchase_pdf/{id}', 'PurchasesReturnController@Return_pdf');
-    Route::get('payment_purchase_pdf/{id}', 'PaymentPurchasesController@Payment_purchase_pdf');
-    Route::get('payment_return_sale_pdf/{id}', 'PaymentSaleReturnsController@payment_return');
-    Route::get('payment_return_purchase_pdf/{id}', 'PaymentPurchaseReturnsController@payment_return');
-    Route::get('payment_sale_pdf/{id}', 'PaymentSalesController@payment_sale');
-    Route::get('sales_print_invoice/{id}', 'SalesController@Print_Invoice_POS');
 
  */

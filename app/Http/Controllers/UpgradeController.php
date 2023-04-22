@@ -39,6 +39,9 @@ class UpgradeController extends Controller
 //                    throw new Exception("not need upgrade");
 //                }
 //            }
+            DB::transaction(function () {
+
+
 //            $items = DB::table('clientes')->get()->collect();
 //            $items->each(function ($item){
 //                $id = DB::table('clients')->insertGetId([
@@ -173,50 +176,127 @@ class UpgradeController extends Controller
 //            });
 //            Log::info("finish sales_type migration");
 
-//            $items = DB::table('productos')->get();
-//            $items->each(function ($item) {
-//
-//                $id = DB::table('products')->insertGetId([
-//                    'id' => $item->id,
-//                    'code' => $item->codigo,
-//                    'name' => $item->formato,
-//                    'cost' => 0,
-//                    'price' => 0,
-//                    'category_id' => $item->tipo??1,
-//                    'unit_id' => 1,
-//                    'unit_sale_id' => 1,
-//                    'unit_purchase_id' => 1,
-//                    'TaxNet' => 0,
-//                    'tax_method' => '1',
-//                    'note' => $item->dimension,
-//                    'stock_alert' => 0,
-//                    'is_variant' => 0,
-//                    'not_selling' => 0,
-//                    'is_active' => 1,
-//                    'created_at' => $item->created_at,
-//                    'updated_at' => $item->updated_at,
-//                    'deleted_at' => $item->deleted_at,
-//                ]);
-//            });
-//            Log::info("finish products migration");
+            $items = DB::table('productos')->get();
+            $items->each(function ($item) {
 
-//            $items = DB::table('stock')->get();
-//            $items->each(function ($item) {
-//
-//                $id = DB::table('product_warehouse')->insertGetId([
-//                    'id' => $item->id,
-//                    'product_id' => $item->producto,
-//                    'warehouse_id' => $item->sucursal,
-//                    'product_variant_id' => null,
-//                    'qty' => $item->cantidad,
-//                    'price' => $item->precioUnidad,
-//                    'created_at' => $item->created_at,
-//                    'updated_at' => $item->updated_at,
-//                    'deleted_at' => $item->deleted_at,
-//                ]);
-//            });
-//            Log::info("finish product_warehouse migration");
+                $id = DB::table('products')->insertGetId([
+                    'id' => $item->id,
+                    'code' => $item->codigo,
+                    'name' => $item->formato,
+                    'cost' => 0,
+                    'price' => 0,
+                    'category_id' => $item->tipo??1,
+                    'unit_id' => 1,
+                    'unit_sale_id' => 1,
+                    'unit_purchase_id' => 1,
+                    'TaxNet' => 0,
+                    'tax_method' => '1',
+                    'note' => $item->dimension,
+                    'stock_alert' => 0,
+                    'is_variant' => 0,
+                    'not_selling' => 0,
+                    'is_active' => 1,
+                    'created_at' => $item->created_at,
+                    'updated_at' => $item->updated_at,
+                    'deleted_at' => $item->deleted_at,
+                ]);
+            });
+            Log::info("finish products migration");
 
+            $items = DB::table('stock')->get();
+            $items->each(function ($item) {
+
+                $id = DB::table('product_warehouse')->insertGetId([
+                    'id' => $item->id,
+                    'product_id' => $item->producto,
+                    'warehouse_id' => $item->sucursal,
+                    'product_variant_id' => null,
+                    'qty' => $item->cantidad,
+                    'price' => $item->precioUnidad,
+                    'created_at' => $item->created_at,
+                    'updated_at' => $item->updated_at,
+                    'deleted_at' => $item->deleted_at,
+                ]);
+            });
+            Log::info("finish product_warehouse migration");
+
+                $items = DB::table('ordenesTrabajo')->get();
+                $items->each(function ($item) {
+                    if ($item->tipoOrden != 0) {
+                        $details = DB::table('detallesOrden')->where('ordenTrabajo', '=', $item->id)->get();
+                        $GrandTotal = 0;
+                        $paid_amount = 0;
+                        $sale_datail = collect();
+                        foreach ($details as $detail) {
+                            $product_id = DB::table('stock')->where('id', '=', $detail->stock)->first()?->producto;
+                            $sale_unit_id = DB::table('products')->where('id', '=', $product_id)->first()?->unit_sale_id;
+                            $GrandTotal += $detail->total;
+                            $sale_datail->add([
+                                "id" => $detail->id,
+                                "date" => Carbon::parse($item->created_at),
+                                "sale_id" => $detail->ordenTrabajo,
+                                "product_id" => $product_id,
+                                "product_variant_id" => null,
+                                "sale_unit_id" => $sale_unit_id,
+                                "price" => $detail->costo,
+                                "TaxNet" => 0,
+                                "tax_method" => 0,
+                                "discount" => 0,
+                                "discount_method" => 0,
+                                "total" => $detail->total,
+                                "quantity" => $detail->cantidad,
+                                "created_at" => $detail->created_at,
+                                "updated_at" => $detail->updated_at,
+                            ]);
+                        }
+
+                        $moving = DB::table('movimientoCajas')->where('ordenTrabajo', '=', $item->id)->get();
+                        foreach ($moving as $mov) {
+                            if (empty($mov->cajaOrigen)) {
+                                $paid_amount += $mov->monto;
+                            }
+                        }
+
+                        $payment_statut = '';
+                        $due = $GrandTotal - $paid_amount;
+                        if ($due === 0.0 || $due < 0.0) {
+                            $payment_statut = 'paid';
+                        } else if ($due != $GrandTotal) {
+                            $payment_statut = 'partial';
+                        } else if ($due == $GrandTotal) {
+                            $payment_statut = 'unpaid';
+                        }
+                        $id = DB::table('sales')->insertGetId([
+                            "id" => $item->id,
+                            "user_pos" => $item->userDiseñador,
+                            "user_id" => $item->userVenta ?? $item->userDiseñador,
+                            "date" => Carbon::parse($item->created_at),
+                            "Ref" => $item->codigoServicio,
+                            "is_pos" => 0,
+                            "client_id" => $item->cliente,
+                            "warehouse_id" => $item->sucursal,
+                            "TaxNet" => 0,
+                            "tax_rate" => 0,
+                            "discount" => 0,
+                            "shipping" => 0,
+                            "GrandTotal" => $GrandTotal,
+                            "paid_amount" => $paid_amount,
+                            "payment_statut" => $payment_statut,
+                            "statut" => ($item->estado == 1) ? 'pending' : 'completed',
+                            "shipping_status" => "",
+                            "notes" => $item->observaciones,
+                            "created_at" => $item->created_at,
+                            "updated_at" => $item->updated_at,
+                            "deleted_at" => $item->deleted_at,
+                            "sales_type_id" => $item->tipoOrden,
+                        ]);
+                        foreach ($sale_datail as $detail) {
+                            $id = DB::table('sale_details')->insertGetId($detail);
+                        }
+                    }
+                });
+            });
+            Log::info("finish sales migration");
         } catch (Exception $ex) {
             $errors = $ex->getMessage();
         }
