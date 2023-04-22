@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router } from "@inertiajs/vue3";
 import ruleForm from "@/rules";
@@ -55,7 +55,26 @@ const productLabel = ref({
     is_variant: "El Producto tiene multiples variantes",
     not_selling: "Este Producto no es para la venta",
 });
-
+function resetForm() {
+    productForm.value = {
+        name: "",
+        code: "",
+        cost: "",
+        price: "",
+        category_id: "",
+        TaxNet: "0",
+        tax_method: "1",
+        unit_id: "",
+        unit_sale_id: "",
+        unit_purchase_id: "",
+        stock_alert: "0",
+        image: "",
+        note: "",
+        is_variant: false,
+        is_imei: false,
+        not_selling: false,
+    };
+}
 //------------- Submit Validation Create Product
 async function Submit_Product() {
     const validate = await form.value.validate();
@@ -170,6 +189,22 @@ function Edit_Product() {
 function onChangeTag(value) {
     variants.value = value;
 }
+watch(
+    () => [props.product],
+    () => {
+        if (props.product != null) {
+            productForm.value = props.product;
+            Get_Units_SubBase(props.product.unit_id);
+            for (let key in props.product.ProductVariant) {
+                variants.value[key] = props.product.ProductVariant[key].text;
+            }
+            editmode.value = true;
+        } else {
+            resetForm();
+            editmode.value = false;
+        }
+    }
+);
 
 onMounted(() => {
     if (props.product != null) {

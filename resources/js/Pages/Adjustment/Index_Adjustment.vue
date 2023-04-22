@@ -5,6 +5,7 @@ import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
 import { router } from "@inertiajs/vue3";
+import rulesForm from "@/rules";
 
 const props = defineProps({
     warehouses: Array,
@@ -38,10 +39,9 @@ const adjustment = ref({});
 
 //---------------Get Details Adjustement ----------------------\\
 function showDetails(id) {
-    loading.value = true;
-    snackbar.value = false;
+    dialogDetail.value = false;
     axios
-        .get("adjustments/detail/" + id)
+        .get("/adjustments/detail/" + id)
         .then(({ data }) => {
             adjustment.value = data.adjustment;
             details.value = data.details;
@@ -52,17 +52,6 @@ function showDetails(id) {
         });
 }
 
-//------------------------------Formetted Numbers -------------------------\\
-function formatNumber(number, dec) {
-    const value = (
-        typeof number === "string" ? number : number.toString()
-    ).split(".");
-    if (dec <= 0) return value[0];
-    let formated = value[1] || "";
-    if (formated.length > dec) return `${value[0]}.${formated.substr(0, dec)}`;
-    while (formated.length < dec) formated += "0";
-    return `${value[0]}.${formated}`;
-}
 //-------------------------------- Reset Form -------------------------------\\
 function reset_Form() {
     adjustment.value = { id: "" };
@@ -80,7 +69,7 @@ function Delete_Item(item) {
 function Remove_Adjustment() {
     snackbar.value = false;
     axios
-        .delete("adjustments/" + adjustment.value.id)
+        .delete("/adjustments/" + adjustment.value.id)
         .then(({ data }) => {
             snackbar.value = true;
             snackbarColor.value = "success";
@@ -117,73 +106,104 @@ function Remove_Adjustment() {
         <!-- Show details -->
         <v-dialog v-model="dialogDetail" max-width="800px">
             <v-card>
+                <v-toolbar
+                    title="Detalle de Ajuste"
+                    density="compact"
+                    border
+                ></v-toolbar>
                 <v-card-text>
                     <v-row>
-                        <v-col lg="5" md="12" sm="12">
-                            <v-table hover density="compact">
-                                <tbody>
-                                    <!-- date -->
-                                    <tr>
-                                        <td>Fecha</td>
-                                        <td class="font-bold">
-                                            {{ adjustment.date }}
-                                        </td>
-                                    </tr>
-                                    <!-- Reference -->
-                                    <tr>
-                                        <td>Codigo</td>
-                                        <td class="font-bold">
-                                            {{ adjustment.Ref }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <!-- warehouse -->
-                                        <td>Ajencia</td>
-                                        <td class="font-bold">
-                                            {{ adjustment.warehouse }}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </v-table>
+                        <v-col cols="12" lg="5" md="12" sm="12">
+                            <v-card variant="outlined">
+                                <v-table hover density="compact">
+                                    <tbody>
+                                        <!-- date -->
+                                        <tr>
+                                            <td>Fecha</td>
+                                            <td class="font-weight-bold">
+                                                {{
+                                                    rulesForm.formatDate(
+                                                        adjustment.date
+                                                    )
+                                                }}
+                                            </td>
+                                        </tr>
+                                        <!-- Reference -->
+                                        <tr>
+                                            <td>Codigo</td>
+                                            <td class="font-weight-bold">
+                                                {{ adjustment.Ref }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <!-- warehouse -->
+                                            <td>Ajencia</td>
+                                            <td class="font-weight-bold">
+                                                {{ adjustment.warehouse }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </v-table>
+                            </v-card>
                         </v-col>
-                        <v-col lg="7" md="12" sm="12" class="mt-3">
-                            <v-table hover density="compact">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Producto</th>
-                                        <th scope="col">Codigo</th>
-                                        <th scope="col">Cantidad</th>
-                                        <th scope="col">Tipo</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="detail in details">
-                                        <td>{{ detail.name }}</td>
-                                        <td>{{ detail.code }}</td>
-                                        <td>
-                                            {{
-                                                formatNumber(detail.quantity, 2)
-                                            }}
-                                            {{ detail.unit }}
-                                        </td>
-                                        <td v-if="detail.type == 'add'">
-                                            Añadido
-                                        </td>
-                                        <td v-else-if="detail.type == 'sub'">
-                                            Quitado
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </v-table>
+                        <v-col cols="12" lg="7" md="12" sm="12">
+                            <v-card variant="outlined">
+                                <v-table hover density="compact">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Codigo</th>
+                                            <th>Cantidad</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="detail in details">
+                                            <td>{{ detail.name }}</td>
+                                            <td>{{ detail.code }}</td>
+                                            <td>
+                                                {{
+                                                    rulesForm.formatNumber(
+                                                        detail.quantity,
+                                                        2
+                                                    )
+                                                }}
+                                                {{ detail.unit }}
+                                            </td>
+                                            <td v-if="detail.type === 'add'">
+                                                Añadido
+                                            </td>
+                                            <td
+                                                v-else-if="
+                                                    detail.type === 'sub'
+                                                "
+                                            >
+                                                Quitado
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </v-table>
+                            </v-card>
                         </v-col>
                     </v-row>
-                    <hr v-show="adjustment.note" />
-                    <v-row class="mt-4">
+                    <hr v-if="adjustment.note" class="mt-4 mb-4" />
+                    <v-row>
                         <v-col md="12">
                             <p>{{ adjustment.note }}</p>
                         </v-col>
                     </v-row>
                 </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        small
+                        variant="elevated"
+                        color="primary"
+                        class="ma-1"
+                        @click="dialogDetail = false"
+                        >Ok
+                    </v-btn>
+                </v-card-actions>
             </v-card>
         </v-dialog>
 
@@ -244,6 +264,7 @@ function Remove_Adjustment() {
                             icon="mdi-pencil"
                             size="x-small"
                             variant="outlined"
+                            :disabled="rulesForm.enableDay(item.raw.updated_at)"
                             @click="
                                 router.visit('/adjustments/edit/' + item.raw.id)
                             "
@@ -255,6 +276,7 @@ function Remove_Adjustment() {
                             icon="mdi-delete"
                             size="x-small"
                             variant="outlined"
+                            :disabled="rulesForm.enableDay(item.raw.updated_at)"
                             @click="Delete_Item(item.raw)"
                         >
                         </v-btn>

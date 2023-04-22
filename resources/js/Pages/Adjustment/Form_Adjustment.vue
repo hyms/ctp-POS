@@ -4,10 +4,10 @@ import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import { router } from "@inertiajs/vue3";
 import ruleForm from "@/rules";
-
 const props = defineProps({
     warehouses: Object,
     adjustment: { type: Object, default: null },
+    details: { type: Object, default: null },
     errors: Object,
 });
 
@@ -21,7 +21,7 @@ const focused = ref(false);
 const search_input = ref("");
 const timer = ref(null);
 const products = ref([]);
-const details = ref([]);
+const detailsForm = ref([]);
 const adjustmentForm = ref({
     id: "",
     notes: "",
@@ -45,9 +45,19 @@ const product = ref({
     unit: "",
 });
 const symbol = ref("");
-const product_autocomplete = ref("");
 const editmode = ref(false);
 const search = ref("");
+
+function resetForm() {
+    adjustmentForm.value = {
+        id: "",
+        notes: "",
+        warehouse_id: "",
+        date: new Date().toISOString().slice(0, 10),
+    };
+    detailsForm.value = [];
+    products.value = [];
+}
 
 function querySelections(val) {
     search_input.value = val;
@@ -75,15 +85,15 @@ function SearchProduct(result) {
     snackbar.value = false;
     product.value = {};
     if (
-        details.value.length > 0 &&
-        details.value.some((detail) => detail.name === result.name)
+        detailsForm.value.length > 0 &&
+        detailsForm.value.some((detail) => detail.name === result.name)
     ) {
         snackbar.value = true;
         snackbarText.value = "Ya esta añadido";
         snackbarColor.value = "warning";
     } else {
         product.value.code = result.code;
-        product.value.current = result.qte ?? 0;
+        product.value.current = result.qty ?? 0;
         product.value.quantity =
             product.value.current < 1 ? product.value.current : 1;
         product.value.product_variant_id = result.product_variant_id;
@@ -102,7 +112,7 @@ async function Submit_Adjustment() {
     const validate = await form.value.validate();
     if (validate.valid)
         if (editmode.value) {
-            // Edit_Product();
+            Update_Adjustment();
         } else {
             Create_Adjustment();
         }
@@ -128,30 +138,30 @@ function Get_Products_By_Warehouse(id) {
 
 //----------------------------------------- Add Product To list -------------------------\\
 function add_product() {
-    if (details.value.length > 0) {
+    if (detailsForm.value.length > 0) {
         detail_order_id();
-    } else if (details.value.length === 0) {
+    } else if (detailsForm.value.length === 0) {
         product.value.detail_id = 1;
     }
-    details.value.push(product.value);
+    detailsForm.value.push(product.value);
 }
 
 //-----------------------------------Verified QTY ------------------------------\\
 function Verified_Qty(detail, id) {
     snackbar.value = false;
-    for (let i = 0; i < details.value.length; i++) {
-        if (details.value[i].detail_id === id) {
+    for (let i = 0; i < detailsForm.value.length; i++) {
+        if (detailsForm.value[i].detail_id === id) {
             if (isNaN(detail.quantity)) {
-                details.value[i].quantity = detail.current;
+                detailsForm.value[i].quantity = detail.current;
             }
 
             if (detail.type == "sub" && detail.quantity > detail.current) {
                 snackbar.value = true;
                 snackbarText.value = "Queda poco Stock";
                 snackbarColor.value = "warning";
-                details.value[i].quantity = detail.current;
+                detailsForm.value[i].quantity = detail.current;
             } else {
-                details.value[i].quantity = detail.quantity;
+                detailsForm.value[i].quantity = detail.quantity;
             }
         }
     }
@@ -160,18 +170,18 @@ function Verified_Qty(detail, id) {
 //----------------------------------- Increment QTY ------------------------------\\
 function increment(detail, id) {
     snackbar.value = false;
-    for (let i = 0; i < details.value.length; i++) {
-        if (details.value[i].detail_id === id) {
+    for (let i = 0; i < detailsForm.value.length; i++) {
+        if (detailsForm.value[i].detail_id === id) {
             if (detail.type === "sub") {
                 if (detail.quantity + 1 > detail.current) {
                     snackbar.value = true;
                     snackbarText.value = "Queda poco Stock";
                     snackbarColor.value = "warning";
                 } else {
-                    formatNumber(details.value[i].quantity++, 2);
+                    ruleForm.formatNumber(detailsForm.value[i].quantity++, 2);
                 }
             } else {
-                formatNumber(details.value[i].quantity++, 2);
+                ruleForm.formatNumber(detailsForm.value[i].quantity++, 2);
             }
         }
     }
@@ -180,8 +190,8 @@ function increment(detail, id) {
 //----------------------------------- Decrement QTY ------------------------------\\
 function decrement(detail, id) {
     snackbar.value = false;
-    for (let i = 0; i < details.value.length; i++) {
-        if (details.value[i].detail_id === id) {
+    for (let i = 0; i < detailsForm.value.length; i++) {
+        if (detailsForm.value[i].detail_id === id) {
             if (detail.quantity - 1 > 0) {
                 if (
                     detail.type === "sub" &&
@@ -191,30 +201,18 @@ function decrement(detail, id) {
                     snackbarText.value = "Queda poco Stock";
                     snackbarColor.value = "warning";
                 } else {
-                    formatNumber(details.value[i].quantity--, 2);
+                    ruleForm.formatNumber(detailsForm.value[i].quantity--, 2);
                 }
             }
         }
     }
 }
 
-//------------------------------Formetted Numbers -------------------------\\
-function formatNumber(number, dec) {
-    const value = (
-        typeof number === "string" ? number : number.toString()
-    ).split(".");
-    if (dec <= 0) return value[0];
-    let formated = value[1] || "";
-    if (formated.length > dec) return `${value[0]}.${formated.substr(0, dec)}`;
-    while (formated.length < dec) formated += "0";
-    return `${value[0]}.${formated}`;
-}
-
 //-----------------------------------Remove the product from the order list ------------------------------\\
 function Remove_Product(id) {
-    for (let i = 0; i < details.value.length; i++) {
-        if (id === details.value[i].detail_id) {
-            details.value.splice(i, 1);
+    for (let i = 0; i < detailsForm.value.length; i++) {
+        if (id === detailsForm.value[i].detail_id) {
+            detailsForm.value.splice(i, 1);
         }
     }
 }
@@ -222,17 +220,17 @@ function Remove_Product(id) {
 //----------------------------------- Verified Quantity if Null Or zero ------------------------------\\
 function verifiedForm() {
     snackbar.value = false;
-    if (details.value.length <= 0) {
+    if (detailsForm.value.length <= 0) {
         snackbar.value = true;
         snackbarText.value = "Agregue un producto a la lista";
         snackbarColor.value = "warning";
         return false;
     }
     let count = 0;
-    for (let i = 0; i < details.value.length; i++) {
+    for (let i = 0; i < detailsForm.value.length; i++) {
         if (
-            details.value[i].quantity == "" ||
-            details.value[i].quantity === 0
+            detailsForm.value[i].quantity == "" ||
+            detailsForm.value[i].quantity === 0
         ) {
             count += 1;
         }
@@ -240,7 +238,7 @@ function verifiedForm() {
 
     if (count > 0) {
         snackbar.value = true;
-        snackbarText.value = "Agregue cantidad";
+        snackbarText.value = "Agregue una cantidad a los productos";
         snackbarColor.value = "warning";
         return false;
     }
@@ -257,7 +255,40 @@ function Create_Adjustment() {
                 warehouse_id: adjustmentForm.value.warehouse_id,
                 date: adjustmentForm.value.date,
                 notes: adjustmentForm.value.notes,
-                details: details.value,
+                details: detailsForm.value,
+            })
+            .then(({ data }) => {
+                snackbar.value = true;
+                snackbarColor.value = "success";
+                snackbarText.value = "Actualizacion exitosa";
+                router.visit("/adjustments/list");
+            })
+            .catch((error) => {
+                console.log(error);
+                snackbar.value = true;
+                snackbarColor.value = "error";
+                snackbarText.value = error.response.data.message;
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    loading.value = false;
+                }, 1000);
+            });
+    }
+}
+//--------------------------------- Update Adjustment -------------------------\\
+function Update_Adjustment() {
+    if (verifiedForm()) {
+        loading.value = true;
+        snackbar.value = false;
+        console.log(props.adjustment);
+        let id = props.adjustment.id;
+        axios
+            .put(`/adjustments/${id}`, {
+                warehouse_id: adjustmentForm.value.warehouse_id,
+                date: adjustmentForm.value.date,
+                notes: adjustmentForm.value.notes,
+                details: detailsForm.value,
             })
             .then(({ data }) => {
                 snackbar.value = true;
@@ -282,8 +313,8 @@ function Create_Adjustment() {
 //-------------------------------- detail order id -------------------------\\
 function detail_order_id() {
     product.value.detail_id = 0;
-    let len = details.value.length;
-    product.value.detail_id = details.value[len - 1].detail_id + 1;
+    let len = detailsForm.value.length;
+    product.value.detail_id = detailsForm.value[len - 1].detail_id + 1;
 }
 
 //---------------------------------Get Product Details ------------------------\\
@@ -298,28 +329,24 @@ function Get_Product_Details(product_id) {
     });
 }
 
-//---------------------------------------Get Adjustment Elements ------------------------------\\
-function Get_Elements() {
-    axios
-        .get("adjustments/create")
-        .then((response) => {
-            this.warehouses = response.data.warehouses;
-            this.isLoading = false;
-        })
-        .catch((response) => {
-            setTimeout(() => {
-                this.isLoading = false;
-            }, 500);
-        });
-}
+watch(
+    () => [props.adjustment],
+    () => {
+        if (props.adjustment != null) {
+            editmode.value = true;
+        } else {
+            resetForm();
+            editmode.value = false;
+        }
+    }
+);
 
 onMounted(() => {
     if (props.adjustment != null) {
         adjustmentForm.value = props.adjustment;
-        // for (let key in props.adjustment.ProductVariant) {
-        //   variants.value[key] = props.product.ProductVariant[key].text;
-        // }
+        detailsForm.value = props.details;
         editmode.value = true;
+        Get_Products_By_Warehouse(adjustmentForm.value.warehouse_id);
     }
 });
 </script>
@@ -351,17 +378,12 @@ onMounted(() => {
                                         hide-details="auto"
                                         clearable
                                         :rules="ruleForm.required"
-                                        :disabled="details.length > 0"
+                                        :disabled="detailsForm.length > 0"
                                     ></v-select>
                                 </v-col>
 
                                 <!-- date  -->
                                 <v-col cols="12" lg="6">
-                                    <!--                  <validation-provider-->
-                                    <!--                    name="date"-->
-                                    <!--                    :rules="{ required: true}"-->
-                                    <!--                    v-slot="validationContext"-->
-                                    <!--                  >-->
                                     <!--                    <v-form-group :label="$t('date') + ' ' + '*'">-->
                                     <!--                      <v-form-input-->
                                     <!--                        :state="getValidationState(validationContext)"-->
@@ -373,7 +395,16 @@ onMounted(() => {
                                     <!--                        id="OrderTax-feedback"-->
                                     <!--                      >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
                                     <!--                    </v-form-group>-->
-                                    <!--                  </validation-provider>-->
+                                    <v-text-field
+                                        v-model="adjustmentForm.date"
+                                        :label="adjustmentLabel.date"
+                                        variant="outlined"
+                                        density="compact"
+                                        hide-details="auto"
+                                        type="date"
+                                        :rules="ruleForm.required"
+                                    >
+                                    </v-text-field>
                                 </v-col>
                             </v-row>
                             <v-row>
@@ -414,13 +445,13 @@ onMounted(() => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr v-if="details.length <= 0">
+                                            <tr v-if="detailsForm.length <= 0">
                                                 <td colspan="7">
                                                     No hay datos disponibles
                                                 </td>
                                             </tr>
                                             <tr
-                                                v-for="detail in details"
+                                                v-for="detail in detailsForm"
                                                 :key="detail.detail_id"
                                             >
                                                 <td>

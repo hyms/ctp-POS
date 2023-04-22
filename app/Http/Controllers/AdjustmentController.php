@@ -40,10 +40,11 @@ class AdjustmentController extends Controller
         $data = collect();
         foreach ($Adjustments as $Adjustment) {
             $item['id'] = $Adjustment->id;
-            $item['date'] = $Adjustment->date;
+            $item['date'] = Carbon::parse($Adjustment->date)->format('d-m-Y');
             $item['Ref'] = $Adjustment->Ref;
             $item['warehouse_name'] = $Adjustment['warehouse']->name;
             $item['items'] = $Adjustment->items;
+            $item['updated_at'] = Carbon::parse($Adjustment->updated_at)->format('Y-m-d');
             $data->add($item);
         }
 
@@ -139,54 +140,44 @@ class AdjustmentController extends Controller
             $old_adjustment_details = AdjustmentDetail::where('adjustment_id', $id)->get();
             $new_adjustment_details = collect($request['details']);
 
-            // Get Ids for new Details
-            $new_products_id = collect();
-            foreach ($new_adjustment_details as $new_detail) {
-                $new_products_id->add($new_detail['id']);
-            }
-
-            $old_products_id = collect();
-            // Init Data with old Parametre
             foreach ($old_adjustment_details as $key => $value) {
-                $old_products_id->add($value->id);
                 $product_warehouse = $this->getProduct_warehouse($value,$current_adjustment);
 
                 if ($product_warehouse) {
                     if ($value['type'] == "add") {
-                        $product_warehouse->qte -= $value['quantity'];
+                        $product_warehouse->qty -= $value['quantity'];
                     } else {
-                        $product_warehouse->qte += $value['quantity'];
+                        $product_warehouse->qty += $value['quantity'];
                     }
                     $product_warehouse->save();
                 }
 
                 // Delete Detail
-                if (!in_array($old_products_id[$key], $new_products_id)) {
+                if ($new_adjustment_details->doesntContain('id','=',$value->id)) {
                     $AdjustmentDetail = AdjustmentDetail::findOrFail($value->id);
                     $AdjustmentDetail->delete();
                 }
-
             }
 
             // Update Data with New request
             foreach ($new_adjustment_details as $key => $product_detail) {
-                $product_warehouse = $this->getProduct_warehouse($product_detail,$request);
+                $item=collect($product_detail);
+                $product_warehouse = $this->getProduct_warehouse($item,$request);
                 if ($product_warehouse) {
-                    if ($product_detail['type'] == "add") {
-                        $product_warehouse->qte += $product_detail['quantity'];
+                    if ($item['type'] == "add") {
+                        $product_warehouse->qty += $item['quantity'];
                     } else {
-                        $product_warehouse->qte -= $product_detail['quantity'];
+                        $product_warehouse->qty -= $item['quantity'];
                     }
                     $product_warehouse->save();
                 }
 
                 $orderDetails['adjustment_id'] = $id;
-                $orderDetails['quantity'] = $product_detail['quantity'];
-                $orderDetails['product_id'] = $product_detail['product_id'];
-                $orderDetails['product_variant_id'] = $product_detail['product_variant_id'];
-                $orderDetails['type'] = $product_detail['type'];
-
-                if (!$old_products_id->contains($product_detail['id'])) {
+                $orderDetails['quantity'] = $item['quantity'];
+                $orderDetails['product_id'] = $item['product_id'];
+                $orderDetails['product_variant_id'] = $item['product_variant_id'];
+                $orderDetails['type'] = $item['type'];
+                if ($old_adjustment_details->doesntContain('id','=',$item->get('id'))) {
                     AdjustmentDetail::Create($orderDetails);
                 } else {
                     AdjustmentDetail::where('id', $product_detail['id'])->update($orderDetails);
@@ -228,9 +219,9 @@ class AdjustmentController extends Controller
                 $product_warehouse = $this->getProduct_warehouse($value, $current_adjustment);
                 if ($product_warehouse) {
                     if ($value['type'] == "add") {
-                        $product_warehouse->qte -= $value['quantity'];
+                        $product_warehouse->qty -= $value['quantity'];
                     } else {
-                        $product_warehouse->qte += $value['quantity'];
+                        $product_warehouse->qty += $value['quantity'];
                     }
                     $product_warehouse->save();
                 }
@@ -252,14 +243,19 @@ class AdjustmentController extends Controller
     public function getNumberOrder()
     {
         $last = DB::table('adjustments')->latest('id')->first();
-
+        $dateYear = Carbon::now()->format("y");
         if ($last) {
             $item = $last->Ref;
             $nwMsg = Str::of($item)->explode("_");
-            $inMsg = $nwMsg[1] + 1;
-            $code = "{$nwMsg[0]}_{$inMsg}";
+            $year = $nwMsg->get(1);
+            $number = $nwMsg->get(2) + 1;
+            if($dateYear!=$year) {
+                $year = $dateYear;
+                $number = 101;
+            }
+            $code = "{$nwMsg[0]}_{$year}_{$number}";
         } else {
-            $code = "AS_1111";
+            $code = "AJ_{$dateYear}_101";
         }
         return $code;
 
@@ -309,6 +305,7 @@ class AdjustmentController extends Controller
 
         $adjustment['notes'] = $Adjustment_data->notes;
         $adjustment['date'] = $Adjustment_data->date;
+        $adjustment['id'] = $Adjustment_data->id;
 
         $detail_id = 0;
         foreach ($Adjustment_data['details'] as $detail) {
@@ -353,8 +350,8 @@ class AdjustmentController extends Controller
 
         //get warehouses assigned to user
         $warehouses = $this->getWarehouses();
-
-        return response()->json([
+        Inertia::share('titlePage', 'Ajustes en stock');
+        return Inertia::render('Adjustment/Form_Adjustment', [
             'details' => $details,
             'adjustment' => $adjustment,
             'warehouses' => $warehouses,

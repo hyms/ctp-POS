@@ -47,7 +47,7 @@ class ProductsController extends Controller
                 ->get();
             $total_qty = 0;
             foreach ($product_warehouse_data as $product_warehouse) {
-                $total_qty += $product_warehouse->qte;
+                $total_qty += $product_warehouse->qty;
                 $item['quantity'] = $total_qty;
             }
 
@@ -413,12 +413,12 @@ class ProductsController extends Controller
                         ->where('deleted_at', '=', null)
                         ->where('warehouse_id', $warehouse->id)
                         ->where('product_variant_id', $variant->id)
-                        ->select(DB::raw('SUM(product_warehouse.qte) AS sum'))
+                        ->select(DB::raw('SUM(product_warehouse.qty) AS sum'))
                         ->first();
 
                     $war_var['mag'] = $warehouse->name;
                     $war_var['variant'] = $variant->name;
-                    $war_var['qte'] = $product_warehouse->sum;
+                    $war_var['qty'] = $product_warehouse->sum;
                     $item['CountQTY_variants'][] = $war_var;
                 }
 
@@ -437,7 +437,7 @@ class ProductsController extends Controller
                 ->first();
 
             $war['mag'] = $warehouse->name;
-            $war['qte'] = $product_warehouse_data->sum;
+            $war['qty'] = $product_warehouse_data->sum;
             $item['CountQTY'][] = $war;
         }
 
@@ -471,7 +471,7 @@ class ProductsController extends Controller
                     })
                     ->where(function ($query) use ($request) {
                         if ($request->stock == '1') {
-                            return $query->where('qte', '>', 0);
+                            return $query->where('qty', '>', 0);
                         }
                     });
             })->get();
@@ -496,20 +496,20 @@ class ProductsController extends Controller
             $item['image'] = $firstimage[0];
 
             if ($product_warehouse['product']['unitSale']->operator == '/') {
-                $item['qte_sale'] = $product_warehouse->qte * $product_warehouse['product']['unitSale']->operator_value;
+                $item['qte_sale'] = $product_warehouse->qty * $product_warehouse['product']['unitSale']->operator_value;
                 $price = $product_warehouse['product']->price / $product_warehouse['product']['unitSale']->operator_value;
             } else {
-                $item['qte_sale'] = $product_warehouse->qte / $product_warehouse['product']['unitSale']->operator_value;
+                $item['qte_sale'] = $product_warehouse->qty / $product_warehouse['product']['unitSale']->operator_value;
                 $price = $product_warehouse['product']->price * $product_warehouse['product']['unitSale']->operator_value;
             }
 
             if ($product_warehouse['product']['unitPurchase']->operator == '/') {
-                $item['qte_purchase'] = round($product_warehouse->qte * $product_warehouse['product']['unitPurchase']->operator_value, 5);
+                $item['qte_purchase'] = round($product_warehouse->qty * $product_warehouse['product']['unitPurchase']->operator_value, 5);
             } else {
-                $item['qte_purchase'] = round($product_warehouse->qte / $product_warehouse['product']['unitPurchase']->operator_value, 5);
+                $item['qte_purchase'] = round($product_warehouse->qty / $product_warehouse['product']['unitPurchase']->operator_value, 5);
             }
 
-            $item['qte'] = $product_warehouse->qte;
+            $item['qty'] = $product_warehouse->qty;
             $item['unitSale'] = $product_warehouse['product']['unitSale']->ShortName;
             $item['unitPurchase'] = $product_warehouse['product']['unitPurchase']->ShortName;
 
@@ -619,7 +619,7 @@ class ProductsController extends Controller
 
         $product_warehouse_data = product_warehouse::with('warehouse', 'product', 'productVariant')
             ->join('products', 'product_warehouse.product_id', '=', 'products.id')
-            ->whereRaw('qte <= stock_alert')
+            ->whereRaw('qty <= stock_alert')
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('warehouse'), function ($query) use ($request) {
                     return $query->where('warehouse_id', $request->warehouse);
@@ -631,13 +631,13 @@ class ProductsController extends Controller
         if ($product_warehouse_data->isNotEmpty()) {
 
             foreach ($product_warehouse_data as $product_warehouse) {
-                if ($product_warehouse->qte <= $product_warehouse['product']->stock_alert) {
+                if ($product_warehouse->qty <= $product_warehouse['product']->stock_alert) {
                     if ($product_warehouse->product_variant_id !== null) {
                         $item['code'] = $product_warehouse['productVariant']->name . '-' . $product_warehouse['product']->code;
                     } else {
                         $item['code'] = $product_warehouse['product']->code;
                     }
-                    $item['quantity'] = $product_warehouse->qte;
+                    $item['quantity'] = $product_warehouse->qty;
                     $item['name'] = $product_warehouse['product']->name;
                     $item['warehouse'] = $product_warehouse['warehouse']->name;
                     $item['stock_alert'] = $product_warehouse['product']->stock_alert;
@@ -690,6 +690,7 @@ class ProductsController extends Controller
         return Inertia::render('Products/Form_product', [
             'categories' => $categories,
             'units' => $units,
+            'product'=>null
         ]);
 
     }

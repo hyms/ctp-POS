@@ -3,6 +3,7 @@ import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import printJS from "print-js";
+import rules from "@/rules";
 
 defineProps({
     product: Object,
@@ -12,18 +13,6 @@ const loading = ref(false);
 const snackbar = ref(false);
 const snackbarText = ref("");
 const snackbarColor = ref("info");
-
-//------------------------------Formetted Numbers -------------------------\\
-function formatNumber(number, dec) {
-    const value = (
-        typeof number === "string" ? number : number.toString()
-    ).split(".");
-    if (dec <= 0) return value[0];
-    let formated = value[1] || "";
-    if (formated.length > dec) return `${value[0]}.${formated.substr(0, dec)}`;
-    while (formated.length < dec) formated += "0";
-    return `${value[0]}.${formated}`;
-}
 
 //------- printproduct
 function print_product() {
@@ -79,7 +68,7 @@ function print_product() {
                                             <td class="font-weight-bold">
                                                 Bs
                                                 {{
-                                                    formatNumber(
+                                                    rules.formatNumber(
                                                         product.cost,
                                                         2
                                                     )
@@ -91,7 +80,7 @@ function print_product() {
                                             <td class="font-weight-bold">
                                                 Bs
                                                 {{
-                                                    formatNumber(
+                                                    rules.formatNumber(
                                                         product.price,
                                                         2
                                                     )
@@ -106,7 +95,7 @@ function print_product() {
                                         <!--                                            <td>Facturar</td>-->
                                         <!--                                            <td class="font-weight-bold">-->
                                         <!--                                                {{-->
-                                        <!--                                                    formatNumber(-->
+                                        <!--                                                    rules.formatNumber(-->
                                         <!--                                                        product.taxe,-->
                                         <!--                                                        2-->
                                         <!--                                                    )-->
@@ -126,7 +115,7 @@ function print_product() {
                                                 <span
                                                     class="badge badge-outline-warning"
                                                     >{{
-                                                        formatNumber(
+                                                        rules.formatNumber(
                                                             product.stock_alert,
                                                             2
                                                         )
@@ -162,7 +151,10 @@ function print_product() {
                                             <td>{{ prod_w.mag }}</td>
                                             <td>
                                                 {{
-                                                    formatNumber(prod_w.qte, 2)
+                                                    rules.formatDate(
+                                                        prod_w.qty,
+                                                        2
+                                                    )
                                                 }}
                                                 {{ product.unit }}
                                             </td>
@@ -188,7 +180,10 @@ function print_product() {
                                             <td>{{ prod_v.variant }}</td>
                                             <td>
                                                 {{
-                                                    formatNumber(prod_v.qte, 2)
+                                                    rules.formatNumber(
+                                                        prod_v.qty,
+                                                        2
+                                                    )
                                                 }}
                                                 {{ product.unit }}
                                             </td>

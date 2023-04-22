@@ -505,22 +505,6 @@ function Pay_return_due(row) {
 //             loading.value = false;
 //         });
 // }
-
-//------------------------------Formetted Numbers -------------------------\\
-function formatNumber(number, dec) {
-    const value = (
-        typeof number === "string" ? number : number.toString()
-    ).split(".");
-    if (dec <= 0) return value[0];
-    let formated = value[1] || "";
-    if (formated.length > dec) return `${value[0]}.${formated.substr(0, dec)}`;
-    while (formated.length < dec) formated += "0";
-    return `${value[0]}.${formated}`;
-}
-
-function consol(item) {
-    console.log(item);
-}
 </script>
 
 <template>
