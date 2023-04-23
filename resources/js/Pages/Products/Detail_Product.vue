@@ -151,7 +151,7 @@ function print_product() {
                                             <td>{{ prod_w.mag }}</td>
                                             <td>
                                                 {{
-                                                    rules.formatDate(
+                                                    rules.formatNumber(
                                                         prod_w.qty,
                                                         2
                                                     )

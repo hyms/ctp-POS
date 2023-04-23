@@ -36,7 +36,7 @@ class Sale extends Model
         return $this->belongsTo('App\Models\User');
     }
 
-    public function details()
+        public function details()
     {
         return $this->hasMany('App\Models\SaleDetail');
     }

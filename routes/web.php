@@ -154,6 +154,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::post('sales', [SalesController::class, 'store']);
     Route::put('sales/{id}', [SalesController::class, 'update']);
     Route::delete('sales/{id}', [SalesController::class, 'destroy']);
+    Route::get('sales/create', [SalesController::class, 'create']);
+    Route::get('sales/edit/{id}', [SalesController::class, 'edit']);
     Route::get('convert_to_sale_data/{id}', [SalesController::class, 'Elemens_Change_To_Sale']);
     Route::get('get_payments_by_sale/{id}', [SalesController::class, 'Payments_Sale']);
     Route::post('sales_send_email', [SalesController::class, 'Send_Email']);

@@ -12,6 +12,24 @@ const menuItems = ref([
         subItems: [],
     },
     {
+        label: "Ordenes",
+        url: "",
+        role: "all",
+        icon: "",
+        subItems: [
+            {
+                label: "Crear Orden",
+                url: "/sales/create",
+                role: "all",
+            },
+            {
+                label: "Listar Ordenes",
+                url: "/sales",
+                role: "all",
+            },
+        ],
+    },
+    {
         label: "Clientes",
         url: "/clients",
         role: "all",
@@ -21,7 +39,7 @@ const menuItems = ref([
     {
         label: "Ajustes",
         url: "",
-        role: "all",
+        role: "venta",
         icon: "",
         subItems: [
             {
@@ -39,7 +57,7 @@ const menuItems = ref([
     {
         label: "Productos",
         url: "",
-        role: "all",
+        role: "venta",
         icon: "",
         subItems: [
             {
@@ -101,7 +119,7 @@ const open = ref([]);
 
 // const url = computed(() => usePage().url);
 
-function linkVisit(url, label, type = "get") {
+function linkVisit(url, type = "get") {
     router.visit(url, {
         method: type,
         preserveState: true,
@@ -190,12 +208,7 @@ onMounted(() => {
                                 <template v-if="getPermission(subLink.role)">
                                     <v-list-item
                                         :key="key + '' + subKey"
-                                        @click="
-                                            linkVisit(
-                                                subLink.url,
-                                                subLink.label
-                                            )
-                                        "
+                                        @click="linkVisit(subLink.url)"
                                         :active="$page.url === subLink.url"
                                         :value="subLink.label"
                                     >
@@ -212,7 +225,7 @@ onMounted(() => {
                     <template v-else>
                         <v-list-item
                             v-if="getPermission(link.role)"
-                            @click="linkVisit(link.url, link.label)"
+                            @click="linkVisit(link.url)"
                             :active="$page.url === link.url"
                             :key="key"
                             :value="link.label"
@@ -235,11 +248,7 @@ onMounted(() => {
             <v-toolbar-title>{{ $page.props.titlePage }}</v-toolbar-title>
 
             <v-spacer></v-spacer>
-            <v-btn
-                color="primary"
-                variant="elevated"
-                prepend-icon="mdi-account"
-            >
+            <v-btn color="secondary" variant="flat" prepend-icon="mdi-account">
                 {{
                     $page.props.user.firstname + " " + $page.props.user.lastname
                 }}
@@ -247,14 +256,12 @@ onMounted(() => {
                 <v-menu activator="parent">
                     <v-list nav density="compact">
                         <v-list-item
-                            @click="linkVisit('/profile', 'profile')"
+                            @click="linkVisit('/profile')"
                             :active="$page.url === '/profile'"
                         >
                             <v-list-item-title>Perfil</v-list-item-title>
                         </v-list-item>
-                        <v-list-item
-                            @click="linkVisit('/logout', 'logout', 'post')"
-                        >
+                        <v-list-item @click="linkVisit('/logout', 'post')">
                             <v-list-item-title>Salir</v-list-item-title>
                         </v-list-item>
                     </v-list>
