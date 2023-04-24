@@ -178,14 +178,14 @@ onMounted(() => {
             <template v-slot:prepend>
                 <v-list-item
                     lines="two"
-                    class="vertical-nav-header d-flex text-center justify-center"
+                    class="vertical-nav-header d-flex text-center justify-center text-center"
                 >
                     <h2 class="d-flex align-center app-title">xCTP</h2>
                 </v-list-item>
             </template>
 
             <v-divider></v-divider>
-            <v-list nav density="compact" :opened="open">
+            <v-list density="comfortable" :opened="open">
                 <template v-for="(link, key) in menuItems">
                     <template v-if="link.subItems.length > 0">
                         <v-list-group
@@ -254,7 +254,7 @@ onMounted(() => {
                 }}
 
                 <v-menu activator="parent">
-                    <v-list nav density="compact">
+                    <v-list density="compact">
                         <v-list-item
                             @click="linkVisit('/profile')"
                             :active="$page.url === '/profile'"
@@ -284,11 +284,5 @@ onMounted(() => {
 .vertical-nav-header {
     background: rgba(0, 0, 21, 0.2);
     height: 64px;
-}
-
-.vertical-nav-menu-link {
-    &.v-list-item--active {
-        box-shadow: 0 5px 10px -4px rgba(94, 86, 105, 0.42);
-    }
 }
 </style>

@@ -11,16 +11,13 @@ use App\utils\helpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Models\PaymentWithCreditCard;
-use Twilio\Rest\Client as Client_Twilio;
 use \Nwidart\Modules\Facades\Module;
 use App\Models\sms_gateway;
-use Stripe;
-use DB;
-use PDF;
 
-class PaymentSalesController extends BaseController
+class PaymentSalesController extends Controller
 {
 
     //------------- Get All Payments Sales --------------\\
@@ -31,7 +28,7 @@ class PaymentSalesController extends BaseController
 
         // How many items do you want to display.
         $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+        $pageStart = Request::get('page', 1);
         // Start displaying items from this number;
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
@@ -120,7 +117,7 @@ class PaymentSalesController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'create', PaymentSale::class);
 
-        \DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
             $helpers = new helpers();
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
@@ -243,7 +240,7 @@ class PaymentSalesController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'update', PaymentSale::class);
 
-        \DB::transaction(function () use ($id, $request) {
+        DB::transaction(function () use ($id, $request) {
             $helpers = new helpers();
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
@@ -385,7 +382,7 @@ class PaymentSalesController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'delete', PaymentSale::class);
 
-        \DB::transaction(function () use ($id, $request) {
+        DB::transaction(function () use ($id, $request) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $payment = PaymentSale::findOrFail($id);

@@ -6,12 +6,14 @@ import ExportBtn from "@/Components/ExportBtn.vue";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
 import { router } from "@inertiajs/vue3";
 import rulesForm from "@/rules";
+import Filter_form from "@/Pages/Sales/filter_form.vue";
 
 const props = defineProps({
     sales: Object,
     sales_types: Object,
     customers: Object,
     warehouses: Object,
+    filter_form: Object,
     errors: Object,
 });
 
@@ -369,7 +371,6 @@ function Edit_Payment(payment) {
 //-------------------------------Show All Payment with Sale ---------------------\\
 function Show_Payments(id, itemSale) {
     // Start the progress bar.
-
     reset_form_payment();
     Sale_id.value = id;
     sale.value = itemSale;
@@ -481,15 +482,13 @@ function Remove_Payment(id) {
 
 //----------------------------------------- Get Payments  -------------------------------\\
 function Get_Payments(id) {
+    dialogShowPayment.value = false;
     axios
         .get("/get_payments_by_sale/" + id)
-        .then((response) => {
-            payment.values = response.data.payments;
-            sale.value_due = response.data.due;
-            setTimeout(() => {
-                // Complete the animation of the  progress bar.
-                dialogShowPayment.value = true;
-            }, 500);
+        .then(({ data }) => {
+            payments.value = data.payments;
+            sale.value_due = data.due;
+            dialogShowPayment.value = true;
         })
         .catch(() => {
             // Complete the animation of the  progress bar.
@@ -557,6 +556,89 @@ function Remove_Sale(id, sale_has_return) {
             :on-save="Remove_Sale"
             :on-close="onCloseDelete"
         ></delete-dialog>
+        <!-- Modal Show Payments-->
+        <v-dialog v-model="dialogShowPayment" width="600">
+            <v-card>
+                <v-toolbar title="Pagos realizados"></v-toolbar>
+                <v-card-text>
+                    <v-row class="mb-3">
+                        <v-col>
+                            <v-table density="compact" hover>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Fecha</th>
+                                        <th scope="col">Codigo</th>
+                                        <th scope="col">Monto</th>
+                                        <th scope="col">PagadoPor</th>
+                                        <th scope="col">Accion</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-if="payments.length <= 0">
+                                        <td colspan="5">No Disponible</td>
+                                    </tr>
+                                    <tr v-for="payment in payments">
+                                        <td>{{ payment.date }}</td>
+                                        <td>{{ payment.Ref }}</td>
+                                        <td>
+                                            Bs
+                                            {{
+                                                rulesForm.formatNumber(
+                                                    payment.montant,
+                                                    2
+                                                )
+                                            }}
+                                        </td>
+                                        <td>{{ payment.Reglement }}</td>
+                                        <td>
+                                            <div
+                                                role="group"
+                                                aria-label="Basic example"
+                                                class="btn-group"
+                                            >
+                                                <span
+                                                    title="Print"
+                                                    class="btn btn-icon btn-info btn-sm"
+                                                    @click="
+                                                        Payment_Sale_PDF(
+                                                            payment,
+                                                            payment.id
+                                                        )
+                                                    "
+                                                >
+                                                    <i class="i-Billing"></i>
+                                                </span>
+                                                <span
+                                                    title="Edit"
+                                                    class="btn btn-icon btn-success btn-sm"
+                                                    @click="
+                                                        Edit_Payment(payment)
+                                                    "
+                                                >
+                                                    <i class="i-Pen-2"></i>
+                                                </span>
+
+                                                <span
+                                                    title="Delete"
+                                                    class="btn btn-icon btn-danger btn-sm"
+                                                    @click="
+                                                        Remove_Payment(
+                                                            payment.id
+                                                        )
+                                                    "
+                                                >
+                                                    <i class="i-Close"></i>
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </v-table>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
         <v-row align="center" class="mb-3">
             <v-col>
                 <v-text-field
@@ -571,6 +653,11 @@ function Remove_Sale(id, sale_has_return) {
             </v-col>
             <v-spacer></v-spacer>
             <v-col cols="auto" class="text-right">
+                <filter_form
+                    :filter_form="filter_form"
+                    :customers="customers"
+                    :sales_types="sales_types"
+                ></filter_form>
                 <ExportBtn
                     :data="sales"
                     :fields="jsonFields"
@@ -687,15 +774,15 @@ function Remove_Sale(id, sale_has_return) {
                                 Añadir Pago
                             </v-list-item>
 
-                            <!--                <b-dropdown-item title="Invoice" @click="Invoice_POS(props.row.id)">-->
+                            <!--                <v-dropdown-item title="Invoice" @click="Invoice_POS(props.row.id)">-->
                             <!--                  <i class="nav-icon i-File-TXT font-weight-bold mr-2"></i>-->
                             <!--                  {{$t('Invoice_POS')}}-->
-                            <!--                </b-dropdown-item>-->
+                            <!--                </v-dropdown-item>-->
 
-                            <!--                <b-dropdown-item title="PDF" @click="Invoice_PDF(props.row , props.row.id)">-->
+                            <!--                <v-dropdown-item title="PDF" @click="Invoice_PDF(props.row , props.row.id)">-->
                             <!--                  <i class="nav-icon i-File-TXT font-weight-bold mr-2"></i>-->
                             <!--                  {{$t('DownloadPdf')}}-->
-                            <!--                </b-dropdown-item>-->
+                            <!--                </v-dropdown-item>-->
                             <v-list-item
                                 @click="Delete_Item(item.raw)"
                                 prepend-icon="mdi-pen"
@@ -770,125 +857,52 @@ function Remove_Sale(id, sale_has_return) {
     <!--                        {label: 'Cancelled', value: 'cancelled'},-->
     <!--                      ]"-->
 
-    <!--    &lt;!&ndash; Modal Show Payments&ndash;&gt;-->
-    <!--    <b-modal hide-footer size="lg" id="Show_payment" :title="$t('ShowPayment')">-->
-    <!--      <b-row>-->
-    <!--        <b-col lg="12" md="12" sm="12" class="mt-3">-->
-    <!--          <div class="table-responsive">-->
-    <!--            <table class="table table-hover table-bordered table-md">-->
-    <!--              <thead>-->
-    <!--                <tr>-->
-    <!--                  <th scope="col">{{$t('date')}}</th>-->
-    <!--                  <th scope="col">{{$t('Reference')}}</th>-->
-    <!--                  <th scope="col">{{$t('Amount')}}</th>-->
-    <!--                  <th scope="col">{{$t('PayeBy')}}</th>-->
-    <!--                  <th scope="col">{{$t('Action')}}</th>-->
-    <!--                </tr>-->
-    <!--              </thead>-->
-    <!--              <tbody>-->
-    <!--                <tr v-if="payments.length <= 0">-->
-    <!--                  <td colspan="5">{{$t('NodataAvailable')}}</td>-->
-    <!--                </tr>-->
-    <!--                <tr v-for="payment in payments">-->
-    <!--                  <td>{{payment.date}}</td>-->
-    <!--                  <td>{{payment.Ref}}</td>-->
-    <!--                  <td>{{currentUser.currency}} {{formatNumber(payment.montant,2)}}</td>-->
-    <!--                  <td>{{payment.Reglement}}</td>-->
-    <!--                  <td>-->
-    <!--                    <div role="group" aria-label="Basic example" class="btn-group">-->
-    <!--                      <span-->
-    <!--                        title="Print"-->
-    <!--                        class="btn btn-icon btn-info btn-sm"-->
-    <!--                        @click="Payment_Sale_PDF(payment,payment.id)"-->
-    <!--                      >-->
-    <!--                        <i class="i-Billing"></i>-->
-    <!--                      </span>-->
-    <!--                      <span-->
-    <!--                        v-if="currentUserPermissions.includes('payment_sales_edit')"-->
-    <!--                        title="Edit"-->
-    <!--                        class="btn btn-icon btn-success btn-sm"-->
-    <!--                        @click="Edit_Payment(payment)"-->
-    <!--                      >-->
-    <!--                        <i class="i-Pen-2"></i>-->
-    <!--                      </span>-->
-    <!--                      <span-->
-    <!--                        title="Email"-->
-    <!--                        class="btn btn-icon btn-primary btn-sm"-->
-    <!--                        @click="EmailPayment(payment , sale)"-->
-    <!--                      >-->
-    <!--                        <i class="i-Envelope"></i>-->
-    <!--                      </span>-->
-    <!--                      <span-->
-    <!--                        title="SMS"-->
-    <!--                        class="btn btn-icon btn-secondary btn-sm"-->
-    <!--                        @click="Payment_Sale_SMS(payment)"-->
-    <!--                      >-->
-    <!--                        <i class="i-Speach-Bubble"></i>-->
-    <!--                      </span>-->
-    <!--                      <span-->
-    <!--                        v-if="currentUserPermissions.includes('payment_sales_delete')"-->
-    <!--                        title="Delete"-->
-    <!--                        class="btn btn-icon btn-danger btn-sm"-->
-    <!--                        @click="Remove_Payment(payment.id)"-->
-    <!--                      >-->
-    <!--                        <i class="i-Close"></i>-->
-    <!--                      </span>-->
-    <!--                    </div>-->
-    <!--                  </td>-->
-    <!--                </tr>-->
-    <!--              </tbody>-->
-    <!--            </table>-->
-    <!--          </div>-->
-    <!--        </b-col>-->
-    <!--      </b-row>-->
-    <!--    </b-modal>-->
-
     <!--    &lt;!&ndash; Modal Add Payment&ndash;&gt;-->
     <!--    <validation-observer ref="Add_payment">-->
-    <!--      <b-modal-->
+    <!--      <v-modal-->
     <!--        hide-footer-->
     <!--        size="lg"-->
     <!--        id="Add_Payment"-->
     <!--        :title="EditPaiementMode?$t('EditPayment'):$t('AddPayment')"-->
     <!--      >-->
-    <!--        <b-form @submit.prevent="Submit_Payment">-->
-    <!--          <b-row>-->
+    <!--        <v-form @submit.prevent="Submit_Payment">-->
+    <!--          <v-row>-->
     <!--            &lt;!&ndash; date &ndash;&gt;-->
-    <!--            <b-col lg="4" md="12" sm="12">-->
+    <!--            <v-col lg="4" md="12" sm="12">-->
     <!--              <validation-provider-->
     <!--                name="date"-->
     <!--                :rules="{ required: true}"-->
     <!--                v-slot="validationContext"-->
     <!--              >-->
-    <!--                <b-form-group :label="$t('date')">-->
-    <!--                  <b-form-input-->
+    <!--                <v-form-group :label="$t('date')">-->
+    <!--                  <v-form-input-->
     <!--                    label="date"-->
     <!--                    :state="getValidationState(validationContext)"-->
     <!--                    aria-describedby="date-feedback"-->
     <!--                    v-model="payment.date"-->
     <!--                    type="date"-->
-    <!--                  ></b-form-input>-->
-    <!--                  <b-form-invalid-feedback id="date-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
-    <!--                </b-form-group>-->
+    <!--                  ></v-form-input>-->
+    <!--                  <v-form-invalid-feedback id="date-feedback">{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
+    <!--                </v-form-group>-->
     <!--              </validation-provider>-->
-    <!--            </b-col>-->
+    <!--            </v-col>-->
 
     <!--            &lt;!&ndash; Reference  &ndash;&gt;-->
-    <!--            <b-col lg="4" md="12" sm="12">-->
-    <!--              <b-form-group :label="$t('Reference')">-->
-    <!--                <b-form-input-->
+    <!--            <v-col lg="4" md="12" sm="12">-->
+    <!--              <v-form-group :label="$t('Reference')">-->
+    <!--                <v-form-input-->
     <!--                  disabled="disabled"-->
     <!--                  label="Reference"-->
     <!--                  :placeholder="$t('Reference')"-->
     <!--                  v-model="payment.Ref"-->
-    <!--                ></b-form-input>-->
-    <!--              </b-form-group>-->
-    <!--            </b-col>-->
+    <!--                ></v-form-input>-->
+    <!--              </v-form-group>-->
+    <!--            </v-col>-->
 
     <!--             &lt;!&ndash; Payment choice &ndash;&gt;-->
-    <!--            <b-col lg="4" md="12" sm="12">-->
+    <!--            <v-col lg="4" md="12" sm="12">-->
     <!--              <validation-provider name="Payment choice" :rules="{ required: true}">-->
-    <!--                <b-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice')">-->
+    <!--                <v-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice')">-->
     <!--                  <v-select-->
     <!--                    :class="{'is-invalid': !!errors.length}"-->
     <!--                    :state="errors[0] ? false : (valid ? true : null)"-->
@@ -908,66 +922,66 @@ function Remove_Sale(id, sale_has_return) {
     <!--                          {label: 'other', value: 'other'},-->
     <!--                          ]"-->
     <!--                  ></v-select>-->
-    <!--                  <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>-->
-    <!--                </b-form-group>-->
+    <!--                  <v-form-invalid-feedback>{{ errors[0] }}</v-form-invalid-feedback>-->
+    <!--                </v-form-group>-->
     <!--              </validation-provider>-->
-    <!--            </b-col>-->
+    <!--            </v-col>-->
 
     <!--            &lt;!&ndash; Received  Amount  &ndash;&gt;-->
-    <!--            <b-col lg="4" md="12" sm="12">-->
+    <!--            <v-col lg="4" md="12" sm="12">-->
     <!--                <validation-provider-->
     <!--                  name="Received Amount"-->
     <!--                  :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
     <!--                  v-slot="validationContext"-->
     <!--                >-->
-    <!--                <b-form-group :label="$t('Received_Amount')">-->
-    <!--                  <b-form-input-->
+    <!--                <v-form-group :label="$t('Received_Amount')">-->
+    <!--                  <v-form-input-->
     <!--                    @keyup="Verified_Received_Amount(payment.received_amount)"-->
     <!--                    label="Received_Amount"-->
     <!--                    :placeholder="$t('Received_Amount')"-->
     <!--                    v-model.number="payment.received_amount"-->
     <!--                    :state="getValidationState(validationContext)"-->
     <!--                    aria-describedby="Received_Amount-feedback"-->
-    <!--                  ></b-form-input>-->
-    <!--                  <b-form-invalid-feedback-->
+    <!--                  ></v-form-input>-->
+    <!--                  <v-form-invalid-feedback-->
     <!--                    id="Received_Amount-feedback"-->
-    <!--                  >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
-    <!--                </b-form-group>-->
+    <!--                  >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
+    <!--                </v-form-group>-->
     <!--              </validation-provider>-->
-    <!--            </b-col>-->
+    <!--            </v-col>-->
 
     <!--            &lt;!&ndash; Paying Amount  &ndash;&gt;-->
-    <!--            <b-col lg="4" md="12" sm="12">-->
+    <!--            <v-col lg="4" md="12" sm="12">-->
     <!--              <validation-provider-->
     <!--                name="Amount"-->
     <!--                :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
     <!--                v-slot="validationContext"-->
     <!--              >-->
-    <!--                <b-form-group :label="$t('Paying_Amount')">-->
-    <!--                  <b-form-input-->
+    <!--                <v-form-group :label="$t('Paying_Amount')">-->
+    <!--                  <v-form-input-->
     <!--                   @keyup="Verified_paidAmount(payment.montant)"-->
     <!--                    label="Amount"-->
     <!--                    :placeholder="$t('Paying_Amount')"-->
     <!--                    v-model.number="payment.montant"-->
     <!--                    :state="getValidationState(validationContext)"-->
     <!--                    aria-describedby="Amount-feedback"-->
-    <!--                  ></b-form-input>-->
-    <!--                  <b-form-invalid-feedback id="Amount-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
-    <!--                </b-form-group>-->
+    <!--                  ></v-form-input>-->
+    <!--                  <v-form-invalid-feedback id="Amount-feedback">{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
+    <!--                </v-form-group>-->
     <!--              </validation-provider>-->
-    <!--            </b-col>-->
+    <!--            </v-col>-->
 
     <!--            &lt;!&ndash; change Amount  &ndash;&gt;-->
-    <!--            <b-col lg="4" md="12" sm="12">-->
+    <!--            <v-col lg="4" md="12" sm="12">-->
     <!--              <label>{{$t('Change')}} :</label>-->
     <!--              <p-->
     <!--                class="change_amount"-->
     <!--              >{{parseFloat(payment.received_amount - payment.montant).toFixed(2)}}</p>-->
-    <!--            </b-col>-->
+    <!--            </v-col>-->
 
     <!--           -->
 
-    <!--            <b-col md="12" v-if="payment.Reglement == 'credit card'">-->
+    <!--            <v-col md="12" v-if="payment.Reglement == 'credit card'">-->
     <!--              <form id="payment-form">-->
     <!--                <label-->
     <!--                  for="card-element"-->
@@ -979,38 +993,38 @@ function Remove_Sale(id, sale_has_return) {
     <!--                &lt;!&ndash; We'll put the error messages in this element &ndash;&gt;-->
     <!--                <div id="card-errors" class="is-invalid" role="alert"></div>-->
     <!--              </form>-->
-    <!--            </b-col>-->
+    <!--            </v-col>-->
 
     <!--            &lt;!&ndash; Note &ndash;&gt;-->
-    <!--            <b-col lg="12" md="12" sm="12" class="mt-3">-->
-    <!--              <b-form-group :label="$t('Note')">-->
-    <!--                <b-form-textarea id="textarea" v-model="payment.notes" rows="3" max-rows="6"></b-form-textarea>-->
-    <!--              </b-form-group>-->
-    <!--            </b-col>-->
-    <!--            <b-col md="12" class="mt-3">-->
-    <!--              <b-button-->
+    <!--            <v-col lg="12" md="12" sm="12" class="mt-3">-->
+    <!--              <v-form-group :label="$t('Note')">-->
+    <!--                <v-form-textarea id="textarea" v-model="payment.notes" rows="3" max-rows="6"></v-form-textarea>-->
+    <!--              </v-form-group>-->
+    <!--            </v-col>-->
+    <!--            <v-col md="12" class="mt-3">-->
+    <!--              <v-button-->
     <!--                variant="primary"-->
     <!--                type="submit"-->
     <!--                :disabled="paymentProcessing"-->
-    <!--              >{{$t('submit')}}</b-button>-->
+    <!--              >{{$t('submit')}}</v-button>-->
     <!--              <div v-once class="typo__p" v-if="paymentProcessing">-->
     <!--                <div class="spinner sm spinner-primary mt-3"></div>-->
     <!--              </div>-->
-    <!--            </b-col>-->
-    <!--          </b-row>-->
-    <!--        </b-form>-->
-    <!--      </b-modal>-->
+    <!--            </v-col>-->
+    <!--          </v-row>-->
+    <!--        </v-form>-->
+    <!--      </v-modal>-->
     <!--    </validation-observer>-->
 
     <!--     &lt;!&ndash; Modal Edit Shipment &ndash;&gt;-->
     <!--    <validation-observer ref="shipment_ref">-->
-    <!--      <b-modal hide-footer size="md" id="modal_shipment" :title="$t('Edit')">-->
-    <!--        <b-form @submit.prevent="Submit_Shipment">-->
-    <!--          <b-row>-->
+    <!--      <v-modal hide-footer size="md" id="modal_shipment" :title="$t('Edit')">-->
+    <!--        <v-form @submit.prevent="Submit_Shipment">-->
+    <!--          <v-row>-->
     <!--            &lt;!&ndash; Status  &ndash;&gt;-->
-    <!--            <b-col md="12">-->
+    <!--            <v-col md="12">-->
     <!--              <validation-provider name="Status" :rules="{ required: true}">-->
-    <!--                <b-form-group slot-scope="{ valid, errors }" :label="$t('Status') + ' ' + '*'">-->
+    <!--                <v-form-group slot-scope="{ valid, errors }" :label="$t('Status') + ' ' + '*'">-->
     <!--                  <v-select-->
     <!--                    :class="{'is-invalid': !!errors.length}"-->
     <!--                    :state="errors[0] ? false : (valid ? true : null)"-->
@@ -1026,60 +1040,60 @@ function Remove_Sale(id, sale_has_return) {
     <!--                                  {label: 'Cancelled', value: 'cancelled'},-->
     <!--                                ]"-->
     <!--                  ></v-select>-->
-    <!--                  <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>-->
-    <!--                </b-form-group>-->
+    <!--                  <v-form-invalid-feedback>{{ errors[0] }}</v-form-invalid-feedback>-->
+    <!--                </v-form-group>-->
     <!--              </validation-provider>-->
-    <!--            </b-col>-->
+    <!--            </v-col>-->
 
-    <!--            <b-col md="12">-->
-    <!--              <b-form-group :label="$t('delivered_to')">-->
-    <!--                <b-form-input-->
+    <!--            <v-col md="12">-->
+    <!--              <v-form-group :label="$t('delivered_to')">-->
+    <!--                <v-form-input-->
     <!--                  label="delivered_to"-->
     <!--                  v-model="shipment.delivered_to"-->
     <!--                  :placeholder="$t('delivered_to')"-->
-    <!--                ></b-form-input>-->
-    <!--              </b-form-group>-->
-    <!--            </b-col>-->
+    <!--                ></v-form-input>-->
+    <!--              </v-form-group>-->
+    <!--            </v-col>-->
 
-    <!--            <b-col md="12">-->
-    <!--              <b-form-group :label="$t('Adress')">-->
+    <!--            <v-col md="12">-->
+    <!--              <v-form-group :label="$t('Adress')">-->
     <!--                <textarea-->
     <!--                  v-model="shipment.shipping_address"-->
     <!--                  rows="4"-->
     <!--                  class="form-control"-->
     <!--                  :placeholder="$t('Enter_Address')"-->
     <!--                ></textarea>-->
-    <!--              </b-form-group>-->
-    <!--            </b-col>-->
+    <!--              </v-form-group>-->
+    <!--            </v-col>-->
 
-    <!--            <b-col md="12">-->
-    <!--              <b-form-group :label="$t('Please_provide_any_details')">-->
+    <!--            <v-col md="12">-->
+    <!--              <v-form-group :label="$t('Please_provide_any_details')">-->
     <!--                <textarea-->
     <!--                  v-model="shipment.shipping_details"-->
     <!--                  rows="4"-->
     <!--                  class="form-control"-->
     <!--                  :placeholder="$t('Please_provide_any_details')"-->
     <!--                ></textarea>-->
-    <!--              </b-form-group>-->
-    <!--            </b-col>-->
+    <!--              </v-form-group>-->
+    <!--            </v-col>-->
 
-    <!--            <b-col md="12" class="mt-3">-->
-    <!--              <b-button-->
+    <!--            <v-col md="12" class="mt-3">-->
+    <!--              <v-button-->
     <!--                variant="primary"-->
     <!--                type="submit"-->
     <!--                :disabled="Submit_Processing_shipment"-->
-    <!--              >{{$t('submit')}}</b-button>-->
+    <!--              >{{$t('submit')}}</v-button>-->
     <!--              <div v-once class="typo__p" v-if="Submit_Processing_shipment">-->
     <!--                <div class="spinner sm spinner-primary mt-3"></div>-->
     <!--              </div>-->
-    <!--            </b-col>-->
-    <!--          </b-row>-->
-    <!--        </b-form>-->
-    <!--      </b-modal>-->
+    <!--            </v-col>-->
+    <!--          </v-row>-->
+    <!--        </v-form>-->
+    <!--      </v-modal>-->
     <!--    </validation-observer>-->
 
     <!--    &lt;!&ndash; Modal Show Invoice POS&ndash;&gt;-->
-    <!--    <b-modal hide-footer size="sm" scrollable id="Show_invoice" :title="$t('Invoice_POS')">-->
+    <!--    <v-modal hide-footer size="sm" scrollable id="Show_invoice" :title="$t('Invoice_POS')">-->
     <!--        <div id="invoice-POS">-->
     <!--          <div style="max-width:400px;margin:0px auto">-->
     <!--          <div class="info" >-->
@@ -1196,7 +1210,7 @@ function Remove_Sale(id, sale_has_return) {
     <!--        <i class="i-Billing"></i>-->
     <!--        {{$t('print')}}-->
     <!--      </button>-->
-    <!--    </b-modal>-->
+    <!--    </v-modal>-->
     <!--  </div>-->
 </template>
 

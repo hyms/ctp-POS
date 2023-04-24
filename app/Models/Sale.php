@@ -22,6 +22,7 @@ class Sale extends Model
         'qte_retturn' => 'double',
         'total_retturn' => 'double',
         'user_id' => 'integer',
+        'user_pos' => 'integer',
         'client_id' => 'integer',
         'warehouse_id' => 'integer',
         'discount' => 'double',
@@ -33,10 +34,15 @@ class Sale extends Model
 
     public function user()
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo('App\Models\User', 'user_id');
     }
 
-        public function details()
+    public function userpos()
+    {
+        return $this->belongsTo('App\Models\User', 'user_pos');
+    }
+
+    public function details()
     {
         return $this->hasMany('App\Models\SaleDetail');
     }

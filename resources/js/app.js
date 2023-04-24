@@ -2,13 +2,15 @@ import "./bootstrap";
 
 import "@mdi/font/css/materialdesignicons.css";
 import { createApp, h } from "vue";
-import "vuetify/styles";
+// import "vuetify/styles";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import * as labs from "vuetify/labs/components";
 import { es } from "vuetify/locale";
 import moment from "moment";
+
+import "@/../css/main.scss";
 
 // import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 // import 'vuetify/dist/vuetify.min.css'

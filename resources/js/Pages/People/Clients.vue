@@ -81,7 +81,7 @@ const fields = ref([
     { title: "Telefono", key: "phone" },
     { title: "NIT", key: "nit_ci" },
     { title: "Deuda Total", key: "due" },
-    { title: "Deuda Total Devolucion", key: "return_Due" },
+    // { title: "Deuda Total Devolucion", key: "return_Due" },
     { title: "Acciones", key: "actions" },
 ]);
 const jsonFields = ref({
@@ -92,7 +92,7 @@ const jsonFields = ref({
     Nit: "nit_ci",
     Correo: "email",
     Deuda_Total: "due",
-    Deuda_Total_Devolucion: "return_Due",
+    // Deuda_Total_Devolucion: "return_Due",
 });
 
 //---------------------- modal  ------------------------------\\
@@ -691,14 +691,14 @@ function Pay_return_due(row) {
                                 </td>
                             </tr>
 
-                            <tr>
-                                <!-- Total_Sell_Return_Due -->
-                                <td>Total Deuda de Devolucion</td>
-                                <td>
-                                    Bs
-                                    {{ client.return_Due }}
-                                </td>
-                            </tr>
+                            <!--                            <tr>-->
+                            <!--                                &lt;!&ndash; Total_Sell_Return_Due &ndash;&gt;-->
+                            <!--                                <td>Total Deuda de Devolucion</td>-->
+                            <!--                                <td>-->
+                            <!--                                    Bs-->
+                            <!--                                    {{ client.return_Due }}-->
+                            <!--                                </td>-->
+                            <!--                            </tr>-->
                         </tbody>
                     </v-table>
                 </v-card-text>

@@ -45,34 +45,41 @@ class SalesController extends Controller
 //        $role = Auth::user()->roles()->first();
 //        $view_records = Role::findOrFail($role->id)->inRole('record_view');
 
-        $Sales = Sale::with('facture', 'client', 'warehouse', 'user','sales_type')
+        $filter = collect($request->get('filter'));
+
+        $Sales = Sale::with('facture', 'client', 'warehouse', 'user', 'userpos', 'sales_type')
             ->where('deleted_at', '=', null)
-            ->orderBy('updated_at','desc')
-            ->get();
+            ->orderBy('updated_at', 'desc');
+        if ($filter->count() > 0) {
+
+        } else {
+            $Sales = $Sales->limit(500);
+        }
+        $Sales = $Sales->get();
         $data = collect();
         foreach ($Sales as $Sale) {
 
             $item['id'] = $Sale['id'];
             $item['date'] = $Sale['date'];
             $item['Ref'] = $Sale['Ref'];
-            $item['created_by'] = $Sale['user']?->username;
+            $item['created_by'] = $Sale->userpos->username;
 //            $statut = match ($Sale['statut']) {
 //                'completed' => 'Completado',
 //                'pending' => 'Pendiente',
-//                'ordering' => 'Ordenado',
+//                'ordered' => 'Ordenado',
 //                default => "",
 //            };
             $item['statut'] = $Sale['statut'];
             $item['shipping_status'] = $Sale['shipping_status'];
             $item['discount'] = $Sale['discount'];
             $item['shipping'] = $Sale['shipping'];
-            $item['warehouse_name'] = $Sale['warehouse']['name'];
-            $item['client_id'] = $Sale['client']?->id;
-            $item['client_name'] = $Sale['client']?->name;
-            $item['client_email'] = $Sale['client']?->email;
-            $item['client_tele'] = $Sale['client']?->phone;
-            $item['client_code'] = $Sale['client']?->code;
-            $item['client_adr'] = $Sale['client']?->adresse;
+            $item['warehouse_name'] = $Sale->warehouse?->name;
+            $item['client_id'] = $Sale->client?->id;
+            $item['client_name'] = $Sale->client?->name;
+            $item['client_email'] = $Sale->client?->email;
+            $item['client_tele'] = $Sale->client?->phone;
+            $item['client_code'] = $Sale->client?->code;
+            $item['client_adr'] = $Sale->client?->adresse;
             $item['GrandTotal'] = number_format($Sale['GrandTotal'], 2, '.', '');
             $item['paid_amount'] = number_format($Sale['paid_amount'], 2, '.', '');
             $item['due'] = number_format($item['GrandTotal'] - $item['paid_amount'], 2, '.', '');
@@ -107,7 +114,7 @@ class SalesController extends Controller
             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
         }
 
-        $sales_types=SalesType::where('deleted_at', '=', null)->get(['id', 'name']);
+        $sales_types = SalesType::where('deleted_at', '=', null)->get(['id', 'name']);
 
         Inertia::share('titlePage', 'Lista de Ordenes');
         return Inertia::render('Sales/Index_Sale', [
@@ -115,6 +122,7 @@ class SalesController extends Controller
             'sales_types' => $sales_types,
             'customers' => $customers,
             'warehouses' => $warehouses,
+            'filter_form'=>$filter
         ]);
     }
 
@@ -568,11 +576,11 @@ class SalesController extends Controller
         $sale_details['shipping'] = $sale_data->shipping;
         $sale_details['tax_rate'] = $sale_data->tax_rate;
         $sale_details['TaxNet'] = $sale_data->TaxNet;
-        $sale_details['client_name'] = $sale_data['client']->name;
-        $sale_details['client_phone'] = $sale_data['client']->phone;
-        $sale_details['client_adr'] = $sale_data['client']->adresse;
-        $sale_details['client_email'] = $sale_data['client']->email;
-        $sale_details['client_tax'] = $sale_data['client']->tax_number;
+        $sale_details['client_name'] = $sale_data->client->name;
+        $sale_details['client_phone'] = $sale_data->client->phone;
+        $sale_details['client_adr'] = $sale_data->client->adresse;
+        $sale_details['client_email'] = $sale_data->client->email;
+        $sale_details['client_tax'] = $sale_data->client->tax_number;
         $sale_details['GrandTotal'] = number_format($sale_data->GrandTotal, 2, '.', '');
         $sale_details['paid_amount'] = number_format($sale_data->paid_amount, 2, '.', '');
         $sale_details['due'] = number_format($sale_details['GrandTotal'] - $sale_details['paid_amount'], 2, '.', '');

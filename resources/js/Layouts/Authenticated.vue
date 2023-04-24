@@ -3,7 +3,7 @@ import Menu from "@/Components/Menu.vue";
 import moment from "moment";
 import { ref } from "vue";
 
-const props = defineProps({ loading: Boolean });
+const props = defineProps({ loading: { type: Boolean, default: false } });
 </script>
 <template>
     <v-dialog :model-value="loading" :scrim="false" persistent width="auto">
