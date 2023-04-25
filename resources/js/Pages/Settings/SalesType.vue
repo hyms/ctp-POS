@@ -4,6 +4,7 @@ import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import ruleForm from "@/rules";
 import { router } from "@inertiajs/vue3";
+import DeleteDialog from "@/Components/DeleteDialog.vue";
 
 const props = defineProps({
     sales_types: Array,
@@ -178,34 +179,12 @@ function Remove_SalesType() {
             :snackbar-color="snackbarColor"
             :snackbar-text="snackbarText"
         ></snackbar>
-        <v-dialog v-model="dialogDelete" max-width="300px">
-            <v-card>
-                <v-card-text class="text-h5 text-center"
-                    >Estas seguro?
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        small
-                        variant="elevated"
-                        color="primary"
-                        class="ma-1"
-                        @click="Remove_SalesType"
-                        >Si
-                    </v-btn>
-                    <v-btn
-                        variant="elevated"
-                        small
-                        color="error"
-                        class="ma-1"
-                        @click="onCloseDelete"
-                        >Cancelar
-                    </v-btn>
-
-                    <v-spacer></v-spacer>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+        <delete-dialog
+            :model="dialogDelete"
+            :on-close="onCloseDelete"
+            :on-save="Remove_SalesType"
+        >
+        </delete-dialog>
         <v-dialog
             v-model="dialog"
             max-width="400px"
@@ -215,7 +194,7 @@ function Remove_SalesType() {
             <v-card>
                 <v-toolbar
                     border
-                    density="comfortable"
+                    density="compact"
                     :title="(editmode ? 'Modificar' : 'Nueva') + ' Categoria'"
                 >
                 </v-toolbar>
@@ -224,7 +203,7 @@ function Remove_SalesType() {
                     <v-form ref="form">
                         <v-row>
                             <!-- Code SalesType -->
-                            <v-col md="12">
+                            <v-col cols="12">
                                 <v-text-field
                                     :label="sales_typeLabels.code + ' *'"
                                     v-model="sales_type.code"
@@ -238,7 +217,7 @@ function Remove_SalesType() {
                             </v-col>
 
                             <!-- Name SalesType -->
-                            <v-col md="12">
+                            <v-col cols="12">
                                 <v-text-field
                                     :label="sales_typeLabels.name + ' *'"
                                     v-model="sales_type.name"
@@ -280,7 +259,7 @@ function Remove_SalesType() {
         </v-dialog>
 
         <v-row align="center">
-            <v-col>
+            <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="search"
                     prepend-icon="mdi-magnify"
@@ -291,8 +270,7 @@ function Remove_SalesType() {
                     variant="underlined"
                 ></v-text-field>
             </v-col>
-            <v-spacer></v-spacer>
-            <v-col cols="auto" class="text-right">
+            <v-col cols="12" sm="6" class="text-right">
                 <v-btn
                     size="small"
                     color="primary"
@@ -305,7 +283,7 @@ function Remove_SalesType() {
             </v-col>
         </v-row>
         <v-row>
-            <v-col>
+            <v-col cols="12">
                 <v-data-table
                     :headers="fields"
                     :items="sales_types"

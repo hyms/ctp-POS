@@ -42,7 +42,7 @@ function print_product() {
                 <v-row id="print_product">
                     <v-col>
                         <v-row>
-                            <v-col md="8">
+                            <v-col cols="12" md="8">
                                 <v-table hover density="compact">
                                     <tbody>
                                         <tr>
@@ -138,7 +138,7 @@ function print_product() {
                         </v-row>
                         <v-row class="mt-4">
                             <!-- Warehouse Quantity -->
-                            <v-col md="5">
+                            <v-col cols="12" md="5">
                                 <v-table hover density="compact">
                                     <thead>
                                         <tr>
@@ -163,7 +163,11 @@ function print_product() {
                                 </v-table>
                             </v-col>
                             <!-- Warehouse Variants Quantity -->
-                            <v-col md="7" v-if="product.is_variant == 'yes'">
+                            <v-col
+                                cols="12"
+                                md="7"
+                                v-if="product.is_variant == 'yes'"
+                            >
                                 <v-table density="compact" hover>
                                     <thead>
                                         <tr>
@@ -196,7 +200,7 @@ function print_product() {
                 </v-row>
                 <hr v-if="product.note" class="mt-4" />
                 <v-row class="mt-4">
-                    <v-col md="12">
+                    <v-col cols="12" md="12">
                         <p>{{ product.note }}</p>
                     </v-col>
                 </v-row>

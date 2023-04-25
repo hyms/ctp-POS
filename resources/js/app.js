@@ -12,7 +12,7 @@ import moment from "moment";
 
 import "@/../css/main.scss";
 
-// import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 // import 'vuetify/dist/vuetify.min.css'
 
 moment.locale("es");
@@ -20,14 +20,13 @@ moment.locale("es");
 import { createInertiaApp } from "@inertiajs/vue3";
 
 const customLight = {
-    dark: false,
     colors: {
-        // background: "#2C384A",
+        // background: "#f7f7f7",
         surface: "#f7f7f7",
         primary: "#3c858d",
         secondary: "#5e8592",
         error: "#e75f5f",
-        info: "#39f",
+        info: "#3d71a5",
         success: "#4fbb73",
         warning: "#ffc340",
     },
@@ -55,16 +54,15 @@ const vuetify = createVuetify({
 });
 
 createInertiaApp({
-    resolve: (name) => {
-        const pages = import.meta.glob("./Pages/**/*.vue", { eager: true });
-        return pages[`./Pages/${name}.vue`];
-    },
+    resolve: (name) =>
+        resolvePageComponent(
+            `./Pages/${name}.vue`,
+            import.meta.glob("./Pages/**/*.vue")
+        ),
     setup({ el, App, props, plugin }) {
         createApp({ render: () => h(App, props) })
             .use(plugin)
-            // .use({moment})
             .use(vuetify)
-            // .mixin({methods: {route}})
             .mount(el);
     },
     progress: {

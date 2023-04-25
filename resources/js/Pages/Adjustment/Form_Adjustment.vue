@@ -359,231 +359,220 @@ onMounted(() => {
         >
         </snackbar>
         <v-form ref="form">
-            <v-row>
-                <v-col lg="12" cols="12" sm="12">
-                    <v-card>
-                        <v-card-text>
-                            <v-row>
-                                <!-- warehouse -->
-                                <v-col cols="12" md="6">
-                                    <v-select
-                                        @update:modelValue="Selected_Warehouse"
-                                        v-model="adjustmentForm.warehouse_id"
-                                        :items="warehouses"
-                                        :label="adjustmentLabel.warehouse_id"
-                                        item-title="title"
-                                        item-value="value"
-                                        variant="outlined"
-                                        density="comfortable"
-                                        hide-details="auto"
-                                        clearable
-                                        :rules="ruleForm.required"
-                                        :disabled="detailsForm.length > 0"
-                                    ></v-select>
-                                </v-col>
+            <v-card>
+                <v-card-text>
+                    <v-row>
+                        <!-- warehouse -->
+                        <v-col cols="12" sm="6">
+                            <v-select
+                                @update:modelValue="Selected_Warehouse"
+                                v-model="adjustmentForm.warehouse_id"
+                                :items="warehouses"
+                                :label="adjustmentLabel.warehouse_id"
+                                item-title="title"
+                                item-value="value"
+                                variant="outlined"
+                                density="comfortable"
+                                hide-details="auto"
+                                clearable
+                                :rules="ruleForm.required"
+                                :disabled="detailsForm.length > 0"
+                            ></v-select>
+                        </v-col>
 
-                                <!-- date  -->
-                                <v-col cols="12" lg="6">
-                                    <!--                    <v-form-group :label="$t('date') + ' ' + '*'">-->
-                                    <!--                      <v-form-input-->
-                                    <!--                        :state="getValidationState(validationContext)"-->
-                                    <!--                        aria-describedby="date-feedback"-->
-                                    <!--                        type="date"-->
-                                    <!--                        v-model="adjustment.date"-->
-                                    <!--                      ></v-form-input>-->
-                                    <!--                      <v-form-invalid-feedback-->
-                                    <!--                        id="OrderTax-feedback"-->
-                                    <!--                      >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-                                    <!--                    </v-form-group>-->
-                                    <v-text-field
-                                        v-model="adjustmentForm.date"
-                                        :label="adjustmentLabel.date"
-                                        variant="outlined"
-                                        density="compact"
-                                        hide-details="auto"
-                                        type="date"
-                                        :rules="ruleForm.required"
+                        <!-- date  -->
+                        <v-col cols="12" sm="6">
+                            <v-text-field
+                                v-model="adjustmentForm.date"
+                                :label="adjustmentLabel.date"
+                                variant="outlined"
+                                density="comfortable"
+                                hide-details="auto"
+                                type="date"
+                                :rules="ruleForm.required"
+                            >
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <!-- Product -->
+                        <v-col cols="12">
+                            <v-autocomplete
+                                @update:modelValue="querySelections"
+                                :loading="loadingFilter"
+                                :items="products"
+                                :model-value="search_input"
+                                item-title="name"
+                                item-value="id"
+                                density="comfortable"
+                                hide-no-data
+                                hide-details
+                                label="Añadir Producto"
+                                :disabled="products.length == 0"
+                                clearable
+                                prepend-inner-icon="mdi-magnify"
+                            ></v-autocomplete>
+                        </v-col>
+                        <!-- Products -->
+                        <v-col cols="12">
+                            <v-table hover class="border" density="comfortable">
+                                <thead>
+                                    <tr class="bg-secondary">
+                                        <th class="text-white text-center">
+                                            #
+                                        </th>
+                                        <th class="text-white text-center">
+                                            Codigo
+                                        </th>
+                                        <th class="text-white text-center">
+                                            Producto
+                                        </th>
+                                        <th class="text-white text-center">
+                                            En Stock
+                                        </th>
+                                        <th class="text-white text-center">
+                                            Cantidad
+                                        </th>
+                                        <th class="text-white text-center">
+                                            Tipo
+                                        </th>
+                                        <th class="text-white text-center"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-if="detailsForm.length <= 0">
+                                        <td colspan="7">
+                                            No hay datos disponibles
+                                        </td>
+                                    </tr>
+                                    <tr
+                                        v-for="detail in detailsForm"
+                                        :key="detail.detail_id"
                                     >
-                                    </v-text-field>
-                                </v-col>
-                            </v-row>
-                            <v-row>
-                                <!-- Product -->
-                                <v-col cols="12">
-                                    <v-autocomplete
-                                        @update:modelValue="querySelections"
-                                        :loading="loadingFilter"
-                                        :items="products"
-                                        :model-value="search_input"
-                                        item-title="name"
-                                        item-value="id"
-                                        density="comfortable"
-                                        hide-no-data
-                                        hide-details
-                                        label="Añadir Producto"
-                                        :disabled="products.length == 0"
-                                        clearable
-                                    ></v-autocomplete>
-                                </v-col>
-                                <!-- Products -->
-                                <v-col cols="12">
-                                    <v-table>
-                                        <thead class="bg-gray-300">
-                                            <tr>
-                                                <th scope="col">#</th>
-                                                <th scope="col">Codigo</th>
-                                                <th scope="col">Producto</th>
-                                                <th scope="col">En Stock</th>
-                                                <th scope="col">Cantidad</th>
-                                                <th scope="col">Tipo</th>
-                                                <th
-                                                    scope="col"
-                                                    class="text-center"
-                                                >
-                                                    <i class="fa fa-trash"></i>
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-if="detailsForm.length <= 0">
-                                                <td colspan="7">
-                                                    No hay datos disponibles
-                                                </td>
-                                            </tr>
-                                            <tr
-                                                v-for="detail in detailsForm"
-                                                :key="detail.detail_id"
+                                        <td>
+                                            {{ detail.detail_id }}
+                                        </td>
+                                        <td>{{ detail.code }}</td>
+                                        <td>({{ detail.name }})</td>
+                                        <td class="text-center">
+                                            <v-chip
+                                                color="primary"
+                                                size="small"
                                             >
-                                                <td>
-                                                    {{ detail.detail_id }}
-                                                </td>
-                                                <td>{{ detail.code }}</td>
-                                                <td>({{ detail.name }})</td>
-                                                <td class="text-center">
-                                                    <v-chip
-                                                        color="primary"
-                                                        size="small"
-                                                    >
-                                                        {{ detail.current }}
-                                                        {{ detail.unit }}
-                                                    </v-chip>
-                                                </td>
-                                                <td>
-                                                    <v-text-field
-                                                        variant="outlined"
-                                                        density="compact"
-                                                        hide-details="auto"
-                                                        :rules="ruleForm.number"
-                                                        v-model="
-                                                            detail.quantity
-                                                        "
-                                                        @keyup="
-                                                            Verified_Qty(
+                                                {{ detail.current }}
+                                                {{ detail.unit }}
+                                            </v-chip>
+                                        </td>
+                                        <td>
+                                            <v-text-field
+                                                variant="outlined"
+                                                density="compact"
+                                                hide-details="auto"
+                                                :rules="ruleForm.number"
+                                                v-model="detail.quantity"
+                                                @keyup="
+                                                    Verified_Qty(
+                                                        detail,
+                                                        detail.detail_id
+                                                    )
+                                                "
+                                                :min="0.0"
+                                                :max="detail.current"
+                                            >
+                                                <template v-slot:append>
+                                                    <v-icon
+                                                        color="secundary"
+                                                        @click="
+                                                            increment(
                                                                 detail,
                                                                 detail.detail_id
                                                             )
                                                         "
-                                                        :min="0.0"
-                                                        :max="detail.current"
                                                     >
-                                                        <template v-slot:append>
-                                                            <v-icon
-                                                                color="secundary"
-                                                                @click="
-                                                                    increment(
-                                                                        detail,
-                                                                        detail.detail_id
-                                                                    )
-                                                                "
-                                                            >
-                                                                mdi-plus-box
-                                                            </v-icon>
-                                                        </template>
-                                                        <template
-                                                            v-slot:prepend
-                                                        >
-                                                            <v-icon
-                                                                color="secundary"
-                                                                @click="
-                                                                    decrement(
-                                                                        detail,
-                                                                        detail.detail_id
-                                                                    )
-                                                                "
-                                                            >
-                                                                mdi-minus-box
-                                                            </v-icon>
-                                                        </template>
-                                                    </v-text-field>
-                                                </td>
-                                                <td>
-                                                    <v-select
-                                                        v-model="detail.type"
-                                                        :items="[
-                                                            {
-                                                                title: 'Añadir',
-                                                                value: 'add',
-                                                            },
-                                                            {
-                                                                title: 'Quitar',
-                                                                value: 'sub',
-                                                            },
-                                                        ]"
-                                                        item-title="title"
-                                                        item-value="value"
-                                                        variant="outlined"
-                                                        density="compact"
-                                                        hide-details="auto"
-                                                    ></v-select>
-                                                </td>
-                                                <td>
-                                                    <v-btn
-                                                        class="ma-1"
-                                                        color="error"
-                                                        icon="mdi-delete"
-                                                        size="x-small"
-                                                        variant="elevated"
+                                                        mdi-plus-box
+                                                    </v-icon>
+                                                </template>
+                                                <template v-slot:prepend>
+                                                    <v-icon
+                                                        color="secundary"
                                                         @click="
-                                                            Remove_Product(
+                                                            decrement(
+                                                                detail,
                                                                 detail.detail_id
                                                             )
                                                         "
                                                     >
-                                                    </v-btn>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </v-table>
-                                </v-col>
-                                <v-col cols="12">
-                                    <v-textarea
-                                        rows="4"
-                                        :label="adjustmentLabel.notes"
-                                        v-model="adjustmentForm.notes"
-                                        :placeholder="adjustmentLabel.notes"
-                                        variant="outlined"
-                                        density="comfortable"
-                                        hide-details="auto"
-                                    ></v-textarea>
-                                </v-col>
-                            </v-row>
-                            <v-row class="mt-3">
-                                <v-col cols="12">
-                                    <v-btn
-                                        variant="elevated"
-                                        type="submit"
-                                        color="primary"
-                                        :loading="loading"
-                                        :disabled="loading"
-                                        @click="Submit_Adjustment"
-                                        >Guardar
-                                    </v-btn>
-                                </v-col>
-                            </v-row>
-                        </v-card-text>
-                    </v-card>
-                </v-col>
-            </v-row>
+                                                        mdi-minus-box
+                                                    </v-icon>
+                                                </template>
+                                            </v-text-field>
+                                        </td>
+                                        <td>
+                                            <v-select
+                                                v-model="detail.type"
+                                                :items="[
+                                                    {
+                                                        title: 'Añadir',
+                                                        value: 'add',
+                                                    },
+                                                    {
+                                                        title: 'Quitar',
+                                                        value: 'sub',
+                                                    },
+                                                ]"
+                                                item-title="title"
+                                                item-value="value"
+                                                variant="outlined"
+                                                density="compact"
+                                                hide-details="auto"
+                                            ></v-select>
+                                        </td>
+                                        <td>
+                                            <v-btn
+                                                class="ma-1"
+                                                color="error"
+                                                icon="mdi-delete"
+                                                size="x-small"
+                                                variant="elevated"
+                                                @click="
+                                                    Remove_Product(
+                                                        detail.detail_id
+                                                    )
+                                                "
+                                            >
+                                            </v-btn>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </v-table>
+                        </v-col>
+                        <v-col cols="12">
+                            <v-textarea
+                                rows="4"
+                                :label="adjustmentLabel.notes"
+                                v-model="adjustmentForm.notes"
+                                :placeholder="adjustmentLabel.notes"
+                                variant="outlined"
+                                density="comfortable"
+                                hide-details="auto"
+                            ></v-textarea>
+                        </v-col>
+                    </v-row>
+                    <v-row class="mt-3">
+                        <v-col cols="12">
+                            <v-btn
+                                variant="elevated"
+                                type="submit"
+                                color="primary"
+                                :loading="loading"
+                                :disabled="loading"
+                                @click="Submit_Adjustment"
+                                >Guardar
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
         </v-form>
     </Layout>
 </template>

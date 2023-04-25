@@ -397,7 +397,7 @@ onMounted(() => {
                         </v-col>
                         <!---->
                         <!-- Multiple Variants -->
-                        <v-col cols="12">
+                        <v-col cols="12" class="pt-0 pb-0">
                             <v-checkbox
                                 v-model="productForm.is_variant"
                                 :label="productLabel.is_variant"
@@ -414,7 +414,7 @@ onMounted(() => {
                         </v-col>
 
                         <!-- This_Product_Not_For_Selling -->
-                        <v-col cols="12">
+                        <v-col cols="12" class="pt-0 pb-0">
                             <v-checkbox
                                 v-model="productForm.not_selling"
                                 :label="productLabel.not_selling"

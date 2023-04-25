@@ -166,109 +166,103 @@ onMounted(() => {
 </script>
 
 <template>
-    <div>
-        <v-navigation-drawer
-            v-model="isDrawerOpen"
-            class="app-navigation-menu"
-            theme="dark"
-            color="#3c4b64"
-            :elevation="2"
-        >
-            <!-- Navigation Header -->
-            <template v-slot:prepend>
-                <v-list-item
-                    lines="two"
-                    class="vertical-nav-header d-flex text-center justify-center text-center"
-                >
-                    <h2 class="d-flex align-center app-title">xCTP</h2>
-                </v-list-item>
-            </template>
+    <v-navigation-drawer
+        v-model="isDrawerOpen"
+        class="app-navigation-menu"
+        theme="dark"
+        color="#3c4b64"
+        :elevation="2"
+    >
+        <!-- Navigation Header -->
+        <template v-slot:prepend>
+            <v-list-item
+                lines="two"
+                class="vertical-nav-header d-flex text-center justify-center text-center"
+            >
+                <h2 class="d-flex align-center app-title">xCTP</h2>
+            </v-list-item>
+        </template>
 
-            <v-divider></v-divider>
-            <v-list density="comfortable" :opened="open">
-                <template v-for="(link, key) in menuItems">
-                    <template v-if="link.subItems.length > 0">
-                        <v-list-group
-                            v-if="getAllPermission(link.subItems)"
-                            :key="key"
-                            :value="link.label"
-                        >
-                            <template v-slot:activator="{ props }">
-                                <v-list-item v-bind="props">
+        <v-divider></v-divider>
+        <v-list density="comfortable" :opened="open">
+            <template v-for="(link, key) in menuItems">
+                <template v-if="link.subItems.length > 0">
+                    <v-list-group
+                        v-if="getAllPermission(link.subItems)"
+                        :key="key"
+                        :value="link.label"
+                    >
+                        <template v-slot:activator="{ props }">
+                            <v-list-item v-bind="props">
+                                <v-list-item-title>
+                                    <span class="text-capitalize">{{
+                                        link.label
+                                    }}</span>
+                                </v-list-item-title>
+                            </v-list-item>
+                        </template>
+                        <template v-for="(subLink, subKey) in link.subItems">
+                            <template v-if="getPermission(subLink.role)">
+                                <v-list-item
+                                    :key="key + '' + subKey"
+                                    @click="linkVisit(subLink.url)"
+                                    :active="$page.url === subLink.url"
+                                    :value="subLink.label"
+                                >
                                     <v-list-item-title>
                                         <span class="text-capitalize">{{
-                                            link.label
+                                            subLink.label
                                         }}</span>
                                     </v-list-item-title>
                                 </v-list-item>
                             </template>
-                            <template
-                                v-for="(subLink, subKey) in link.subItems"
-                            >
-                                <template v-if="getPermission(subLink.role)">
-                                    <v-list-item
-                                        :key="key + '' + subKey"
-                                        @click="linkVisit(subLink.url)"
-                                        :active="$page.url === subLink.url"
-                                        :value="subLink.label"
-                                    >
-                                        <v-list-item-title>
-                                            <span class="text-capitalize">{{
-                                                subLink.label
-                                            }}</span>
-                                        </v-list-item-title>
-                                    </v-list-item>
-                                </template>
-                            </template>
-                        </v-list-group>
-                    </template>
-                    <template v-else>
-                        <v-list-item
-                            v-if="getPermission(link.role)"
-                            @click="linkVisit(link.url)"
-                            :active="$page.url === link.url"
-                            :key="key"
-                            :value="link.label"
-                        >
-                            <v-list-item-title>
-                                <span class="text-capitalize">{{
-                                    link.label
-                                }}</span>
-                            </v-list-item-title>
-                        </v-list-item>
-                    </template>
+                        </template>
+                    </v-list-group>
                 </template>
-            </v-list>
-        </v-navigation-drawer>
-        <v-app-bar :elevation="2">
-            <v-app-bar-nav-icon
-                @click.stop="isDrawerOpen = !isDrawerOpen"
-            ></v-app-bar-nav-icon>
+                <template v-else>
+                    <v-list-item
+                        v-if="getPermission(link.role)"
+                        @click="linkVisit(link.url)"
+                        :active="$page.url === link.url"
+                        :key="key"
+                        :value="link.label"
+                    >
+                        <v-list-item-title>
+                            <span class="text-capitalize">{{
+                                link.label
+                            }}</span>
+                        </v-list-item-title>
+                    </v-list-item>
+                </template>
+            </template>
+        </v-list>
+    </v-navigation-drawer>
+    <v-app-bar :elevation="2">
+        <v-app-bar-nav-icon
+            @click.stop="isDrawerOpen = !isDrawerOpen"
+        ></v-app-bar-nav-icon>
 
-            <v-toolbar-title>{{ $page.props.titlePage }}</v-toolbar-title>
+        <v-toolbar-title>{{ $page.props.titlePage }}</v-toolbar-title>
 
-            <v-spacer></v-spacer>
-            <v-btn color="secondary" variant="flat" prepend-icon="mdi-account">
-                {{
-                    $page.props.user.firstname + " " + $page.props.user.lastname
-                }}
+        <v-spacer></v-spacer>
+        <v-btn color="secondary" variant="flat" prepend-icon="mdi-account">
+            {{ $page.props.user.firstname + " " + $page.props.user.lastname }}
 
-                <v-menu activator="parent">
-                    <v-list density="compact">
-                        <v-list-item
-                            @click="linkVisit('/profile')"
-                            :active="$page.url === '/profile'"
-                        >
-                            <v-list-item-title>Perfil</v-list-item-title>
-                        </v-list-item>
-                        <v-list-item @click="linkVisit('/logout', 'post')">
-                            <v-list-item-title>Salir</v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
-            </v-btn>
-        </v-app-bar>
-    </div>
+            <v-menu activator="parent">
+                <v-list density="compact">
+                    <v-list-item
+                        @click="linkVisit('/profile')"
+                        :active="$page.url === '/profile'"
+                    >
+                        <v-list-item-title>Perfil</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="linkVisit('/logout', 'post')">
+                        <v-list-item-title>Salir</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
+        </v-btn>
+    </v-app-bar>
 </template>
 
 <style lang="scss" scoped>

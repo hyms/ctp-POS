@@ -136,11 +136,11 @@ function Create_User() {
     axios
         .post("users", data)
         .then(({ data }) => {
+            dialog.value = false;
             snackbar.value = true;
             snackbarColor.value = "success";
             snackbarText.value = "Proceso exitoso";
             router.reload();
-            dialog.value = false;
         })
         .catch((error) => {
             console.log(error);
@@ -281,7 +281,7 @@ function onClose() {
             <v-card>
                 <v-toolbar
                     border
-                    density="comfortable"
+                    density="compact"
                     :title="(editmode ? 'Modificar' : 'Nuevo') + ' Usuario'"
                 >
                 </v-toolbar>
@@ -290,7 +290,7 @@ function onClose() {
                     <v-form ref="form">
                         <v-row>
                             <!-- First name -->
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="userLabels.firstname + ' *'"
                                     v-model="user.firstname"
@@ -308,7 +308,7 @@ function onClose() {
                             </v-col>
 
                             <!-- Last name -->
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="userLabels.lastname + ' *'"
                                     v-model="user.lastname"
@@ -326,7 +326,7 @@ function onClose() {
                             </v-col>
 
                             <!-- Username -->
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="userLabels.username + ' *'"
                                     v-model="user.username"
@@ -344,7 +344,7 @@ function onClose() {
                             </v-col>
 
                             <!-- Phone -->
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="userLabels.phone + ' *'"
                                     v-model="user.phone"
@@ -362,7 +362,7 @@ function onClose() {
                             </v-col>
 
                             <!-- Email -->
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="userLabels.email + ' *'"
                                     v-model="user.email"
@@ -396,7 +396,7 @@ function onClose() {
                             </v-col>
 
                             <!-- role -->
-                            <v-col md="6" sm="12" class="mb-3">
+                            <v-col cols="12" md="6">
                                 <v-select
                                     v-model="user.role"
                                     :items="roles"
@@ -411,7 +411,7 @@ function onClose() {
                             </v-col>
 
                             <!-- New Password -->
-                            <v-col md="6" v-if="editmode" class="mb-3">
+                            <v-col cols="12" md="6" v-if="editmode">
                                 <v-text-field
                                     :label="userLabels.NewPassword + ' *'"
                                     v-model="user.NewPassword"
@@ -426,7 +426,7 @@ function onClose() {
                                 >
                                 </v-text-field>
                             </v-col>
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="userLabels.ci"
                                     v-model="user.ci"
@@ -439,15 +439,18 @@ function onClose() {
                                 </v-text-field>
                             </v-col>
                             <!-- assigned_warehouses -->
-                            <v-col md="4" sm="4">
-                                <h5>Sucursales Asignadas</h5>
+                            <v-col cols="12" sm="4">
+                                <p class="font-weight-bold mt-3">
+                                    Sucursales Asignadas
+                                </p>
                             </v-col>
 
-                            <v-col md="8" sm="8">
+                            <v-col cols="12" sm="8">
                                 <v-checkbox
                                     v-model="user.is_all_warehouses"
                                     :model-value="!!user.is_all_warehouses"
                                     :label="userLabels.is_all_warehouses"
+                                    density="comfortable"
                                     hide-details="auto"
                                 ></v-checkbox>
                                 <v-select
@@ -492,8 +495,9 @@ function onClose() {
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
         <v-row align="center">
-            <v-col>
+            <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="search"
                     prepend-icon="mdi-magnify"
@@ -505,7 +509,7 @@ function onClose() {
                 ></v-text-field>
             </v-col>
             <v-spacer></v-spacer>
-            <v-col cols="auto" class="text-right">
+            <v-col cols="12" sm="auto" class="text-right">
                 <ExportBtn
                     :data="users"
                     :fields="jsonFields"
@@ -521,9 +525,7 @@ function onClose() {
                     Añadir
                 </v-btn>
             </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
+            <v-col cols="12">
                 <v-data-table
                     :headers="fields"
                     :items="users"

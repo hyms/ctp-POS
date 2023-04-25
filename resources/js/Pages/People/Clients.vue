@@ -5,6 +5,7 @@ import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
 import ruleForm from "@/rules";
 import { router } from "@inertiajs/vue3";
+import DeleteDialog from "@/Components/DeleteDialog.vue";
 
 const props = defineProps({
     clients: Array,
@@ -517,11 +518,7 @@ function Pay_return_due(row) {
         <!-- Modal Show Import Clients -->
         <v-dialog v-model="dialogImport" max-width="600px" scrollable>
             <v-card>
-                <v-toolbar
-                    border
-                    density="comfortable"
-                    title="Importar Clientes"
-                >
+                <v-toolbar border density="compact" title="Importar Clientes">
                 </v-toolbar>
                 <v-card-text>
                     <v-form
@@ -541,7 +538,7 @@ function Pay_return_due(row) {
                                 ></v-file-input>
                             </v-col>
 
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-btn
                                     type="submit"
                                     color="primary"
@@ -562,7 +559,7 @@ function Pay_return_due(row) {
                                 </div>
                             </v-col>
 
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-btn
                                     :href="'/import/exemples/import_clients.csv'"
                                     color="info"
@@ -635,7 +632,7 @@ function Pay_return_due(row) {
             <v-card>
                 <v-toolbar
                     border
-                    density="comfortable"
+                    density="compact"
                     title="Detalle del Cliente"
                 ></v-toolbar>
                 <v-card-text>
@@ -644,48 +641,64 @@ function Pay_return_due(row) {
                             <tr>
                                 <!-- Customer Code -->
                                 <td>{{ clientLabel.code }}</td>
-                                <td>{{ client.code }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.code }}
+                                </td>
                             </tr>
                             <tr>
                                 <!-- Customer Company Name -->
                                 <td>{{ clientLabel.company_name }}</td>
-                                <td>{{ client.company_name }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.company_name }}
+                                </td>
                             </tr>
                             <tr>
                                 <!-- Customer Name -->
                                 <td>{{ clientLabel.name }}</td>
-                                <td>{{ client.name }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.name }}
+                                </td>
                             </tr>
                             <tr>
                                 <!-- Customer Phone -->
                                 <td>{{ clientLabel.phone }}</td>
-                                <td>{{ client.phone }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.phone }}
+                                </td>
                             </tr>
                             <tr>
                                 <!-- Customer Email -->
                                 <td>{{ clientLabel.email }}</td>
-                                <td>{{ client.email }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.email }}
+                                </td>
                             </tr>
                             <tr>
                                 <!-- Customer City -->
                                 <td>{{ clientLabel.city }}</td>
-                                <td>{{ client.city }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.city }}
+                                </td>
                             </tr>
                             <tr>
                                 <!-- Customer Adress -->
                                 <td>{{ clientLabel.adresse }}</td>
-                                <td>{{ client.adresse }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.adresse }}
+                                </td>
                             </tr>
                             <tr>
                                 <!-- Tax Number -->
                                 <td>{{ clientLabel.nit_ci }}</td>
-                                <td>{{ client.nit_ci }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.nit_ci }}
+                                </td>
                             </tr>
 
                             <tr>
                                 <!-- Total_Sale_Due -->
                                 <td>Total Deuda</td>
-                                <td>
+                                <td class="font-weight-bold">
                                     Bs
                                     {{ client.due }}
                                 </td>
@@ -724,7 +737,7 @@ function Pay_return_due(row) {
         >
             <v-card>
                 <v-toolbar
-                    density="comfortable"
+                    density="compact"
                     border
                     :title="(editmode ? 'Editar ' : 'Añadir ') + 'Cliente'"
                 ></v-toolbar>
@@ -732,7 +745,7 @@ function Pay_return_due(row) {
                     <v-form @submit.prevent="onSave" ref="form">
                         <v-row>
                             <!-- Customer Name -->
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="clientLabel.name + ' *'"
                                     v-model="client.name"
@@ -746,7 +759,7 @@ function Pay_return_due(row) {
                             </v-col>
 
                             <!-- Customer Company_name -->
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="clientLabel.company_name"
                                     v-model="client.company_name"
@@ -760,7 +773,7 @@ function Pay_return_due(row) {
                             </v-col>
 
                             <!-- Customer Email -->
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="clientLabel.email"
                                     v-model="client.email"
@@ -773,7 +786,7 @@ function Pay_return_due(row) {
                             </v-col>
 
                             <!-- Customer Phone -->
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="clientLabel.phone"
                                     v-model="client.phone"
@@ -786,7 +799,7 @@ function Pay_return_due(row) {
                             </v-col>
 
                             <!-- Customer City -->
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="clientLabel.city"
                                     v-model="client.city"
@@ -799,7 +812,7 @@ function Pay_return_due(row) {
                             </v-col>
 
                             <!-- Customer Tax Number -->
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="clientLabel.nit_ci"
                                     v-model="client.nit_ci"
@@ -851,34 +864,11 @@ function Pay_return_due(row) {
             </v-card>
         </v-dialog>
         <!-- Modal Remove Customer -->
-        <v-dialog v-model="dialogDelete" max-width="300px">
-            <v-card>
-                <v-card-text class="text-h5 text-center"
-                    >Estas seguro?
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        small
-                        variant="elevated"
-                        color="primary"
-                        class="ma-1"
-                        @click="Remove_Client"
-                        >Si
-                    </v-btn>
-                    <v-btn
-                        variant="elevated"
-                        small
-                        color="error"
-                        class="ma-1"
-                        @click="onCloseDelete"
-                        >Cancelar
-                    </v-btn>
-
-                    <v-spacer></v-spacer>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+        <delete-dialog
+            :model="dialogDelete"
+            :on-save="Remove_Client"
+            :on-close="onCloseDelete"
+        ></delete-dialog>
         <v-row align="center">
             <v-col>
                 <v-text-field

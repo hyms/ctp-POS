@@ -74,11 +74,11 @@ function Create_Warehouse() {
             city: warehouse.value.city,
         })
         .then(({ data }) => {
+            dialog.value = false;
             snackbar.value = true;
             snackbarColor.value = "success";
             snackbarText.value = "Proceso exitoso";
             router.reload();
-            dialog.value = false;
         })
         .catch((error) => {
             console.log(error);
@@ -166,11 +166,11 @@ function Remove_Warehouse() {
     axios
         .delete("warehouses/" + warehouse.value.id)
         .then(({ data }) => {
+            dialogDelete.value = false;
             snackbar.value = true;
             snackbarColor.value = "success";
             snackbarText.value = "Borrado exitoso";
             router.reload();
-            dialogDelete.value = false;
         })
         .catch((error) => {
             console.log(error);
@@ -213,7 +213,7 @@ function onCloseDelete() {
             <v-card>
                 <v-toolbar
                     border
-                    density="comfortable"
+                    density="compact"
                     :title="(editmode ? 'Modificar' : 'Nuevo') + ' Almacen'"
                 >
                 </v-toolbar>
@@ -222,7 +222,7 @@ function onCloseDelete() {
                     <v-form ref="form">
                         <v-row>
                             <!-- First name -->
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="warehouseLabels.name + ' *'"
                                     v-model="warehouse.name"
@@ -236,7 +236,7 @@ function onCloseDelete() {
                             </v-col>
 
                             <!-- Last name -->
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="warehouseLabels.mobile"
                                     v-model="warehouse.mobile"
@@ -249,7 +249,7 @@ function onCloseDelete() {
                             </v-col>
 
                             <!-- Username -->
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="warehouseLabels.city"
                                     v-model="warehouse.city"
@@ -262,7 +262,7 @@ function onCloseDelete() {
                             </v-col>
 
                             <!-- Phone -->
-                            <v-col md="6" sm="12">
+                            <v-col cols="12" md="6">
                                 <v-text-field
                                     :label="warehouseLabels.email"
                                     v-model="warehouse.email"
@@ -302,8 +302,8 @@ function onCloseDelete() {
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-row align="center">
-            <v-col>
+        <v-row>
+            <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="search"
                     prepend-icon="mdi-magnify"
@@ -314,8 +314,7 @@ function onCloseDelete() {
                     variant="underlined"
                 ></v-text-field>
             </v-col>
-            <v-spacer></v-spacer>
-            <v-col cols="auto" class="text-right">
+            <v-col cols="12" sm="6" class="text-right">
                 <v-btn
                     size="small"
                     color="primary"
@@ -326,39 +325,38 @@ function onCloseDelete() {
                     Añadir
                 </v-btn>
             </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <v-data-table
-                    :headers="fields"
-                    :items="warehouses"
-                    :search="search"
-                    hover
-                    class="elevation-2"
-                    density="compact"
-                    no-data-text="No existen datos a mostrar"
-                >
-                    <template v-slot:item.actions="{ item }">
-                        <v-btn
-                            class="ma-1"
-                            color="primary"
-                            icon="mdi-pencil"
-                            size="x-small"
-                            variant="outlined"
-                            @click="Edit_Warehouse(item.raw)"
-                        >
-                        </v-btn>
-                        <v-btn
-                            class="ma-1"
-                            color="error"
-                            icon="mdi-delete"
-                            size="x-small"
-                            variant="outlined"
-                            @click="Delete_Warehouse(item.raw)"
-                        >
-                        </v-btn>
-                    </template>
-                </v-data-table>
+            <v-col cols="12">
+                <v-card>
+                    <v-data-table
+                        :headers="fields"
+                        :items="warehouses"
+                        :search="search"
+                        hover
+                        density="compact"
+                        no-data-text="No existen datos a mostrar"
+                    >
+                        <template v-slot:item.actions="{ item }">
+                            <v-btn
+                                class="ma-1"
+                                color="primary"
+                                icon="mdi-pencil"
+                                size="x-small"
+                                variant="outlined"
+                                @click="Edit_Warehouse(item.raw)"
+                            >
+                            </v-btn>
+                            <v-btn
+                                class="ma-1"
+                                color="error"
+                                icon="mdi-delete"
+                                size="x-small"
+                                variant="outlined"
+                                @click="Delete_Warehouse(item.raw)"
+                            >
+                            </v-btn>
+                        </template>
+                    </v-data-table>
+                </v-card>
             </v-col>
         </v-row>
     </Layout>

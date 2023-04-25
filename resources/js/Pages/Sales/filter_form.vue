@@ -34,11 +34,18 @@ onMounted(() => {
 });
 
 function search() {
-    console.log(form.value);
     router.get(
         "/sales",
         {
-            filter: form.value,
+            filter: {
+                start_date: form.value.start_date,
+                end_date: form.value.end_date,
+                sale_ref: form.value.sale_ref,
+                client: form.value.client,
+                sale_type: form.value.sale_type,
+                statut: form.value.statut,
+                status_payment: form.value.status_payment,
+            },
         },
         { replace: true }
     );

@@ -4,6 +4,7 @@ import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import ruleForm from "@/rules";
 import { router } from "@inertiajs/vue3";
+import DeleteDialog from "@/Components/DeleteDialog.vue";
 
 const props = defineProps({
     categories: Array,
@@ -178,12 +179,12 @@ function Remove_Category() {
             :snackbar-color="snackbarColor"
             :snackbar-text="snackbarText"
         ></snackbar>
-        <delete_-category
+        <delete-dialog
             :model="dialogDelete"
             :on-save="Remove_Category"
             :on-close="onCloseDelete"
         >
-        </delete_-category>
+        </delete-dialog>
         <v-dialog
             v-model="dialog"
             max-width="400px"
@@ -193,7 +194,7 @@ function Remove_Category() {
             <v-card>
                 <v-toolbar
                     border
-                    density="comfortable"
+                    density="compact"
                     :title="(editmode ? 'Modificar' : 'Nueva') + ' Categoria'"
                 >
                 </v-toolbar>
@@ -202,7 +203,7 @@ function Remove_Category() {
                     <v-form ref="form">
                         <v-row>
                             <!-- Code category -->
-                            <v-col md="12">
+                            <v-col cols="12">
                                 <v-text-field
                                     :label="categoryLabels.code + ' *'"
                                     v-model="category.code"
@@ -216,7 +217,7 @@ function Remove_Category() {
                             </v-col>
 
                             <!-- Name category -->
-                            <v-col md="12">
+                            <v-col cols="12">
                                 <v-text-field
                                     :label="categoryLabels.name + ' *'"
                                     v-model="category.name"
@@ -258,7 +259,7 @@ function Remove_Category() {
         </v-dialog>
 
         <v-row align="center">
-            <v-col>
+            <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="search"
                     prepend-icon="mdi-magnify"
@@ -269,8 +270,7 @@ function Remove_Category() {
                     variant="underlined"
                 ></v-text-field>
             </v-col>
-            <v-spacer></v-spacer>
-            <v-col cols="auto" class="text-right">
+            <v-col cols="12" sm="6" class="text-right">
                 <v-btn
                     size="small"
                     color="primary"
@@ -283,7 +283,7 @@ function Remove_Category() {
             </v-col>
         </v-row>
         <v-row>
-            <v-col>
+            <v-col cols="12">
                 <v-data-table
                     :headers="fields"
                     :items="categories"

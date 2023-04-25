@@ -231,7 +231,7 @@ function Remove_Unit() {
             <v-card>
                 <v-toolbar
                     border
-                    density="comfortable"
+                    density="compact"
                     :title="(editmode ? 'Modificar' : 'Nueva') + ' Unidad'"
                 >
                 </v-toolbar>
@@ -240,7 +240,7 @@ function Remove_Unit() {
                     <v-form ref="form">
                         <v-row>
                             <!-- Name -->
-                            <v-col md="12">
+                            <v-col cols="12">
                                 <v-text-field
                                     :label="unitLabels.name + ' *'"
                                     v-model="unit.name"
@@ -257,7 +257,7 @@ function Remove_Unit() {
                                 </v-text-field>
                             </v-col>
                             <!-- ShortName -->
-                            <v-col md="12">
+                            <v-col cols="12">
                                 <v-text-field
                                     :label="unitLabels.ShortName + ' *'"
                                     v-model="unit.ShortName"
@@ -274,7 +274,7 @@ function Remove_Unit() {
                                 </v-text-field>
                             </v-col>
                             <!-- Base unit -->
-                            <v-col md="12">
+                            <v-col cols="12">
                                 <v-select
                                     @update:modelValue="Selected_Base_Unit"
                                     v-model="unit.base_unit"
@@ -289,7 +289,7 @@ function Remove_Unit() {
                                 ></v-select>
                             </v-col>
                             <!-- operator  -->
-                            <v-col md="12" v-if="show_operator">
+                            <v-col cols="12" v-if="show_operator">
                                 <v-select
                                     v-model="unit.operator"
                                     :items="[
@@ -309,7 +309,7 @@ function Remove_Unit() {
                             </v-col>
 
                             <!-- Operation Value -->
-                            <v-col md="12" v-if="show_operator">
+                            <v-col cols="12" v-if="show_operator">
                                 <v-text-field
                                     :label="unitLabels.operator_value + ' *'"
                                     v-model="unit.operator_value"
@@ -355,7 +355,7 @@ function Remove_Unit() {
         </v-dialog>
 
         <v-row align="center">
-            <v-col>
+            <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="search"
                     prepend-icon="mdi-magnify"
@@ -366,8 +366,7 @@ function Remove_Unit() {
                     variant="underlined"
                 ></v-text-field>
             </v-col>
-            <v-spacer></v-spacer>
-            <v-col cols="auto" class="text-right">
+            <v-col cols="12" sm="6" class="text-right">
                 <v-btn
                     size="small"
                     color="primary"
@@ -380,7 +379,7 @@ function Remove_Unit() {
             </v-col>
         </v-row>
         <v-row>
-            <v-col>
+            <v-col cols="12">
                 <v-data-table
                     :headers="fields"
                     :items="units"

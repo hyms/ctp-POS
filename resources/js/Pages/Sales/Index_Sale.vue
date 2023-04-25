@@ -566,11 +566,11 @@ function Remove_Sale(id, sale_has_return) {
                             <v-table density="compact" hover>
                                 <thead>
                                     <tr>
-                                        <th scope="col">Fecha</th>
-                                        <th scope="col">Codigo</th>
-                                        <th scope="col">Monto</th>
-                                        <th scope="col">PagadoPor</th>
-                                        <th scope="col">Accion</th>
+                                        <th>Fecha</th>
+                                        <th>Codigo</th>
+                                        <th>Monto</th>
+                                        <th>Pagado en</th>
+                                        <th>Accion</th>
                                     </tr>
                                 </thead>
                                 <tbody>
