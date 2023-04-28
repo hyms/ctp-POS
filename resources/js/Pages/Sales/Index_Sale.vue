@@ -640,17 +640,6 @@ function Remove_Sale(id, sale_has_return) {
             </v-card>
         </v-dialog>
         <v-row align="center" class="mb-3">
-            <v-col>
-                <v-text-field
-                    v-model="search"
-                    prepend-icon="mdi-magnify"
-                    density="compact"
-                    hide-details
-                    label="Buscar"
-                    single-line
-                    variant="underlined"
-                ></v-text-field>
-            </v-col>
             <v-spacer></v-spacer>
             <v-col cols="auto" class="text-right">
                 <filter_form

@@ -676,7 +676,9 @@ class SalesController extends Controller
 
         $company = Setting::where('deleted_at', '=', null)->first();
 
-        return response()->json([
+
+        Inertia::share('titlePage', 'Lista de Ordenes');
+        return Inertia::render('Sales/Detail_Sale', [
             'details' => $details,
             'sale' => $sale_details,
             'company' => $company,
