@@ -116,7 +116,7 @@ function Delete_Sale() {}
                         <v-row class="justify-content-md-center">
                             <v-col cols="12 text-center mb-3">
                                 <p class="font-weight-bold text-h5">
-                                    Detalle de Venta : {{ sale.Ref }}
+                                    Detalle de Orden : {{ sale.Ref }}
                                 </p>
                             </v-col>
                         </v-row>

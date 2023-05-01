@@ -17,9 +17,7 @@ const loadingFilter = ref(false);
 const snackbar = ref(false);
 const snackbarText = ref("");
 const snackbarColor = ref("info");
-const focused = ref(false);
 const search_input = ref("");
-const timer = ref(null);
 const products = ref([]);
 const detailsForm = ref([]);
 const adjustmentForm = ref({
@@ -44,9 +42,7 @@ const product = ref({
     product_variant_id: "",
     unit: "",
 });
-const symbol = ref("");
 const editmode = ref(false);
-const search = ref("");
 
 function resetForm() {
     adjustmentForm.value = {

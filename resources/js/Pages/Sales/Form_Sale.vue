@@ -1,3 +1,489 @@
+<script setup>
+import { ref, onMounted, watch } from "vue";
+import Layout from "@/Layouts/Authenticated.vue";
+import { router } from "@inertiajs/vue3";
+import ruleForm from "@/rules";
+import Snackbar from "@/Components/snackbar.vue";
+import Vue3TagsInput from "vue3-tags-input";
+
+const props = defineProps({
+    clients: Object,
+    warehouses: Object,
+    sale: { type: Object, default: null },
+    errors: Object,
+});
+
+const form = ref(null);
+const loading = ref(false);
+const loadingFilter = ref(false);
+const snackbar = ref(false);
+const snackbarText = ref("");
+const snackbarColor = ref("info");
+const search_input = ref("");
+
+const client = ref({});
+const products = ref([]);
+const detailsForm = ref([]);
+const detail = ref({});
+const payment = ref({
+    status: "pending",
+    Reglement: "Cash",
+    amount: "",
+    received_amount: "",
+});
+const sales = ref([]);
+const saleForm = ref({
+    id: "",
+    date: new Date().toISOString().slice(0, 10),
+    statut: "completed",
+    notes: "",
+    client_id: "",
+    warehouse_id: "",
+    tax_rate: 0,
+    TaxNet: 0,
+    shipping: 0,
+    discount: 0,
+});
+const total = ref(0);
+const GrandTotal = ref(0);
+const units = ref([]);
+const product = ref({
+    id: "",
+    code: "",
+    stock: "",
+    quantity: 1,
+    discount: "",
+    DiscountNet: "",
+    discount_Method: "",
+    name: "",
+    sale_unit_id: "",
+    fix_stock: "",
+    fix_price: "",
+    unitSale: "",
+    Net_price: "",
+    Unit_price: "",
+    Total_price: "",
+    subtotal: "",
+    product_id: "",
+    detail_id: "",
+    taxe: "",
+    tax_percent: "",
+    tax_method: "",
+    product_variant_id: "",
+    is_imei: "",
+    imei_number: "",
+});
+
+//---------------------- Event Select Payment Status ------------------------------\\
+
+function Selected_PaymentStatus(value) {
+    if (value == "paid") {
+        let payment_amount = GrandTotal.value.toFixed(2);
+        payment.value.amount = ruleForm.formatNumber(payment_amount, 2);
+        payment.value.received_amount = ruleForm.formatNumber(
+            payment_amount,
+            2
+        );
+    } else {
+        payment.value.amount = 0;
+        payment.value.received_amount = 0;
+    }
+}
+
+//---------- keyup paid Amount
+
+function Verified_paidAmount() {
+    snackbar.value = false;
+    if (isNaN(payment.value.amount)) {
+        payment.value.amount = 0;
+    } else if (payment.value.amount > payment.value.received_amount) {
+        snackbar.value = true;
+        snackbarText.value = "Pago es mayor al monto recibido";
+        snackbarColor.value = "warning";
+        payment.value.amount = 0;
+    } else if (payment.value.amount > GrandTotal.value) {
+        snackbar.value = true;
+        snackbarText.value = "Pago es mayor al monto total";
+        snackbarColor.value = "warning";
+        payment.value.amount = 0;
+    }
+}
+
+//---------- keyup Received Amount
+
+function Verified_Received_Amount() {
+    if (isNaN(payment.value.received_amount)) {
+        payment.value.received_amount = 0;
+    }
+}
+
+//--- Submit Validate Create Sale
+async function Submit_Sale() {
+    snackbar.value = false;
+    const validate = await form.value.validate();
+    if (validate.valid) {
+        snackbar.value = true;
+        snackbarText.value = "llene el formulario correctamente";
+        snackbarColor.value = "error";
+    } else if (payment.value.amount > payment.value.received_amount) {
+        snackbar.value = true;
+        snackbarText.value = "el monto a pagar es mayor al monto recibido";
+        snackbarColor.value = "warning";
+        payment.value.received_amount = 0;
+    } else if (payment.value.amount > GrandTotal.value) {
+        snackbar.value = true;
+        snackbarText.value = "el monto a pagar es mayor al monto total";
+        snackbarColor.value = "warning";
+        payment.value.amount = 0;
+    } else {
+        Create_Sale();
+    }
+}
+//---------------------- get_units ------------------------------\\
+function get_units(value) {
+    axios
+        .get("/get_units?id=" + value)
+        .then(({ data }) => (units.value = data));
+}
+
+//------ Show Modal Update Detail Product
+function Modal_Updat_Detail(item) {
+    detail.value = {};
+    get_units(item.product_id);
+    detail.value.detail_id = item.detail_id;
+    detail.value.sale_unit_id = item.sale_unit_id;
+    detail.value.name = item.name;
+    detail.value.Unit_price = item.Unit_price;
+    detail.value.fix_price = item.fix_price;
+    detail.value.fix_stock = item.fix_stock;
+    detail.value.stock = item.stock;
+    detail.value.tax_method = item.tax_method;
+    detail.value.discount_Method = item.discount_Method;
+    detail.value.discount = item.discount;
+    detail.value.quantity = item.quantity;
+    detail.value.tax_percent = item.tax_percent;
+}
+
+//------ Submit Update Detail Product
+
+function Update_Detail() {
+    loading.value = true;
+    for (let i = 0; i < details.value.length; i++) {
+        if (details.value[i].detail_id === detail.value.detail_id) {
+            // this.convert_unit();
+            for (let k = 0; k < units.value.length; k++) {
+                if (units.value[k].id == detail.value.sale_unit_id) {
+                    if (units.value[k].operator == "/") {
+                        details.value[i].stock =
+                            detail.value.fix_stock *
+                            units.value[k].operator_value;
+                        details.value[i].unitSale = units.value[k].ShortName;
+                    } else {
+                        details.value[i].stock =
+                            detail.value.fix_stock /
+                            units.value[k].operator_value;
+                        details.value[i].unitSale = units.value[k].ShortName;
+                    }
+                }
+            }
+
+            if (details.value[i].stock < details.value[i].quantity) {
+                details.value[i].quantity = details.value[i].stock;
+            } else {
+                details.value[i].quantity = 1;
+            }
+
+            details.value[i].Unit_price = detail.value.Unit_price;
+            details.value[i].tax_percent = detail.value.tax_percent;
+            details.value[i].tax_method = detail.value.tax_method;
+            details.value[i].discount_Method = detail.value.discount_Method;
+            details.value[i].discount = detail.value.discount;
+            details.value[i].sale_unit_id = detail.value.sale_unit_id;
+            details.value[i].imei_number = detail.value.imei_number;
+
+            if (details.value[i].discount_Method == "2") {
+                //Fixed
+                details.value[i].DiscountNet = details.value[i].discount;
+            } else {
+                //Percentage %
+                details.value[i].DiscountNet = parseFloat(
+                    (details.value[i].Unit_price * details.value[i].discount) /
+                        100
+                );
+            }
+
+            if (details.value[i].tax_method == "1") {
+                //Exclusive
+                details.value[i].Net_price = parseFloat(
+                    details.value[i].Unit_price - details.value[i].DiscountNet
+                );
+
+                details.value[i].taxe = parseFloat(
+                    (details.value[i].tax_percent *
+                        (details.value[i].Unit_price -
+                            details.value[i].DiscountNet)) /
+                        100
+                );
+            } else {
+                //Inclusive
+                details.value[i].Net_price = parseFloat(
+                    (details.value[i].Unit_price -
+                        details.value[i].DiscountNet) /
+                        (details.value[i].tax_percent / 100 + 1)
+                );
+
+                details.value[i].taxe = parseFloat(
+                    details.value[i].Unit_price -
+                        details.value[i].Net_price -
+                        details.value[i].DiscountNet
+                );
+            }
+        }
+    }
+    Calcul_Total();
+
+    //form_Update_Detail
+}
+
+//------------------------- get Result Value Search Product
+
+function getResultValue(result) {
+    return result.code + " " + "(" + result.name + ")";
+}
+
+//---------------------- Event Select Warehouse ------------------------------\\
+function Selected_Warehouse(value) {
+    search_input.value = "";
+    product_filter.value = [];
+    Get_Products_By_Warehouse(value);
+}
+
+//------------------------------------ Get Products By Warehouse -------------------------\\
+
+//------------------------------------ Get Products By Warehouse -------------------------\\
+
+function Get_Products_By_Warehouse(id) {
+    axios
+        .get("/get_Products_by_warehouse/" + id + "?stock=" + 0)
+        .then((response) => {
+            products.value = response.data;
+        })
+        .catch((error) => {});
+}
+
+//----------------------------------------- Add Product to order list -------------------------\\
+function add_product() {
+    if (details.value.length > 0) {
+        Last_Detail_id();
+    } else if (details.value.length === 0) {
+        product.value.detail_id = 1;
+    }
+
+    details.value.push(product.value);
+}
+
+//-----------------------------------Verified QTY ------------------------------\\
+function Verified_Qty(detail, id) {
+    for (let i = 0; i < details.value.length; i++) {
+        if (details.value[i].detail_id === id) {
+            if (isNaN(detail.quantity)) {
+                details.value[i].quantity = detail.stock;
+            }
+
+            if (detail.quantity > detail.stock) {
+                snackbar.value = true;
+                snackbarText.value = "bajo stock";
+                snackbarColor.value = "warning";
+                details.value[i].quantity = detail.stock;
+            } else {
+                details.value[i].quantity = detail.quantity;
+            }
+        }
+    }
+    Calcul_Total();
+}
+
+//-----------------------------------increment QTY ------------------------------\\
+
+function increment(detail, id) {
+    for (let i = 0; i < details.value.length; i++) {
+        if (details.value[i].detail_id == id) {
+            if (detail.quantity + 1 > detail.stock) {
+                snackbar.value = true;
+                snackbarText.value = "bajo stock";
+                snackbarColor.value = "warning";
+            } else {
+                ruleForm.formatNumber(details.value[i].quantity++, 2);
+            }
+        }
+    }
+    Calcul_Total();
+}
+
+//-----------------------------------decrement QTY ------------------------------\\
+
+function decrement(detail, id) {
+    for (let i = 0; i < details.value.length; i++) {
+        if (details.value[i].detail_id == id) {
+            if (detail.quantity - 1 > 0) {
+                if (detail.quantity - 1 > detail.stock) {
+                    snackbar.value = true;
+                    snackbarText.value = "bajo stock";
+                    snackbarColor.value = "warning";
+                } else {
+                    ruleForm.formatNumber(details.value[i].quantity--, 2);
+                }
+            }
+        }
+    }
+    Calcul_Total();
+}
+
+//-----------------------------------------Calcul Total ------------------------------\\
+function Calcul_Total() {
+    total.value = 0;
+    for (let i = 0; i < details.value.length; i++) {
+        let tax = details.value[i].taxe * details.value[i].quantity;
+        details.value[i].subtotal = parseFloat(
+            details.value[i].quantity * details.value[i].Net_price + tax
+        );
+        total.value = parseFloat(total.value + details.value[i].subtotal);
+    }
+
+    const total_without_discount = parseFloat(
+        total.value - sale.value.discount
+    );
+    sale.value.TaxNet = parseFloat(
+        (total_without_discount * sale.value.tax_rate) / 100
+    );
+    GrandTotal.value = parseFloat(
+        total_without_discount + sale.value.TaxNet + sale.value.shipping
+    );
+
+    let grand_total = GrandTotal.value.toFixed(2);
+    GrandTotal.value = parseFloat(grand_total);
+
+    if (payment.value.status == "paid") {
+        payment.value.amount = this.formatNumber(GrandTotal.value, 2);
+    }
+}
+
+// -----------------------------------Delete Detail Product ------------------------------\\
+function delete_Product_Detail(id) {
+    for (let i = 0; i < details.value.length; i++) {
+        if (id === details.value[i].detail_id) {
+            details.value.splice(i, 1);
+            Calcul_Total();
+        }
+    }
+}
+
+//-----------------------------------verified Order List ------------------------------\\
+function verifiedForm() {
+    if (details.value.length <= 0) {
+        snackbar.value = true;
+        snackbarText.value = "debes añadir un producto";
+        snackbarColor.value = "warning";
+        return false;
+    } else {
+        let count = 0;
+        for (let i = 0; i < details.value.length; i++) {
+            if (
+                details.value[i].quantity == "" ||
+                details.value[i].quantity === 0
+            ) {
+                count += 1;
+            }
+        }
+
+        if (count > 0) {
+            snackbar.value = true;
+            snackbarText.value = "Debes añadir cantidades";
+            snackbarColor.value = "warning";
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+
+//--------------------------------- Create Sale -------------------------\\
+function Create_Sale() {
+    if (verifiedForm()) {
+        loading.value = true;
+        snackbar.value = false;
+        payment.valueProcessing = true;
+        axios
+            .post("sales", {
+                date: sale.value.date,
+                client_id: sale.value.client_id,
+                warehouse_id: sale.value.warehouse_id,
+                statut: sale.value.statut,
+                notes: sale.value.notes,
+                tax_rate: sale.value.tax_rate ? sale.value.tax_rate : 0,
+                TaxNet: sale.value.TaxNet ? sale.value.TaxNet : 0,
+                discount: sale.value.discount ? sale.value.discount : 0,
+                shipping: sale.value.shipping ? sale.value.shipping : 0,
+                GrandTotal: GrandTotal.value,
+                details: details.value,
+                payment: payment.value,
+                amount: parseFloat(payment.value.amount).toFixed(2),
+                received_amount: parseFloat(
+                    payment.value.received_amount
+                ).toFixed(2),
+                change: parseFloat(
+                    payment.value.received_amount - payment.value.amount
+                ).toFixed(2),
+            })
+            .then((response) => {
+                snackbar.value = true;
+                snackbarText.value = "compra exitosa";
+                snackbarColor.value = "success";
+                payment.valueProcessing = false;
+                router.visit("/sales");
+            })
+            .catch((error) => {
+                snackbar.value = true;
+                snackbarText.value = "Pago invalido";
+                snackbarColor.value = "error";
+            })
+            .finally(() => {
+                loading.value = false;
+            });
+    }
+}
+
+//-------------------------------- Get Last Detail Id -------------------------\\
+function Last_Detail_id() {
+    product.value.detail_id = 0;
+    let len = details.value.length;
+    product.value.detail_id = details.value[len - 1].detail_id + 1;
+}
+
+//---------------------------------Get Product Details ------------------------\\
+
+function Get_Product_Details(product_id) {
+    axios.get("/products/" + product_id).then((response) => {
+        product.value.discount = 0;
+        product.value.DiscountNet = 0;
+        product.value.discount_Method = "2";
+        product.value.product_id = response.data.id;
+        product.value.name = response.data.name;
+        product.value.Net_price = response.data.Net_price;
+        product.value.Unit_price = response.data.Unit_price;
+        product.value.taxe = response.data.tax_price;
+        product.value.tax_method = response.data.tax_method;
+        product.value.tax_percent = response.data.tax_percent;
+        product.value.unitSale = response.data.unitSale;
+        product.value.fix_price = response.data.fix_price;
+        product.value.sale_unit_id = response.data.sale_unit_id;
+        product.value.is_imei = response.data.is_imei;
+        product.value.imei_number = "";
+        add_product();
+        Calcul_Total();
+    });
+}
+</script>
 <template>
     <!--  <div class="main-content">-->
     <!--    <breadcumb :page="$t('AddSale')" :folder="$t('ListSales')"/>-->
@@ -584,792 +1070,3 @@
     <!--    </validation-observer>-->
     <!--  </div>-->
 </template>
-
-<script>
-// import { mapActions, mapGetters } from "vuex";
-// import NProgress from "nprogress";
-// import { loadStripe } from "@stripe/stripe-js";
-//
-// export default {
-//   metaInfo: {
-//     title: "Create Sale"
-//   },
-//   data() {
-//     return {
-//       focused: false,
-//       timer:null,
-//       search_input:'',
-//       product_filter:[],
-//       stripe_key:'',
-//       stripe: {},
-//       cardElement: {},
-//       paymentProcessing: false,
-//       Submit_Processing_detail:false,
-//       isLoading: true,
-//       warehouses: [],
-//       clients: [],
-//       client: {},
-//       products: [],
-//       details: [],
-//       detail: {},
-//       sales: [],
-//       payment: {
-//         status: "pending",
-//         Reglement: "Cash",
-//         amount: "",
-//         received_amount: "",
-//       },
-//       sale: {
-//         id: "",
-//         date: new Date().toISOString().slice(0, 10),
-//         statut: "completed",
-//         notes: "",
-//         client_id: "",
-//         warehouse_id: "",
-//         tax_rate: 0,
-//         TaxNet: 0,
-//         shipping: 0,
-//         discount: 0
-//       },
-//       timer:null,
-//       total: 0,
-//       GrandTotal: 0,
-//       units:[],
-//       product: {
-//         id: "",
-//         code: "",
-//         stock: "",
-//         quantity: 1,
-//         discount: "",
-//         DiscountNet: "",
-//         discount_Method: "",
-//         name: "",
-//         sale_unit_id:"",
-//         fix_stock:"",
-//         fix_price:"",
-//         unitSale: "",
-//         Net_price: "",
-//         Unit_price: "",
-//         Total_price: "",
-//         subtotal: "",
-//         product_id: "",
-//         detail_id: "",
-//         taxe: "",
-//         tax_percent: "",
-//         tax_method: "",
-//         product_variant_id: "",
-//         is_imei: "",
-//         imei_number:"",
-//       }
-//     };
-//   },
-//
-//   computed: {
-//     ...mapGetters(["currentUser"])
-//   },
-//
-//
-//
-//   methods: {
-//
-//
-//     async loadStripe_payment() {
-//       this.stripe = await loadStripe(`${this.stripe_key}`);
-//       const elements = this.stripe.elements();
-//
-//       this.cardElement = elements.create("card", {
-//         classes: {
-//           base:
-//             "bg-gray-100 rounded border border-gray-300 focus:border-indigo-500 text-base outline-none text-gray-700 p-3 leading-8 transition-colors duration-200 ease-in-out"
-//         }
-//       });
-//
-//       this.cardElement.mount("#card-element");
-//     },
-//
-//      handleFocus() {
-//       this.focused = true
-//     },
-//
-//     handleBlur() {
-//       this.focused = false
-//     },
-//
-//
-//      //---------------------- Event Select Payment Method ------------------------------\\
-//
-//     Selected_PaymentMethod(value) {
-//       if (value == "credit card") {
-//         setTimeout(() => {
-//           this.loadStripe_payment();
-//         }, 500);
-//       }
-//     },
-//
-//     //---------------------- Event Select Payment Status ------------------------------\\
-//
-//     Selected_PaymentStatus(value){
-//       if (value == "paid") {
-//         var payment_amount = this.GrandTotal.toFixed(2);
-//         this.payment.amount = this.formatNumber(payment_amount, 2);
-//         this.payment.received_amount = this.formatNumber(payment_amount, 2);
-//       }else{
-//         this.payment.amount = 0;
-//         this.payment.received_amount = 0;
-//       }
-//     },
-//
-//     //---------- keyup paid Amount
-//
-//     Verified_paidAmount() {
-//       if (isNaN(this.payment.amount)) {
-//         this.payment.amount = 0;
-//       } else if (this.payment.amount > this.payment.received_amount) {
-//           this.makeToast(
-//             "warning",
-//             this.$t("Paying_amount_is_greater_than_Received_amount"),
-//             this.$t("Warning")
-//           );
-//           this.payment.amount = 0;
-//       }
-//       else if (this.payment.amount > this.GrandTotal) {
-//         this.makeToast(
-//           "warning",
-//           this.$t("Paying_amount_is_greater_than_Grand_Total"),
-//           this.$t("Warning")
-//         );
-//         this.payment.amount = 0;
-//       }
-//     },
-//
-//     //---------- keyup Received Amount
-//
-//     Verified_Received_Amount() {
-//       if (isNaN(this.payment.received_amount)) {
-//         this.payment.received_amount = 0;
-//       }
-//     },
-//
-//
-//
-//     //--- Submit Validate Create Sale
-//     Submit_Sale() {
-//       this.$refs.create_sale.validate().then(success => {
-//         if (!success) {
-//           this.makeToast(
-//             "danger",
-//             this.$t("Please_fill_the_form_correctly"),
-//             this.$t("Failed")
-//           );
-//         } else if (this.payment.amount > this.payment.received_amount) {
-//           this.makeToast(
-//             "warning",
-//             this.$t("Paying_amount_is_greater_than_Received_amount"),
-//             this.$t("Warning")
-//           );
-//           this.payment.received_amount = 0;
-//         }
-//           else if (this.payment.amount > this.GrandTotal) {
-//             this.makeToast(
-//               "warning",
-//               this.$t("Paying_amount_is_greater_than_Grand_Total"),
-//               this.$t("Warning")
-//             );
-//             this.payment.amount = 0;
-//           }else{
-//             this.Create_Sale();
-//           }
-//       });
-//     },
-//     //---Submit Validation Update Detail
-//     submit_Update_Detail() {
-//       this.$refs.Update_Detail.validate().then(success => {
-//         if (!success) {
-//           return;
-//         } else {
-//           this.Update_Detail();
-//         }
-//       });
-//     },
-//     //---Validate State Fields
-//     getValidationState({ dirty, validated, valid = null }) {
-//       return dirty || validated ? valid : null;
-//     },
-//
-//     //------ Toast
-//     makeToast(variant, msg, title) {
-//       this.$root.$bvToast.toast(msg, {
-//         title: title,
-//         variant: variant,
-//         solid: true
-//       });
-//     },
-//
-//     //---------------------- get_units ------------------------------\\
-//     get_units(value) {
-//       axios
-//         .get("get_units?id=" + value)
-//         .then(({ data }) => (this.units = data));
-//     },
-//
-//     //------ Show Modal Update Detail Product
-//     Modal_Updat_Detail(detail) {
-//       NProgress.start();
-//       NProgress.set(0.1);
-//       this.detail = {};
-//       this.get_units(detail.product_id);
-//       this.detail.detail_id = detail.detail_id;
-//       this.detail.sale_unit_id = detail.sale_unit_id;
-//       this.detail.name = detail.name;
-//       this.detail.Unit_price = detail.Unit_price;
-//       this.detail.fix_price = detail.fix_price;
-//       this.detail.fix_stock = detail.fix_stock;
-//       this.detail.stock = detail.stock;
-//       this.detail.tax_method = detail.tax_method;
-//       this.detail.discount_Method = detail.discount_Method;
-//       this.detail.discount = detail.discount;
-//       this.detail.quantity = detail.quantity;
-//       this.detail.tax_percent = detail.tax_percent;
-//       this.detail.is_imei = detail.is_imei;
-//       this.detail.imei_number = detail.imei_number;
-//
-//        setTimeout(() => {
-//         NProgress.done();
-//         this.$bvModal.show("form_Update_Detail");
-//       }, 1000);
-//     },
-//
-//
-//     //------ Submit Update Detail Product
-//
-//     Update_Detail() {
-//       NProgress.start();
-//       NProgress.set(0.1);
-//       this.Submit_Processing_detail = true;
-//       for (var i = 0; i < this.details.length; i++) {
-//         if (this.details[i].detail_id === this.detail.detail_id) {
-//
-//           // this.convert_unit();
-//            for(var k=0; k<this.units.length; k++){
-//               if (this.units[k].id == this.detail.sale_unit_id) {
-//                 if(this.units[k].operator == '/'){
-//                   this.details[i].stock       = this.detail.fix_stock  * this.units[k].operator_value;
-//                   this.details[i].unitSale    = this.units[k].ShortName;
-//
-//                 }else{
-//                   this.details[i].stock       = this.detail.fix_stock  / this.units[k].operator_value;
-//                   this.details[i].unitSale    = this.units[k].ShortName;
-//                 }
-//               }
-//             }
-//
-//             if (this.details[i].stock < this.details[i].quantity) {
-//               this.details[i].quantity = this.details[i].stock;
-//             } else {
-//               this.details[i].quantity =1;
-//             }
-//
-//           this.details[i].Unit_price = this.detail.Unit_price;
-//           this.details[i].tax_percent = this.detail.tax_percent;
-//           this.details[i].tax_method = this.detail.tax_method;
-//           this.details[i].discount_Method = this.detail.discount_Method;
-//           this.details[i].discount = this.detail.discount;
-//           this.details[i].sale_unit_id = this.detail.sale_unit_id;
-//           this.details[i].imei_number = this.detail.imei_number;
-//
-//           if (this.details[i].discount_Method == "2") {
-//             //Fixed
-//             this.details[i].DiscountNet = this.details[i].discount;
-//           } else {
-//             //Percentage %
-//             this.details[i].DiscountNet = parseFloat(
-//               (this.details[i].Unit_price * this.details[i].discount) / 100
-//             );
-//           }
-//
-//           if (this.details[i].tax_method == "1") {
-//             //Exclusive
-//             this.details[i].Net_price = parseFloat(
-//               this.details[i].Unit_price - this.details[i].DiscountNet
-//             );
-//
-//             this.details[i].taxe = parseFloat(
-//               (this.details[i].tax_percent *
-//                 (this.details[i].Unit_price - this.details[i].DiscountNet)) /
-//                 100
-//             );
-//           } else {
-//             //Inclusive
-//             this.details[i].Net_price = parseFloat(
-//               (this.details[i].Unit_price - this.details[i].DiscountNet) /
-//                 (this.details[i].tax_percent / 100 + 1)
-//             );
-//
-//             this.details[i].taxe = parseFloat(
-//               this.details[i].Unit_price -
-//                 this.details[i].Net_price -
-//                 this.details[i].DiscountNet
-//             );
-//           }
-//
-//           this.$forceUpdate();
-//         }
-//       }
-//       this.Calcul_Total();
-//
-//       setTimeout(() => {
-//         NProgress.done();
-//         this.Submit_Processing_detail = false;
-//         this.$bvModal.hide("form_Update_Detail");
-//       }, 1000);
-//
-//     },
-//
-//
-//
-//     // Search Products
-//     search(){
-//
-//       if (this.timer) {
-//             clearTimeout(this.timer);
-//             this.timer = null;
-//       }
-//
-//       if (this.search_input.length < 1) {
-//
-//         return this.product_filter= [];
-//       }
-//       if (this.sale.warehouse_id != "" &&  this.sale.warehouse_id != null) {
-//         this.timer = setTimeout(() => {
-//           const product_filter = this.products.filter(product => product.code === this.search_input || product.barcode.includes(this.search_input));
-//             if(product_filter.length === 1){
-//                 this.SearchProduct(product_filter[0])
-//             }else{
-//                 this.product_filter=  this.products.filter(product => {
-//                   return (
-//                     product.name.toLowerCase().includes(this.search_input.toLowerCase()) ||
-//                     product.code.toLowerCase().includes(this.search_input.toLowerCase()) ||
-//                     product.barcode.toLowerCase().includes(this.search_input.toLowerCase())
-//                     );
-//                 });
-//             }
-//         }, 800);
-//       } else {
-//         this.makeToast(
-//           "warning",
-//           this.$t("SelectWarehouse"),
-//           this.$t("Warning")
-//         );
-//       }
-//
-//     },
-//
-//     //------------------------- get Result Value Search Product
-//
-//     getResultValue(result) {
-//       return result.code + " " + "(" + result.name + ")";
-//     },
-//
-//     //------------------------- Submit Search Product
-//
-//     SearchProduct(result) {
-//       this.product = {};
-//       if (
-//         this.details.length > 0 &&
-//         this.details.some(detail => detail.code === result.code)
-//       ) {
-//         this.makeToast("warning", this.$t("AlreadyAdd"), this.$t("Warning"));
-//       } else {
-//         this.product.code = result.code;
-//         this.product.stock = result.qte_sale;
-//         this.product.fix_stock = result.qte;
-//         if (result.qte_sale < 1) {
-//           this.product.quantity = result.qte_sale;
-//         } else {
-//           this.product.quantity = 1;
-//         }
-//         this.product.product_variant_id = result.product_variant_id;
-//         this.Get_Product_Details(result.id);
-//       }
-//
-//       this.search_input= '';
-//       this.$refs.product_autocomplete.value = "";
-//       this.product_filter = [];
-//     },
-//
-//     //---------------------- Event Select Warehouse ------------------------------\\
-//     Selected_Warehouse(value) {
-//       this.search_input= '';
-//       this.product_filter = [];
-//       this.Get_Products_By_Warehouse(value);
-//     },
-//
-//      //------------------------------------ Get Products By Warehouse -------------------------\\
-//
-//     Get_Products_By_Warehouse(id) {
-//       // Start the progress bar.
-//         NProgress.start();
-//         NProgress.set(0.1);
-//       axios
-//         .get("get_Products_by_warehouse/" + id + "?stock=" + 1 + "&is_sale=" + 1)
-//          .then(response => {
-//             this.products = response.data;
-//              NProgress.done();
-//
-//             })
-//           .catch(error => {
-//           });
-//     },
-//
-//     //----------------------------------------- Add Product to order list -------------------------\\
-//     add_product() {
-//       if (this.details.length > 0) {
-//         this.Last_Detail_id();
-//       } else if (this.details.length === 0) {
-//         this.product.detail_id = 1;
-//       }
-//
-//       this.details.push(this.product);
-//       if(this.product.is_imei){
-//         this.Modal_Updat_Detail(this.product);
-//       }
-//     },
-//
-//     //-----------------------------------Verified QTY ------------------------------\\
-//     Verified_Qty(detail, id) {
-//       for (var i = 0; i < this.details.length; i++) {
-//         if (this.details[i].detail_id === id) {
-//           if (isNaN(detail.quantity)) {
-//             this.details[i].quantity = detail.stock;
-//           }
-//
-//           if (detail.quantity > detail.stock) {
-//             this.makeToast("warning", this.$t("LowStock"), this.$t("Warning"));
-//             this.details[i].quantity = detail.stock;
-//           } else {
-//             this.details[i].quantity = detail.quantity;
-//           }
-//         }
-//       }
-//       this.$forceUpdate();
-//       this.Calcul_Total();
-//     },
-//
-//     //-----------------------------------increment QTY ------------------------------\\
-//
-//     increment(detail, id) {
-//       for (var i = 0; i < this.details.length; i++) {
-//         if (this.details[i].detail_id == id) {
-//           if (detail.quantity + 1 > detail.stock) {
-//             this.makeToast("warning", this.$t("LowStock"), this.$t("Warning"));
-//           } else {
-//             this.formatNumber(this.details[i].quantity++, 2);
-//           }
-//         }
-//       }
-//       this.$forceUpdate();
-//       this.Calcul_Total();
-//     },
-//
-//     //-----------------------------------decrement QTY ------------------------------\\
-//
-//     decrement(detail, id) {
-//       for (var i = 0; i < this.details.length; i++) {
-//         if (this.details[i].detail_id == id) {
-//           if (detail.quantity - 1 > 0) {
-//             if (detail.quantity - 1 > detail.stock) {
-//               this.makeToast(
-//                 "warning",
-//                 this.$t("LowStock"),
-//                 this.$t("Warning")
-//               );
-//             } else {
-//               this.formatNumber(this.details[i].quantity--, 2);
-//             }
-//           }
-//         }
-//       }
-//       this.$forceUpdate();
-//       this.Calcul_Total();
-//     },
-//
-//     //------------------------------Formetted Numbers -------------------------\\
-//     formatNumber(number, dec) {
-//       const value = (typeof number === "string"
-//         ? number
-//         : number.toString()
-//       ).split(".");
-//       if (dec <= 0) return value[0];
-//       let formated = value[1] || "";
-//       if (formated.length > dec)
-//         return `${value[0]}.${formated.substr(0, dec)}`;
-//       while (formated.length < dec) formated += "0";
-//       return `${value[0]}.${formated}`;
-//     },
-//
-//     //-----------------------------------------Calcul Total ------------------------------\\
-//     Calcul_Total() {
-//       this.total = 0;
-//       for (var i = 0; i < this.details.length; i++) {
-//         var tax = this.details[i].taxe * this.details[i].quantity;
-//         this.details[i].subtotal = parseFloat(
-//           this.details[i].quantity * this.details[i].Net_price + tax
-//         );
-//         this.total = parseFloat(this.total + this.details[i].subtotal);
-//       }
-//
-//       const total_without_discount = parseFloat(
-//         this.total - this.sale.discount
-//       );
-//       this.sale.TaxNet = parseFloat(
-//         (total_without_discount * this.sale.tax_rate) / 100
-//       );
-//       this.GrandTotal = parseFloat(
-//         total_without_discount + this.sale.TaxNet + this.sale.shipping
-//       );
-//
-//       var grand_total =  this.GrandTotal.toFixed(2);
-//       this.GrandTotal = parseFloat(grand_total);
-//
-//       if(this.payment.status == 'paid'){
-//           this.payment.amount = this.formatNumber(this.GrandTotal, 2);
-//       }
-//
-//     },
-//
-//     //-----------------------------------Delete Detail Product ------------------------------\\
-//     delete_Product_Detail(id) {
-//       for (var i = 0; i < this.details.length; i++) {
-//         if (id === this.details[i].detail_id) {
-//           this.details.splice(i, 1);
-//           this.Calcul_Total();
-//         }
-//       }
-//     },
-//
-//     //-----------------------------------verified Order List ------------------------------\\
-//
-//     verifiedForm() {
-//       if (this.details.length <= 0) {
-//         this.makeToast(
-//           "warning",
-//           this.$t("AddProductToList"),
-//           this.$t("Warning")
-//         );
-//         return false;
-//       } else {
-//         var count = 0;
-//         for (var i = 0; i < this.details.length; i++) {
-//           if (
-//             this.details[i].quantity == "" ||
-//             this.details[i].quantity === 0
-//           ) {
-//             count += 1;
-//           }
-//         }
-//
-//         if (count > 0) {
-//           this.makeToast("warning", this.$t("AddQuantity"), this.$t("Warning"));
-//
-//           return false;
-//         } else {
-//           return true;
-//         }
-//       }
-//     },
-//
-//     //---------- keyup OrderTax
-//     keyup_OrderTax() {
-//       if (isNaN(this.sale.tax_rate)) {
-//         this.sale.tax_rate = 0;
-//       } else if(this.sale.tax_rate == ''){
-//          this.sale.tax_rate = 0;
-//         this.Calcul_Total();
-//       }else {
-//         this.Calcul_Total();
-//       }
-//     },
-//
-//     //---------- keyup Discount
-//
-//     keyup_Discount() {
-//       if (isNaN(this.sale.discount)) {
-//         this.sale.discount = 0;
-//       } else if(this.sale.discount == ''){
-//          this.sale.discount = 0;
-//         this.Calcul_Total();
-//       }else {
-//         this.Calcul_Total();
-//       }
-//     },
-//
-//     //---------- keyup Shipping
-//
-//     keyup_Shipping() {
-//       if (isNaN(this.sale.shipping)) {
-//         this.sale.shipping = 0;
-//       } else if(this.sale.shipping == ''){
-//          this.sale.shipping = 0;
-//         this.Calcul_Total();
-//       }else {
-//         this.Calcul_Total();
-//       }
-//     },
-//
-//     async processPayment() {
-//       this.paymentProcessing = true;
-//       const { token, error } = await this.stripe.createToken(
-//         this.cardElement
-//       );
-//       if (error) {
-//         this.paymentProcessing = false;
-//         NProgress.done();
-//         this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-//       } else {
-//         axios
-//           .post("sales", {
-//             date: this.sale.date,
-//             client_id: this.sale.client_id,
-//             warehouse_id: this.sale.warehouse_id,
-//             statut: this.sale.statut,
-//             notes: this.sale.notes,
-//             tax_rate: this.sale.tax_rate?this.sale.tax_rate:0,
-//             TaxNet: this.sale.TaxNet?this.sale.TaxNet:0,
-//             discount: this.sale.discount?this.sale.discount:0,
-//             shipping: this.sale.shipping?this.sale.shipping:0,
-//             GrandTotal: this.GrandTotal,
-//             details: this.details,
-//             payment: this.payment,
-//             amount: parseFloat(this.payment.amount).toFixed(2),
-//             received_amount: parseFloat(this.payment.received_amount).toFixed(2),
-//             change: parseFloat(this.payment.received_amount - this.payment.amount).toFixed(2),
-//             token: token.id
-//           })
-//           .then(response => {
-//             this.paymentProcessing = false;
-//             this.makeToast(
-//               "success",
-//               this.$t("Create.TitleSale"),
-//               this.$t("Success")
-//             );
-//             NProgress.done();
-//             this.$router.push({ name: "index_sales" });
-//           })
-//           .catch(error => {
-//             this.paymentProcessing = false;
-//             NProgress.done();
-//             this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-//           });
-//       }
-//     },
-//     //--------------------------------- Create Sale -------------------------\\
-//     Create_Sale() {
-//       if (this.verifiedForm()) {
-//         // Start the progress bar.
-//         NProgress.start();
-//         NProgress.set(0.1);
-//          if(this.payment.Reglement  == 'credit card'){
-//           if(this.stripe_key != ''){
-//             this.processPayment();
-//           }else{
-//             this.makeToast("danger", this.$t("credit_card_account_not_available"), this.$t("Failed"));
-//             NProgress.done();
-//           }
-//         }else{
-//           this.paymentProcessing = true;
-//           axios
-//             .post("sales", {
-//               date: this.sale.date,
-//               client_id: this.sale.client_id,
-//               warehouse_id: this.sale.warehouse_id,
-//               statut: this.sale.statut,
-//               notes: this.sale.notes,
-//               tax_rate: this.sale.tax_rate?this.sale.tax_rate:0,
-//               TaxNet: this.sale.TaxNet?this.sale.TaxNet:0,
-//               discount: this.sale.discount?this.sale.discount:0,
-//               shipping: this.sale.shipping?this.sale.shipping:0,
-//               GrandTotal: this.GrandTotal,
-//               details: this.details,
-//               payment: this.payment,
-//               amount: parseFloat(this.payment.amount).toFixed(2),
-//               received_amount: parseFloat(this.payment.received_amount).toFixed(2),
-//               change: parseFloat(this.payment.received_amount - this.payment.amount).toFixed(2),
-//             })
-//             .then(response => {
-//               this.makeToast(
-//                 "success",
-//                 this.$t("Create.TitleSale"),
-//                 this.$t("Success")
-//               );
-//               NProgress.done();
-//               this.paymentProcessing = false;
-//               this.$router.push({ name: "index_sales" });
-//             })
-//             .catch(error => {
-//               NProgress.done();
-//               this.paymentProcessing = false;
-//               this.makeToast(
-//                 "danger",
-//                 this.$t("InvalidData"),
-//                 this.$t("Failed")
-//               );
-//             });
-//         }
-//       }
-//     },
-//
-//     //-------------------------------- Get Last Detail Id -------------------------\\
-//     Last_Detail_id() {
-//       this.product.detail_id = 0;
-//       var len = this.details.length;
-//       this.product.detail_id = this.details[len - 1].detail_id + 1;
-//     },
-//
-//     //---------------------------------Get Product Details ------------------------\\
-//
-//     Get_Product_Details(product_id) {
-//       axios.get("products/" + product_id).then(response => {
-//         this.product.discount = 0;
-//         this.product.DiscountNet = 0;
-//         this.product.discount_Method = "2";
-//         this.product.product_id = response.data.id;
-//         this.product.name = response.data.name;
-//         this.product.Net_price = response.data.Net_price;
-//         this.product.Unit_price = response.data.Unit_price;
-//         this.product.taxe = response.data.tax_price;
-//         this.product.tax_method = response.data.tax_method;
-//         this.product.tax_percent = response.data.tax_percent;
-//         this.product.unitSale = response.data.unitSale;
-//         this.product.fix_price = response.data.fix_price;
-//         this.product.sale_unit_id = response.data.sale_unit_id;
-//         this.product.is_imei = response.data.is_imei;
-//         this.product.imei_number = '';
-//         this.add_product();
-//         this.Calcul_Total();
-//       });
-//     },
-//
-//     //---------------------------------------Get Elements ------------------------------\\
-//     GetElements() {
-//       axios
-//         .get("sales/create")
-//         .then(response => {
-//           this.clients = response.data.clients;
-//           this.warehouses = response.data.warehouses;
-//           this.stripe_key = response.data.stripe_key;
-//           this.isLoading = false;
-//         })
-//         .catch(response => {
-//           setTimeout(() => {
-//             this.isLoading = false;
-//           }, 500);
-//         });
-//     }
-//   },
-//
-//   //----------------------------- Created function-------------------
-//   created() {
-//     this.GetElements();
-//   }
-// };
-</script>
