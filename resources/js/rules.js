@@ -55,7 +55,7 @@ export default {
     },
     formatNumber: (number, dec) => {
         const value = (
-            typeof number === "string" ? number : number.toString()
+            typeof number === "string" ? number : (number * 1).toString()
         ).split(".");
         if (dec <= 0) return value[0];
         let formated = value[1] || "";

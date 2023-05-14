@@ -90,6 +90,7 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
 
     //------------------------------- PRODUCTS --------------------------\\
     Route::get('products/create', [ProductsController::class, 'create']);
+    Route::get('products/{id}', [ProductsController::class, 'show']);
     Route::get('products/edit/{id}', [ProductsController::class, 'edit']);
     Route::get('products/list', [ProductsController::class, 'index']);
     Route::post('products', [ProductsController::class, 'store']);

@@ -932,10 +932,11 @@ class SalesController extends Controller
             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
         }
 
-        $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
+        $clients = Client::where('deleted_at', '=', null)->get(['id', 'company_name']);
 //        $stripe_key = config('app.STRIPE_KEY');
 
-        return response()->json([
+        Inertia::share('titlePage', 'Nueva Orden');
+        return Inertia::render('Sales/Form_Sale', [
 //            'stripe_key' => $stripe_key,
             'clients' => $clients,
             'warehouses' => $warehouses,

@@ -117,13 +117,13 @@ async function Submit_Adjustment() {
 //---------------------- Event Select Warehouse ------------------------------\\
 function Selected_Warehouse(value) {
     search_input.value = "";
-    product.value = [];
     Get_Products_By_Warehouse(value);
 }
 
 //------------------------------------ Get Products By Warehouse -------------------------\\
 
 function Get_Products_By_Warehouse(id) {
+    products.value = [];
     axios
         .get("/get_Products_by_warehouse/" + id + "?stock=" + 0)
         .then((response) => {
@@ -411,7 +411,11 @@ onMounted(() => {
                         </v-col>
                         <!-- Products -->
                         <v-col cols="12">
-                            <v-table hover class="border" density="comfortable">
+                            <v-table
+                                hover
+                                class="border rounded"
+                                density="comfortable"
+                            >
                                 <thead>
                                     <tr class="bg-secondary">
                                         <th class="text-white text-center">
