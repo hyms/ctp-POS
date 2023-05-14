@@ -3,7 +3,7 @@ import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
-import ruleForm from "@/rules";
+import helper from "@/helpers";
 import { router } from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
 
@@ -750,7 +750,7 @@ function Pay_return_due(row) {
                                     :label="clientLabel.name + ' *'"
                                     v-model="client.name"
                                     :placeholder="clientLabel.name"
-                                    :rules="ruleForm.required"
+                                    :rules="helper.required"
                                     variant="outlined"
                                     density="comfortable"
                                     hide-details="auto"
@@ -764,7 +764,7 @@ function Pay_return_due(row) {
                                     :label="clientLabel.company_name"
                                     v-model="client.company_name"
                                     :placeholder="clientLabel.company_name"
-                                    :rules="ruleForm.required"
+                                    :rules="helper.required"
                                     variant="outlined"
                                     density="comfortable"
                                     hide-details="auto"

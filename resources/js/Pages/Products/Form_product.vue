@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router } from "@inertiajs/vue3";
-import ruleForm from "@/rules";
+import helper from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
 import Vue3TagsInput from "vue3-tags-input";
 
@@ -236,7 +236,7 @@ onMounted(() => {
                                 :label="productLabel.name + ' *'"
                                 v-model="productForm.name"
                                 :placeholder="productLabel.name"
-                                :rules="ruleForm.required"
+                                :rules="helper.required"
                                 variant="outlined"
                                 density="comfortable"
                                 hide-details="auto"
@@ -250,7 +250,7 @@ onMounted(() => {
                                 :label="productLabel.code + ' *'"
                                 v-model="productForm.code"
                                 :placeholder="productLabel.code"
-                                :rules="ruleForm.required"
+                                :rules="helper.required"
                                 variant="outlined"
                                 density="comfortable"
                                 hide-details="auto"
@@ -270,7 +270,7 @@ onMounted(() => {
                                 density="comfortable"
                                 hide-details="auto"
                                 clearable
-                                :rules="ruleForm.required"
+                                :rules="helper.required"
                             ></v-select>
                         </v-col>
 
@@ -281,8 +281,8 @@ onMounted(() => {
                                 v-model="productForm.cost"
                                 :placeholder="productLabel.cost"
                                 :rules="
-                                    ruleForm.required.concat(
-                                        ruleForm.numberWithDecimal
+                                    helper.required.concat(
+                                        helper.numberWithDecimal
                                     )
                                 "
                                 variant="outlined"
@@ -299,8 +299,8 @@ onMounted(() => {
                                 v-model="productForm.price"
                                 :placeholder="productLabel.price"
                                 :rules="
-                                    ruleForm.required.concat(
-                                        ruleForm.numberWithDecimal
+                                    helper.required.concat(
+                                        helper.numberWithDecimal
                                     )
                                 "
                                 variant="outlined"
@@ -323,7 +323,7 @@ onMounted(() => {
                                 density="comfortable"
                                 hide-details="auto"
                                 clearable
-                                :rules="ruleForm.required"
+                                :rules="helper.required"
                             ></v-select>
                         </v-col>
 
@@ -344,7 +344,7 @@ onMounted(() => {
                                 density="comfortable"
                                 hide-details="auto"
                                 clearable
-                                :rules="ruleForm.required"
+                                :rules="helper.required"
                             ></v-select>
                         </v-col>
                         <!---->
@@ -365,7 +365,7 @@ onMounted(() => {
                                 density="comfortable"
                                 hide-details="auto"
                                 clearable
-                                :rules="ruleForm.required"
+                                :rules="helper.required"
                             ></v-select>
                         </v-col>
                         <!---->
@@ -375,7 +375,7 @@ onMounted(() => {
                                 :label="productLabel.stock_alert"
                                 v-model="productForm.stock_alert"
                                 :placeholder="productLabel.stock_alert"
-                                :rules="ruleForm.numberWithDecimal"
+                                :rules="helper.numberWithDecimal"
                                 variant="outlined"
                                 density="comfortable"
                                 hide-details="auto"

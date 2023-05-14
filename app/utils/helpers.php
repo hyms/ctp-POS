@@ -4,6 +4,7 @@ namespace App\utils;
 use App\Models\Currency;
 use App\Models\Role;
 use App\Models\Setting;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class helpers
@@ -83,6 +84,13 @@ class helpers
             $code = 'usd';
         }
         return $code;
+    }
+
+    public static function to_select_vuetify(Collection $data)
+    {
+        return $data->map(function ($item, $key) {
+            return ['value' => $item->id, 'title' => $item->name];
+        });
     }
 
 }

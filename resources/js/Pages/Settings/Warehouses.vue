@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
-import ruleForm from "@/rules";
+import helper from "@/helpers";
 import { router } from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
 
@@ -227,7 +227,7 @@ function onCloseDelete() {
                                     :label="warehouseLabels.name + ' *'"
                                     v-model="warehouse.name"
                                     :placeholder="warehouseLabels.name"
-                                    :rules="ruleForm.required"
+                                    :rules="helper.required"
                                     variant="outlined"
                                     density="comfortable"
                                     hide-details="auto"

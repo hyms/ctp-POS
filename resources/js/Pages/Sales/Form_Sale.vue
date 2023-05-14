@@ -2,13 +2,13 @@
 import { ref, onMounted, watch } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router } from "@inertiajs/vue3";
-import ruleForm from "@/rules";
+import helper from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
-import Vue3TagsInput from "vue3-tags-input";
 
 const props = defineProps({
     clients: Object,
     warehouses: Object,
+    sales_types: Object,
     sale: { type: Object, default: null },
     errors: Object,
 });
@@ -22,13 +22,14 @@ const snackbarColor = ref("info");
 const search_input = ref("");
 
 const client = ref({});
+const clientFilter = ref([]);
 const products = ref([]);
 const detailsForm = ref([]);
 const detail = ref({});
 const payment = ref({
-    status: "pending",
+    status: "unpaid",
     Reglement: "Cash",
-    amount: "",
+    amount: 0,
     received_amount: "",
 });
 const sales = ref([]);
@@ -39,6 +40,7 @@ const saleForm = ref({
     notes: "",
     client_id: "",
     warehouse_id: "",
+    sales_type_id: "",
     tax_rate: 0,
     TaxNet: 0,
     shipping: 0,
@@ -50,7 +52,7 @@ const saleLabel = ref({
     notes: "Notas",
     client_id: "Cliente",
     warehouse_id: "Agencia",
-    shipping: "Comprando",
+    sales_type_id: "Tipo de Orden",
     discount: "Descuento",
 });
 const total = ref(0);
@@ -88,11 +90,8 @@ const product = ref({
 function Selected_PaymentStatus(value) {
     if (value == "paid") {
         let payment_amount = GrandTotal.value.toFixed(2);
-        payment.value.amount = ruleForm.formatNumber(payment_amount, 2);
-        payment.value.received_amount = ruleForm.formatNumber(
-            payment_amount,
-            2
-        );
+        payment.value.amount = helper.formatNumber(payment_amount, 2);
+        payment.value.received_amount = helper.formatNumber(payment_amount, 2);
     } else {
         payment.value.amount = 0;
         payment.value.received_amount = 0;
@@ -130,24 +129,15 @@ function Verified_Received_Amount() {
 async function Submit_Sale() {
     snackbar.value = false;
     const validate = await form.value.validate();
-    if (validate.valid) {
+    if (!validate.valid) {
         snackbar.value = true;
         snackbarText.value = "llene el formulario correctamente";
         snackbarColor.value = "error";
-    } else if (payment.value.amount > payment.value.received_amount) {
-        snackbar.value = true;
-        snackbarText.value = "el monto a pagar es mayor al monto recibido";
-        snackbarColor.value = "warning";
-        payment.value.received_amount = 0;
-    } else if (payment.value.amount > GrandTotal.value) {
-        snackbar.value = true;
-        snackbarText.value = "el monto a pagar es mayor al monto total";
-        snackbarColor.value = "warning";
-        payment.value.amount = 0;
     } else {
         Create_Sale();
     }
 }
+
 //---------------------- get_units ------------------------------\\
 function get_units(value) {
     axios
@@ -276,6 +266,7 @@ function getResultValue(val) {
     }
     loadingFilter.value = false;
 }
+
 //------------------------- Submit Search Product//
 
 function SearchProduct(result) {
@@ -364,7 +355,7 @@ function increment(detail, id) {
                 snackbarText.value = "bajo stock";
                 snackbarColor.value = "warning";
             } else {
-                ruleForm.formatNumber(detailsForm.value[i].quantity++, 2);
+                helper.formatNumber(detailsForm.value[i].quantity++, 2);
             }
         }
     }
@@ -382,7 +373,7 @@ function decrement(detail, id) {
                     snackbarText.value = "bajo stock";
                     snackbarColor.value = "warning";
                 } else {
-                    ruleForm.formatNumber(detailsForm.value[i].quantity--, 2);
+                    helper.formatNumber(detailsForm.value[i].quantity--, 2);
                 }
             }
         }
@@ -393,7 +384,6 @@ function decrement(detail, id) {
 //-----------------------------------------Calcul Total ------------------------------\\
 function Calcul_Total() {
     total.value = 0;
-    console.log(detailsForm.value);
     for (let i = 0; i < detailsForm.value.length; i++) {
         detailsForm.value[i].subtotal = parseFloat(
             detailsForm.value[i].quantity * detailsForm.value[i].Net_price
@@ -404,16 +394,14 @@ function Calcul_Total() {
         total.value - saleForm.value.discount
     );
 
-    GrandTotal.value = parseFloat(
-        total_without_discount + saleForm.value.shipping
-    );
+    GrandTotal.value = parseFloat(total_without_discount);
 
     let grand_total = GrandTotal.value.toFixed(2);
     GrandTotal.value = parseFloat(grand_total);
 
-    if (payment.value.status == "paid") {
-        payment.value.amount = ruleForm.formatNumber(GrandTotal.value, 2);
-    }
+    // if (payment.value.status == "paid") {
+    payment.value.amount = helper.formatNumber(GrandTotal.value, 2);
+    // }
 }
 
 // -----------------------------------Delete Detail Product ------------------------------\\
@@ -428,17 +416,17 @@ function delete_Product_Detail(id) {
 
 //-----------------------------------verified Order List ------------------------------\\
 function verifiedForm() {
-    if (details.value.length <= 0) {
+    if (detailsForm.value.length <= 0) {
         snackbar.value = true;
         snackbarText.value = "debes añadir un producto";
         snackbarColor.value = "warning";
         return false;
     } else {
         let count = 0;
-        for (let i = 0; i < details.value.length; i++) {
+        for (let i = 0; i < detailsForm.value.length; i++) {
             if (
-                details.value[i].quantity == "" ||
-                details.value[i].quantity === 0
+                detailsForm.value[i].quantity == "" ||
+                detailsForm.value[i].quantity === 0
             ) {
                 count += 1;
             }
@@ -460,20 +448,20 @@ function Create_Sale() {
     if (verifiedForm()) {
         loading.value = true;
         snackbar.value = false;
-        payment.valueProcessing = true;
         axios
-            .post("sales", {
-                date: sale.value.date,
-                client_id: sale.value.client_id,
-                warehouse_id: sale.value.warehouse_id,
-                statut: sale.value.statut,
-                notes: sale.value.notes,
-                tax_rate: sale.value.tax_rate ? sale.value.tax_rate : 0,
-                TaxNet: sale.value.TaxNet ? sale.value.TaxNet : 0,
-                discount: sale.value.discount ? sale.value.discount : 0,
-                shipping: sale.value.shipping ? sale.value.shipping : 0,
+            .post("/sales", {
+                sales_type: saleForm.value.sales_type_id,
+                date: saleForm.value.date,
+                client_id: saleForm.value.client_id,
+                warehouse_id: saleForm.value.warehouse_id,
+                statut: saleForm.value.statut,
+                notes: saleForm.value.notes,
+                tax_rate: saleForm.value.tax_rate ? saleForm.value.tax_rate : 0,
+                TaxNet: saleForm.value.TaxNet ? saleForm.value.TaxNet : 0,
+                discount: saleForm.value.discount ? saleForm.value.discount : 0,
+                shipping: saleForm.value.shipping ? saleForm.value.shipping : 0,
                 GrandTotal: GrandTotal.value,
-                details: details.value,
+                details: detailsForm.value,
                 payment: payment.value,
                 amount: parseFloat(payment.value.amount).toFixed(2),
                 received_amount: parseFloat(
@@ -487,12 +475,12 @@ function Create_Sale() {
                 snackbar.value = true;
                 snackbarText.value = "compra exitosa";
                 snackbarColor.value = "success";
-                payment.valueProcessing = false;
                 router.visit("/sales");
             })
             .catch((error) => {
+                console.log(error);
                 snackbar.value = true;
-                snackbarText.value = "Pago invalido";
+                snackbarText.value = "No se pudo procesar el pago";
                 snackbarColor.value = "error";
             })
             .finally(() => {
@@ -529,6 +517,48 @@ function Get_Product_Details(product_id) {
         Calcul_Total();
     });
 }
+//---------- keyup Discount
+
+function keyup_Discount() {
+    if (isNaN(saleForm.value.discount)) {
+        saleForm.value.discount = 0;
+    } else if (saleForm.value.discount == "") {
+        saleForm.value.discount = 0;
+        Calcul_Total();
+    } else {
+        Calcul_Total();
+    }
+}
+function change_payment_status() {
+    if (
+        parseFloat(payment.value.received_amount, 2) >=
+        parseFloat(payment.value.amount, 2)
+    ) {
+        payment.value.status = "paid";
+    } else if (
+        parseFloat(payment.value.received_amount, 2) <= 0 ||
+        payment.value.received_amount == ""
+    ) {
+        payment.value.status = "unpaid";
+    } else {
+        payment.value.status = "partial";
+    }
+}
+//---------- filter clients
+function querySelections(v) {
+    clientFilter.value = props.clients.filter((e) => {
+        return (
+            (e.title || "").toLowerCase().indexOf((v || "").toLowerCase()) > -1
+        );
+    });
+}
+
+onMounted(() => {
+    if (props.warehouses.length == 1) {
+        saleForm.value.warehouse_id = props.warehouses[0].value;
+        Get_Products_By_Warehouse(saleForm.value.warehouse_id);
+    }
+});
 </script>
 <template>
     <Layout :loading="loading">
@@ -545,7 +575,7 @@ function Get_Product_Details(product_id) {
                         <v-card-text>
                             <v-row>
                                 <!-- date-->
-                                <v-col lg="4" md="4" cols="12" class="mv-3">
+                                <v-col lg="4" md="4" cols="12">
                                     <v-text-field
                                         v-model="saleForm.date"
                                         :label="saleLabel.date"
@@ -553,40 +583,37 @@ function Get_Product_Details(product_id) {
                                         density="comfortable"
                                         hide-details="auto"
                                         type="date"
-                                        :rules="ruleForm.required"
+                                        :rules="helper.required"
                                     >
                                     </v-text-field>
                                 </v-col>
                                 <!-- Customer -->
-                                <v-col lg="4" md="4" cols="12" class="mv-3">
+                                <v-col lg="4" md="4" cols="12">
                                     <v-autocomplete
                                         v-model="saleForm.client_id"
-                                        :items="clients"
+                                        @update:search="querySelections"
+                                        :items="clientFilter"
                                         :label="saleLabel.client_id"
-                                        item-title="company_name"
-                                        item-value="id"
                                         variant="outlined"
                                         density="comfortable"
                                         hide-details="auto"
                                         clearable
-                                        :rules="ruleForm.required"
+                                        :rules="helper.required"
                                     ></v-autocomplete>
                                 </v-col>
 
                                 <!-- warehouse -->
-                                <v-col lg="4" md="4" cols="12" class="mv-3">
+                                <v-col lg="4" md="4" cols="12">
                                     <v-select
                                         @update:modelValue="Selected_Warehouse"
                                         v-model="saleForm.warehouse_id"
                                         :items="warehouses"
                                         :label="saleLabel.warehouse_id"
-                                        item-title="name"
-                                        item-value="id"
                                         variant="outlined"
                                         density="comfortable"
                                         hide-details="auto"
                                         clearable
-                                        :rules="ruleForm.required"
+                                        :rules="helper.required"
                                     ></v-select>
                                 </v-col>
 
@@ -597,6 +624,7 @@ function Get_Product_Details(product_id) {
                                         :loading="loadingFilter"
                                         :items="products"
                                         :model-value="search_input"
+                                        variant="solo-filled"
                                         item-title="name"
                                         item-value="id"
                                         density="comfortable"
@@ -673,10 +701,8 @@ function Get_Product_Details(product_id) {
                                                     <v-chip
                                                         color="primary"
                                                         size="small"
-                                                        >{{
-                                                            detail.code
-                                                        }}</v-chip
-                                                    >
+                                                        >{{ detail.code }}
+                                                    </v-chip>
 
                                                     {{ detail.name }}
                                                 </td>
@@ -685,7 +711,7 @@ function Get_Product_Details(product_id) {
                                                         variant="outlined"
                                                         density="compact"
                                                         hide-details="auto"
-                                                        :rules="ruleForm.number"
+                                                        :rules="helper.number"
                                                         v-model="
                                                             detail.Net_price
                                                         "
@@ -713,7 +739,7 @@ function Get_Product_Details(product_id) {
                                                             density="compact"
                                                             hide-details="auto"
                                                             :rules="
-                                                                ruleForm.number
+                                                                helper.number
                                                             "
                                                             v-model="
                                                                 detail.quantity
@@ -765,7 +791,7 @@ function Get_Product_Details(product_id) {
                                                 <td>
                                                     Bs
                                                     {{
-                                                        ruleForm.formatNumber(
+                                                        helper.formatNumber(
                                                             detail.DiscountNet *
                                                                 detail.quantity,
                                                             2
@@ -789,239 +815,116 @@ function Get_Product_Details(product_id) {
                                                         "
                                                         class="i-Edit text-25 text-success"
                                                     ></i>
-                                                    <i
+                                                    <v-btn
+                                                        class="ma-1"
+                                                        color="success"
+                                                        icon="mdi-pen"
+                                                        size="x-small"
+                                                        variant="elevated"
+                                                        @click="
+                                                            Modal_Updat_Detail(
+                                                                detail
+                                                            )
+                                                        "
+                                                    >
+                                                    </v-btn>
+                                                    <v-btn
+                                                        class="ma-1"
+                                                        color="error"
+                                                        icon="mdi-delete"
+                                                        size="x-small"
+                                                        variant="elevated"
                                                         @click="
                                                             delete_Product_Detail(
                                                                 detail.detail_id
                                                             )
                                                         "
-                                                        class="i-Close-Window text-25 text-danger"
-                                                    ></i>
+                                                    >
+                                                    </v-btn>
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </v-table>
                                 </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col lg="4" md="4" cols="12">
+                                    <!-- Discount -->
+                                    <v-text-field
+                                        :label="saleLabel.discount"
+                                        variant="outlined"
+                                        density="compact"
+                                        hide-details="auto"
+                                        :rules="helper.number"
+                                        v-model="saleForm.discount"
+                                        @keyup="keyup_Discount()"
+                                    ></v-text-field>
+                                </v-col>
+                                <!-- Amount  -->
+                                <v-col lg="4" md="4" cols="12">
+                                    <v-text-field
+                                        v-model="payment.amount"
+                                        variant="outlined"
+                                        density="compact"
+                                        readonly
+                                        hide-details="auto"
+                                        type="text"
+                                        label="Total"
+                                        :rules="helper.numberWithDecimal"
+                                    ></v-text-field>
+                                </v-col>
+                                <!-- Received  Amount  -->
+                                <v-col lg="4" md="4" cols="12">
+                                    <v-text-field
+                                        v-model="payment.received_amount"
+                                        variant="outlined"
+                                        density="compact"
+                                        clearable
+                                        hide-details="auto"
+                                        type="text"
+                                        label="Monto Recibido"
+                                        :rules="helper.numberWithDecimal"
+                                        @keyup="change_payment_status()"
+                                    ></v-text-field>
+                                </v-col>
 
-                                <!--                <div class="offset-md-9 col-md-3 mt-4">-->
-                                <!--                  <table class="table table-striped table-sm">-->
-                                <!--                    <tbody>-->
-                                <!--                      <tr>-->
-                                <!--                        <td class="bold">{{$t('OrderTax')}}</td>-->
-                                <!--                        <td>-->
-                                <!--                          <span>Bs {{sale.TaxNet.toFixed(2)}} ({{formatNumber(sale.tax_rate,2)}} %)</span>-->
-                                <!--                        </td>-->
-                                <!--                      </tr>-->
-                                <!--                      <tr>-->
-                                <!--                        <td class="bold">{{$t('Discount')}}</td>-->
-                                <!--                        <td>Bs {{sale.discount.toFixed(2)}}</td>-->
-                                <!--                      </tr>-->
-                                <!--                      <tr>-->
-                                <!--                        <td class="bold">{{$t('Shipping')}}</td>-->
-                                <!--                        <td>Bs {{sale.shipping.toFixed(2)}}</td>-->
-                                <!--                      </tr>-->
-                                <!--                      <tr>-->
-                                <!--                        <td>-->
-                                <!--                          <span class="font-weight-bold">{{$t('Total')}}</span>-->
-                                <!--                        </td>-->
-                                <!--                        <td>-->
-                                <!--                          <span-->
-                                <!--                            class="font-weight-bold"-->
-                                <!--                          >Bs {{GrandTotal.toFixed(2)}}</span>-->
-                                <!--                        </td>-->
-                                <!--                      </tr>-->
-                                <!--                    </tbody>-->
-                                <!--                  </table>-->
-                                <!--                </div>-->
+                                <!-- Status  -->
+                                <v-col lg="4" md="4" cols="12">
+                                    <v-select
+                                        v-model="saleForm.statut"
+                                        variant="outlined"
+                                        density="compact"
+                                        clearable
+                                        hide-details="auto"
+                                        :items="helper.statutSale()"
+                                        :label="saleLabel.statut"
+                                    ></v-select>
+                                </v-col>
 
-                                <!--                &lt;!&ndash; Order Tax  &ndash;&gt;-->
-                                <!--                <v-col lg="4" md="4" sm="12" class="mv-3">-->
-                                <!--                  <validation-provider-->
-                                <!--                    name="Order Tax"-->
-                                <!--                    :rules="{ regex: /^\d*\.?\d*$/}"-->
-                                <!--                    v-slot="validationContext"-->
-                                <!--                  >-->
-                                <!--                    <v-form-group :label="$t('OrderTax')">-->
-                                <!--                      <v-input-group append="%">-->
-                                <!--                        <v-form-input-->
-                                <!--                          :state="getValidationState(validationContext)"-->
-                                <!--                          aria-describedby="OrderTax-feedback"-->
-                                <!--                          label="Order Tax"-->
-                                <!--                          v-model.number="sale.tax_rate"-->
-                                <!--                          @keyup="keyup_OrderTax()"-->
-                                <!--                        ></v-form-input>-->
-                                <!--                      </v-input-group>-->
-                                <!--                      <v-form-invalid-feedback-->
-                                <!--                        id="OrderTax-feedback"-->
-                                <!--                      >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-                                <!--                    </v-form-group>-->
-                                <!--                  </validation-provider>-->
-                                <!--                </v-col>-->
+                                <!-- Sales type  -->
+                                <v-col lg="4" md="4" cols="12">
+                                    <v-select
+                                        v-model="saleForm.sales_type_id"
+                                        variant="outlined"
+                                        density="compact"
+                                        hide-details="auto"
+                                        :items="sales_types"
+                                        :label="saleLabel.sales_type_id + ' *'"
+                                        :rules="helper.required"
+                                    ></v-select>
+                                </v-col>
 
-                                <!--                &lt;!&ndash; Discount &ndash;&gt;-->
-                                <!--                <v-col lg="4" md="4" sm="12" class="mv-3">-->
-                                <!--                  <validation-provider-->
-                                <!--                    name="Discount"-->
-                                <!--                    :rules="{ regex: /^\d*\.?\d*$/}"-->
-                                <!--                    v-slot="validationContext"-->
-                                <!--                  >-->
-                                <!--                    <v-form-group :label="$t('Discount')">-->
-                                <!--                      <v-input-group :append="currentUser.currency">-->
-                                <!--                        <v-form-input-->
-                                <!--                          :state="getValidationState(validationContext)"-->
-                                <!--                          aria-describedby="Discount-feedback"-->
-                                <!--                          label="Discount"-->
-                                <!--                          v-model.number="sale.discount"-->
-                                <!--                          @keyup="keyup_Discount()"-->
-                                <!--                        ></v-form-input>-->
-                                <!--                      </v-input-group>-->
-                                <!--                      <v-form-invalid-feedback-->
-                                <!--                        id="Discount-feedback"-->
-                                <!--                      >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-                                <!--                    </v-form-group>-->
-                                <!--                  </validation-provider>-->
-                                <!--                </v-col>-->
-
-                                <!--                &lt;!&ndash; Shipping  &ndash;&gt;-->
-                                <!--                <v-col lg="4" md="4" sm="12" class="mv-3">-->
-                                <!--                  <validation-provider-->
-                                <!--                    name="Shipping"-->
-                                <!--                    :rules="{ regex: /^\d*\.?\d*$/}"-->
-                                <!--                    v-slot="validationContext"-->
-                                <!--                  >-->
-                                <!--                    <v-form-group :label="$t('Shipping')">-->
-                                <!--                      <v-input-group :append="currentUser.currency">-->
-                                <!--                        <v-form-input-->
-                                <!--                          :state="getValidationState(validationContext)"-->
-                                <!--                          aria-describedby="Shipping-feedback"-->
-                                <!--                          label="Shipping"-->
-                                <!--                          v-model.number="sale.shipping"-->
-                                <!--                          @keyup="keyup_Shipping()"-->
-                                <!--                        ></v-form-input>-->
-                                <!--                      </v-input-group>-->
-
-                                <!--                      <v-form-invalid-feedback-->
-                                <!--                        id="Shipping-feedback"-->
-                                <!--                      >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-                                <!--                    </v-form-group>-->
-                                <!--                  </validation-provider>-->
-                                <!--                </v-col>-->
-
-                                <!--                &lt;!&ndash; Status  &ndash;&gt;-->
-                                <!--                <v-col lg="4" md="4" sm="12" class="mv-3">-->
-                                <!--                  <validation-provider name="Status" :rules="{ required: true}">-->
-                                <!--                    <v-form-group slot-scope="{ valid, errors }" :label="$t('Status') + ' ' + '*'">-->
-                                <!--                      <v-select-->
-                                <!--                        :class="{'is-invalid': !!errors.length}"-->
-                                <!--                        :state="errors[0] ? false : (valid ? true : null)"-->
-                                <!--                        v-model="sale.statut"-->
-                                <!--                        :reduce="label => label.value"-->
-                                <!--                        :placeholder="$t('Choose_Status')"-->
-                                <!--                        :options="-->
-                                <!--                                [-->
-                                <!--                                  {label: 'completed', value: 'completed'},-->
-                                <!--                                  {label: 'Pending', value: 'pending'},-->
-                                <!--                                  {label: 'ordered', value: 'ordered'}-->
-                                <!--                                ]"-->
-                                <!--                      ></v-select>-->
-                                <!--                      <v-form-invalid-feedback>{{ errors[0] }}</v-form-invalid-feedback>-->
-                                <!--                    </v-form-group>-->
-                                <!--                  </validation-provider>-->
-                                <!--                </v-col>-->
-
-                                <!--                &lt;!&ndash; PaymentStatus  &ndash;&gt;-->
-                                <!--                <v-col md="4">-->
-                                <!--                  <validation-provider name="PaymentStatus">-->
-                                <!--                    <v-form-group :label="$t('PaymentStatus')">-->
-                                <!--                      <v-select-->
-                                <!--                        @input="Selected_PaymentStatus"-->
-                                <!--                        :reduce="label => label.value"-->
-                                <!--                        v-model="payment.status"-->
-                                <!--                        :placeholder="$t('Choose_Status')"-->
-                                <!--                        :options="-->
-                                <!--                                [-->
-                                <!--                                  {label: 'Paid', value: 'paid'},-->
-                                <!--                                  {label: 'partial', value: 'partial'},-->
-                                <!--                                  {label: 'Pending', value: 'pending'},-->
-                                <!--                                ]"-->
-                                <!--                      ></v-select>-->
-                                <!--                    </v-form-group>-->
-                                <!--                  </validation-provider>-->
-                                <!--                </v-col>-->
-
-                                <!--                &lt;!&ndash; Payment choice &ndash;&gt;-->
-                                <!--                <v-col md="4" v-if="payment.status != 'pending'">-->
-                                <!--                  <validation-provider name="Payment choice" :rules="{ required: true}">-->
-                                <!--                    <v-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice') + ' ' + '*'">-->
-                                <!--                      <v-select-->
-                                <!--                        :class="{'is-invalid': !!errors.length}"-->
-                                <!--                        :state="errors[0] ? false : (valid ? true : null)"-->
-                                <!--                        :reduce="label => label.value"-->
-                                <!--                        @input="Selected_PaymentMethod"-->
-                                <!--                        v-model="payment.Reglement"-->
-                                <!--                        :placeholder="$t('PleaseSelect')"-->
-                                <!--                        :options="-->
-                                <!--                                  [-->
-                                <!--                                  {label: 'Cash', value: 'Cash'},-->
-                                <!--                                  {label: 'credit card', value: 'credit card'},-->
-                                <!--                                  {label: 'TPE', value: 'tpe'},-->
-                                <!--                                  {label: 'cheque', value: 'cheque'},-->
-                                <!--                                  {label: 'Western Union', value: 'Western Union'},-->
-                                <!--                                  {label: 'bank transfer', value: 'bank transfer'},-->
-                                <!--                                  {label: 'other', value: 'other'},-->
-                                <!--                                  ]"-->
-                                <!--                      ></v-select>-->
-                                <!--                      <v-form-invalid-feedback>{{ errors[0] }}</v-form-invalid-feedback>-->
-                                <!--                    </v-form-group>-->
-                                <!--                  </validation-provider>-->
-                                <!--                </v-col>-->
-
-                                <!--                  &lt;!&ndash; Received  Amount  &ndash;&gt;-->
-                                <!--                  <v-col md="4" v-if="payment.status != 'pending'">-->
-                                <!--                      <validation-provider-->
-                                <!--                        name="Received Amount"-->
-                                <!--                        :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
-                                <!--                        v-slot="validationContext"-->
-                                <!--                      >-->
-                                <!--                        <v-form-group :label="$t('Received_Amount') + ' ' + '*'">-->
-                                <!--                          <v-form-input-->
-                                <!--                            @keyup="Verified_Received_Amount(payment.received_amount)"-->
-                                <!--                            label="Received_Amount"-->
-                                <!--                            :placeholder="$t('Received_Amount')"-->
-                                <!--                            v-model.number="payment.received_amount"-->
-                                <!--                            :state="getValidationState(validationContext)"-->
-                                <!--                            aria-describedby="Received_Amount-feedback"-->
-                                <!--                          ></v-form-input>-->
-                                <!--                          <v-form-invalid-feedback-->
-                                <!--                            id="Received_Amount-feedback"-->
-                                <!--                          >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-                                <!--                        </v-form-group>-->
-                                <!--                      </validation-provider>-->
-                                <!--                    </v-col>-->
-
-                                <!--                &lt;!&ndash; Amount  &ndash;&gt;-->
-                                <!--                <v-col md="4" v-if="payment.status != 'pending'">-->
-                                <!--                  <validation-provider-->
-                                <!--                    name="Amount"-->
-                                <!--                    :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
-                                <!--                    v-slot="validationContext"-->
-                                <!--                  >-->
-                                <!--                    <v-form-group :label="$t('Paying_Amount') + ' ' + '*'">-->
-                                <!--                      <v-form-input-->
-                                <!--                        :disabled="payment.status == 'paid'"-->
-                                <!--                        label="Amount"-->
-                                <!--                        :placeholder="$t('Paying_Amount')"-->
-                                <!--                        v-model.number="payment.amount"-->
-                                <!--                        @keyup="Verified_paidAmount(payment.amount)"-->
-                                <!--                        :state="getValidationState(validationContext)"-->
-                                <!--                        aria-describedby="Amount-feedback"-->
-                                <!--                      ></v-form-input>-->
-                                <!--                      <v-form-invalid-feedback-->
-                                <!--                        id="Amount-feedback"-->
-                                <!--                      >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-                                <!--                    </v-form-group>-->
-                                <!--                  </validation-provider>-->
-                                <!--                </v-col>-->
+                                <!-- Payment choice -->
+                                <v-col lg="4" md="4" cols="12">
+                                    <v-select
+                                        v-model="payment.Reglement"
+                                        variant="outlined"
+                                        density="compact"
+                                        hide-details="auto"
+                                        :items="helper.reglamentPayment()"
+                                        label="Tipo de Pago"
+                                    ></v-select>
+                                </v-col>
 
                                 <!--                &lt;!&ndash; change  Amount  &ndash;&gt;-->
                                 <!--                <v-col md="4" v-if="payment.status != 'pending'">-->
@@ -1031,43 +934,26 @@ function Get_Product_Details(product_id) {
                                 <!--                  >{{parseFloat(payment.received_amount - payment.amount).toFixed(2)}}</p>-->
                                 <!--                </v-col>-->
 
-                                <!--                 <v-col-->
-                                <!--                  md="12"-->
-                                <!--                  class="mt-3"-->
-                                <!--                  v-if="payment.status != 'pending' && payment.Reglement == 'credit card'"-->
-                                <!--                >-->
-                                <!--                  <form id="payment-form">-->
-                                <!--                    <label-->
-                                <!--                      for="card-element"-->
-                                <!--                      class="leading-7 text-sm text-gray-600"-->
-                                <!--                    >{{$t('Credit_Card_Info')}}</label>-->
-                                <!--                    <div id="card-element">-->
-                                <!--                      &lt;!&ndash; Elements will create input elements here &ndash;&gt;-->
-                                <!--                    </div>-->
-                                <!--                    &lt;!&ndash; We'll put the error messages in this element &ndash;&gt;-->
-                                <!--                    <div id="card-errors" role="alert"></div>-->
-                                <!--                  </form>-->
-                                <!--                </v-col>-->
+                                <v-col md="12" class="mt-3">
+                                    <v-textarea
+                                        v-model="saleForm.notes"
+                                        rows="4"
+                                        variant="outlined"
+                                        label="Notas"
+                                        placeholder="Notas"
+                                        hide-details="auto"
+                                    ></v-textarea>
+                                </v-col>
 
-                                <!--                <v-col md="12" class="mt-3">-->
-                                <!--                  <v-form-group :label="$t('Note')">-->
-                                <!--                    <textarea-->
-                                <!--                      v-model="sale.notes"-->
-                                <!--                      rows="4"-->
-                                <!--                      class="form-control"-->
-                                <!--                      :placeholder="$t('Afewwords')"-->
-                                <!--                    ></textarea>-->
-                                <!--                  </v-form-group>-->
-                                <!--                </v-col>-->
-
-                                <!--                <v-col md="12">-->
-                                <!--                  <v-form-group>-->
-                                <!--                    <v-button variant="primary" :disabled="paymentProcessing" @click="Submit_Sale">{{$t('submit')}}</v-button>-->
-                                <!--                    <div v-once class="typo__p" v-if="paymentProcessing">-->
-                                <!--                    <div class="spinner sm spinner-primary mt-3"></div>-->
-                                <!--                  </div>-->
-                                <!--                  </v-form-group>-->
-                                <!--                </v-col>-->
+                                <v-col cols="12">
+                                    <v-btn
+                                        variant="flat"
+                                        color="primary"
+                                        :disabled="loading"
+                                        @click="Submit_Sale"
+                                        >Guardar</v-btn
+                                    >
+                                </v-col>
                             </v-row>
                         </v-card-text>
                     </v-card>

@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
-import ruleForm from "@/rules";
+import helper from "@/helpers";
 import { router } from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
 
@@ -208,7 +208,7 @@ function Remove_SalesType() {
                                     :label="sales_typeLabels.code + ' *'"
                                     v-model="sales_type.code"
                                     :placeholder="sales_typeLabels.code"
-                                    :rules="ruleForm.required"
+                                    :rules="helper.required"
                                     variant="outlined"
                                     density="comfortable"
                                     hide-details="auto"
@@ -222,7 +222,7 @@ function Remove_SalesType() {
                                     :label="sales_typeLabels.name + ' *'"
                                     v-model="sales_type.name"
                                     :placeholder="sales_typeLabels.name"
-                                    :rules="ruleForm.required"
+                                    :rules="helper.required"
                                     variant="outlined"
                                     density="comfortable"
                                     hide-details="auto"

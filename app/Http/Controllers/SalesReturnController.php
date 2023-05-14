@@ -250,7 +250,7 @@ class SalesReturnController extends BaseController
                 }
 
             }
-            SaleReturnDetails::insert($orderDetails);
+            SaleReturnDetails::created($orderDetails);
         }, 10);
 
         return response()->json(['success' => true]);

@@ -4,7 +4,7 @@ import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
 
-import ruleForm from "@/rules";
+import helper from "@/helpers";
 import { router } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -296,9 +296,9 @@ function onClose() {
                                     v-model="user.firstname"
                                     :placeholder="userLabels.firstname"
                                     :rules="
-                                        ruleForm.required
-                                            .concat(ruleForm.min(3))
-                                            .concat(ruleForm.max(30))
+                                        helper.required
+                                            .concat(helper.min(3))
+                                            .concat(helper.max(30))
                                     "
                                     variant="outlined"
                                     density="comfortable"
@@ -314,9 +314,9 @@ function onClose() {
                                     v-model="user.lastname"
                                     :placeholder="userLabels.lastname"
                                     :rules="
-                                        ruleForm.required
-                                            .concat(ruleForm.min(3))
-                                            .concat(ruleForm.max(30))
+                                        helper.required
+                                            .concat(helper.min(3))
+                                            .concat(helper.max(30))
                                     "
                                     variant="outlined"
                                     density="comfortable"
@@ -332,9 +332,9 @@ function onClose() {
                                     v-model="user.username"
                                     :placeholder="userLabels.username"
                                     :rules="
-                                        ruleForm.required
-                                            .concat(ruleForm.min(3))
-                                            .concat(ruleForm.max(30))
+                                        helper.required
+                                            .concat(helper.min(3))
+                                            .concat(helper.max(30))
                                     "
                                     variant="outlined"
                                     density="comfortable"
@@ -350,9 +350,7 @@ function onClose() {
                                     v-model="user.phone"
                                     :placeholder="userLabels.phone"
                                     :rules="
-                                        ruleForm.required.concat(
-                                            ruleForm.number
-                                        )
+                                        helper.required.concat(helper.number)
                                     "
                                     variant="outlined"
                                     density="comfortable"
@@ -367,7 +365,7 @@ function onClose() {
                                     :label="userLabels.email + ' *'"
                                     v-model="user.email"
                                     :placeholder="userLabels.email"
-                                    :rules="ruleForm.required"
+                                    :rules="helper.required"
                                     variant="outlined"
                                     density="comfortable"
                                     hide-details="auto"
@@ -383,9 +381,9 @@ function onClose() {
                                     v-model="user.password"
                                     :placeholder="userLabels.password"
                                     :rules="
-                                        ruleForm.required
-                                            .concat(ruleForm.min(6))
-                                            .concat(ruleForm.max(14))
+                                        helper.required
+                                            .concat(helper.min(6))
+                                            .concat(helper.max(14))
                                     "
                                     variant="outlined"
                                     density="comfortable"
@@ -400,7 +398,7 @@ function onClose() {
                                 <v-select
                                     v-model="user.role"
                                     :items="roles"
-                                    :rules="ruleForm.required"
+                                    :rules="helper.required"
                                     :label="userLabels.role"
                                     item-title="title"
                                     item-value="value"
@@ -417,7 +415,7 @@ function onClose() {
                                     v-model="user.NewPassword"
                                     :placeholder="userLabels.NewPassword"
                                     :rules="
-                                        ruleForm.min(6).concat(ruleForm.max(14))
+                                        helper.min(6).concat(helper.max(14))
                                     "
                                     variant="outlined"
                                     density="comfortable"
@@ -431,7 +429,7 @@ function onClose() {
                                     :label="userLabels.ci"
                                     v-model="user.ci"
                                     :placeholder="userLabels.ci"
-                                    :rules="ruleForm.number"
+                                    :rules="helper.number"
                                     variant="outlined"
                                     density="comfortable"
                                     hide-details="auto"

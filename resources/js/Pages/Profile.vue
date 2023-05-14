@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router } from "@inertiajs/vue3";
-import ruleForm from "@/rules";
+import helper from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
@@ -90,9 +90,9 @@ function Update_Profile() {
                                 v-model="user.firstname"
                                 :placeholder="userLabels.firstname"
                                 :rules="
-                                    ruleForm.required
-                                        .concat(ruleForm.max(20))
-                                        .concat(ruleForm.min(4))
+                                    helper.required
+                                        .concat(helper.max(20))
+                                        .concat(helper.min(4))
                                 "
                                 variant="outlined"
                                 density="comfortable"
@@ -108,9 +108,9 @@ function Update_Profile() {
                                 v-model="user.lastname"
                                 :placeholder="userLabels.lastname"
                                 :rules="
-                                    ruleForm.required
-                                        .concat(ruleForm.max(20))
-                                        .concat(ruleForm.min(4))
+                                    helper.required
+                                        .concat(helper.max(20))
+                                        .concat(helper.min(4))
                                 "
                                 variant="outlined"
                                 density="comfortable"
@@ -125,7 +125,7 @@ function Update_Profile() {
                                 :label="userLabels.phone + ' *'"
                                 v-model="user.phone"
                                 :placeholder="userLabels.phone"
-                                :rules="ruleForm.required"
+                                :rules="helper.required"
                                 variant="outlined"
                                 density="comfortable"
                                 hide-details="auto"
@@ -139,7 +139,7 @@ function Update_Profile() {
                                 :label="userLabels.email + ' *'"
                                 v-model="user.email"
                                 :placeholder="userLabels.email"
-                                :rules="ruleForm.required"
+                                :rules="helper.required"
                                 variant="outlined"
                                 density="comfortable"
                                 hide-details="auto"
@@ -154,9 +154,7 @@ function Update_Profile() {
                                 :label="userLabels.NewPassword + ' *'"
                                 v-model="user.NewPassword"
                                 :placeholder="userLabels.NewPassword"
-                                :rules="
-                                    ruleForm.min(6).concat(ruleForm.max(14))
-                                "
+                                :rules="helper.min(6).concat(helper.max(14))"
                                 variant="outlined"
                                 density="comfortable"
                                 hide-details="auto"

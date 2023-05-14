@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import { router } from "@inertiajs/vue3";
-import ruleForm from "@/rules";
+import helper from "@/helpers";
 const props = defineProps({
     warehouses: Object,
     adjustment: { type: Object, default: null },
@@ -174,10 +174,10 @@ function increment(detail, id) {
                     snackbarText.value = "Queda poco Stock";
                     snackbarColor.value = "warning";
                 } else {
-                    ruleForm.formatNumber(detailsForm.value[i].quantity++, 2);
+                    helper.formatNumber(detailsForm.value[i].quantity++, 2);
                 }
             } else {
-                ruleForm.formatNumber(detailsForm.value[i].quantity++, 2);
+                helper.formatNumber(detailsForm.value[i].quantity++, 2);
             }
         }
     }
@@ -197,7 +197,7 @@ function decrement(detail, id) {
                     snackbarText.value = "Queda poco Stock";
                     snackbarColor.value = "warning";
                 } else {
-                    ruleForm.formatNumber(detailsForm.value[i].quantity--, 2);
+                    helper.formatNumber(detailsForm.value[i].quantity--, 2);
                 }
             }
         }
@@ -344,6 +344,10 @@ onMounted(() => {
         editmode.value = true;
         Get_Products_By_Warehouse(adjustmentForm.value.warehouse_id);
     }
+    if (props.warehouses.length == 1) {
+        adjustmentForm.value.warehouse_id = props.warehouses[0].value;
+        Get_Products_By_Warehouse(adjustmentForm.value.warehouse_id);
+    }
 });
 </script>
 <template>
@@ -371,7 +375,7 @@ onMounted(() => {
                                 density="comfortable"
                                 hide-details="auto"
                                 clearable
-                                :rules="ruleForm.required"
+                                :rules="helper.required"
                                 :disabled="detailsForm.length > 0"
                             ></v-select>
                         </v-col>
@@ -385,7 +389,7 @@ onMounted(() => {
                                 density="comfortable"
                                 hide-details="auto"
                                 type="date"
-                                :rules="ruleForm.required"
+                                :rules="helper.required"
                             >
                             </v-text-field>
                         </v-col>
@@ -468,7 +472,7 @@ onMounted(() => {
                                                 variant="outlined"
                                                 density="compact"
                                                 hide-details="auto"
-                                                :rules="ruleForm.number"
+                                                :rules="helper.number"
                                                 v-model="detail.quantity"
                                                 @keyup="
                                                     Verified_Qty(

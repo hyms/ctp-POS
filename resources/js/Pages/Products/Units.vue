@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
-import ruleForm from "@/rules";
+import helper from "@/helpers";
 import { router } from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
 
@@ -246,9 +246,7 @@ function Remove_Unit() {
                                     v-model="unit.name"
                                     :placeholder="unitLabels.name"
                                     :rules="
-                                        ruleForm.required.concat(
-                                            ruleForm.max(15)
-                                        )
+                                        helper.required.concat(helper.max(15))
                                     "
                                     variant="outlined"
                                     density="comfortable"
@@ -263,9 +261,7 @@ function Remove_Unit() {
                                     v-model="unit.ShortName"
                                     :placeholder="unitLabels.ShortName"
                                     :rules="
-                                        ruleForm.required.concat(
-                                            ruleForm.max(15)
-                                        )
+                                        helper.required.concat(helper.max(15))
                                     "
                                     variant="outlined"
                                     density="comfortable"
@@ -315,8 +311,8 @@ function Remove_Unit() {
                                     v-model="unit.operator_value"
                                     :placeholder="unitLabels.operator_value"
                                     :rules="
-                                        ruleForm.required.concat(
-                                            ruleForm.numberWithDecimal
+                                        helper.required.concat(
+                                            helper.numberWithDecimal
                                         )
                                     "
                                     variant="outlined"

@@ -51,30 +51,30 @@ class WarehouseController extends Controller
                 ->toArray();
 
             if ($products) {
+                $product_warehouse = collect();
                 foreach ($products as $product) {
-                    $product_warehouse = [];
+
                     $Product_Variants = ProductVariant::where('product_id', $product)
                         ->where('deleted_at', null)
                         ->get();
 
                     if ($Product_Variants->isNotEmpty()) {
                         foreach ($Product_Variants as $product_variant) {
-
-                            $product_warehouse[] = [
+                            $product_warehouse->add([
                                 'product_id' => $product,
                                 'warehouse_id' => $Warehouse->id,
                                 'product_variant_id' => $product_variant->id,
-                            ];
+                            ]);
                         }
                     } else {
-                        $product_warehouse[] = [
+                        $product_warehouse->add([
                             'product_id' => $product,
                             'warehouse_id' => $Warehouse->id,
                             'product_variant_id' => null,
-                        ];
+                        ]);
                     }
 
-                    product_warehouse::insert($product_warehouse);
+                    product_warehouse::created($product_warehouse);
                 }
             }
 

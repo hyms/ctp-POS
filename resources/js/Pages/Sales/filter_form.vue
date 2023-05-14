@@ -1,13 +1,13 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { router } from "@inertiajs/vue3";
-
+import helpers from "@/helpers";
 const props = defineProps({
     filter_form: Object,
     sales_types: Object,
     customers: Object,
 });
-
+const clientFilter = ref([]);
 const form = ref({
     start_date: "",
     end_date: "",
@@ -52,6 +52,13 @@ function search() {
     // axios.get("/sales", {
     //     filter: form.value,
     // });
+}
+function querySelections(v) {
+    clientFilter.value = props.customers.filter((e) => {
+        return (
+            (e.name || "").toLowerCase().indexOf((v || "").toLowerCase()) > -1
+        );
+    });
 }
 </script>
 <template>
@@ -110,13 +117,14 @@ function search() {
                         <v-col cols="12" sm="6">
                             <v-autocomplete
                                 v-model="form.client"
+                                @update:search="querySelections"
                                 item-title="name"
                                 item-value="id"
                                 variant="outlined"
                                 density="compact"
                                 clearable
                                 hide-details="auto"
-                                :items="customers"
+                                :items="clientFilter"
                                 :label="formLabel.client"
                             ></v-autocomplete>
                         </v-col>
@@ -140,11 +148,7 @@ function search() {
                                 density="compact"
                                 clearable
                                 hide-details="auto"
-                                :items="[
-                                    { title: 'Completado', value: 'completed' },
-                                    { title: 'Pendiente', value: 'pending' },
-                                    { title: 'ordenado', value: 'ordered' },
-                                ]"
+                                :items="helpers.statutSale()"
                                 :label="formLabel.statut"
                             ></v-select>
                         </v-col>
@@ -157,11 +161,7 @@ function search() {
                                 density="compact"
                                 clearable
                                 hide-details="auto"
-                                :items="[
-                                    { title: 'Pagado', value: 'paid' },
-                                    { title: 'Deuda', value: 'unpaid' },
-                                    { title: 'Parcial', value: 'partial' },
-                                ]"
+                                :items="helpers.statusPayment()"
                                 :label="formLabel.status_payment"
                             ></v-select>
                         </v-col>

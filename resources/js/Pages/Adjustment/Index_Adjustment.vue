@@ -5,7 +5,7 @@ import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
 import { router } from "@inertiajs/vue3";
-import rulesForm from "@/rules";
+import helper from "@/helpers";
 
 const props = defineProps({
     warehouses: Array,
@@ -122,7 +122,7 @@ function Remove_Adjustment() {
                                             <td>Fecha</td>
                                             <td class="font-weight-bold">
                                                 {{
-                                                    rulesForm.formatDate(
+                                                    helper.formatDate(
                                                         adjustment.date
                                                     )
                                                 }}
@@ -163,7 +163,7 @@ function Remove_Adjustment() {
                                             <td>{{ detail.code }}</td>
                                             <td>
                                                 {{
-                                                    rulesForm.formatNumber(
+                                                    helper.formatNumber(
                                                         detail.quantity,
                                                         2
                                                     )
@@ -264,7 +264,7 @@ function Remove_Adjustment() {
                             icon="mdi-pencil"
                             size="x-small"
                             variant="outlined"
-                            :disabled="rulesForm.enableDay(item.raw.updated_at)"
+                            :disabled="helper.enableDay(item.raw.updated_at)"
                             @click="
                                 router.visit('/adjustments/edit/' + item.raw.id)
                             "
@@ -276,7 +276,7 @@ function Remove_Adjustment() {
                             icon="mdi-delete"
                             size="x-small"
                             variant="outlined"
-                            :disabled="rulesForm.enableDay(item.raw.updated_at)"
+                            :disabled="helper.enableDay(item.raw.updated_at)"
                             @click="Delete_Item(item.raw)"
                         >
                         </v-btn>

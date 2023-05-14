@@ -67,4 +67,26 @@ export default {
     formatDate: (date) => {
         return moment(date).format("DD-MM-YYYY");
     },
+    statutSale: () => {
+        return [
+            { title: "Completado", value: "completed" },
+            { title: "Pendiente", value: "pending" },
+            { title: "Ordenado", value: "ordered" },
+        ];
+    },
+    statusPayment: () => {
+        return [
+            { title: "Pagado", value: "paid" },
+            { title: "Deuda", value: "unpaid" },
+            { title: "Parcial", value: "partial" },
+        ];
+    },
+    reglamentPayment: () => {
+        return [
+            { title: "Efectivo", value: "Cash" },
+            { title: "Cheque", value: "cheque" },
+            { title: "Transferencia Bancaria", value: "bank transfer" },
+            { title: "Otros", value: "other" },
+        ];
+    },
 };

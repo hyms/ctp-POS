@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SalesType;
 use Exception;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use App\Mail\SaleMail;
 use App\Models\Client;
@@ -30,9 +31,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
-use PDF;
-use ArPHP\I18N\Arabic;
-use \Nwidart\Modules\Facades\Module;
+use PhpOffice\PhpSpreadsheet\Writer\Pdf;
 
 class SalesController extends Controller
 {
@@ -51,32 +50,32 @@ class SalesController extends Controller
             ->where('deleted_at', '=', null)
             ->orderBy('updated_at', 'desc');
         if ($filter->count() > 0) {
-            $filterData=false;
-            if(!empty($filter->get('start_date')) && $filter->get('end_date')){
-                $Sales = $Sales->whereBetween('date',[Carbon::parse($filter->get('start_date')),Carbon::parse($filter->get('end_date'))]);
-                $filterData=true;
+            $filterData = false;
+            if (!empty($filter->get('start_date')) && $filter->get('end_date')) {
+                $Sales = $Sales->whereBetween('date', [Carbon::parse($filter->get('start_date')), Carbon::parse($filter->get('end_date'))]);
+                $filterData = true;
             }
-            if(!empty($filter->get('sale_ref'))){
-                $Sales = $Sales->where('Ref','like', "%{$filter->get('sale_ref')}%");
-                $filterData=true;
+            if (!empty($filter->get('sale_ref'))) {
+                $Sales = $Sales->where('Ref', 'like', "%{$filter->get('sale_ref')}%");
+                $filterData = true;
             }
-            if(!empty($filter->get('client'))){
-                $Sales = $Sales->where('client_id','=', $filter->get('client'));
-                $filterData=true;
+            if (!empty($filter->get('client'))) {
+                $Sales = $Sales->where('client_id', '=', $filter->get('client'));
+                $filterData = true;
             }
-            if(!empty($filter->get('sale_type'))){
-                $Sales = $Sales->where('sales_type_id','=', $filter->get('sale_type'));
-                $filterData=true;
+            if (!empty($filter->get('sale_type'))) {
+                $Sales = $Sales->where('sales_type_id', '=', $filter->get('sale_type'));
+                $filterData = true;
             }
-            if(!empty($filter->get('statut'))){
-                $Sales = $Sales->where('statut','=', $filter->get('statut'));
-                $filterData=true;
+            if (!empty($filter->get('statut'))) {
+                $Sales = $Sales->where('statut', '=', $filter->get('statut'));
+                $filterData = true;
             }
-            if(!empty($filter->get('status_payment'))){
-                $Sales = $Sales->where('payment_statut','=',$filter->get('status_payment'));
-                $filterData=true;
+            if (!empty($filter->get('status_payment'))) {
+                $Sales = $Sales->where('payment_statut', '=', $filter->get('status_payment'));
+                $filterData = true;
             }
-            if(!$filterData) {
+            if (!$filterData) {
                 $Sales = $Sales->limit(1000);
             }
         } else {
@@ -89,7 +88,7 @@ class SalesController extends Controller
             $item['id'] = $Sale['id'];
             $item['date'] = $Sale['date'];
             $item['Ref'] = $Sale['Ref'];
-            $item['created_by'] = $Sale->userpos->username;
+            $item['created_by'] = $Sale->userpos?$Sale->userpos->username:$Sale->user->username;
 //            $statut = match ($Sale['statut']) {
 //                'completed' => 'Completado',
 //                'pending' => 'Pendiente',
@@ -130,7 +129,7 @@ class SalesController extends Controller
             $data->add($item);
         }
 
-        $customers = client::where('deleted_at', '=', null)->get(['id', 'name']);
+        $customers = client::where('deleted_at', '=', null)->get(['id', 'company_name as name']);
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
@@ -149,7 +148,7 @@ class SalesController extends Controller
             'sales_types' => $sales_types,
             'customers' => $customers,
             'warehouses' => $warehouses,
-            'filter_form'=>$filter
+            'filter_form' => $filter
         ]);
     }
 
@@ -170,8 +169,9 @@ class SalesController extends Controller
             $order = new Sale;
 
             $order->is_pos = 0;
+            $order->sales_type_id = $request->sales_type;
             $order->date = $request->date;
-            $order->Ref = $this->getNumberOrder();
+            $order->Ref = $this->getNumberOrder($request->sales_type);
             $order->client_id = $request->client_id;
             $order->GrandTotal = $request->GrandTotal;
             $order->warehouse_id = $request->warehouse_id;
@@ -179,6 +179,7 @@ class SalesController extends Controller
             $order->TaxNet = $request->TaxNet;
             $order->discount = $request->discount;
             $order->shipping = $request->shipping;
+            $order->shipping_status = "";
             $order->statut = $request->statut;
             $order->payment_statut = 'unpaid';
             $order->notes = $request->notes;
@@ -187,10 +188,11 @@ class SalesController extends Controller
             $order->save();
 
             $data = $request['details'];
+            $orderDetails = collect();
             foreach ($data as $key => $value) {
                 $unit = Unit::where('id', $value['sale_unit_id'])
                     ->first();
-                $orderDetails[] = [
+                $orderDetails->add([
                     'date' => $request->date,
                     'sale_id' => $order->id,
                     'sale_unit_id' => $value['sale_unit_id'],
@@ -203,7 +205,7 @@ class SalesController extends Controller
                     'product_id' => $value['product_id'],
                     'product_variant_id' => $value['product_variant_id'],
                     'total' => $value['subtotal'],
-                ];
+                ]);
 
 
                 if ($order->statut == "completed") {
@@ -214,36 +216,23 @@ class SalesController extends Controller
                             ->where('product_variant_id', $value['product_variant_id'])
                             ->first();
 
-                        if ($unit && $product_warehouse) {
-                            if ($unit->operator == '/') {
-                                $product_warehouse->qty -= $value['quantity'] / $unit->operator_value;
-                            } else {
-                                $product_warehouse->qty -= $value['quantity'] * $unit->operator_value;
-                            }
-                            $product_warehouse->save();
-                        }
-
                     } else {
                         $product_warehouse = product_warehouse::where('deleted_at', '=', null)
                             ->where('warehouse_id', $order->warehouse_id)
                             ->where('product_id', $value['product_id'])
                             ->first();
 
-                        if ($unit && $product_warehouse) {
-                            if ($unit->operator == '/') {
-                                $product_warehouse->qty -= $value['quantity'] / $unit->operator_value;
-                            } else {
-                                $product_warehouse->qty -= $value['quantity'] * $unit->operator_value;
-                            }
-                            $product_warehouse->save();
-                        }
+                    }
+                    if ($unit && $product_warehouse) {
+                        $product_warehouse->qty -= $unit->operator == '/' ? $value['quantity'] / $unit->operator_value : $value['quantity'] * $unit->operator_value;
+                        $product_warehouse->save();
                     }
                 }
             }
-            SaleDetail::insert($orderDetails);
+            SaleDetail::created($orderDetails);
 
             $role = Auth::user()->roles()->first();
-            $view_records = Role::findOrFail($role->id)->inRole('record_view');
+//            $view_records = Role::findOrFail($role->id)->inRole('record_view');
 
             if ($request->payment['status'] != 'pending') {
                 $sale = Sale::findOrFail($order->id);
@@ -797,20 +786,25 @@ class SalesController extends Controller
 
     //------------- Reference Number Order SALE -----------\\
 
-    public function getNumberOrder()
+    public function getNumberOrder($type)
     {
-
-        $last = DB::table('sales')->latest('id')->first();
-
+        $last = DB::table('sales')->latest('id')->where('sales_type_id', '=', $type)->first();
+        $base_code = DB::table('sales_type')->where('id', '=', $type)->first();
+        $dateYear = Carbon::now()->format("y");
         if ($last) {
             $item = $last->Ref;
-            $nwMsg = explode("_", $item);
-            $inMsg = $nwMsg[1] + 1;
-            $code = $nwMsg[0] . '_' . $inMsg;
-        } else {
-            $code = 'SL_1111';
+            $nwMsg = Str::of($item)->explode("_");
+            if ($nwMsg->count() > 1) {
+                $year = $nwMsg->get(1);
+                $number = $nwMsg->get(2) + 1;
+                if ($dateYear != $year) {
+                    $year = $dateYear;
+                    $number = 101;
+                }
+                return "{$nwMsg[0]}_{$year}_{$number}";
+            }
         }
-        return $code;
+        return "{$base_code->code}_{$dateYear}_101";
     }
 
     //------------- SALE PDF -----------\\
@@ -932,14 +926,15 @@ class SalesController extends Controller
             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
         }
 
-        $clients = Client::where('deleted_at', '=', null)->get(['id', 'company_name']);
+        $clients = Client::select(['id', 'company_name as name'])->where('deleted_at', '=', null)->get();
 //        $stripe_key = config('app.STRIPE_KEY');
-
+        $sales_types = SalesType::where('deleted_at', '=', null)->get(['id', 'name']);
         Inertia::share('titlePage', 'Nueva Orden');
         return Inertia::render('Sales/Form_Sale', [
 //            'stripe_key' => $stripe_key,
-            'clients' => $clients,
-            'warehouses' => $warehouses,
+            'clients' => helpers::to_select_vuetify($clients),
+            'warehouses' => helpers::to_select_vuetify($warehouses),
+            'sales_types' => helpers::to_select_vuetify($sales_types)
         ]);
 
     }

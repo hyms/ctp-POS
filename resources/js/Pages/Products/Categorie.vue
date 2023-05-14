@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
-import ruleForm from "@/rules";
+import helper from "@/helpers";
 import { router } from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
 
@@ -208,7 +208,7 @@ function Remove_Category() {
                                     :label="categoryLabels.code + ' *'"
                                     v-model="category.code"
                                     :placeholder="categoryLabels.code"
-                                    :rules="ruleForm.required"
+                                    :rules="helper.required"
                                     variant="outlined"
                                     density="comfortable"
                                     hide-details="auto"
@@ -222,7 +222,7 @@ function Remove_Category() {
                                     :label="categoryLabels.name + ' *'"
                                     v-model="category.name"
                                     :placeholder="categoryLabels.name"
-                                    :rules="ruleForm.required"
+                                    :rules="helper.required"
                                     variant="outlined"
                                     density="comfortable"
                                     hide-details="auto"

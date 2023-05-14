@@ -3,7 +3,7 @@ import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import printJS from "print-js";
-import rules from "@/rules";
+import rules from "@/helpers";
 
 defineProps({
     product: Object,

@@ -5,7 +5,7 @@ import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
 import { router } from "@inertiajs/vue3";
-import rulesForm from "@/rules";
+import helper from "@/helpers";
 import Filter_form from "@/Pages/Sales/filter_form.vue";
 
 const props = defineProps({
@@ -583,7 +583,7 @@ function Remove_Sale(id, sale_has_return) {
                                         <td>
                                             Bs
                                             {{
-                                                rulesForm.formatNumber(
+                                                helper.formatNumber(
                                                     payment.montant,
                                                     2
                                                 )
