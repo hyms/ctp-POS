@@ -100,7 +100,7 @@ class AdjustmentController extends Controller
                     $product_warehouse->save();
                 }
             }
-            AdjustmentDetail::insert($orderDetails->all());
+            AdjustmentDetail::created($orderDetails->all());
         }, 10);
 
         return response()->json(['success' => true]);
@@ -141,7 +141,7 @@ class AdjustmentController extends Controller
             $new_adjustment_details = collect($request['details']);
 
             foreach ($old_adjustment_details as $key => $value) {
-                $product_warehouse = $this->getProduct_warehouse($value,$current_adjustment);
+                $product_warehouse = $this->getProduct_warehouse($value, $current_adjustment);
 
                 if ($product_warehouse) {
                     if ($value['type'] == "add") {
@@ -153,7 +153,7 @@ class AdjustmentController extends Controller
                 }
 
                 // Delete Detail
-                if ($new_adjustment_details->doesntContain('id','=',$value->id)) {
+                if ($new_adjustment_details->doesntContain('id', '=', $value->id)) {
                     $AdjustmentDetail = AdjustmentDetail::findOrFail($value->id);
                     $AdjustmentDetail->delete();
                 }
@@ -161,8 +161,8 @@ class AdjustmentController extends Controller
 
             // Update Data with New request
             foreach ($new_adjustment_details as $key => $product_detail) {
-                $item=collect($product_detail);
-                $product_warehouse = $this->getProduct_warehouse($item,$request);
+                $item = collect($product_detail);
+                $product_warehouse = $this->getProduct_warehouse($item, $request);
                 if ($product_warehouse) {
                     if ($item['type'] == "add") {
                         $product_warehouse->qty += $item['quantity'];
@@ -177,10 +177,10 @@ class AdjustmentController extends Controller
                 $orderDetails['product_id'] = $item['product_id'];
                 $orderDetails['product_variant_id'] = $item['product_variant_id'];
                 $orderDetails['type'] = $item['type'];
-                if ($old_adjustment_details->doesntContain('id','=',$item->get('id'))) {
+                if ($old_adjustment_details->doesntContain('id', '=', $item->get('id'))) {
                     AdjustmentDetail::Create($orderDetails);
                 } else {
-                    AdjustmentDetail::where('id', $product_detail['id'])->update($orderDetails);
+                    AdjustmentDetail::where('id', $item['id'])->update($orderDetails);
                 }
 
             }
@@ -249,16 +249,13 @@ class AdjustmentController extends Controller
             $nwMsg = Str::of($item)->explode("_");
             $year = $nwMsg->get(1);
             $number = $nwMsg->get(2) + 1;
-            if($dateYear!=$year) {
+            if ($dateYear != $year) {
                 $year = $dateYear;
                 $number = 101;
             }
-            $code = "{$nwMsg[0]}_{$year}_{$number}";
-        } else {
-            $code = "AJ_{$dateYear}_101";
+            return "{$nwMsg[0]}_{$year}_{$number}";
         }
-        return $code;
-
+        return "AJ_{$dateYear}_101";
     }
 
     //---------------- Show Form Create Adjustment ---------------\\

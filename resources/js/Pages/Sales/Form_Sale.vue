@@ -10,9 +10,11 @@ const props = defineProps({
     warehouses: Object,
     sales_types: Object,
     sale: { type: Object, default: null },
+    details: { type: Object, default: null },
     errors: Object,
 });
 
+const edit = ref(false);
 const form = ref(null);
 const loading = ref(false);
 const loadingFilter = ref(false);
@@ -134,7 +136,11 @@ async function Submit_Sale() {
         snackbarText.value = "llene el formulario correctamente";
         snackbarColor.value = "error";
     } else {
-        Create_Sale();
+        if (!edit.value) {
+            Create_Sale();
+        } else {
+            Update_Sale();
+        }
     }
 }
 
@@ -488,6 +494,43 @@ function Create_Sale() {
             });
     }
 }
+//--------------------------------- Update Sale -------------------------\\
+function Update_Sale() {
+    if (verifiedForm()) {
+        loading.value = true;
+        snackbar.value = false;
+        let id = props.sale.id;
+        axios
+            .put(`/sales/${id}`, {
+                date: saleForm.value.date,
+                client_id: saleForm.value.client_id,
+                GrandTotal: GrandTotal.value,
+                warehouse_id: saleForm.value.warehouse_id,
+                statut: saleForm.value.statut,
+                notes: saleForm.value.notes,
+                tax_rate: saleForm.value.tax_rate ? saleForm.value.tax_rate : 0,
+                TaxNet: saleForm.value.TaxNet ? saleForm.value.TaxNet : 0,
+                discount: saleForm.value.discount ? saleForm.value.discount : 0,
+                shipping: saleForm.value.shipping ? saleForm.value.shipping : 0,
+                details: detailsForm.value,
+            })
+            .then((response) => {
+                snackbar.value = true;
+                snackbarText.value = "compra exitosa";
+                snackbarColor.value = "success";
+                router.visit("/sales");
+            })
+            .catch((error) => {
+                console.log(error);
+                snackbar.value = true;
+                snackbarText.value = "No se pudo procesar el pago";
+                snackbarColor.value = "error";
+            })
+            .finally(() => {
+                loading.value = false;
+            });
+    }
+}
 
 //-------------------------------- Get Last Detail Id -------------------------\\
 function Last_Detail_id() {
@@ -554,7 +597,17 @@ function querySelections(v) {
 }
 
 onMounted(() => {
-    if (props.warehouses.length == 1) {
+    edit.value = false;
+    if (props.sale != null) {
+        edit.value = true;
+        saleForm.value = props.sale;
+        detailsForm.value = props.details;
+        clientFilter.value = props.clients.filter(
+            (val) => val.value === props.sale.client_id
+        );
+        Get_Products_By_Warehouse(props.sale.warehouse_id);
+        Calcul_Total();
+    } else if (props.warehouses.length == 1) {
         saleForm.value.warehouse_id = props.warehouses[0].value;
         Get_Products_By_Warehouse(saleForm.value.warehouse_id);
     }

@@ -15,7 +15,6 @@ use App\Models\ProductVariant;
 use App\Models\product_warehouse;
 use App\Models\Quotation;
 use App\Models\Shipment;
-use App\Models\sms_gateway;
 use App\Models\Role;
 use App\Models\SaleReturn;
 use App\Models\Sale;
@@ -88,7 +87,7 @@ class SalesController extends Controller
             $item['id'] = $Sale['id'];
             $item['date'] = $Sale['date'];
             $item['Ref'] = $Sale['Ref'];
-            $item['created_by'] = $Sale->userpos?$Sale->userpos->username:$Sale->user->username;
+            $item['created_by'] = $Sale->userpos ? $Sale->userpos->username : $Sale->user->username;
 //            $statut = match ($Sale['statut']) {
 //                'completed' => 'Completado',
 //                'pending' => 'Pendiente',
@@ -311,19 +310,9 @@ class SalesController extends Controller
 //                    $this->authorizeForUser($request->user('api'), 'check_record', $current_Sale);
 //                }
                 $old_sale_details = SaleDetail::where('sale_id', $id)->get();
-                $new_sale_details = $request['details'];
-                $length = sizeof($new_sale_details);
+                $new_sale_details = collect($request['details']);
 
-                // Get Ids for new Details
-                $new_products_id = [];
-                foreach ($new_sale_details as $new_detail) {
-                    $new_products_id[] = $new_detail['id'];
-                }
-
-                // Init Data with old Parametre
-                $old_products_id = [];
                 foreach ($old_sale_details as $key => $value) {
-                    $old_products_id[] = $value->id;
 
                     //check if detail has sale_unit_id Or Null
                     if ($value['sale_unit_id'] !== null) {
@@ -338,39 +327,18 @@ class SalesController extends Controller
                     if ($value['sale_unit_id'] !== null) {
                         if ($current_Sale->statut == "completed") {
 
-                            if ($value['product_variant_id'] !== null) {
-                                $product_warehouse = product_warehouse::where('deleted_at', '=', null)
-                                    ->where('warehouse_id', $current_Sale->warehouse_id)
-                                    ->where('product_id', $value['product_id'])
-                                    ->where('product_variant_id', $value['product_variant_id'])
-                                    ->first();
-
-                                if ($product_warehouse) {
-                                    if ($old_unit->operator == '/') {
-                                        $product_warehouse->qty += $value['quantity'] / $old_unit->operator_value;
-                                    } else {
-                                        $product_warehouse->qty += $value['quantity'] * $old_unit->operator_value;
-                                    }
-                                    $product_warehouse->save();
+                            $product_warehouse = $this->getProduct_warehouse($value, $current_Sale);
+                            if ($product_warehouse) {
+                                if ($old_unit->operator == '/') {
+                                    $product_warehouse->qty += $value['quantity'] / $old_unit->operator_value;
+                                } else {
+                                    $product_warehouse->qty += $value['quantity'] * $old_unit->operator_value;
                                 }
-
-                            } else {
-                                $product_warehouse = product_warehouse::where('deleted_at', '=', null)
-                                    ->where('warehouse_id', $current_Sale->warehouse_id)
-                                    ->where('product_id', $value['product_id'])
-                                    ->first();
-                                if ($product_warehouse) {
-                                    if ($old_unit->operator == '/') {
-                                        $product_warehouse->qty += $value['quantity'] / $old_unit->operator_value;
-                                    } else {
-                                        $product_warehouse->qty += $value['quantity'] * $old_unit->operator_value;
-                                    }
-                                    $product_warehouse->save();
-                                }
+                                $product_warehouse->save();
                             }
                         }
                         // Delete Detail
-                        if (!in_array($old_products_id[$key], $new_products_id)) {
+                        if ($new_sale_details->doesntContain('id', '=', $value->id)) {
                             $SaleDetail = SaleDetail::findOrFail($value->id);
                             $SaleDetail->delete();
                         }
@@ -379,66 +347,42 @@ class SalesController extends Controller
 
                 // Update Data with New request
                 foreach ($new_sale_details as $prd => $prod_detail) {
-
-                    if ($prod_detail['no_unit'] !== 0) {
-                        $unit_prod = Unit::where('id', $prod_detail['sale_unit_id'])->first();
+                    $item = collect($prod_detail);
+                    if ($item['sale_unit_id'] !== 0) {
+                        $unit_prod = Unit::where('id', $item['sale_unit_id'])->first();
 
                         if ($request['statut'] == "completed") {
-
-                            if ($prod_detail['product_variant_id'] !== null) {
-                                $product_warehouse = product_warehouse::where('deleted_at', '=', null)
-                                    ->where('warehouse_id', $request->warehouse_id)
-                                    ->where('product_id', $prod_detail['product_id'])
-                                    ->where('product_variant_id', $prod_detail['product_variant_id'])
-                                    ->first();
-
-                                if ($product_warehouse) {
-                                    if ($unit_prod->operator == '/') {
-                                        $product_warehouse->qty -= $prod_detail['quantity'] / $unit_prod->operator_value;
-                                    } else {
-                                        $product_warehouse->qty -= $prod_detail['quantity'] * $unit_prod->operator_value;
-                                    }
-                                    $product_warehouse->save();
+                            $product_warehouse = $this->getProduct_warehouse($item, $request);
+                            if ($product_warehouse) {
+                                if ($unit_prod->operator == '/') {
+                                    $product_warehouse->qty -= $prod_detail['quantity'] / $unit_prod->operator_value;
+                                } else {
+                                    $product_warehouse->qty -= $prod_detail['quantity'] * $unit_prod->operator_value;
                                 }
-
-                            } else {
-                                $product_warehouse = product_warehouse::where('deleted_at', '=', null)
-                                    ->where('warehouse_id', $request->warehouse_id)
-                                    ->where('product_id', $prod_detail['product_id'])
-                                    ->first();
-
-                                if ($product_warehouse) {
-                                    if ($unit_prod->operator == '/') {
-                                        $product_warehouse->qty -= $prod_detail['quantity'] / $unit_prod->operator_value;
-                                    } else {
-                                        $product_warehouse->qty -= $prod_detail['quantity'] * $unit_prod->operator_value;
-                                    }
-                                    $product_warehouse->save();
-                                }
+                                $product_warehouse->save();
                             }
-
                         }
 
                         $orderDetails['sale_id'] = $id;
                         $orderDetails['date'] = $request['date'];
-                        $orderDetails['price'] = $prod_detail['Unit_price'];
-                        $orderDetails['sale_unit_id'] = $prod_detail['sale_unit_id'];
-                        $orderDetails['TaxNet'] = $prod_detail['tax_percent'];
-                        $orderDetails['tax_method'] = $prod_detail['tax_method'];
-                        $orderDetails['discount'] = $prod_detail['discount'];
-                        $orderDetails['discount_method'] = $prod_detail['discount_Method'];
-                        $orderDetails['quantity'] = $prod_detail['quantity'];
-                        $orderDetails['product_id'] = $prod_detail['product_id'];
-                        $orderDetails['product_variant_id'] = $prod_detail['product_variant_id'];
-                        $orderDetails['total'] = $prod_detail['subtotal'];
-                        $orderDetails['imei_number'] = $prod_detail['imei_number'];
+                        $orderDetails['price'] = $item['Unit_price'];
+                        $orderDetails['sale_unit_id'] = $item['sale_unit_id'];
+                        $orderDetails['TaxNet'] = $item['tax_percent'];
+                        $orderDetails['tax_method'] = $item['tax_method'];
+                        $orderDetails['discount'] = $item['discount'];
+                        $orderDetails['discount_method'] = $item['discount_Method'];
+                        $orderDetails['quantity'] = $item['quantity'];
+                        $orderDetails['product_id'] = $item['product_id'];
+                        $orderDetails['product_variant_id'] = $item['product_variant_id'];
+                        $orderDetails['total'] = $item['subtotal'];
+                        $orderDetails['imei_number'] = $item['imei_number'];
 
-                        if (!in_array($prod_detail['id'], $old_products_id)) {
+                        if ($old_sale_details->doesntContain('id', '=', $item->get('id'))) {
                             $orderDetails['date'] = Carbon::now();
                             $orderDetails['sale_unit_id'] = $unit_prod ? $unit_prod->id : Null;
                             SaleDetail::Create($orderDetails);
                         } else {
-                            SaleDetail::where('id', $prod_detail['id'])->update($orderDetails);
+                            SaleDetail::where('id', $item['id'])->update($orderDetails);
                         }
                     }
                 }
@@ -471,7 +415,22 @@ class SalesController extends Controller
 
         return response()->json(['success' => true]);
     }
-
+    public function getProduct_warehouse(mixed $value, $current_Sale): mixed
+    {
+        if ($value['product_variant_id'] !== null) {
+            $product_warehouse = product_warehouse::where('deleted_at', '=', null)
+                ->where('warehouse_id', $current_Sale->warehouse_id)
+                ->where('product_id', $value['product_id'])
+                ->where('product_variant_id', $value['product_variant_id'])
+                ->first();
+        } else {
+            $product_warehouse = product_warehouse::where('deleted_at', '=', null)
+                ->where('warehouse_id', $current_Sale->warehouse_id)
+                ->where('product_id', $value['product_id'])
+                ->first();
+        }
+        return $product_warehouse;
+    }
     //------------- Remove SALE BY ID -----------\\
 
     public function destroy(Request $request, $id)
@@ -952,37 +911,33 @@ class SalesController extends Controller
             $Sale_data = Sale::with('details.product.unitSale')
                 ->where('deleted_at', '=', null)
                 ->findOrFail($id);
-            $details = array();
+            $details = collect();
             // Check If User Has Permission view All Records
 //            if (!$view_records) {
 //                // Check If User->id === sale->id
 //                $this->authorizeForUser($request->user('api'), 'check_record', $Sale_data);
 //            }
 
+            $sale['client_id'] = '';
             if ($Sale_data->client_id) {
                 if (Client::where('id', $Sale_data->client_id)
                     ->where('deleted_at', '=', null)
                     ->first()) {
                     $sale['client_id'] = $Sale_data->client_id;
-                } else {
-                    $sale['client_id'] = '';
                 }
-            } else {
-                $sale['client_id'] = '';
             }
 
+            $sale['warehouse_id'] = '';
             if ($Sale_data->warehouse_id) {
                 if (Warehouse::where('id', $Sale_data->warehouse_id)
                     ->where('deleted_at', '=', null)
                     ->first()) {
                     $sale['warehouse_id'] = $Sale_data->warehouse_id;
-                } else {
-                    $sale['warehouse_id'] = '';
                 }
-            } else {
-                $sale['warehouse_id'] = '';
             }
 
+            $sale['id'] = $Sale_data->id;
+            $sale['sales_type_id'] = $Sale_data->sales_type_id;
             $sale['date'] = $Sale_data->date;
             $sale['tax_rate'] = $Sale_data->tax_rate;
             $sale['TaxNet'] = $Sale_data->TaxNet;
@@ -1020,14 +975,6 @@ class SalesController extends Controller
                     $data['product_variant_id'] = $detail->product_variant_id;
                     $data['code'] = $productsVariants->name . '-' . $detail['product']['code'];
 
-                    if ($unit && $unit->operator == '/') {
-                        $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
-                    } else if ($unit && $unit->operator == '*') {
-                        $data['stock'] = $item_product ? $item_product->qte / $unit->operator_value : 0;
-                    } else {
-                        $data['stock'] = 0;
-                    }
-
                 } else {
                     $item_product = product_warehouse::where('product_id', $detail->product_id)
                         ->where('deleted_at', '=', null)->where('warehouse_id', $Sale_data->warehouse_id)
@@ -1037,14 +984,13 @@ class SalesController extends Controller
                     $data['product_variant_id'] = null;
                     $data['code'] = $detail['product']['code'];
 
-                    if ($unit && $unit->operator == '/') {
-                        $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
-                    } else if ($unit && $unit->operator == '*') {
-                        $data['stock'] = $item_product ? $item_product->qte / $unit->operator_value : 0;
-                    } else {
-                        $data['stock'] = 0;
-                    }
-
+                }
+                if ($unit && $unit->operator == '/') {
+                    $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
+                } else if ($unit && $unit->operator == '*') {
+                    $data['stock'] = $item_product ? $item_product->qte / $unit->operator_value : 0;
+                } else {
+                    $data['stock'] = 0;
                 }
 
                 $data['id'] = $detail->id;
@@ -1057,8 +1003,6 @@ class SalesController extends Controller
                 $data['etat'] = 'current';
                 $data['unitSale'] = $unit->ShortName;
                 $data['sale_unit_id'] = $unit->id;
-                $data['is_imei'] = $detail['product']['is_imei'];
-                $data['imei_number'] = $detail->imei_number;
 
                 if ($detail->discount_method == '2') {
                     $data['DiscountNet'] = $detail->discount;
@@ -1077,14 +1021,13 @@ class SalesController extends Controller
                 if ($detail->tax_method == '1') {
                     $data['Net_price'] = $detail->price - $data['DiscountNet'];
                     $data['taxe'] = $tax_price;
-                    $data['subtotal'] = ($data['Net_price'] * $data['quantity']) + ($tax_price * $data['quantity']);
                 } else {
                     $data['Net_price'] = ($detail->price - $data['DiscountNet']) / (($detail->TaxNet / 100) + 1);
                     $data['taxe'] = $detail->price - $data['Net_price'] - $data['DiscountNet'];
-                    $data['subtotal'] = ($data['Net_price'] * $data['quantity']) + ($tax_price * $data['quantity']);
                 }
+                $data['subtotal'] = ($data['Net_price'] * $data['quantity']) + ($tax_price * $data['quantity']);
 
-                $details[] = $data;
+                $details->add($data);
             }
 
             //get warehouses assigned to user
@@ -1097,15 +1040,16 @@ class SalesController extends Controller
             }
 
             $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
-
-            return response()->json([
+            $sales_types = SalesType::where('deleted_at', '=', null)->get(['id', 'name']);
+            Inertia::share('titlePage', 'Editar Orden');
+            return Inertia::render('Sales/Form_Sale', [
+                'clients' => helpers::to_select_vuetify($clients),
+                'warehouses' => helpers::to_select_vuetify($warehouses),
+                'sales_types' => helpers::to_select_vuetify($sales_types),
                 'details' => $details,
                 'sale' => $sale,
-                'clients' => $clients,
-                'warehouses' => $warehouses,
             ]);
         }
-
     }
 
 
