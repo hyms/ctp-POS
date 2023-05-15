@@ -83,6 +83,29 @@ const menuItems = ref([
         ],
     },
     {
+        label: "Gastos",
+        url: "",
+        role: "venta",
+        icon: "",
+        subItems: [
+            {
+                label: "Añadir Gastos",
+                url: "/expenses/create",
+                role: "admin",
+            },
+            {
+                label: "Listar Gastos",
+                url: "/expenses",
+                role: "admin",
+            },
+            {
+                label: "Categorias de Gastos",
+                url: "/expenses_category",
+                role: "admin",
+            },
+        ],
+    },
+    {
         label: "Configuraciones",
         url: "",
         role: "admin",

@@ -7,49 +7,47 @@ import { router } from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
 
 const props = defineProps({
-    sales_types: Array,
-    errors: Object,
+    Expenses_category: Object,
 });
 
-//declare variable
 const form = ref(null);
 const search = ref("");
 const loading = ref(false);
 const snackbar = ref(false);
 const snackbarText = ref("");
 const snackbarColor = ref("info");
-const dialog = ref(false);
-const dialogDelete = ref(false);
 const editmode = ref(false);
+const category = ref({
+    id: "",
+    name: "",
+    description: "",
+});
+const categoryLabel = ref({
+    name: "Nombre",
+    description: "Descripcion",
+});
 
 const fields = ref([
     { title: "Nombre", key: "name" },
-    { title: "Codigo", key: "code" },
+    { title: "Descripcion", key: "description" },
     { title: "Acciones", key: "actions" },
 ]);
-const sales_type = ref({
-    id: "",
-    name: "",
-    code: "",
-});
-const sales_typeLabels = ref({
-    name: "Nombre",
-    code: "Codigo",
-});
+const dialog = ref(false);
+const dialogDelete = ref(false);
 
-//------------- Submit Validation Create & Edit SalesType
-async function Submit_SalesType() {
+//------------- Submit Validation Create & Edit Category
+async function Submit_Category() {
     const validate = await form.value.validate();
     if (validate.valid)
         if (!editmode.value) {
-            Create_SalesType();
+            Create_Category();
         } else {
-            Update_SalesType();
+            Update_Category();
         }
 }
 
-//------------------------------ Modal  (create SalesType) -------------------------------\\
-function New_SalesType() {
+//--------------------------Show Modal (new Category) ----------------\\
+function New_Category() {
     reset_Form();
     editmode.value = false;
     dialog.value = true;
@@ -58,86 +56,85 @@ function onClose() {
     dialog.value = false;
     reset_Form();
 }
-//------------------------------ Modal (Update SalesType) -------------------------------\\
-function Edit_SalesType(item) {
+//-------------------------- Show Modal (Edit Category) ----------------\\
+function Edit_Category(cat) {
     reset_Form();
-    sales_type.value = item;
+    category.value = cat;
     editmode.value = true;
     dialog.value = true;
 }
 
-//----------------------------------Create new SalesType ----------------\\
-function Create_SalesType() {
-    loading.value = true;
-    snackbar.value = false;
-    axios
-        .post("sales_types", {
-            name: sales_type.value.name,
-            code: sales_type.value.code,
-        })
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbarColor.value = "success";
-            snackbarText.value = "Proceso exitoso";
-            router.reload();
-            dialog.value = false;
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbarColor.value = "error";
-            snackbarText.value = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
-}
-
-//---------------------------------- Update SalesType ----------------\\
-function Update_SalesType() {
-    loading.value = true;
-    snackbar.value = false;
-    axios
-        .put("sales_types/" + sales_type.value.id, {
-            name: sales_type.value.name,
-            code: sales_type.value.code,
-        })
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbarColor.value = "success";
-            snackbarText.value = "Proceso exitoso";
-            router.reload();
-            dialog.value = false;
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbarColor.value = "error";
-            snackbarText.value = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
-}
-
 //--------------------------- reset Form ----------------\\
-
 function reset_Form() {
-    sales_type.value = {
+    category.value = {
         id: "",
         name: "",
-        code: "",
+        description: "",
     };
 }
 
+//----------------------------------Create new Category ----------------\\
+function Create_Category() {
+    loading.value = true;
+    snackbar.value = false;
+    axios
+        .post("/expenses_category", {
+            name: category.value.name,
+            description: category.value.description,
+        })
+        .then(({ data }) => {
+            snackbar.value = true;
+            snackbarColor.value = "success";
+            snackbarText.value = "Proceso exitoso";
+            router.reload();
+            dialog.value = false;
+        })
+        .catch((error) => {
+            console.log(error);
+            snackbar.value = true;
+            snackbarColor.value = "error";
+            snackbarText.value = error.response.data.message;
+        })
+        .finally(() => {
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
+        });
+}
+
+//---------------------------------- Update Category ----------------\\
+function Update_Category() {
+    loading.value = true;
+    snackbar.value = false;
+    axios
+        .put("/expenses_category/" + category.value.id, {
+            name: category.value.name,
+            description: category.value.description,
+        })
+        .then(({ data }) => {
+            snackbar.value = true;
+            snackbarColor.value = "success";
+            snackbarText.value = "Proceso exitoso";
+            router.reload();
+            dialog.value = false;
+        })
+        .catch((error) => {
+            console.log(error);
+            snackbar.value = true;
+            snackbarColor.value = "error";
+            snackbarText.value = error.response.data.message;
+        })
+        .finally(() => {
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
+        });
+}
+
 //---------------------- delete modal  ------------------------------\\
-function Delete_SalesType(item) {
+function Delete_CategoryExpense(item) {
     reset_Form();
-    sales_type.value = item;
+    category.value = item;
     dialogDelete.value = true;
 }
 
@@ -146,12 +143,12 @@ function onCloseDelete() {
     dialogDelete.value = false;
 }
 
-//--------------------------- Remove SalesType----------------\\
-function Remove_SalesType() {
+//--------------------------- Delete Category----------------\\
+function Delete_Category(id) {
     loading.value = true;
     snackbar.value = false;
     axios
-        .delete("sales_types/" + sales_type.value.id)
+        .delete("/expenses_category/" + id)
         .then(({ data }) => {
             snackbar.value = true;
             snackbarColor.value = "success";
@@ -182,7 +179,7 @@ function Remove_SalesType() {
         <delete-dialog
             :model="dialogDelete"
             :on-close="onCloseDelete"
-            :on-save="Remove_SalesType"
+            :on-save="Delete_Category"
         >
         </delete-dialog>
         <v-dialog
@@ -196,7 +193,8 @@ function Remove_SalesType() {
                     border
                     density="compact"
                     :title="
-                        (editmode ? 'Modificar' : 'Nuevo') + ' Tipo de Venta'
+                        (editmode ? 'Modificar' : 'Nueva') +
+                        ' Categoria de gasto'
                     "
                 >
                 </v-toolbar>
@@ -204,12 +202,12 @@ function Remove_SalesType() {
                 <v-card-text>
                     <v-form ref="form">
                         <v-row>
-                            <!-- Code SalesType -->
+                            <!-- Name Category -->
                             <v-col cols="12">
                                 <v-text-field
-                                    :label="sales_typeLabels.code + ' *'"
-                                    v-model="sales_type.code"
-                                    :placeholder="sales_typeLabels.code"
+                                    :label="categoryLabel.name + ' *'"
+                                    v-model="category.name"
+                                    :placeholder="categoryLabel.name"
                                     :rules="helper.required"
                                     variant="outlined"
                                     density="comfortable"
@@ -218,18 +216,18 @@ function Remove_SalesType() {
                                 </v-text-field>
                             </v-col>
 
-                            <!-- Name SalesType -->
+                            <!-- Description Category -->
                             <v-col cols="12">
-                                <v-text-field
-                                    :label="sales_typeLabels.name + ' *'"
-                                    v-model="sales_type.name"
-                                    :placeholder="sales_typeLabels.name"
-                                    :rules="helper.required"
+                                <v-textarea
+                                    :label="categoryLabel.description"
+                                    v-model="category.description"
+                                    :placeholder="categoryLabel.description"
+                                    rows="4"
                                     variant="outlined"
                                     density="comfortable"
                                     hide-details="auto"
                                 >
-                                </v-text-field>
+                                </v-textarea>
                             </v-col>
                         </v-row>
                     </v-form>
@@ -250,7 +248,7 @@ function Remove_SalesType() {
                         color="primary"
                         variant="elevated"
                         class="ma-1"
-                        @click="Submit_SalesType"
+                        @click="Submit_Category"
                         :loading="loading"
                         :disabled="loading"
                     >
@@ -259,7 +257,6 @@ function Remove_SalesType() {
                 </v-card-actions>
             </v-card>
         </v-dialog>
-
         <v-row align="center">
             <v-col cols="12" sm="6">
                 <v-text-field
@@ -278,7 +275,7 @@ function Remove_SalesType() {
                     color="primary"
                     class="ma-1"
                     prepend-icon="mdi-account-plus"
-                    @click="New_SalesType"
+                    @click="New_Category"
                 >
                     Añadir
                 </v-btn>
@@ -288,7 +285,7 @@ function Remove_SalesType() {
             <v-col cols="12">
                 <v-data-table
                     :headers="fields"
-                    :items="sales_types"
+                    :items="Expenses_category"
                     :search="search"
                     hover
                     class="elevation-2"
@@ -302,7 +299,7 @@ function Remove_SalesType() {
                             icon="mdi-pencil"
                             size="x-small"
                             variant="outlined"
-                            @click="Edit_SalesType(item.raw)"
+                            @click="Edit_Category(item.raw)"
                         >
                         </v-btn>
                         <v-btn
@@ -311,7 +308,7 @@ function Remove_SalesType() {
                             icon="mdi-delete"
                             size="x-small"
                             variant="outlined"
-                            @click="Delete_SalesType(item.raw)"
+                            @click="Delete_CategoryExpense(item.raw)"
                         >
                         </v-btn>
                     </template>

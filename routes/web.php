@@ -138,6 +138,7 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
 
     //------------------------------- Expenses --------------------------\\
     Route::get('expenses', [ExpensesController::class, 'index']);
+    Route::get('expenses/create', [ExpensesController::class, 'create']);
     Route::post('expenses', [ExpensesController::class, 'store']);
     Route::put('expenses/{id}', [ExpensesController::class, 'update']);
     Route::delete('expenses/{id}', [ExpensesController::class, 'destroy']);
