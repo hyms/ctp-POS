@@ -228,7 +228,7 @@ class SalesController extends Controller
                     }
                 }
             }
-            SaleDetail::created($orderDetails);
+            SaleDetail::create($orderDetails);
 
             $role = Auth::user()->roles()->first();
 //            $view_records = Role::findOrFail($role->id)->inRole('record_view');

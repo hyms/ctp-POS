@@ -74,7 +74,7 @@ class WarehouseController extends Controller
                         ]);
                     }
 
-                    product_warehouse::created($product_warehouse);
+                    product_warehouse::create($product_warehouse);
                 }
             }
 

@@ -135,6 +135,8 @@ return new class extends Migration {
             $table->foreignId('warehouse_id')->constrained('warehouses');
             $table->string('details');
             $table->float('amount', 10, 0);
+            $table->timestamps(6);
+            $table->softDeletes();
         });
         Schema::create('adjustments', function (Blueprint $table) {
             $table->engine = 'InnoDB';

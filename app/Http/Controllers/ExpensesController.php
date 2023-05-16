@@ -9,72 +9,30 @@ use App\Models\Role;
 use App\Models\Warehouse;
 use App\utils\helpers;
 use Carbon\Carbon;
-use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
-class ExpensesController extends BaseController
+class ExpensesController extends Controller
 {
 
     //-------------- Show All  Expenses -----------\\
 
     public function index(request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'view', Expense::class);
+//        $this->authorizeForUser($request->user('api'), 'view', Expense::class);
 
-        // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
-        // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-        $order = $request->SortField;
-        $dir = $request->SortType;
-        $helpers = new helpers();
-        $role = Auth::user()->roles()->first();
-        $view_records = Role::findOrFail($role->id)->inRole('record_view');
-        // Filter fields With Params to retrieve
-        $columns = array(0 => 'Ref', 1 => 'warehouse_id', 2 => 'date', 3 => 'expense_category_id');
-        $param = array(0 => 'like', 1 => '=', 2 => '=', 3 => '=');
-        $data = array();
+
+//        $helpers = new helpers();
+//        $role = Auth::user()->roles()->first();
+//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
 
         // Check If User Has Permission View  All Records
         $Expenses = Expense::with('expense_category', 'warehouse')
             ->where('deleted_at', '=', null)
-            ->where(function ($query) use ($view_records) {
-                if (!$view_records) {
-                    return $query->where('user_id', '=', Auth::user()->id);
-                }
-            });
-
-        //Multiple Filter
-        $Filtred = $helpers->filter($Expenses, $columns, $param, $request)
-        //Search With Multiple Param
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('search'), function ($query) use ($request) {
-                    return $query->where('Ref', 'LIKE', "%{$request->search}%")
-                        ->orWhere('date', 'LIKE', "%{$request->search}%")
-                        ->orWhere('details', 'LIKE', "%{$request->search}%")
-                        ->orWhere(function ($query) use ($request) {
-                            return $query->whereHas('expense_category', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        })
-                        ->orWhere(function ($query) use ($request) {
-                            return $query->whereHas('warehouse', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        });
-                });
-            });
-        $totalRows = $Filtred->count();
-        if($perPage == "-1"){
-            $perPage = $totalRows;
-        }
-        $Expenses = $Filtred->offset($offSet)
-            ->limit($perPage)
-            ->orderBy($order, $dir)
             ->get();
-
+        $data = collect();
         foreach ($Expenses as $Expense) {
 
             $item['id'] = $Expense->id;
@@ -84,7 +42,7 @@ class ExpensesController extends BaseController
             $item['amount'] = $Expense->amount;
             $item['warehouse_name'] = $Expense['warehouse']->name;
             $item['category_name'] = $Expense['expense_category']->name;
-            $data[] = $item;
+             $data->add($item);
         }
 
         $Expenses_category = ExpenseCategory::where('deleted_at', '=', null)->get(['id', 'name']);
@@ -98,11 +56,11 @@ class ExpensesController extends BaseController
              $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
           }
 
-        return response()->json([
+        Inertia::share('titlePage', 'Gastos');
+        return Inertia::render('Expense/Index_Expense',[
             'expenses' => $data,
             'Expenses_category' => $Expenses_category,
             'warehouses' => $warehouses,
-            'totalRows' => $totalRows,
         ]);
 
     }
@@ -111,7 +69,7 @@ class ExpensesController extends BaseController
 
     public function store(Request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'create', Expense::class);
+//        $this->authorizeForUser($request->user('api'), 'create', Expense::class);
 
         request()->validate([
             'expense.date' => 'required',
@@ -146,16 +104,16 @@ class ExpensesController extends BaseController
     public function update(Request $request, $id)
     {
 
-        $this->authorizeForUser($request->user('api'), 'update', Expense::class);
-        $role = Auth::user()->roles()->first();
-        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+//        $this->authorizeForUser($request->user('api'), 'update', Expense::class);
+//        $role = Auth::user()->roles()->first();
+//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
         $expense = Expense::findOrFail($id);
 
         // Check If User Has Permission view All Records
-        if (!$view_records) {
-            // Check If User->id === expense->id
-            $this->authorizeForUser($request->user('api'), 'check_record', $expense);
-        }
+//        if (!$view_records) {
+//            // Check If User->id === expense->id
+//            $this->authorizeForUser($request->user('api'), 'check_record', $expense);
+//        }
 
         request()->validate([
             'expense.date' => 'required',
@@ -180,16 +138,16 @@ class ExpensesController extends BaseController
 
     public function destroy(Request $request, $id)
     {
-        $this->authorizeForUser($request->user('api'), 'delete', Expense::class);
-        $role = Auth::user()->roles()->first();
-        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+//        $this->authorizeForUser($request->user('api'), 'delete', Expense::class);
+//        $role = Auth::user()->roles()->first();
+//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
         $expense = Expense::findOrFail($id);
 
         // Check If User Has Permission view All Records
-        if (!$view_records) {
-            // Check If User->id === expense->id
-            $this->authorizeForUser($request->user('api'), 'check_record', $expense);
-        }
+//        if (!$view_records) {
+//            // Check If User->id === expense->id
+//            $this->authorizeForUser($request->user('api'), 'check_record', $expense);
+//        }
 
         $expense->update([
             'deleted_at' => Carbon::now(),
@@ -198,29 +156,29 @@ class ExpensesController extends BaseController
         return response()->json(['success' => true]);
     }
 
-    //-------------- Delete by selection  ---------------\\
-
-    public function delete_by_selection(Request $request)
-    {
-        $this->authorizeForUser($request->user('api'), 'delete', Expense::class);
-        $selectedIds = $request->selectedIds;
-        $role = Auth::user()->roles()->first();
-        $view_records = Role::findOrFail($role->id)->inRole('record_view');
-
-        foreach ($selectedIds as $expense_id) {
-            $expense = Expense::findOrFail($expense_id);
-
-            // Check If User Has Permission view All Records
-            if (!$view_records) {
-                // Check If User->id === expense->id
-                $this->authorizeForUser($request->user('api'), 'check_record', $expense);
-            }
-            $expense->update([
-                'deleted_at' => Carbon::now(),
-            ]);
-        }
-        return response()->json(['success' => true]);
-    }
+//    //-------------- Delete by selection  ---------------\\
+//
+//    public function delete_by_selection(Request $request)
+//    {
+//        $this->authorizeForUser($request->user('api'), 'delete', Expense::class);
+//        $selectedIds = $request->selectedIds;
+//        $role = Auth::user()->roles()->first();
+//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+//
+//        foreach ($selectedIds as $expense_id) {
+//            $expense = Expense::findOrFail($expense_id);
+//
+//            // Check If User Has Permission view All Records
+//            if (!$view_records) {
+//                // Check If User->id === expense->id
+//                $this->authorizeForUser($request->user('api'), 'check_record', $expense);
+//            }
+//            $expense->update([
+//                'deleted_at' => Carbon::now(),
+//            ]);
+//        }
+//        return response()->json(['success' => true]);
+//    }
 
     //--------------- Reference Number of Expense ----------------\\
 
@@ -247,7 +205,7 @@ class ExpensesController extends BaseController
     public function create(Request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'create', Expense::class);
+//        $this->authorizeForUser($request->user('api'), 'create', Expense::class);
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
@@ -260,8 +218,9 @@ class ExpensesController extends BaseController
 
         $Expenses_category = ExpenseCategory::where('deleted_at', '=', null)->get(['id', 'name']);
 
-        return response()->json([
-            'Expenses_category' => $Expenses_category,
+        Inertia::share('titlePage', 'Nuevo Gasto');
+        return Inertia::render('Expense/Form_Expense',[
+            'expense_category' => $Expenses_category,
             'warehouses' => $warehouses,
         ]);
     }

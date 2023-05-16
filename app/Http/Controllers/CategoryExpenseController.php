@@ -21,7 +21,7 @@ class CategoryExpenseController extends Controller
 //        $view_records = Role::findOrFail($role->id)->inRole('record_view');
         $ExpenseCategory = ExpenseCategory::where('deleted_at', '=', null)->get();
 
-        Inertia::share('titlePage', 'Gastos');
+        Inertia::share('titlePage', 'Categoria de Gastos');
         return Inertia::render('Expense/Category_Expense',[
             'Expenses_category' => $ExpenseCategory,
         ]);
@@ -37,9 +37,9 @@ class CategoryExpenseController extends Controller
             'name' => 'required',
         ]);
 
-        ExpenseCategory::created([
+        ExpenseCategory::create([
             'user_id' => Auth::user()->id,
-            'description' => $request['description'],
+            'description' => $request['description']??"",
             'name' => $request['name'],
         ]);
 

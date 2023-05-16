@@ -1,416 +1,161 @@
-<script>
-// import { mapActions, mapGetters } from "vuex";
-// import NProgress from "nprogress";
-// import jsPDF from "jspdf";
-// import "jspdf-autotable";
-//
-// export default {
-//   metaInfo: {
-//     title: "Expense"
-//   },
-//   data() {
-//     return {
-//       isLoading: true,
-//       serverParams: {
-//         columnFilters: {},
-//         sort: {
-//           field: "id",
-//           type: "desc"
-//         },
-//         page: 1,
-//         perPage: 10
-//       },
-//       selectedIds: [],
-//       totalRows: "",
-//       search: "",
-//       limit: "10",
-//       Filter_date: "",
-//       Filter_Ref: "",
-//       Filter_warehouse: "",
-//       Filter_category: "",
-//       expenses: [],
-//       warehouses: [],
-//       expense_Category: []
-//     };
-//   },
-//
-//   computed: {
-//     ...mapGetters(["currentUserPermissions", "currentUser"]),
-//     columns() {
-//       return [
-//         {
-//           label: this.$t("date"),
-//           field: "date",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Reference"),
-//           field: "Ref",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Details"),
-//           field: "details",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Amount"),
-//           field: "amount",
-//           type: "decimal",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Categorie"),
-//           field: "category_name",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("warehouse"),
-//           field: "warehouse_name",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Action"),
-//           field: "actions",
-//           html: true,
-//           tdClass: "text-right",
-//           thClass: "text-right",
-//           sortable: false
-//         }
-//       ];
-//     }
-//   },
-//
-//   methods: {
-//     //---------------------- Expenses PDF -------------------------------\\
-//     Expense_PDF() {
-//       var self = this;
-//
-//       let pdf = new jsPDF("p", "pt");
-//       let columns = [
-//         { title: "Date", dataKey: "date" },
-//         { title: "Reference", dataKey: "Ref" },
-//         { title: "Amount", dataKey: "amount" },
-//         { title: "Category", dataKey: "category_name" },
-//         { title: "Warehouse", dataKey: "warehouse_name" }
-//       ];
-//       pdf.autoTable(columns, self.expenses);
-//       pdf.text("Expense List", 40, 25);
-//       pdf.save("Expense_List.pdf");
-//     },
-//
-//     //------ update Params Table
-//     updateParams(newProps) {
-//       this.serverParams = Object.assign({}, this.serverParams, newProps);
-//     },
-//
-//     //---- Event Page Change
-//     onPageChange({ currentPage }) {
-//       if (this.serverParams.page !== currentPage) {
-//         this.updateParams({ page: currentPage });
-//         this.Get_Expenses(currentPage);
-//       }
-//     },
-//
-//     //---- Event Per Page Change
-//     onPerPageChange({ currentPerPage }) {
-//       if (this.limit !== currentPerPage) {
-//         this.limit = currentPerPage;
-//         this.updateParams({ page: 1, perPage: currentPerPage });
-//         this.Get_Expenses(1);
-//       }
-//     },
-//
-//     //---- Event Select Rows
-//     selectionChanged({ selectedRows }) {
-//       this.selectedIds = [];
-//       selectedRows.forEach((row, index) => {
-//         this.selectedIds.push(row.id);
-//       });
-//     },
-//
-//     //------ Event Sort Change
-//     onSortChange(params) {
-//       let field = "";
-//       if (params[0].field == "warehouse_name") {
-//         field = "warehouse_id";
-//       } else if (params[0].field == "category_name") {
-//         field = "expense_category_id";
-//       } else {
-//         field = params[0].field;
-//       }
-//       this.updateParams({
-//         sort: {
-//           type: params[0].type,
-//           field: field
-//         }
-//       });
-//       this.Get_Expenses(this.serverParams.page);
-//     },
-//
-//     //------ Event Search
-//     onSearch(value) {
-//       this.search = value.searchTerm;
-//       this.Get_Expenses(this.serverParams.page);
-//     },
-//
-//     //------ Reset Filter
-//     Reset_Filter() {
-//       this.search = "";
-//       this.Filter_date = "";
-//       this.Filter_Ref = "";
-//       this.Filter_warehouse = "";
-//       this.Filter_category = "";
-//       this.Get_Expenses(this.serverParams.page);
-//     },
-//
-//     // Simply replaces null values with strings=''
-//     setToStrings() {
-//       if (this.Filter_warehouse === null) {
-//         this.Filter_warehouse = "";
-//       } else if (this.Filter_category === null) {
-//         this.Filter_category = "";
-//       }
-//     },
-//
-//     //------------------------------------------------ Get All Expense -------------------------------\\
-//     Get_Expenses(page) {
-//       // Start the progress bar.
-//       NProgress.start();
-//       NProgress.set(0.1);
-//       this.setToStrings();
-//       axios
-//         .get(
-//           "expenses?page=" +
-//             page +
-//             "&Ref=" +
-//             this.Filter_Ref +
-//             "&warehouse_id=" +
-//             this.Filter_warehouse +
-//             "&date=" +
-//             this.Filter_date +
-//             "&expense_category_id=" +
-//             this.Filter_category +
-//             "&SortField=" +
-//             this.serverParams.sort.field +
-//             "&SortType=" +
-//             this.serverParams.sort.type +
-//             "&search=" +
-//             this.search +
-//             "&limit=" +
-//             this.limit
-//         )
-//         .then(response => {
-//           this.expenses = response.data.expenses;
-//           this.expense_Category = response.data.Expenses_category;
-//           this.warehouses = response.data.warehouses;
-//           this.totalRows = response.data.totalRows;
-//
-//           // Complete the animation of theprogress bar.
-//           NProgress.done();
-//           this.isLoading = false;
-//         })
-//         .catch(response => {
-//           // Complete the animation of theprogress bar.
-//           NProgress.done();
-//           setTimeout(() => {
-//             this.isLoading = false;
-//           }, 500);
-//         });
-//     },
-//
-//     //------------------------------- Remove Expense -------------------------\\
-//
-//     Remove_Expense(id) {
-//       this.$swal({
-//         title: this.$t("Delete.Title"),
-//         text: this.$t("Delete.Text"),
-//         type: "warning",
-//         showCancelButton: true,
-//         confirmButtonColor: "#3085d6",
-//         cancelButtonColor: "#d33",
-//         cancelButtonText: this.$t("Delete.cancelButtonText"),
-//         confirmButtonText: this.$t("Delete.confirmButtonText")
-//       }).then(result => {
-//         if (result.value) {
-//           // Start the progress bar.
-//           NProgress.start();
-//           NProgress.set(0.1);
-//           axios
-//             .delete("expenses/" + id)
-//             .then(() => {
-//               this.$swal(
-//                 this.$t("Delete.Deleted"),
-//                 this.$t("Expense_Deleted"),
-//                 "success"
-//               );
-//               Fire.$emit("Delete_Expense");
-//             })
-//             .catch(() => {
-//               // Complete the animation of theprogress bar.
-//               setTimeout(() => NProgress.done(), 500);
-//               this.$swal(
-//                 this.$t("Delete.Failed"),
-//                 this.$t("Delete.Therewassomethingwronge"),
-//                 "warning"
-//               );
-//             });
-//         }
-//       });
-//     },
-//
-//     //---- Delete Expense by selection
-//
-//     delete_by_selected() {
-//       this.$swal({
-//         title: this.$t("Delete.Title"),
-//         text: this.$t("Delete.Text"),
-//         type: "warning",
-//         showCancelButton: true,
-//         confirmButtonColor: "#3085d6",
-//         cancelButtonColor: "#d33",
-//         cancelButtonText: this.$t("Delete.cancelButtonText"),
-//         confirmButtonText: this.$t("Delete.confirmButtonText")
-//       }).then(result => {
-//         if (result.value) {
-//           // Start the progress bar.
-//           NProgress.start();
-//           NProgress.set(0.1);
-//           axios
-//             .post("expenses_delete_by_selection", {
-//               selectedIds: this.selectedIds
-//             })
-//             .then(() => {
-//               this.$swal(
-//                 this.$t("Delete.Deleted"),
-//                 this.$t("Expense_Deleted"),
-//                 "success"
-//               );
-//
-//               Fire.$emit("Delete_Expense");
-//             })
-//             .catch(() => {
-//               // Complete the animation of theprogress bar.
-//               setTimeout(() => NProgress.done(), 500);
-//               this.$swal(
-//                 this.$t("Delete.Failed"),
-//                 this.$t("Delete.Therewassomethingwronge"),
-//                 "warning"
-//               );
-//             });
-//         }
-//       });
-//     }
-//   },
-//
-//   //----------------------------- Created function-------------------
-//   created: function() {
-//     this.Get_Expenses(1);
-//
-//     Fire.$on("Delete_Expense", () => {
-//       setTimeout(() => {
-//         // Complete the animation of theprogress bar.
-//         NProgress.done();
-//         this.Get_Expenses(this.serverParams.page);
-//       }, 500);
-//     });
-//   }
-// };
+<script setup>
+import { ref } from "vue";
+import Layout from "@/Layouts/Authenticated.vue";
+import Snackbar from "@/Components/snackbar.vue";
+import ExportBtn from "@/Components/ExportBtn.vue";
+import helper from "@/helpers";
+import { router } from "@inertiajs/vue3";
+import DeleteDialog from "@/Components/DeleteDialog.vue";
+
+const props = defineProps({
+    expenses: Object,
+    Expenses_category: Object,
+    warehouses: Object,
+    errors: Object,
+});
+//declare variable
+const form = ref(null);
+const search = ref("");
+const loading = ref(false);
+const snackbar = ref(false);
+const snackbarText = ref("");
+const snackbarColor = ref("info");
+const dialogDelete = ref(false);
+
+const fields = ref([
+    { title: "Fecha", key: "date" },
+    { title: "Codigo", key: "Ref" },
+    { title: "Detalle", key: "details" },
+    { title: "Monto", key: "amount" },
+    { title: "Categoria", key: "category_name" },
+    { title: "Sucursal", key: "warehouse_name" },
+    { title: "Acciones", key: "actions" },
+]);
+const jsonFields = ref({
+    Fecha: "date",
+    Codigo: "code",
+    Detalle: "details",
+    Monto: "amount",
+    Categoria: "category_name",
+    Sucursal: "warehouse_name",
+});
+const expense = ref({
+    id: "",
+});
+//------------------------------- Remove Expense -------------------------\\
+
+function Remove_Expense() {
+    loading.value = true;
+    snackbar.value = false;
+    axios
+        .delete("expenses/" + expense.value.id)
+        .then(({ data }) => {
+            snackbar.value = true;
+            snackbarColor.value = "success";
+            snackbarText.value = "Borrado exitoso";
+            router.reload();
+            dialogDelete.value = false;
+        })
+        .catch((error) => {
+            console.log(error);
+            snackbar.value = true;
+            snackbarColor.value = "error";
+            snackbarText.value = error.response.data.message;
+        })
+        .finally(() => {
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
+        });
+}
+function onCloseDelete() {
+    dialogDelete.value = false;
+}
+function Delete_Expense(id) {
+    expense.value.id = id;
+    dialogDelete.value = true;
+}
 </script>
 <template>
-    <!--  <div class="main-content">-->
-    <!--    <breadcumb :page="$t('Expense_List')" :folder="$t('Expenses')"/>-->
-
-    <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
-    <!--    <div v-else>-->
-    <!--      <vue-good-table-->
-    <!--        mode="remote"-->
-    <!--        :columns="columns"-->
-    <!--        :totalRows="totalRows"-->
-    <!--        :rows="expenses"-->
-    <!--        @on-page-change="onPageChange"-->
-    <!--        @on-per-page-change="onPerPageChange"-->
-    <!--        @on-sort-change="onSortChange"-->
-    <!--        @on-search="onSearch"-->
-    <!--        :search-options="{-->
-    <!--        enabled: true,-->
-    <!--        placeholder: $t('Search_this_table'),  -->
-    <!--      }"-->
-    <!--        :select-options="{ -->
-    <!--          enabled: true ,-->
-    <!--          clearSelectionText: '',-->
-    <!--        }"-->
-    <!--        @on-selected-rows-change="selectionChanged"-->
-    <!--        :pagination-options="{-->
-    <!--        enabled: true,-->
-    <!--        mode: 'records',-->
-    <!--        nextLabel: 'next',-->
-    <!--        prevLabel: 'prev',-->
-    <!--      }"-->
-    <!--        styleClass="tableOne table-hover vgt-table"-->
-    <!--      >-->
-    <!--        <div slot="selected-row-actions">-->
-    <!--          <button class="btn btn-danger btn-sm" @click="delete_by_selected()">{{$t('Del')}}</button>-->
-    <!--        </div>-->
-    <!--        <div slot="table-actions" class="mt-2 mb-3">-->
-    <!--          <b-button variant="outline-info ripple m-1" size="sm" v-b-toggle.sidebar-right>-->
-    <!--            <i class="i-Filter-2"></i>-->
-    <!--            {{ $t("Filter") }}-->
-    <!--          </b-button>-->
-    <!--          <b-button @click="Expense_PDF()" size="sm" variant="outline-success ripple m-1">-->
-    <!--            <i class="i-File-Copy"></i> PDF-->
-    <!--          </b-button>-->
-    <!--           <vue-excel-xlsx-->
-    <!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
-    <!--              :data="expenses"-->
-    <!--              :columns="columns"-->
-    <!--              :file-name="'Expenses'"-->
-    <!--              :file-type="'xlsx'"-->
-    <!--              :sheet-name="'Expenses'"-->
-    <!--              >-->
-    <!--              <i class="i-File-Excel"></i> EXCEL-->
-    <!--          </vue-excel-xlsx>-->
-    <!--          <router-link-->
-    <!--            class="btn-sm btn btn-primary ripple btn-icon m-1"-->
-    <!--            v-if="currentUserPermissions && currentUserPermissions.includes('expense_add')"-->
-    <!--            to="/app/expenses/store"-->
-    <!--          >-->
-    <!--            <span class="ul-btn__icon">-->
-    <!--              <i class="i-Add"></i>-->
-    <!--            </span>-->
-    <!--            <span class="ul-btn__text ml-1">{{$t('Add')}}</span>-->
-    <!--          </router-link>-->
-    <!--        </div>-->
-
-    <!--        <template slot="table-row" slot-scope="props">-->
-    <!--          <span v-if="props.column.field == 'actions'">-->
-    <!--            <router-link-->
-    <!--              v-if="currentUserPermissions && currentUserPermissions.includes('expense_edit')"-->
-    <!--              title="Edit"-->
-    <!--              v-b-tooltip.hover-->
-    <!--              :to="'/app/expenses/edit/'+props.row.id"-->
-    <!--            >-->
-    <!--              <i class="i-Edit text-25 text-success"></i>-->
-    <!--            </router-link>-->
-    <!--            <a-->
-    <!--              title="Delete"-->
-    <!--              class="cursor-pointer"-->
-    <!--              v-b-tooltip.hover-->
-    <!--              v-if="currentUserPermissions && currentUserPermissions.includes('expense_delete')"-->
-    <!--              @click="Remove_Expense(props.row.id)"-->
-    <!--            >-->
-    <!--              <i class="i-Close-Window text-25 text-danger"></i>-->
-    <!--            </a>-->
-    <!--          </span>-->
-    <!--        </template>-->
-    <!--      </vue-good-table>-->
-    <!--    </div>-->
+    <layout :loading="loading">
+        <snackbar
+            :snackbar="snackbar"
+            :snackbar-text="snackbarText"
+            :snackbar-color="snackbarColor"
+        ></snackbar>
+        <!-- Modal Remove Expense -->
+        <delete-dialog
+            :model="dialogDelete"
+            :on-save="Remove_Expense"
+            :on-close="onCloseDelete"
+        ></delete-dialog>
+        <v-row align="center">
+            <v-col>
+                <v-text-field
+                    v-model="search"
+                    prepend-icon="mdi-magnify"
+                    density="compact"
+                    hide-details
+                    label="Buscar"
+                    single-line
+                    variant="underlined"
+                ></v-text-field>
+            </v-col>
+            <v-spacer></v-spacer>
+            <v-col cols="auto" class="text-right">
+                <ExportBtn
+                    :data="expenses"
+                    :fields="jsonFields"
+                    name-file="Gastos"
+                ></ExportBtn>
+                <v-btn
+                    size="small"
+                    color="primary"
+                    class="ma-1"
+                    prepend-icon="mdi-account-plus"
+                    @click="router.visit('/expenses/create')"
+                >
+                    Añadir
+                </v-btn>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <v-data-table
+                    :headers="fields"
+                    :items="expenses"
+                    :search="search"
+                    hover
+                    class="elevation-2"
+                    density="compact"
+                    no-data-text="No existen datos a mostrar"
+                >
+                    <template v-slot:item.actions="{ item }">
+                        <v-btn
+                            class="ma-1"
+                            color="primary"
+                            icon="mdi-pencil"
+                            size="x-small"
+                            variant="outlined"
+                            @click="
+                                router.visit('/expenses/edit/' + item.raw.id)
+                            "
+                        >
+                        </v-btn>
+                        <v-btn
+                            class="ma-1"
+                            color="error"
+                            icon="mdi-delete"
+                            size="x-small"
+                            variant="outlined"
+                            @click="Delete_Expense(item.raw.id)"
+                        >
+                        </v-btn>
+                    </template>
+                </v-data-table>
+            </v-col>
+        </v-row>
+    </layout>
 
     <!--    &lt;!&ndash; Multiple Filters &ndash;&gt;-->
     <!--    <b-sidebar id="sidebar-right" :title="$t('Filter')" bg-variant="white" right shadow>-->

@@ -129,7 +129,7 @@ class ProductsController extends Controller
                             'name' => $variant,
                         ]);
                     }
-                    ProductVariant::created($Product_variants_data);
+                    ProductVariant::create($Product_variants_data);
                 }
 
                 //--Store Product Warehouse
@@ -155,7 +155,7 @@ class ProductsController extends Controller
                             ]);
                         }
                     }
-                    product_warehouse::created($product_warehouse);
+                    product_warehouse::create($product_warehouse);
                 }
 
             }, 10);
@@ -258,7 +258,7 @@ class ProductsController extends Controller
                                         ]);
 
                                     }
-                                    product_warehouse::created($product_warehouse);
+                                    product_warehouse::create($product_warehouse);
                                 }
                             }
                         }
@@ -288,7 +288,7 @@ class ProductsController extends Controller
                                         'product_variant_id' => $ProductVarDT->id,
                                     ]);
                                 }
-                                product_warehouse::created($product_warehouse_DT);
+                                product_warehouse::create($product_warehouse_DT);
                             }
                         }
 
@@ -319,7 +319,7 @@ class ProductsController extends Controller
                                 ]);
 
                             }
-                            product_warehouse::created($product_warehouse);
+                            product_warehouse::create($product_warehouse);
                         }
                     }
                 }
@@ -895,7 +895,7 @@ class ProductsController extends Controller
                         }
                     }
                     if ($warehouses) {
-                        product_warehouse::created($product_warehouse);
+                        product_warehouse::create($product_warehouse);
                     }
                 }
             }, 10);

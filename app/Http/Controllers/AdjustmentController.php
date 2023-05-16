@@ -100,7 +100,7 @@ class AdjustmentController extends Controller
                     $product_warehouse->save();
                 }
             }
-            AdjustmentDetail::created($orderDetails->all());
+            AdjustmentDetail::create($orderDetails->all());
         }, 10);
 
         return response()->json(['success' => true]);

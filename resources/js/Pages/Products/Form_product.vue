@@ -14,7 +14,6 @@ const props = defineProps({
 });
 const form = ref(null);
 const editmode = ref(false);
-const search = ref("");
 const loading = ref(false);
 const snackbar = ref(false);
 const snackbarText = ref("");
