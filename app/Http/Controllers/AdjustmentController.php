@@ -80,16 +80,15 @@ class AdjustmentController extends Controller
             $order->user_id = Auth::user()->id;
             $order->save();
 
-            $i = 0;
-            $orderDetails = collect();
+
             foreach ($data as $key => $value) {
-                $orderDetails->add([
+                $orderDetails = [
                     'adjustment_id' => $order->id,
                     'quantity' => $value['quantity'],
                     'product_id' => $value['product_id'],
                     'product_variant_id' => $value['product_variant_id'],
                     'type' => $value['type'],
-                ]);
+                ];
                 $product_warehouse = $this->getProduct_warehouse($value, $order);
                 if ($product_warehouse) {
                     if ($value['type'] == "add") {
@@ -99,8 +98,9 @@ class AdjustmentController extends Controller
                     }
                     $product_warehouse->save();
                 }
+                AdjustmentDetail::create($orderDetails);
             }
-            AdjustmentDetail::create($orderDetails->all());
+
         }, 10);
 
         return response()->json(['success' => true]);
@@ -243,19 +243,7 @@ class AdjustmentController extends Controller
     public function getNumberOrder()
     {
         $last = DB::table('adjustments')->latest('id')->first();
-        $dateYear = Carbon::now()->format("y");
-        if ($last) {
-            $item = $last->Ref;
-            $nwMsg = Str::of($item)->explode("_");
-            $year = $nwMsg->get(1);
-            $number = $nwMsg->get(2) + 1;
-            if ($dateYear != $year) {
-                $year = $dateYear;
-                $number = 101;
-            }
-            return "{$nwMsg[0]}_{$year}_{$number}";
-        }
-        return "AJ_{$dateYear}_101";
+        return helpers::get_code($last?->Ref,"AJ");
     }
 
     //---------------- Show Form Create Adjustment ---------------\\

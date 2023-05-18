@@ -1,11 +1,16 @@
 <?php
+
 namespace App\utils;
 
 use App\Models\Currency;
 use App\Models\Role;
 use App\Models\Setting;
+use App\Models\UserWarehouse;
+use App\Models\Warehouse;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class helpers
 {
@@ -26,8 +31,8 @@ class helpers
                 return $model->when($request->filled($field['value']),
                     function ($query) use ($request, $model, $field) {
                         $field['param'] = 'like' ?
-                        $model->where($field['value'], 'like', "{$request[$field['value']]}")
-                        : $model->where($field['value'], $request[$field['value']]);
+                            $model->where($field['value'], 'like', "{$request[$field['value']]}")
+                            : $model->where($field['value'], $request[$field['value']]);
                     });
             });
         }
@@ -93,4 +98,33 @@ class helpers
         });
     }
 
+    public static function get_code($ref, $sub_code)
+    {
+        $dateYear = Carbon::now()->format("y");
+        $code = "{$sub_code}_{$dateYear}_1001";
+        if (isset($ref)) {
+            $nwMsg = Str::of($ref)->explode("_");
+            if ($nwMsg->count() > 1) {
+                $year = $nwMsg->get(1);
+                $number = $nwMsg->get(2) + 1;
+                if ($dateYear != $year) {
+                    $year = $dateYear;
+                    $number = 1001;
+                }
+                $code = "{$nwMsg[0]}_{$year}_{$number}";
+            }
+        }
+        return $code;
+    }
+
+    public static function getWarehouses($user_auth)
+    {
+        if ($user_auth->is_all_warehouses) {
+            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
+        } else {
+            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
+            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
+        }
+        return $warehouses;
+    }
 }

@@ -58,13 +58,7 @@ class ProductsController extends Controller
         }
 
         //get warehouses assigned to user
-        $user_auth = auth()->user();
-        if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        } else {
-            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-        }
+        $warehouses = helpers::getWarehouses(auth()->user());
 
         $categories = Category::where('deleted_at', null)->get(['id', 'name']);
         Inertia::share('titlePage', 'Productos');
@@ -377,13 +371,7 @@ class ProductsController extends Controller
 
         $Product = Product::where('deleted_at', '=', null)->findOrFail($id);
         //get warehouses assigned to user
-        $user_auth = auth()->user();
-        if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        } else {
-            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-        }
+        $warehouses = helpers::getWarehouses(auth()->user());
 
         $item['id'] = $Product->id;
         $item['code'] = $Product->code;
@@ -656,13 +644,7 @@ class ProductsController extends Controller
         $products = new LengthAwarePaginator($data_collection, count($data), $perPage, Paginator::resolveCurrentPage(), array('path' => Paginator::resolveCurrentPath()));
 
         //get warehouses assigned to user
-        $user_auth = auth()->user();
-        if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        } else {
-            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-        }
+        $warehouses = helpers::getWarehouses(auth()->user());
 
         return response()->json([
             'products' => $products,

@@ -37,6 +37,7 @@ async function Submit_Expense() {
     const validate = await form.value.validate();
     if (validate.valid)
         if (editmode.value) {
+            Update_Expense();
         } else {
             Create_Expense();
         }
@@ -69,17 +70,42 @@ function Create_Expense() {
             }, 1000);
         });
 }
-watch(
-    () => [props.expense],
-    () => {
-        if (props.expense != null) {
-            expenseForm.value = props.expense;
-            editmode.value = true;
-        } else {
-            editmode.value = false;
-        }
+//--------------------------------- Update Expense -------------------------\\
+function Update_Expense() {
+    loading.value = true;
+    snackbar.value = false;
+    let id = expenseForm.value.id;
+    axios
+        .put(`/expenses/${id}`, {
+            expense: expenseForm.value,
+        })
+        .then(({ data }) => {
+            snackbar.value = true;
+            snackbarColor.value = "success";
+            snackbarText.value = "Actualizacion exitosa";
+            router.visit("/expenses");
+        })
+        .catch((error) => {
+            console.log(error);
+            snackbar.value = true;
+            snackbarColor.value = "error";
+            snackbarText.value = error.response.data.message;
+        })
+        .finally(() => {
+            setTimeout(() => {
+                loading.value = false;
+            }, 1000);
+        });
+}
+
+onMounted(() => {
+    if (props.expense != null) {
+        expenseForm.value = props.expense;
+        editmode.value = true;
+    } else {
+        editmode.value = false;
     }
-);
+});
 </script>
 <template>
     <Layout :loading="loading">

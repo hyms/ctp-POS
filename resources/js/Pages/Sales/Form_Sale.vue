@@ -542,7 +542,7 @@ function Last_Detail_id() {
 //---------------------------------Get Product Details ------------------------\\
 
 function Get_Product_Details(product_id) {
-    axios.get("/products/" + product_id).then((response) => {
+    axios.get("/product/" + product_id).then((response) => {
         product.value.discount = 0;
         product.value.DiscountNet = 0;
         product.value.discount_Method = "2";

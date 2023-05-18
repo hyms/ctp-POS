@@ -90,7 +90,7 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
 
     //------------------------------- PRODUCTS --------------------------\\
     Route::get('products/create', [ProductsController::class, 'create']);
-    Route::get('products/{id}', [ProductsController::class, 'show']);
+    Route::get('product/{id}', [ProductsController::class, 'show']);
     Route::get('products/edit/{id}', [ProductsController::class, 'edit']);
     Route::get('products/list', [ProductsController::class, 'index']);
     Route::post('products', [ProductsController::class, 'store']);
@@ -139,6 +139,7 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     //------------------------------- Expenses --------------------------\\
     Route::get('expenses', [ExpensesController::class, 'index']);
     Route::get('expenses/create', [ExpensesController::class, 'create']);
+    Route::get('expenses/edit/{id}', [ExpensesController::class, 'edit']);
     Route::post('expenses', [ExpensesController::class, 'store']);
     Route::put('expenses/{id}', [ExpensesController::class, 'update']);
     Route::delete('expenses/{id}', [ExpensesController::class, 'destroy']);

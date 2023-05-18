@@ -131,13 +131,7 @@ class SalesController extends Controller
         $customers = client::where('deleted_at', '=', null)->get(['id', 'company_name as name']);
 
         //get warehouses assigned to user
-        $user_auth = auth()->user();
-        if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        } else {
-            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-        }
+        $warehouses = helpers::getWarehouses(auth()->user());
 
         $sales_types = SalesType::where('deleted_at', '=', null)->get(['id', 'name']);
 
@@ -749,21 +743,7 @@ class SalesController extends Controller
     {
         $last = DB::table('sales')->latest('id')->where('sales_type_id', '=', $type)->first();
         $base_code = DB::table('sales_type')->where('id', '=', $type)->first();
-        $dateYear = Carbon::now()->format("y");
-        if ($last) {
-            $item = $last->Ref;
-            $nwMsg = Str::of($item)->explode("_");
-            if ($nwMsg->count() > 1) {
-                $year = $nwMsg->get(1);
-                $number = $nwMsg->get(2) + 1;
-                if ($dateYear != $year) {
-                    $year = $dateYear;
-                    $number = 101;
-                }
-                return "{$nwMsg[0]}_{$year}_{$number}";
-            }
-        }
-        return "{$base_code->code}_{$dateYear}_101";
+        return helpers::get_code($last?->Ref,$base_code->code);
     }
 
     //------------- SALE PDF -----------\\
@@ -877,13 +857,7 @@ class SalesController extends Controller
 //        $this->authorizeForUser($request->user('api'), 'create', Sale::class);
 
         //get warehouses assigned to user
-        $user_auth = auth()->user();
-        if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        } else {
-            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-        }
+        $warehouses = helpers::getWarehouses(auth()->user());
 
         $clients = Client::select(['id', 'company_name as name'])->where('deleted_at', '=', null)->get();
 //        $stripe_key = config('app.STRIPE_KEY');
@@ -1208,13 +1182,7 @@ class SalesController extends Controller
         }
 
         //get warehouses assigned to user
-        $user_auth = auth()->user();
-        if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        } else {
-            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-        }
+        $warehouses = helpers::getWarehouses(auth()->user());
 
         $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
 

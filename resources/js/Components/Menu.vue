@@ -126,12 +126,12 @@ const menuItems = ref([
                 url: "/users",
                 role: "admin",
             },
-            {
-                label: "respaldo",
-                url: "/backup",
-                role: "admin",
-                //newPage: true,
-            },
+            // {
+            //     label: "respaldo",
+            //     url: "/backup",
+            //     role: "admin",
+            //     //newPage: true,
+            // },
         ],
     },
 ]);

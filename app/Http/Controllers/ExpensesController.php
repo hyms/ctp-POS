@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\User;
 use App\Models\UserWarehouse;
 use App\Models\Expense;
@@ -42,22 +43,16 @@ class ExpensesController extends Controller
             $item['amount'] = $Expense->amount;
             $item['warehouse_name'] = $Expense['warehouse']->name;
             $item['category_name'] = $Expense['expense_category']->name;
-             $data->add($item);
+            $data->add($item);
         }
 
         $Expenses_category = ExpenseCategory::where('deleted_at', '=', null)->get(['id', 'name']);
 
-          //get warehouses assigned to user
-          $user_auth = auth()->user();
-          if($user_auth->is_all_warehouses){
-             $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-          }else{
-             $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-          }
+        //get warehouses assigned to user
+        $warehouses = helpers::getWarehouses(auth()->user());
 
         Inertia::share('titlePage', 'Gastos');
-        return Inertia::render('Expense/Index_Expense',[
+        return Inertia::render('Expense/Index_Expense', [
             'expenses' => $data,
             'Expenses_category' => $Expenses_category,
             'warehouses' => $warehouses,
@@ -94,10 +89,11 @@ class ExpensesController extends Controller
 
     //------------ function show -----------\\
 
-    public function show($id){
+    public function show($id)
+    {
         //
-        
-        }
+
+    }
 
     //-------------- Update  Expense -----------\\
 
@@ -186,17 +182,7 @@ class ExpensesController extends Controller
     {
 
         $last = DB::table('expenses')->latest('id')->first();
-
-        if ($last) {
-            $item = $last->Ref;
-            $nwMsg = explode("_", $item);
-            $inMsg = $nwMsg[1] + 1;
-            $code = $nwMsg[0] . '_' . $inMsg;
-        } else {
-            $code = 'EXP_1111';
-        }
-        return $code;
-
+        return helpers::get_code($last?->Ref, "GA");
     }
 
 
@@ -208,18 +194,12 @@ class ExpensesController extends Controller
 //        $this->authorizeForUser($request->user('api'), 'create', Expense::class);
 
         //get warehouses assigned to user
-        $user_auth = auth()->user();
-        if($user_auth->is_all_warehouses){
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        }else{
-            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-        }
+        $warehouses = helpers::getWarehouses(auth()->user());
 
         $Expenses_category = ExpenseCategory::where('deleted_at', '=', null)->get(['id', 'name']);
 
         Inertia::share('titlePage', 'Nuevo Gasto');
-        return Inertia::render('Expense/Form_Expense',[
+        return Inertia::render('Expense/Form_Expense', [
             'expense_category' => $Expenses_category,
             'warehouses' => $warehouses,
         ]);
@@ -230,59 +210,47 @@ class ExpensesController extends Controller
     public function edit(Request $request, $id)
     {
 
-        $this->authorizeForUser($request->user('api'), 'update', Expense::class);
-        $role = Auth::user()->roles()->first();
-        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+//        $this->authorizeForUser($request->user('api'), 'update', Expense::class);
+//        $role = Auth::user()->roles()->first();
+//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
         $Expense = Expense::where('deleted_at', '=', null)->findOrFail($id);
 
         // Check If User Has Permission view All Records
-        if (!$view_records) {
-            // Check If User->id === Expense->id
-            $this->authorizeForUser($request->user('api'), 'check_record', $Expense);
-        }
-
+//        if (!$view_records) {
+//             Check If User->id === Expense->id
+//            $this->authorizeForUser($request->user('api'), 'check_record', $Expense);
+//        }
+        $data['warehouse_id'] = '';
         if ($Expense->warehouse_id) {
             if (Warehouse::where('id', $Expense->warehouse_id)
                 ->where('deleted_at', '=', null)
                 ->first()) {
                 $data['warehouse_id'] = $Expense->warehouse_id;
-            } else {
-                $data['warehouse_id'] = '';
             }
-        } else {
-            $data['warehouse_id'] = '';
         }
-
+        $data['category_id'] = '';
         if ($Expense->expense_category_id) {
             if (ExpenseCategory::where('id', $Expense->expense_category_id)
                 ->where('deleted_at', '=', null)
                 ->first()) {
                 $data['category_id'] = $Expense->expense_category_id;
-            } else {
-                $data['category_id'] = '';
             }
-        } else {
-            $data['category_id'] = '';
         }
 
+        $data['id'] = $Expense->id;
         $data['date'] = $Expense->date;
         $data['amount'] = $Expense->amount;
         $data['details'] = $Expense->details;
 
         //get warehouses assigned to user
-        $user_auth = auth()->user();
-        if($user_auth->is_all_warehouses){
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        }else{
-            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-        }
+        $warehouses = helpers::getWarehouses(auth()->user());
 
         $Expenses_category = ExpenseCategory::where('deleted_at', '=', null)->get(['id', 'name']);
 
-        return response()->json([
+        Inertia::share('titlePage', 'Modificar Gasto');
+        return Inertia::render('Expense/Form_Expense', [
             'expense' => $data,
-            'expense_Category' => $Expenses_category,
+            'expense_category' => $Expenses_category,
             'warehouses' => $warehouses,
         ]);
     }
