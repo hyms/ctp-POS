@@ -225,10 +225,11 @@ onMounted(() => {
         >
         </snackbar>
 
-        <v-card>
+        <v-card variant="elevated">
+            <v-toolbar height="10"></v-toolbar>
             <v-card-text>
                 <v-form @submit.prevent="Submit_Product" ref="form">
-                    <v-row class="mt-3">
+                    <v-row>
                         <!-- Name -->
                         <v-col cols="12" md="6">
                             <v-text-field

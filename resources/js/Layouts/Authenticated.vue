@@ -8,9 +8,13 @@ const props = defineProps({ loading: { type: Boolean, default: false } });
 <template>
     <v-theme-provider theme="customLight" with-background>
         <v-dialog :model-value="loading" persistent width="auto">
-            <div class="text-center">
-            <v-progress-circular bg-color="surface" color="primary" indeterminate :size="65" :width="6"></v-progress-circular>
-            </div>
+            <v-card color="surface">
+                <v-card-text>
+                    <div class="text-center ma-1 pa-1">
+            <v-progress-circular color="primary" indeterminate :size="65" :width="6"></v-progress-circular>
+                    </div>
+                </v-card-text>
+            </v-card>
         </v-dialog>
         <v-layout full-height>
             <Menu> </Menu>

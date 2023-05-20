@@ -360,6 +360,7 @@ onMounted(() => {
         </snackbar>
         <v-form ref="form">
             <v-card>
+                <v-toolbar height="10"></v-toolbar>
                 <v-card-text>
                     <v-row>
                         <!-- warehouse -->
@@ -405,6 +406,7 @@ onMounted(() => {
                                 item-title="name"
                                 item-value="id"
                                 density="comfortable"
+                                variant="solo-filled"
                                 hide-no-data
                                 hide-details
                                 label="Añadir Producto"
