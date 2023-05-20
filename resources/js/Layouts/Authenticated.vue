@@ -7,20 +7,12 @@ const props = defineProps({ loading: { type: Boolean, default: false } });
 </script>
 <template>
     <v-theme-provider theme="customLight" with-background>
-        <v-dialog :model-value="loading" :scrim="false" persistent width="auto">
-            <v-card color="primary">
-                <v-card-text>
-                    Cargando ...
-                    <v-progress-linear
-                        indeterminate
-                        rounded
-                        color="white"
-                        :height="5"
-                    ></v-progress-linear>
-                </v-card-text>
-            </v-card>
+        <v-dialog :model-value="loading" persistent width="auto">
+            <div class="text-center">
+            <v-progress-circular bg-color="surface" color="primary" indeterminate :size="65" :width="6"></v-progress-circular>
+            </div>
         </v-dialog>
-        <v-layout full-height v-if="!loading">
+        <v-layout full-height>
             <Menu> </Menu>
 
             <v-main>

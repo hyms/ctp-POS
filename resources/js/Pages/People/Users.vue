@@ -266,7 +266,7 @@ function onClose() {
 </script>
 
 <template>
-    <Layout :loading="loading">
+    <Layout>
         <Snackbar
             :snackbar="snackbar"
             :snackbar-color="snackbarColor"
@@ -532,6 +532,8 @@ function onClose() {
                     class="elevation-2"
                     density="compact"
                     no-data-text="No existen datos a mostrar"
+                    :loading="loading"
+                    loading-text="Cargando..."
                 >
                     <template v-slot:item.statut="{ item }">
                         <v-switch

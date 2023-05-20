@@ -192,7 +192,7 @@ function onCloseDelete() {
 </script>
 
 <template>
-    <Layout :loading="loading">
+    <Layout>
         <snackbar
             :snackbar="snackbar"
             :snackbar-color="snackbarColor"
@@ -334,6 +334,8 @@ function onCloseDelete() {
                         hover
                         density="compact"
                         no-data-text="No existen datos a mostrar"
+                        :loading="loading"
+                        loading-text="Cargando..."
                     >
                         <template v-slot:item.actions="{ item }">
                             <v-btn
