@@ -170,7 +170,7 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
 //------------------------------- Payments  Sales --------------------------\\
     Route::get('payment_sale', [PaymentSalesController::class,'index']);
     Route::post('payment_sale', [PaymentSalesController::class,'store']);
-    Route::put('payment_sale', [PaymentSalesController::class,'update']);
+    Route::put('payment_sale/{id}', [PaymentSalesController::class,'update']);
     Route::delete('payment_sale/{id}', [PaymentSalesController::class,'destroy']);
     Route::get('payment_sale_get_number', [PaymentSalesController::class,'getNumberOrder']);
     //------------------------------------------------------------------\\

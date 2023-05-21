@@ -1,3 +1,194 @@
+<script>
+// import { mapActions, mapGetters } from "vuex";
+// import NProgress from "nprogress";
+//
+// export default {
+//   metaInfo: {
+//     title: "System Settings"
+//   },
+//   data() {
+//     return {
+//
+//       isLoading: true,
+//       data: new FormData(),
+//       settings: [],
+//       currencies: [],
+//       clients: [],
+//       warehouses: [],
+//       sms_gateway: [],
+//       zones_array:[],
+//       setting: {
+//         client_id: "",
+//         warehouse_id: "",
+//         currency_id: "",
+//         email: "",
+//         logo: "",
+//         CompanyName: "",
+//         CompanyPhone: "",
+//         CompanyAdress: "",
+//         footer:"",
+//         developed_by:"",
+//         default_language:"",
+//         sms_gateway:"",
+//         is_invoice_footer:'',
+//         invoice_footer:'',
+//       },
+//
+//     };
+//   },
+//
+//   methods: {
+//     ...mapActions(["refreshUserPermissions"]),
+//
+//
+//       SetLocal(locale) {
+//       this.$i18n.locale = locale;
+//       this.$store.dispatch("language/setLanguage", locale);
+//       Fire.$emit("ChangeLanguage");
+//     },
+//
+//     //------------- Submit Validation Setting
+//     Submit_Setting() {
+//       this.$refs.form_setting.validate().then(success => {
+//         if (!success) {
+//           this.makeToast(
+//             "danger",
+//             this.$t("Please_fill_the_form_correctly"),
+//             this.$t("Failed")
+//           );
+//         } else {
+//           this.Update_Settings();
+//         }
+//       });
+//     },
+//
+//     //------ Toast
+//     makeToast(variant, msg, title) {
+//       this.$root.$bvToast.toast(msg, {
+//         title: title,
+//         variant: variant,
+//         solid: true
+//       });
+//     },
+//
+//     getValidationState({ dirty, validated, valid = null }) {
+//       return dirty || validated ? valid : null;
+//     },
+//
+//     //------------------------------ Event Upload Logo -------------------------------\\
+//     async onFileSelected(e) {
+//       const { valid } = await this.$refs.Logo.validate(e);
+//
+//       if (valid) {
+//         this.setting.logo = e.target.files[0];
+//       } else {
+//         this.setting.logo = "";
+//       }
+//     },
+//
+//      Selected_Time_Zone(value) {
+//           if (value === null) {
+//               this.setting.timezone = "";
+//           }
+//       },
+//
+//
+//
+//     //---------------------------------- Update Settings ----------------\\
+//     Update_Settings() {
+//       NProgress.start();
+//       NProgress.set(0.1);
+//       var self = this;
+//       self.data.append("client", self.setting.client_id);
+//       self.data.append("warehouse", self.setting.warehouse_id);
+//       self.data.append("currency", self.setting.currency_id);
+//       self.data.append("email", self.setting.email);
+//       self.data.append("logo", self.setting.logo);
+//       self.data.append("CompanyName", self.setting.CompanyName);
+//       self.data.append("CompanyPhone", self.setting.CompanyPhone);
+//       self.data.append("CompanyAdress", self.setting.CompanyAdress);
+//       self.data.append("footer", self.setting.footer);
+//       self.data.append("developed_by", self.setting.developed_by);
+//       self.data.append("default_language", self.setting.default_language);
+//       self.data.append("sms_gateway", self.setting.sms_gateway);
+//       self.data.append("is_invoice_footer", self.setting.is_invoice_footer);
+//       self.data.append("invoice_footer", self.setting.invoice_footer);
+//       self.data.append("timezone", self.setting.timezone);
+//       self.data.append("_method", "put");
+//
+//       axios
+//         .post("settings/" + self.setting.id, self.data)
+//         .then(response => {
+//           Fire.$emit("Event_Setting");
+//           this.makeToast(
+//             "success",
+//             this.$t("Successfully_Updated"),
+//             this.$t("Success")
+//           );
+//           this.refreshUserPermissions();
+//           NProgress.done();
+//           this.SetLocal(self.setting.default_language);
+//         })
+//         .catch(error => {
+//           this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+//           NProgress.done();
+//         });
+//     },
+//
+//     //---------------------------------- Clear_Cache ----------------\\
+//     Clear_Cache() {
+//       NProgress.start();
+//       NProgress.set(0.1);
+//       axios
+//         .get("clear_cache")
+//         .then(response => {
+//           this.makeToast(
+//             "success",
+//             this.$t("Cache_cleared_successfully"),
+//             this.$t("Success")
+//           );
+//           NProgress.done();
+//         })
+//         .catch(error => {
+//           NProgress.done();
+//           this.makeToast("danger", this.$t("Failed_to_clear_cache"), this.$t("Failed"));
+//         });
+//     },
+//
+//     //---------------------------------- Get SETTINGS ----------------\\
+//     Get_Settings() {
+//       axios
+//         .get("get_Settings_data")
+//         .then(response => {
+//           this.setting    = response.data.settings;
+//           this.currencies = response.data.currencies;
+//           this.clients    = response.data.clients;
+//           this.warehouses = response.data.warehouses;
+//           this.sms_gateway    = response.data.sms_gateway;
+//            this.zones_array    = response.data.zones_array;
+//           this.isLoading = false;
+//         })
+//         .catch(error => {
+//           setTimeout(() => {
+//             this.isLoading = false;
+//           }, 500);
+//         });
+//     },
+//
+//   }, //end Methods
+//
+//   //----------------------------- Created function-------------------
+//
+//   created: function() {
+//     this.Get_Settings();
+//
+//     Fire.$on("Event_Setting", () => {
+//       this.Get_Settings();
+//     });
+//
+//   }
+// };
+</script>
 <template>
     <!--  <div class="main-content">-->
     <!--    <breadcumb :page="$t('SystemSettings')" :folder="$t('Settings')"/>-->
@@ -315,195 +506,3 @@
     <!--      </b-form>-->
     <!--  </div>-->
 </template>
-
-<script>
-// import { mapActions, mapGetters } from "vuex";
-// import NProgress from "nprogress";
-//
-// export default {
-//   metaInfo: {
-//     title: "System Settings"
-//   },
-//   data() {
-//     return {
-//
-//       isLoading: true,
-//       data: new FormData(),
-//       settings: [],
-//       currencies: [],
-//       clients: [],
-//       warehouses: [],
-//       sms_gateway: [],
-//       zones_array:[],
-//       setting: {
-//         client_id: "",
-//         warehouse_id: "",
-//         currency_id: "",
-//         email: "",
-//         logo: "",
-//         CompanyName: "",
-//         CompanyPhone: "",
-//         CompanyAdress: "",
-//         footer:"",
-//         developed_by:"",
-//         default_language:"",
-//         sms_gateway:"",
-//         is_invoice_footer:'',
-//         invoice_footer:'',
-//       },
-//
-//     };
-//   },
-//
-//   methods: {
-//     ...mapActions(["refreshUserPermissions"]),
-//
-//
-//       SetLocal(locale) {
-//       this.$i18n.locale = locale;
-//       this.$store.dispatch("language/setLanguage", locale);
-//       Fire.$emit("ChangeLanguage");
-//     },
-//
-//     //------------- Submit Validation Setting
-//     Submit_Setting() {
-//       this.$refs.form_setting.validate().then(success => {
-//         if (!success) {
-//           this.makeToast(
-//             "danger",
-//             this.$t("Please_fill_the_form_correctly"),
-//             this.$t("Failed")
-//           );
-//         } else {
-//           this.Update_Settings();
-//         }
-//       });
-//     },
-//
-//     //------ Toast
-//     makeToast(variant, msg, title) {
-//       this.$root.$bvToast.toast(msg, {
-//         title: title,
-//         variant: variant,
-//         solid: true
-//       });
-//     },
-//
-//     getValidationState({ dirty, validated, valid = null }) {
-//       return dirty || validated ? valid : null;
-//     },
-//
-//     //------------------------------ Event Upload Logo -------------------------------\\
-//     async onFileSelected(e) {
-//       const { valid } = await this.$refs.Logo.validate(e);
-//
-//       if (valid) {
-//         this.setting.logo = e.target.files[0];
-//       } else {
-//         this.setting.logo = "";
-//       }
-//     },
-//
-//      Selected_Time_Zone(value) {
-//           if (value === null) {
-//               this.setting.timezone = "";
-//           }
-//       },
-//
-//
-//
-//     //---------------------------------- Update Settings ----------------\\
-//     Update_Settings() {
-//       NProgress.start();
-//       NProgress.set(0.1);
-//       var self = this;
-//       self.data.append("client", self.setting.client_id);
-//       self.data.append("warehouse", self.setting.warehouse_id);
-//       self.data.append("currency", self.setting.currency_id);
-//       self.data.append("email", self.setting.email);
-//       self.data.append("logo", self.setting.logo);
-//       self.data.append("CompanyName", self.setting.CompanyName);
-//       self.data.append("CompanyPhone", self.setting.CompanyPhone);
-//       self.data.append("CompanyAdress", self.setting.CompanyAdress);
-//       self.data.append("footer", self.setting.footer);
-//       self.data.append("developed_by", self.setting.developed_by);
-//       self.data.append("default_language", self.setting.default_language);
-//       self.data.append("sms_gateway", self.setting.sms_gateway);
-//       self.data.append("is_invoice_footer", self.setting.is_invoice_footer);
-//       self.data.append("invoice_footer", self.setting.invoice_footer);
-//       self.data.append("timezone", self.setting.timezone);
-//       self.data.append("_method", "put");
-//
-//       axios
-//         .post("settings/" + self.setting.id, self.data)
-//         .then(response => {
-//           Fire.$emit("Event_Setting");
-//           this.makeToast(
-//             "success",
-//             this.$t("Successfully_Updated"),
-//             this.$t("Success")
-//           );
-//           this.refreshUserPermissions();
-//           NProgress.done();
-//           this.SetLocal(self.setting.default_language);
-//         })
-//         .catch(error => {
-//           this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-//           NProgress.done();
-//         });
-//     },
-//
-//     //---------------------------------- Clear_Cache ----------------\\
-//     Clear_Cache() {
-//       NProgress.start();
-//       NProgress.set(0.1);
-//       axios
-//         .get("clear_cache")
-//         .then(response => {
-//           this.makeToast(
-//             "success",
-//             this.$t("Cache_cleared_successfully"),
-//             this.$t("Success")
-//           );
-//           NProgress.done();
-//         })
-//         .catch(error => {
-//           NProgress.done();
-//           this.makeToast("danger", this.$t("Failed_to_clear_cache"), this.$t("Failed"));
-//         });
-//     },
-//
-//     //---------------------------------- Get SETTINGS ----------------\\
-//     Get_Settings() {
-//       axios
-//         .get("get_Settings_data")
-//         .then(response => {
-//           this.setting    = response.data.settings;
-//           this.currencies = response.data.currencies;
-//           this.clients    = response.data.clients;
-//           this.warehouses = response.data.warehouses;
-//           this.sms_gateway    = response.data.sms_gateway;
-//            this.zones_array    = response.data.zones_array;
-//           this.isLoading = false;
-//         })
-//         .catch(error => {
-//           setTimeout(() => {
-//             this.isLoading = false;
-//           }, 500);
-//         });
-//     },
-//
-//   }, //end Methods
-//
-//   //----------------------------- Created function-------------------
-//
-//   created: function() {
-//     this.Get_Settings();
-//
-//     Fire.$on("Event_Setting", () => {
-//       this.Get_Settings();
-//     });
-//
-//   }
-// };
-</script>

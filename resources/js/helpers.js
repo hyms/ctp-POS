@@ -1,4 +1,5 @@
 import moment from "moment";
+// import pos_css from "@/../css/pos_print.css";
 
 let debug = true;
 export default {
@@ -93,4 +94,18 @@ export default {
             {title: "Otros", value: "other"},
         ];
     },
+    print_pos: () => {
+        let pos_css = import('@/../css/pos_print.css?url');
+        let divContents = document.getElementById("invoice-POS").innerHTML;
+        let a = window.open("", "", "height=500, width=500");
+        a.document.write('<html><link rel="stylesheet" href="' + pos_css + '">');
+        a.document.write("<body >");
+        a.document.write(divContents);
+        a.document.write("</body></html>");
+        a.document.close();
+
+        setTimeout(() => {
+            a.print();
+        }, 1000);
+    }
 };

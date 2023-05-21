@@ -304,11 +304,7 @@ function onClose() {
                     :label="userLabels.firstname + ' *'"
                     v-model="user.firstname"
                     :placeholder="userLabels.firstname"
-                    :rules="
-                                        helper.required
-                                            .concat(helper.min(3))
-                                            .concat(helper.max(30))
-                                    "
+                    :rules="helper.required.concat(helper.min(3)).concat(helper.max(30))"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
@@ -322,11 +318,7 @@ function onClose() {
                     :label="userLabels.lastname + ' *'"
                     v-model="user.lastname"
                     :placeholder="userLabels.lastname"
-                    :rules="
-                                        helper.required
-                                            .concat(helper.min(3))
-                                            .concat(helper.max(30))
-                                    "
+                    :rules="helper.required.concat(helper.min(3)).concat(helper.max(30))"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
@@ -340,11 +332,7 @@ function onClose() {
                     :label="userLabels.username + ' *'"
                     v-model="user.username"
                     :placeholder="userLabels.username"
-                    :rules="
-                                        helper.required
-                                            .concat(helper.min(3))
-                                            .concat(helper.max(30))
-                                    "
+                    :rules="helper.required.concat(helper.min(3)).concat(helper.max(30))"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
@@ -358,9 +346,7 @@ function onClose() {
                     :label="userLabels.phone + ' *'"
                     v-model="user.phone"
                     :placeholder="userLabels.phone"
-                    :rules="
-                                        helper.required.concat(helper.number)
-                                    "
+                    :rules="helper.required.concat(helper.number)"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
@@ -389,11 +375,7 @@ function onClose() {
                     :label="userLabels.password + ' *'"
                     v-model="user.password"
                     :placeholder="userLabels.password"
-                    :rules="
-                                        helper.required
-                                            .concat(helper.min(6))
-                                            .concat(helper.max(14))
-                                    "
+                    :rules="helper.required.concat(helper.min(6)).concat(helper.max(14))"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
@@ -423,9 +405,7 @@ function onClose() {
                     :label="userLabels.NewPassword + ' *'"
                     v-model="user.NewPassword"
                     :placeholder="userLabels.NewPassword"
-                    :rules="
-                                        helper.min(6).concat(helper.max(14))
-                                    "
+                    :rules="helper.min(6).concat(helper.max(14))"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"

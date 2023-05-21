@@ -214,7 +214,6 @@ function Create_Client() {
           preserveState: true,
           preserveScroll: true,
         });
-        ;
         dialog.value = false;
       })
       .catch((error) => {

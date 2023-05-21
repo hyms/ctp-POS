@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SalesType;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -30,7 +31,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
-use PhpOffice\PhpSpreadsheet\Writer\Pdf;
 
 class SalesController extends Controller
 {
@@ -100,7 +100,7 @@ class SalesController extends Controller
             $item['shipping'] = $Sale['shipping'];
             $item['warehouse_name'] = $Sale->warehouse?->name;
             $item['client_id'] = $Sale->client?->id;
-            $item['client_name'] = $Sale->client?->name;
+            $item['client_name'] = $Sale->client?->company_name;
             $item['client_email'] = $Sale->client?->email;
             $item['client_tele'] = $Sale->client?->phone;
             $item['client_code'] = $Sale->client?->code;
@@ -319,18 +319,7 @@ class SalesController extends Controller
                     }
 
                     if ($value['sale_unit_id'] !== null) {
-                        if ($current_Sale->statut == "completed") {
-
-                            $product_warehouse = $this->getProduct_warehouse($value, $current_Sale);
-                            if ($product_warehouse) {
-                                if ($old_unit->operator == '/') {
-                                    $product_warehouse->qty += $value['quantity'] / $old_unit->operator_value;
-                                } else {
-                                    $product_warehouse->qty += $value['quantity'] * $old_unit->operator_value;
-                                }
-                                $product_warehouse->save();
-                            }
-                        }
+                        $this->save_product_warehouse($current_Sale, $value, $old_unit);
                         // Delete Detail
                         if ($new_sale_details->doesntContain('id', '=', $value->id)) {
                             $SaleDetail = SaleDetail::findOrFail($value->id);
@@ -459,18 +448,7 @@ class SalesController extends Controller
                         $old_unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
                     }
 
-                    if ($current_Sale->statut == "completed") {
-                        $product_warehouse = $this->getProduct_warehouse($value,$current_Sale);
-
-                        if ($product_warehouse) {
-                            if ($old_unit->operator == '/') {
-                                $product_warehouse->qty += $value['quantity'] / $old_unit->operator_value;
-                            } else {
-                                $product_warehouse->qty += $value['quantity'] * $old_unit->operator_value;
-                            }
-                            $product_warehouse->save();
-                        }
-                    }
+                    $this->save_product_warehouse($current_Sale, $value, $old_unit);
 
                 }
 
@@ -480,7 +458,7 @@ class SalesController extends Controller
                 $current_Sale->details()->delete();
                 $current_Sale->update([
                     'deleted_at' => Carbon::now(),
-                    'shipping_status' => NULL,
+                    'shipping_status' => '',
                 ]);
 
 
@@ -515,6 +493,7 @@ class SalesController extends Controller
 //            $this->authorizeForUser($request->user('api'), 'check_record', $sale_data);
 //        }
 
+        $sale_details['id'] = $sale_data->id;
         $sale_details['Ref'] = $sale_data->Ref;
         $sale_details['date'] = $sale_data->date;
         $sale_details['note'] = $sale_data->notes;
@@ -525,6 +504,7 @@ class SalesController extends Controller
         $sale_details['tax_rate'] = $sale_data->tax_rate;
         $sale_details['TaxNet'] = $sale_data->TaxNet;
         $sale_details['client_name'] = $sale_data->client->name;
+        $sale_details['client_company_name'] = $sale_data->client->company_name;
         $sale_details['client_phone'] = $sale_data->client->phone;
         $sale_details['client_adr'] = $sale_data->client->adresse;
         $sale_details['client_email'] = $sale_data->client->email;
@@ -625,7 +605,7 @@ class SalesController extends Controller
         $item['shipping'] = number_format($sale->shipping, 2, '.', '');
         $item['taxe'] = number_format($sale->TaxNet, 2, '.', '');
         $item['tax_rate'] = $sale->tax_rate;
-        $item['client_name'] = $sale['client']->name;
+        $item['client_name'] = $sale['client']->company_name;
         $item['GrandTotal'] = number_format($sale->GrandTotal, 2, '.', '');
         $item['paid_amount'] = number_format($sale->paid_amount, 2, '.', '');
 
@@ -730,13 +710,14 @@ class SalesController extends Controller
     public function Sale_PDF(Request $request, $id)
     {
 
-        $details = array();
+        $details = collect();
         $helpers = new helpers();
         $sale_data = Sale::with('details.product.unitSale')
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
 
         $sale['client_name'] = $sale_data['client']->name;
+        $sale['client_company_name'] = $sale_data['client']->company_name;
         $sale['client_phone'] = $sale_data['client']->phone;
         $sale['client_adr'] = $sale_data['client']->adresse;
         $sale['client_email'] = $sale_data['client']->email;
@@ -803,7 +784,7 @@ class SalesController extends Controller
             $data['is_imei'] = $detail['product']['is_imei'];
             $data['imei_number'] = $detail->imei_number;
 
-            $details[] = $data;
+            $details->add($data);
         }
         $settings = Setting::where('deleted_at', '=', null)->first();
         $symbol = $helpers->Get_Currency_Code();
@@ -814,14 +795,6 @@ class SalesController extends Controller
             'sale' => $sale,
             'details' => $details,
         ])->render();
-
-        $arabic = new Arabic();
-        $p = $arabic->arIdentify($Html);
-
-        for ($i = count($p) - 1; $i >= 0; $i -= 2) {
-            $utf8ar = $arabic->utf8Glyphs(substr($Html, $p[$i - 1], $p[$i] - $p[$i - 1]));
-            $Html = substr_replace($Html, $utf8ar, $p[$i - 1], $p[$i] - $p[$i - 1]);
-        }
 
         $pdf = PDF::loadHTML($Html);
         return $pdf->download('sale.pdf');
@@ -1307,4 +1280,30 @@ class SalesController extends Controller
 
     }
 
+    /**
+     * @param $current_Sale
+     * @param mixed $value
+     * @param $old_unit
+     * @return void
+     */
+    public function save_product_warehouse($current_Sale, mixed $value, $old_unit): void
+    {
+        if ($current_Sale->statut == "completed") {
+            $product_warehouse = $this->getProduct_warehouse($value, $current_Sale);
+
+            if ($product_warehouse) {
+                if ($old_unit->operator == '/') {
+                    $product_warehouse->qty += $value['quantity'] / $old_unit->operator_value;
+                } else {
+                    $product_warehouse->qty += $value['quantity'] * $old_unit->operator_value;
+                }
+                $product_warehouse->save();
+            }
+        }
+    }
+
 }
+
+
+
+
