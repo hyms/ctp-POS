@@ -509,14 +509,14 @@ function Pay_return_due(row) {
 </script>
 
 <template>
-    <layout :loading="loading">
+    <layout>
         <snackbar
             :snackbar="snackbar"
             :snackbar-text="snackbarText"
             :snackbar-color="snackbarColor"
         ></snackbar>
         <!-- Modal Show Import Clients -->
-        <v-dialog v-model="dialogImport" max-width="600px" scrollable>
+<!--        <v-dialog v-model="dialogImport" max-width="600px" scrollable>
             <v-card>
                 <v-toolbar border density="compact" title="Importar Clientes">
                 </v-toolbar>
@@ -526,7 +526,7 @@ function Pay_return_due(row) {
                         enctype="multipart/form-data"
                     >
                         <v-row>
-                            <!-- File -->
+                            &lt;!&ndash; File &ndash;&gt;
                             <v-col md="12" sm="12" class="mb-3">
                                 <v-file-input
                                     accept="csv/*"
@@ -626,7 +626,7 @@ function Pay_return_due(row) {
                     </v-btn>
                 </v-card-actions>
             </v-card>
-        </v-dialog>
+        </v-dialog>-->
         <!-- Modal Show Customer Details -->
         <v-dialog v-model="dialogDetail" max-width="600px" scrollable>
             <v-card>
@@ -761,7 +761,7 @@ function Pay_return_due(row) {
                             <!-- Customer Company_name -->
                             <v-col cols="12" md="6">
                                 <v-text-field
-                                    :label="clientLabel.company_name"
+                                    :label="clientLabel.company_name + ' *'"
                                     v-model="client.company_name"
                                     :placeholder="clientLabel.company_name"
                                     :rules="helper.required"
@@ -870,7 +870,7 @@ function Pay_return_due(row) {
             :on-close="onCloseDelete"
         ></delete-dialog>
         <v-row align="center">
-            <v-col>
+            <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="search"
                     prepend-icon="mdi-magnify"
@@ -882,7 +882,7 @@ function Pay_return_due(row) {
                 ></v-text-field>
             </v-col>
             <v-spacer></v-spacer>
-            <v-col cols="auto" class="text-right">
+            <v-col cols="12" sm="auto" class="text-right">
                 <ExportBtn
                     :data="clients"
                     :fields="jsonFields"
@@ -919,6 +919,8 @@ function Pay_return_due(row) {
                     class="elevation-2"
                     density="compact"
                     no-data-text="No existen datos a mostrar"
+                    :loading="loading"
+                    loading-text="Cargando..."
                 >
                     <template v-slot:item.actions="{ item }">
                         <v-menu>
@@ -933,42 +935,53 @@ function Pay_return_due(row) {
                                 >
                                 </v-btn>
                             </template>
-                            <v-list nav density="compact">
-                                <v-list-item
-                                    v-if="item.raw.due > 0"
-                                    @click="Pay_due(item.raw)"
-                                    prepend-icon="mdi-dollar"
-                                >
-                                    Pagar todas la deudas a la vez
-                                </v-list-item>
+                            <v-list density="compact">
+<!--                                <v-list-item-->
+<!--                                    v-if="item.raw.due > 0"-->
+<!--                                    @click="Pay_due(item.raw)"-->
+<!--                                    prepend-icon="mdi-currency-usd"-->
+<!--                                >-->
+<!--                                    <v-list-item-title>-->
+<!--                                    Pagar todas la deudas a la vez-->
+<!--                                    </v-list-item-title>-->
+<!--                                </v-list-item>-->
 
-                                <v-list-item
-                                    v-if="item.raw.return_Due > 0"
-                                    @click="Pay_return_due(item.raw)"
-                                    prepend-icon="mdi-dollar"
-                                >
-                                    Pagar todas la deudas de devolucion a la vez
-                                </v-list-item>
+<!--                                <v-list-item-->
+<!--                                    v-if="item.raw.return_Due > 0"-->
+<!--                                    @click="Pay_return_due(item.raw)"-->
+<!--                                    prepend-icon="mdi-currency-usd"-->
+
+<!--                                >-->
+<!--                                    <v-list-item-title>-->
+<!--                                    Pagar todas la deudas de devolucion a la vez-->
+<!--                                    </v-list-item-title>-->
+<!--                                </v-list-item>-->
 
                                 <v-list-item
                                     @click="showDetails(item.raw)"
                                     prepend-icon="mdi-eye"
                                 >
+                                    <v-list-item-title>
                                     Detalles del cliente
+                                    </v-list-item-title>
                                 </v-list-item>
 
                                 <v-list-item
                                     @click="Edit_Client(item.raw)"
                                     prepend-icon="mdi-pencil"
                                 >
+                                    <v-list-item-title>
                                     Editar Cliente
+                                    </v-list-item-title>
                                 </v-list-item>
 
                                 <v-list-item
                                     @click="Delete_Client(item.raw)"
                                     prepend-icon="mdi-delete"
                                 >
+                                    <v-list-item-title>
                                     Eliminar Cliente
+                                    </v-list-item-title>
                                 </v-list-item>
                             </v-list>
                         </v-menu>

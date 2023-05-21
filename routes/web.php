@@ -167,6 +167,14 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::get('get_Products_by_sale/{id}', [SalesController::class, 'get_Products_by_sale']);
     //------------------------------------------------------------------\\
 
+//------------------------------- Payments  Sales --------------------------\\
+    Route::get('payment_sale', [PaymentSalesController::class,'index']);
+    Route::post('payment_sale', [PaymentSalesController::class,'store']);
+    Route::put('payment_sale', [PaymentSalesController::class,'update']);
+    Route::delete('payment_sale/{id}', [PaymentSalesController::class,'destroy']);
+    Route::get('payment_sale_get_number', [PaymentSalesController::class,'getNumberOrder']);
+    //------------------------------------------------------------------\\
+
     //------------------------------- Transfers --------------------------\\
     Route::get('transfers', [TransferController::class, 'index']);
     Route::post('transfers', [TransferController::class, 'store']);
@@ -365,7 +373,7 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::get('pos/get_products_pos', 'PosController@GetProductsByParametre');
     Route::get('pos/data_create_pos', 'PosController@GetELementPos');
 
-  
+
     //------------------------------- PURCHASES --------------------------\\
     //------------------------------------------------------------------\\
 
@@ -392,13 +400,7 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::resource('shipments', 'ShipmentController');
 
 
-    //------------------------------- Payments  Sales --------------------------\\
-    //------------------------------------------------------------------\\
 
-    Route::resource('payment_sale', 'PaymentSalesController');
-    Route::get('payment_sale_get_number', 'PaymentSalesController@getNumberOrder');
-    Route::post('payment_sale_send_email', 'PaymentSalesController@SendEmail');
-    Route::post('payment_sale_send_sms', 'PaymentSalesController@Send_SMS');
 
 
 
@@ -447,9 +449,9 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     Route::post('payment/returns_purchase/send/email', 'PaymentPurchaseReturnsController@SendEmail');
     Route::post('payment/returns_purchase/send/sms', 'PaymentPurchaseReturnsController@Send_SMS');
 
-   
 
-   
+
+
     //------------------------------- Permission Groups user -----------\\
     //------------------------------------------------------------------\\
 

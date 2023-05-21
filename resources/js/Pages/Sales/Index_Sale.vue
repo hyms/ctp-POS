@@ -26,11 +26,11 @@ const dialogDelete = ref(false);
 const dialogInvoice = ref(false);
 const dialogAddPayment = ref(false);
 const dialogShowPayment = ref(false);
+const dialogDeletePayment = ref(false);
 const dialogShipment = ref(false);
 const fields = ref([
     { title: "Fecha", key: "date" },
     { title: "Codigo", key: "Ref" },
-    { title: "Creado Por", key: "created_by" },
     { title: "Cliente", key: "client_name" },
     { title: "Agencia", key: "warehouse_name" },
     { title: "Estado", key: "statut" },
@@ -412,12 +412,11 @@ function Create_Payment() {
 
 //---------------------------------------- Update Payment ------------------------------\\
 function Update_Payment() {
-    payment.valueProcessing = true;
     loading.value = true;
     snackbar.value = false;
 
     axios
-        .put("payment_sale/" + payment.value.id, {
+        .put("/payment_sale/" + payment.value.id, {
             sale_id: sale.value.id,
             date: payment.value.date,
             montant: parseFloat(payment.value.montant).toFixed(2),
@@ -431,13 +430,15 @@ function Update_Payment() {
             notes: payment.value.notes,
         })
         .then((response) => {
-            payment.valueProcessing = false;
             snackbar.value = true;
             snackbarColor.value = "success";
             snackbarText.value = "Transaccion realizada con exito";
         })
         .catch((error) => {
-            payment.valueProcessing = false;
+            console.log(error);
+            snackbar.value = true;
+            snackbarColor.value = "error";
+            snackbarText.value = error.response.data.message;
         })
         .finally(() => {
             loading.value = false;
@@ -455,17 +456,24 @@ function Delete_Item(item) {
     sale.value = item;
     dialogDelete.value = true;
 }
+function Delete_Payment(item) {
+    sale.value = item;
+    dialogDeletePayment.value = true;
+}
 
-function Remove_Payment(id) {
+function Remove_Payment() {
     snackbar.value = false;
+    loading.value = false;
     axios
         .delete("/payment_sale/" + sale.value.id)
         .then(({ data }) => {
             snackbar.value = true;
             snackbarColor.value = "success";
             snackbarText.value = "Borrado exitoso";
-            router.reload();
-            dialogDelete.value = false;
+            router.reload({preserveState: true,
+                preserveScroll: true,});
+            dialogDeletePayment.value = false;
+            dialogShowPayment.value = false;
         })
         .catch((error) => {
             console.log(error);
@@ -487,7 +495,7 @@ function Get_Payments(id) {
         .get("/get_payments_by_sale/" + id)
         .then(({ data }) => {
             payments.value = data.payments;
-            sale.value_due = data.due;
+            sale.value.due = data.due;
             dialogShowPayment.value = true;
         })
         .catch(() => {
@@ -525,7 +533,8 @@ function Remove_Sale(id, sale_has_return) {
                 snackbar.value = true;
                 snackbarColor.value = "success";
                 snackbarText.value = "Borrado exitoso";
-                router.reload();
+                router.reload({preserveState: true,
+                    preserveScroll: true,});
                 dialogDelete.value = false;
             })
             .catch((error) => {
@@ -544,17 +553,23 @@ function Remove_Sale(id, sale_has_return) {
 </script>
 
 <template>
-    <layout :loading="loading">
+    <layout>
         <snackbar
             :snackbar="snackbar"
             :snackbar-text="snackbarText"
             :snackbar-color="snackbarColor"
         ></snackbar>
-        <!-- Modal Remove Adjustment -->
+        <!-- Modal Remove Sale -->
         <delete-dialog
             :model="dialogDelete"
             :on-save="Remove_Sale"
             :on-close="onCloseDelete"
+        ></delete-dialog>
+        <!-- Modal Remove Payment -->
+        <delete-dialog
+            :model="dialogDeletePayment"
+            :on-save="Remove_Payment"
+            :on-close="()=>{dialogDeletePayment=false}"
         ></delete-dialog>
         <!-- Modal Show Payments-->
         <v-dialog v-model="dialogShowPayment" width="600">
@@ -591,45 +606,53 @@ function Remove_Sale(id, sale_has_return) {
                                         </td>
                                         <td>{{ payment.Reglement }}</td>
                                         <td>
-                                            <div
-                                                role="group"
-                                                aria-label="Basic example"
-                                                class="btn-group"
-                                            >
-                                                <span
-                                                    title="Print"
-                                                    class="btn btn-icon btn-info btn-sm"
-                                                    @click="
+                                               <v-btn
+                                                   title="Imprimir"
+                                                   size="x-small"
+                                                   color="info"
+                                                   @click="
                                                         Payment_Sale_PDF(
                                                             payment,
                                                             payment.id
                                                         )
                                                     "
-                                                >
-                                                    <i class="i-Billing"></i>
-                                                </span>
-                                                <span
-                                                    title="Edit"
-                                                    class="btn btn-icon btn-success btn-sm"
-                                                    @click="
+                                                   icon="mdi-printer"
+                                                   class="ma-1"
+                                               >
+                                               </v-btn>
+                                               <v-btn
+                                                   title="Editar"
+                                                   size="x-small"
+                                                   color="success"
+                                                   @click="
                                                         Edit_Payment(payment)
                                                     "
-                                                >
-                                                    <i class="i-Pen-2"></i>
-                                                </span>
-
+                                                   icon="mdi-pencil"
+                                                   class="ma-1"
+                                               >
+                                               </v-btn>
+                                               <v-btn
+                                                   title="Borrar"
+                                                   size="x-small"
+                                                   color="error"
+                                                   @click="
+                                                         Delete_Payment(
+                                                            payment
+                                                        )
+                                                    "
+                                                   icon="mdi-close"
+                                                   class="ma-1"
+                                               >
+                                               </v-btn>
                                                 <span
                                                     title="Delete"
                                                     class="btn btn-icon btn-danger btn-sm"
                                                     @click="
-                                                        Remove_Payment(
-                                                            payment.id
-                                                        )
+
                                                     "
                                                 >
                                                     <i class="i-Close"></i>
                                                 </span>
-                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -639,6 +662,164 @@ function Remove_Sale(id, sale_has_return) {
                 </v-card-text>
             </v-card>
         </v-dialog>
+            <!-- Modal Add Payment-->
+        <!--    <validation-observer ref="Add_payment">-->
+        <!--      <v-modal-->
+        <!--        hide-footer-->
+        <!--        size="lg"-->
+        <!--        id="Add_Payment"-->
+        <!--        :title="EditPaiementMode?$t('EditPayment'):$t('AddPayment')"-->
+        <!--      >-->
+        <!--        <v-form @submit.prevent="Submit_Payment">-->
+        <!--          <v-row>-->
+        <!--            &lt;!&ndash; date &ndash;&gt;-->
+        <!--            <v-col lg="4" md="12" sm="12">-->
+        <!--              <validation-provider-->
+        <!--                name="date"-->
+        <!--                :rules="{ required: true}"-->
+        <!--                v-slot="validationContext"-->
+        <!--              >-->
+        <!--                <v-form-group :label="$t('date')">-->
+        <!--                  <v-form-input-->
+        <!--                    label="date"-->
+        <!--                    :state="getValidationState(validationContext)"-->
+        <!--                    aria-describedby="date-feedback"-->
+        <!--                    v-model="payment.date"-->
+        <!--                    type="date"-->
+        <!--                  ></v-form-input>-->
+        <!--                  <v-form-invalid-feedback id="date-feedback">{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
+        <!--                </v-form-group>-->
+        <!--              </validation-provider>-->
+        <!--            </v-col>-->
+
+        <!--            &lt;!&ndash; Reference  &ndash;&gt;-->
+        <!--            <v-col lg="4" md="12" sm="12">-->
+        <!--              <v-form-group :label="$t('Reference')">-->
+        <!--                <v-form-input-->
+        <!--                  disabled="disabled"-->
+        <!--                  label="Reference"-->
+        <!--                  :placeholder="$t('Reference')"-->
+        <!--                  v-model="payment.Ref"-->
+        <!--                ></v-form-input>-->
+        <!--              </v-form-group>-->
+        <!--            </v-col>-->
+
+        <!--             &lt;!&ndash; Payment choice &ndash;&gt;-->
+        <!--            <v-col lg="4" md="12" sm="12">-->
+        <!--              <validation-provider name="Payment choice" :rules="{ required: true}">-->
+        <!--                <v-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice')">-->
+        <!--                  <v-select-->
+        <!--                    :class="{'is-invalid': !!errors.length}"-->
+        <!--                    :state="errors[0] ? false : (valid ? true : null)"-->
+        <!--                    v-model="payment.Reglement"-->
+        <!--                    @input="Selected_PaymentMethod"-->
+        <!--                    :disabled="EditPaiementMode && payment.Reglement == 'credit card'"-->
+        <!--                    :reduce="label => label.value"-->
+        <!--                    :placeholder="$t('PleaseSelect')"-->
+        <!--                    :options="-->
+        <!--                          [-->
+        <!--                          {label: 'Cash', value: 'Cash'},-->
+        <!--                          {label: 'credit card', value: 'credit card'},-->
+        <!--                          {label: 'TPE', value: 'tpe'},-->
+        <!--                          {label: 'cheque', value: 'cheque'},-->
+        <!--                          {label: 'Western Union', value: 'Western Union'},-->
+        <!--                          {label: 'bank transfer', value: 'bank transfer'},-->
+        <!--                          {label: 'other', value: 'other'},-->
+        <!--                          ]"-->
+        <!--                  ></v-select>-->
+        <!--                  <v-form-invalid-feedback>{{ errors[0] }}</v-form-invalid-feedback>-->
+        <!--                </v-form-group>-->
+        <!--              </validation-provider>-->
+        <!--            </v-col>-->
+
+        <!--            &lt;!&ndash; Received  Amount  &ndash;&gt;-->
+        <!--            <v-col lg="4" md="12" sm="12">-->
+        <!--                <validation-provider-->
+        <!--                  name="Received Amount"-->
+        <!--                  :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
+        <!--                  v-slot="validationContext"-->
+        <!--                >-->
+        <!--                <v-form-group :label="$t('Received_Amount')">-->
+        <!--                  <v-form-input-->
+        <!--                    @keyup="Verified_Received_Amount(payment.received_amount)"-->
+        <!--                    label="Received_Amount"-->
+        <!--                    :placeholder="$t('Received_Amount')"-->
+        <!--                    v-model.number="payment.received_amount"-->
+        <!--                    :state="getValidationState(validationContext)"-->
+        <!--                    aria-describedby="Received_Amount-feedback"-->
+        <!--                  ></v-form-input>-->
+        <!--                  <v-form-invalid-feedback-->
+        <!--                    id="Received_Amount-feedback"-->
+        <!--                  >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
+        <!--                </v-form-group>-->
+        <!--              </validation-provider>-->
+        <!--            </v-col>-->
+
+        <!--            &lt;!&ndash; Paying Amount  &ndash;&gt;-->
+        <!--            <v-col lg="4" md="12" sm="12">-->
+        <!--              <validation-provider-->
+        <!--                name="Amount"-->
+        <!--                :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
+        <!--                v-slot="validationContext"-->
+        <!--              >-->
+        <!--                <v-form-group :label="$t('Paying_Amount')">-->
+        <!--                  <v-form-input-->
+        <!--                   @keyup="Verified_paidAmount(payment.montant)"-->
+        <!--                    label="Amount"-->
+        <!--                    :placeholder="$t('Paying_Amount')"-->
+        <!--                    v-model.number="payment.montant"-->
+        <!--                    :state="getValidationState(validationContext)"-->
+        <!--                    aria-describedby="Amount-feedback"-->
+        <!--                  ></v-form-input>-->
+        <!--                  <v-form-invalid-feedback id="Amount-feedback">{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
+        <!--                </v-form-group>-->
+        <!--              </validation-provider>-->
+        <!--            </v-col>-->
+
+        <!--            &lt;!&ndash; change Amount  &ndash;&gt;-->
+        <!--            <v-col lg="4" md="12" sm="12">-->
+        <!--              <label>{{$t('Change')}} :</label>-->
+        <!--              <p-->
+        <!--                class="change_amount"-->
+        <!--              >{{parseFloat(payment.received_amount - payment.montant).toFixed(2)}}</p>-->
+        <!--            </v-col>-->
+
+        <!--           -->
+
+        <!--            <v-col md="12" v-if="payment.Reglement == 'credit card'">-->
+        <!--              <form id="payment-form">-->
+        <!--                <label-->
+        <!--                  for="card-element"-->
+        <!--                  class="leading-7 text-sm text-gray-600"-->
+        <!--                >{{$t('Credit_Card_Info')}}</label>-->
+        <!--                <div id="card-element">-->
+        <!--                  &lt;!&ndash; Elements will create input elements here &ndash;&gt;-->
+        <!--                </div>-->
+        <!--                &lt;!&ndash; We'll put the error messages in this element &ndash;&gt;-->
+        <!--                <div id="card-errors" class="is-invalid" role="alert"></div>-->
+        <!--              </form>-->
+        <!--            </v-col>-->
+
+        <!--            &lt;!&ndash; Note &ndash;&gt;-->
+        <!--            <v-col lg="12" md="12" sm="12" class="mt-3">-->
+        <!--              <v-form-group :label="$t('Note')">-->
+        <!--                <v-form-textarea id="textarea" v-model="payment.notes" rows="3" max-rows="6"></v-form-textarea>-->
+        <!--              </v-form-group>-->
+        <!--            </v-col>-->
+        <!--            <v-col md="12" class="mt-3">-->
+        <!--              <v-button-->
+        <!--                variant="primary"-->
+        <!--                type="submit"-->
+        <!--                :disabled="paymentProcessing"-->
+        <!--              >{{$t('submit')}}</v-button>-->
+        <!--              <div v-once class="typo__p" v-if="paymentProcessing">-->
+        <!--                <div class="spinner sm spinner-primary mt-3"></div>-->
+        <!--              </div>-->
+        <!--            </v-col>-->
+        <!--          </v-row>-->
+        <!--        </v-form>-->
+        <!--      </v-modal>-->
+        <!--    </validation-observer>-->
         <v-row align="center" class="mb-3">
             <v-spacer></v-spacer>
             <v-col cols="auto" class="text-right">
@@ -672,6 +853,8 @@ function Remove_Sale(id, sale_has_return) {
                 hover
                 density="compact"
                 no-data-text="No existen datos a mostrar"
+                :loading="loading"
+                loading-text="Cargando..."
             >
                 <template v-slot:item.statut="{ item }">
                     <v-chip
@@ -719,6 +902,15 @@ function Remove_Sale(id, sale_has_return) {
                         >Deuda</v-chip
                     >
                 </template>
+                <template  v-slot:item.Ref="{ item }">
+                    <v-btn
+                    variant="tonal"
+                    size="x-small"
+                    color="default"
+                    :text="item.raw.Ref"
+                    @click="router.visit('/sales/detail/'+item.raw.id)"
+                    ></v-btn>
+                </template>
                 <template v-slot:item.actions="{ item }">
                     <v-menu>
                         <template v-slot:activator="{ props }">
@@ -732,14 +924,16 @@ function Remove_Sale(id, sale_has_return) {
                             >
                             </v-btn>
                         </template>
-                        <v-list nav density="compact">
+                        <v-list density="compact">
                             <v-list-item
                                 @click="
                                     router.visit('/sales/detail/' + item.raw.id)
                                 "
-                                prepend-icon="mdi-paper"
+                                prepend-icon="mdi-eye"
                             >
+                                <v-list-item-title>
                                 Detalle de Orden
+                                </v-list-item-title>
                             </v-list-item>
                             <v-list-item
                                 @click="
@@ -747,20 +941,27 @@ function Remove_Sale(id, sale_has_return) {
                                 "
                                 prepend-icon="mdi-pen"
                             >
+                                <v-list-item-title>
                                 Editar Orden
+                                </v-list-item-title>
                             </v-list-item>
                             <v-list-item
                                 @click="Show_Payments(item.raw.id, item.raw)"
-                                prepend-icon="mdi-pen"
+                                prepend-icon="mdi-basket"
                             >
+                                <v-list-item-title>
                                 Ver Pagos
+                                </v-list-item-title>
                             </v-list-item>
                             <!--                                  v-if="currentUserPermissions.includes('payment_sales_add')"-->
                             <v-list-item
                                 @click="New_Payment(item.raw)"
-                                prepend-icon="mdi-pen"
+                                prepend-icon="mdi-currency-usd"
+                                v-if="item.raw.payment_status!='paid'"
                             >
+                                <v-list-item-title>
                                 Añadir Pago
+                                </v-list-item-title>
                             </v-list-item>
 
                             <!--                <v-dropdown-item title="Invoice" @click="Invoice_POS(props.row.id)">-->
@@ -774,9 +975,11 @@ function Remove_Sale(id, sale_has_return) {
                             <!--                </v-dropdown-item>-->
                             <v-list-item
                                 @click="Delete_Item(item.raw)"
-                                prepend-icon="mdi-pen"
+                                prepend-icon="mdi-delete"
                             >
+                                <v-list-item-title>
                                 Eliminar
+                                </v-list-item-title>
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -785,225 +988,8 @@ function Remove_Sale(id, sale_has_return) {
         </v-card>
     </layout>
 
-    <!--          <div v-else-if="props.column.field == 'payment_status'">-->
-    <!--            <span-->
-    <!--              v-if="props.row.payment_status == 'paid'"-->
-    <!--              class="badge badge-outline-success"-->
-    <!--            >{{$t('Paid')}}</span>-->
-    <!--            <span-->
-    <!--              v-else-if="props.row.payment_status == 'partial'"-->
-    <!--              class="badge badge-outline-primary"-->
-    <!--            >{{$t('partial')}}</span>-->
-    <!--            <span v-else class="badge badge-outline-warning">{{$t('Unpaid')}}</span>-->
-    <!--          </div>-->
-    <!--          <div v-else-if="props.column.field == 'shipping_status'">-->
-    <!--            <span-->
-    <!--              v-if="props.row.shipping_status == 'ordered'"-->
-    <!--              class="badge badge-outline-warning"-->
-    <!--            >{{$t('Ordered')}}</span>-->
 
-    <!--            <span-->
-    <!--              v-else-if="props.row.shipping_status == 'packed'"-->
-    <!--              class="badge badge-outline-info"-->
-    <!--            >{{$t('Packed')}}</span>-->
 
-    <!--            <span-->
-    <!--              v-else-if="props.row.shipping_status == 'shipped'"-->
-    <!--              class="badge badge-outline-secondary"-->
-    <!--            >{{$t('Shipped')}}</span>-->
-
-    <!--             <span-->
-    <!--              v-else-if="props.row.shipping_status == 'delivered'"-->
-    <!--              class="badge badge-outline-success"-->
-    <!--            >{{$t('Delivered')}}</span>-->
-
-    <!--            <span v-else-if="props.row.shipping_status == 'cancelled'" class="badge badge-outline-danger">{{$t('Cancelled')}}</span>-->
-    <!--          </div>-->
-    <!--           <div v-else-if="props.column.field == 'Ref'">-->
-    <!--              <router-link-->
-    <!--                :to="'/app/sales/detail/'+props.row.id"-->
-    <!--              >-->
-    <!--                <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
-    <!--              </router-link> <br>-->
-    <!--              <small v-if="props.row.sale_has_return == 'yes'"><i class="text-15 text-danger i-Back"></i></small>-->
-    <!--              -->
-    <!--            </div>-->
-    <!--        </template>-->
-    <!--      </vue-good-table>-->
-    <!--    </div>-->
-
-    <!--                      [-->
-    <!--                        {label: 'Paid', value: 'paid'},-->
-    <!--                        {label: 'partial', value: 'partial'},-->
-    <!--                        {label: 'UnPaid', value: 'unpaid'},-->
-    <!--                      ]"-->
-
-    <!--                      [-->
-    <!--                        {label: 'Ordered', value: 'ordered'},-->
-    <!--                        {label: 'Packed', value: 'packed'},-->
-    <!--                        {label: 'Shipped', value: 'shipped'},-->
-    <!--                        {label: 'Delivered', value: 'delivered'},-->
-    <!--                        {label: 'Cancelled', value: 'cancelled'},-->
-    <!--                      ]"-->
-
-    <!--    &lt;!&ndash; Modal Add Payment&ndash;&gt;-->
-    <!--    <validation-observer ref="Add_payment">-->
-    <!--      <v-modal-->
-    <!--        hide-footer-->
-    <!--        size="lg"-->
-    <!--        id="Add_Payment"-->
-    <!--        :title="EditPaiementMode?$t('EditPayment'):$t('AddPayment')"-->
-    <!--      >-->
-    <!--        <v-form @submit.prevent="Submit_Payment">-->
-    <!--          <v-row>-->
-    <!--            &lt;!&ndash; date &ndash;&gt;-->
-    <!--            <v-col lg="4" md="12" sm="12">-->
-    <!--              <validation-provider-->
-    <!--                name="date"-->
-    <!--                :rules="{ required: true}"-->
-    <!--                v-slot="validationContext"-->
-    <!--              >-->
-    <!--                <v-form-group :label="$t('date')">-->
-    <!--                  <v-form-input-->
-    <!--                    label="date"-->
-    <!--                    :state="getValidationState(validationContext)"-->
-    <!--                    aria-describedby="date-feedback"-->
-    <!--                    v-model="payment.date"-->
-    <!--                    type="date"-->
-    <!--                  ></v-form-input>-->
-    <!--                  <v-form-invalid-feedback id="date-feedback">{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-    <!--                </v-form-group>-->
-    <!--              </validation-provider>-->
-    <!--            </v-col>-->
-
-    <!--            &lt;!&ndash; Reference  &ndash;&gt;-->
-    <!--            <v-col lg="4" md="12" sm="12">-->
-    <!--              <v-form-group :label="$t('Reference')">-->
-    <!--                <v-form-input-->
-    <!--                  disabled="disabled"-->
-    <!--                  label="Reference"-->
-    <!--                  :placeholder="$t('Reference')"-->
-    <!--                  v-model="payment.Ref"-->
-    <!--                ></v-form-input>-->
-    <!--              </v-form-group>-->
-    <!--            </v-col>-->
-
-    <!--             &lt;!&ndash; Payment choice &ndash;&gt;-->
-    <!--            <v-col lg="4" md="12" sm="12">-->
-    <!--              <validation-provider name="Payment choice" :rules="{ required: true}">-->
-    <!--                <v-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice')">-->
-    <!--                  <v-select-->
-    <!--                    :class="{'is-invalid': !!errors.length}"-->
-    <!--                    :state="errors[0] ? false : (valid ? true : null)"-->
-    <!--                    v-model="payment.Reglement"-->
-    <!--                    @input="Selected_PaymentMethod"-->
-    <!--                    :disabled="EditPaiementMode && payment.Reglement == 'credit card'"-->
-    <!--                    :reduce="label => label.value"-->
-    <!--                    :placeholder="$t('PleaseSelect')"-->
-    <!--                    :options="-->
-    <!--                          [-->
-    <!--                          {label: 'Cash', value: 'Cash'},-->
-    <!--                          {label: 'credit card', value: 'credit card'},-->
-    <!--                          {label: 'TPE', value: 'tpe'},-->
-    <!--                          {label: 'cheque', value: 'cheque'},-->
-    <!--                          {label: 'Western Union', value: 'Western Union'},-->
-    <!--                          {label: 'bank transfer', value: 'bank transfer'},-->
-    <!--                          {label: 'other', value: 'other'},-->
-    <!--                          ]"-->
-    <!--                  ></v-select>-->
-    <!--                  <v-form-invalid-feedback>{{ errors[0] }}</v-form-invalid-feedback>-->
-    <!--                </v-form-group>-->
-    <!--              </validation-provider>-->
-    <!--            </v-col>-->
-
-    <!--            &lt;!&ndash; Received  Amount  &ndash;&gt;-->
-    <!--            <v-col lg="4" md="12" sm="12">-->
-    <!--                <validation-provider-->
-    <!--                  name="Received Amount"-->
-    <!--                  :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
-    <!--                  v-slot="validationContext"-->
-    <!--                >-->
-    <!--                <v-form-group :label="$t('Received_Amount')">-->
-    <!--                  <v-form-input-->
-    <!--                    @keyup="Verified_Received_Amount(payment.received_amount)"-->
-    <!--                    label="Received_Amount"-->
-    <!--                    :placeholder="$t('Received_Amount')"-->
-    <!--                    v-model.number="payment.received_amount"-->
-    <!--                    :state="getValidationState(validationContext)"-->
-    <!--                    aria-describedby="Received_Amount-feedback"-->
-    <!--                  ></v-form-input>-->
-    <!--                  <v-form-invalid-feedback-->
-    <!--                    id="Received_Amount-feedback"-->
-    <!--                  >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-    <!--                </v-form-group>-->
-    <!--              </validation-provider>-->
-    <!--            </v-col>-->
-
-    <!--            &lt;!&ndash; Paying Amount  &ndash;&gt;-->
-    <!--            <v-col lg="4" md="12" sm="12">-->
-    <!--              <validation-provider-->
-    <!--                name="Amount"-->
-    <!--                :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
-    <!--                v-slot="validationContext"-->
-    <!--              >-->
-    <!--                <v-form-group :label="$t('Paying_Amount')">-->
-    <!--                  <v-form-input-->
-    <!--                   @keyup="Verified_paidAmount(payment.montant)"-->
-    <!--                    label="Amount"-->
-    <!--                    :placeholder="$t('Paying_Amount')"-->
-    <!--                    v-model.number="payment.montant"-->
-    <!--                    :state="getValidationState(validationContext)"-->
-    <!--                    aria-describedby="Amount-feedback"-->
-    <!--                  ></v-form-input>-->
-    <!--                  <v-form-invalid-feedback id="Amount-feedback">{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-    <!--                </v-form-group>-->
-    <!--              </validation-provider>-->
-    <!--            </v-col>-->
-
-    <!--            &lt;!&ndash; change Amount  &ndash;&gt;-->
-    <!--            <v-col lg="4" md="12" sm="12">-->
-    <!--              <label>{{$t('Change')}} :</label>-->
-    <!--              <p-->
-    <!--                class="change_amount"-->
-    <!--              >{{parseFloat(payment.received_amount - payment.montant).toFixed(2)}}</p>-->
-    <!--            </v-col>-->
-
-    <!--           -->
-
-    <!--            <v-col md="12" v-if="payment.Reglement == 'credit card'">-->
-    <!--              <form id="payment-form">-->
-    <!--                <label-->
-    <!--                  for="card-element"-->
-    <!--                  class="leading-7 text-sm text-gray-600"-->
-    <!--                >{{$t('Credit_Card_Info')}}</label>-->
-    <!--                <div id="card-element">-->
-    <!--                  &lt;!&ndash; Elements will create input elements here &ndash;&gt;-->
-    <!--                </div>-->
-    <!--                &lt;!&ndash; We'll put the error messages in this element &ndash;&gt;-->
-    <!--                <div id="card-errors" class="is-invalid" role="alert"></div>-->
-    <!--              </form>-->
-    <!--            </v-col>-->
-
-    <!--            &lt;!&ndash; Note &ndash;&gt;-->
-    <!--            <v-col lg="12" md="12" sm="12" class="mt-3">-->
-    <!--              <v-form-group :label="$t('Note')">-->
-    <!--                <v-form-textarea id="textarea" v-model="payment.notes" rows="3" max-rows="6"></v-form-textarea>-->
-    <!--              </v-form-group>-->
-    <!--            </v-col>-->
-    <!--            <v-col md="12" class="mt-3">-->
-    <!--              <v-button-->
-    <!--                variant="primary"-->
-    <!--                type="submit"-->
-    <!--                :disabled="paymentProcessing"-->
-    <!--              >{{$t('submit')}}</v-button>-->
-    <!--              <div v-once class="typo__p" v-if="paymentProcessing">-->
-    <!--                <div class="spinner sm spinner-primary mt-3"></div>-->
-    <!--              </div>-->
-    <!--            </v-col>-->
-    <!--          </v-row>-->
-    <!--        </v-form>-->
-    <!--      </v-modal>-->
-    <!--    </validation-observer>-->
 
     <!--     &lt;!&ndash; Modal Edit Shipment &ndash;&gt;-->
     <!--    <validation-observer ref="shipment_ref">-->
@@ -1081,126 +1067,6 @@ function Remove_Sale(id, sale_has_return) {
     <!--      </v-modal>-->
     <!--    </validation-observer>-->
 
-    <!--    &lt;!&ndash; Modal Show Invoice POS&ndash;&gt;-->
-    <!--    <v-modal hide-footer size="sm" scrollable id="Show_invoice" :title="$t('Invoice_POS')">-->
-    <!--        <div id="invoice-POS">-->
-    <!--          <div style="max-width:400px;margin:0px auto">-->
-    <!--          <div class="info" >-->
-    <!--            <h2 class="text-center">{{invoice_pos.setting.CompanyName}}</h2>-->
-
-    <!--            <p>-->
-    <!--                <span>{{$t('date')}} : {{invoice_pos.sale.date}} <br></span>-->
-    <!--                <span v-show="pos_settings.show_address">{{$t('Adress')}} : {{invoice_pos.setting.CompanyAdress}} <br></span>-->
-    <!--                <span v-show="pos_settings.show_email">{{$t('Email')}} : {{invoice_pos.setting.email}} <br></span>-->
-    <!--                <span v-show="pos_settings.show_phone">{{$t('Phone')}} : {{invoice_pos.setting.CompanyPhone}} <br></span>-->
-    <!--                <span v-show="pos_settings.show_customer">{{$t('Customer')}} : {{invoice_pos.sale.client_name}} <br></span>-->
-    <!--              </p>-->
-    <!--          </div>-->
-
-    <!--          <table>-->
-    <!--            <tbody>-->
-    <!--              <tr v-for="detail_invoice in invoice_pos.details">-->
-    <!--                <td colspan="3">-->
-    <!--                  {{detail_invoice.name}}-->
-    <!--                  <br v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null">-->
-    <!--                  <span v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null ">{{$t('IMEI_SN')}} : {{detail_invoice.imei_number}}</span>-->
-    <!--                  <br>-->
-    <!--                  <span>{{formatNumber(detail_invoice.quantity,2)}} {{detail_invoice.unit_sale}} x {{formatNumber(detail_invoice.total/detail_invoice.quantity,2)}}</span>-->
-    <!--                </td>-->
-    <!--                <td style="text-align:right;vertical-align:bottom">{{formatNumber(detail_invoice.total,2)}}</td>-->
-    <!--              </tr>-->
-
-    <!--              <tr style="margin-top:10px" v-show="pos_settings.show_discount">-->
-    <!--                <td colspan="3" class="total">{{$t('OrderTax')}}</td>-->
-    <!--                <td style="text-align:right;" class="total">{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.taxe ,2)}} ({{formatNumber(invoice_pos.sale.tax_rate,2)}} %)</td>-->
-    <!--              </tr>-->
-
-    <!--              <tr style="margin-top:10px" v-show="pos_settings.show_discount">-->
-    <!--                <td colspan="3" class="total">{{$t('Discount')}}</td>-->
-    <!--                <td style="text-align:right;" class="total">{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.discount ,2)}}</td>-->
-    <!--              </tr>-->
-
-    <!--              <tr style="margin-top:10px" v-show="pos_settings.show_discount">-->
-    <!--                <td colspan="3" class="total">{{$t('Shipping')}}</td>-->
-    <!--                <td style="text-align:right;" class="total">{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.shipping ,2)}}</td>-->
-    <!--              </tr>-->
-
-    <!--              <tr style="margin-top:10px">-->
-    <!--                <td colspan="3" class="total">{{$t('Total')}}</td>-->
-    <!--                <td style="text-align:right;" class="total">{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.GrandTotal ,2)}}</td>-->
-    <!--              </tr>-->
-
-    <!--                  <tr v-show="invoice_pos.sale.paid_amount < invoice_pos.sale.GrandTotal">-->
-    <!--                    <td colspan="3" class="total">{{$t('Paid')}}</td>-->
-    <!--                    <td-->
-    <!--                      style="text-align:right;"-->
-    <!--                      class="total"-->
-    <!--                    >{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.paid_amount ,2)}}</td>-->
-    <!--                  </tr>-->
-
-    <!--                  <tr v-show="invoice_pos.sale.paid_amount < invoice_pos.sale.GrandTotal">-->
-    <!--                    <td colspan="3" class="total">{{$t('Due')}}</td>-->
-    <!--                    <td-->
-    <!--                      style="text-align:right;"-->
-    <!--                      class="total"-->
-    <!--                    >{{invoice_pos.symbol}} {{parseFloat(invoice_pos.sale.GrandTotal - invoice_pos.sale.paid_amount).toFixed(2)}}</td>-->
-    <!--                  </tr>-->
-    <!--            </tbody>-->
-    <!--          </table>-->
-
-    <!--           <table-->
-    <!--                class="change mt-3"-->
-    <!--                style=" font-size: 10px;"-->
-    <!--                v-show="invoice_pos.sale.paid_amount > 0"-->
-    <!--              >-->
-    <!--                <thead>-->
-    <!--                  <tr style="background: #eee; ">-->
-    <!--                    <th style="text-align: left;" colspan="1">{{$t('PayeBy')}}:</th>-->
-    <!--                    <th style="text-align: center;" colspan="2">{{$t('Amount')}}:</th>-->
-    <!--                    <th style="text-align: right;" colspan="1">{{$t('Change')}}:</th>-->
-    <!--                  </tr>-->
-    <!--                </thead>-->
-
-    <!--                <tbody>-->
-    <!--                  <tr v-for="payment_pos in payments">-->
-    <!--                    <td style="text-align: left;" colspan="1">{{payment_pos.Reglement}}</td>-->
-    <!--                    <td-->
-    <!--                      style="text-align: center;"-->
-    <!--                      colspan="2"-->
-    <!--                    >{{formatNumber(payment_pos.montant ,2)}}</td>-->
-    <!--                    <td-->
-    <!--                      style="text-align: right;"-->
-    <!--                      colspan="1"-->
-    <!--                    >{{formatNumber(payment_pos.change ,2)}}</td>-->
-    <!--                  </tr>-->
-    <!--                </tbody>-->
-    <!--              </table>-->
-
-    <!--          <div id="legalcopy" class="ml-2">-->
-    <!--            <p class="legal" v-show="pos_settings.show_note">-->
-    <!--               <strong>{{pos_settings.note_customer}}</strong>-->
-    <!--            </p>-->
-    <!--            <div id="bar" v-show="pos_settings.show_barcode">-->
-    <!--              <barcode-->
-    <!--                class="barcode"-->
-    <!--                :format="barcodeFormat"-->
-    <!--                :value="invoice_pos.sale.Ref"-->
-    <!--                textmargin="0"-->
-    <!--                fontoptions="bold"-->
-    <!--                fontSize= "15"-->
-    <!--                height= "25"-->
-    <!--                width= "1"-->
-    <!--              ></barcode>-->
-    <!--            </div>-->
-    <!--            </div>-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--      <button @click="print_it()" class="btn btn-outline-primary">-->
-    <!--        <i class="i-Billing"></i>-->
-    <!--        {{$t('print')}}-->
-    <!--      </button>-->
-    <!--    </v-modal>-->
-    <!--  </div>-->
 </template>
 
 <style>

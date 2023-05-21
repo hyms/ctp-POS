@@ -7,8 +7,8 @@ const props = defineProps({
 </script>
 <template>
     <!-- Modal Remove Product -->
-    <v-dialog :model-value="model" max-width="300px">
-        <v-card color="surface">
+    <v-dialog :model-value="model" width="auto">
+        <v-card color="surface" max-width="300px">
             <v-card-text class="text-h5 text-center"
                 >Estas seguro?
             </v-card-text>

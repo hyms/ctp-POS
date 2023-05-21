@@ -789,7 +789,7 @@ class ProductsController extends Controller
             ->where('deleted_at', null)
             ->get()->map(function ($item, $key) {
                 return ['value' => $item->id, 'title' => $item->name];
-            });;
+            });
 
 
         Inertia::share('titlePage', 'Editar producto');

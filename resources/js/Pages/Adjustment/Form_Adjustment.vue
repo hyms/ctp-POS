@@ -344,7 +344,7 @@ onMounted(() => {
         editmode.value = true;
         Get_Products_By_Warehouse(adjustmentForm.value.warehouse_id);
     }
-    if (props.warehouses.length == 1) {
+    else if (props.warehouses.length == 1) {
         adjustmentForm.value.warehouse_id = props.warehouses[0].value;
         Get_Products_By_Warehouse(adjustmentForm.value.warehouse_id);
     }

@@ -1,2 +1,5 @@
 $font-size-root: 0.9rem !default;
+.v-list-item__prepend .v-icon{
+    margin-inline-end: 10px;
+}
 @import 'vuetify/styles';

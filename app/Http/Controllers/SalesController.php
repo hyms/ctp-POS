@@ -266,7 +266,7 @@ class SalesController extends Controller
                             'payment_statut' => $payment_statut,
                         ]);
                     }
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     return response()->json(['message' => $e->getMessage()], 500);
                 }
 
@@ -436,7 +436,7 @@ class SalesController extends Controller
 //            $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $current_Sale = Sale::findOrFail($id);
             $old_sale_details = SaleDetail::where('sale_id', $id)->get();
-            $shipment_data = Shipment::where('sale_id', $id)->first();
+            //$shipment_data = Shipment::where('sale_id', $id)->first();
 
             if (SaleReturn::where('sale_id', $id)->where('deleted_at', '=', null)->exists()) {
                 return response()->json(['success' => false, 'Return exist for the Transaction' => false], 403);
@@ -460,44 +460,23 @@ class SalesController extends Controller
                     }
 
                     if ($current_Sale->statut == "completed") {
+                        $product_warehouse = $this->getProduct_warehouse($value,$current_Sale);
 
-                        if ($value['product_variant_id'] !== null) {
-                            $product_warehouse = product_warehouse::where('deleted_at', '=', null)
-                                ->where('warehouse_id', $current_Sale->warehouse_id)
-                                ->where('product_id', $value['product_id'])
-                                ->where('product_variant_id', $value['product_variant_id'])
-                                ->first();
-
-                            if ($product_warehouse) {
-                                if ($old_unit->operator == '/') {
-                                    $product_warehouse->qty += $value['quantity'] / $old_unit->operator_value;
-                                } else {
-                                    $product_warehouse->qty += $value['quantity'] * $old_unit->operator_value;
-                                }
-                                $product_warehouse->save();
+                        if ($product_warehouse) {
+                            if ($old_unit->operator == '/') {
+                                $product_warehouse->qty += $value['quantity'] / $old_unit->operator_value;
+                            } else {
+                                $product_warehouse->qty += $value['quantity'] * $old_unit->operator_value;
                             }
-
-                        } else {
-                            $product_warehouse = product_warehouse::where('deleted_at', '=', null)
-                                ->where('warehouse_id', $current_Sale->warehouse_id)
-                                ->where('product_id', $value['product_id'])
-                                ->first();
-                            if ($product_warehouse) {
-                                if ($old_unit->operator == '/') {
-                                    $product_warehouse->qty += $value['quantity'] / $old_unit->operator_value;
-                                } else {
-                                    $product_warehouse->qty += $value['quantity'] * $old_unit->operator_value;
-                                }
-                                $product_warehouse->save();
-                            }
+                            $product_warehouse->save();
                         }
                     }
 
                 }
 
-                if ($shipment_data) {
-                    $shipment_data->delete();
-                }
+//                if ($shipment_data) {
+//                    $shipment_data->delete();
+//                }
                 $current_Sale->details()->delete();
                 $current_Sale->update([
                     'deleted_at' => Carbon::now(),

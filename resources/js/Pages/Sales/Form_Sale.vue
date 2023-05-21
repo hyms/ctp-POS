@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import {ref, onMounted, watch} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import { router } from "@inertiajs/vue3";
+import {router} from "@inertiajs/vue3";
 import helper from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
 
@@ -9,12 +9,12 @@ const props = defineProps({
     clients: Object,
     warehouses: Object,
     sales_types: Object,
-    sale: { type: Object, default: null },
-    details: { type: Object, default: null },
+    sale: {type: Object, default: null},
+    details: {type: Object, default: null},
     errors: Object,
 });
 
-const edit = ref(false);
+const editmode = ref(false);
 const form = ref(null);
 const loading = ref(false);
 const loadingFilter = ref(false);
@@ -26,8 +26,8 @@ const search_input = ref("");
 const client = ref({});
 const clientFilter = ref([]);
 const products = ref([]);
-const detailsForm = ref([]);
 const detail = ref({});
+const detailsForm = ref([]);
 const payment = ref({
     status: "unpaid",
     Reglement: "Cash",
@@ -136,7 +136,7 @@ async function Submit_Sale() {
         snackbarText.value = "llene el formulario correctamente";
         snackbarColor.value = "error";
     } else {
-        if (!edit.value) {
+        if (!editmode.value) {
             Create_Sale();
         } else {
             Update_Sale();
@@ -148,7 +148,7 @@ async function Submit_Sale() {
 function get_units(value) {
     axios
         .get("/get_units?id=" + value)
-        .then(({ data }) => (units.value = data));
+        .then(({data}) => (units.value = data));
 }
 
 //------ Show Modal Update Detail Product
@@ -213,7 +213,7 @@ function Update_Detail() {
                 //Percentage %
                 details.value[i].DiscountNet = parseFloat(
                     (details.value[i].Unit_price * details.value[i].discount) /
-                        100
+                    100
                 );
             }
 
@@ -227,20 +227,20 @@ function Update_Detail() {
                     (details.value[i].tax_percent *
                         (details.value[i].Unit_price -
                             details.value[i].DiscountNet)) /
-                        100
+                    100
                 );
             } else {
                 //Inclusive
                 details.value[i].Net_price = parseFloat(
                     (details.value[i].Unit_price -
                         details.value[i].DiscountNet) /
-                        (details.value[i].tax_percent / 100 + 1)
+                    (details.value[i].tax_percent / 100 + 1)
                 );
 
                 details.value[i].taxe = parseFloat(
                     details.value[i].Unit_price -
-                        details.value[i].Net_price -
-                        details.value[i].DiscountNet
+                    details.value[i].Net_price -
+                    details.value[i].DiscountNet
                 );
             }
         }
@@ -316,7 +316,8 @@ function Get_Products_By_Warehouse(id) {
         .then((response) => {
             products.value = response.data;
         })
-        .catch((error) => {});
+        .catch((error) => {
+        });
 }
 
 //----------------------------------------- Add Product to order list -------------------------\\
@@ -494,6 +495,7 @@ function Create_Sale() {
             });
     }
 }
+
 //--------------------------------- Update Sale -------------------------\\
 function Update_Sale() {
     if (verifiedForm()) {
@@ -560,6 +562,7 @@ function Get_Product_Details(product_id) {
         Calcul_Total();
     });
 }
+
 //---------- keyup Discount
 
 function keyup_Discount() {
@@ -572,6 +575,7 @@ function keyup_Discount() {
         Calcul_Total();
     }
 }
+
 function change_payment_status() {
     if (
         parseFloat(payment.value.received_amount, 2) >=
@@ -587,6 +591,7 @@ function change_payment_status() {
         payment.value.status = "partial";
     }
 }
+
 //---------- filter clients
 function querySelections(v) {
     clientFilter.value = props.clients.filter((e) => {
@@ -596,10 +601,45 @@ function querySelections(v) {
     });
 }
 
+function resetForm() {
+    detailsForm.value = [];
+    products.value = [];
+    payment.value = {
+        status: "unpaid",
+        Reglement: "Cash",
+        amount: 0,
+        received_amount: "",
+    };
+    saleForm.value = {
+        id: "",
+        date: new Date().toISOString().slice(0, 10),
+        statut: "completed",
+        notes: "",
+        client_id: "",
+        warehouse_id: "",
+        sales_type_id: "",
+        tax_rate: 0,
+        TaxNet: 0,
+        shipping: 0,
+        discount: 0,
+    };
+}
+
+watch(
+    () => [props.sale],
+    () => {
+        if (props.sale != null) {
+            editmode.value = true;
+        } else {
+            resetForm();
+            editmode.value = false;
+        }
+    }
+);
+
 onMounted(() => {
-    edit.value = false;
     if (props.sale != null) {
-        edit.value = true;
+        editmode.value = true;
         saleForm.value = props.sale;
         detailsForm.value = props.details;
         clientFilter.value = props.clients.filter(
@@ -622,396 +662,394 @@ onMounted(() => {
         >
         </snackbar>
         <v-form ref="form">
-            <v-row>
-                <v-col cols="12">
-                    <v-card>
-                        <v-card-text>
-                            <v-row>
-                                <!-- date-->
-                                <v-col lg="4" md="4" cols="12">
-                                    <v-text-field
-                                        v-model="saleForm.date"
-                                        :label="saleLabel.date"
-                                        variant="outlined"
-                                        density="comfortable"
-                                        hide-details="auto"
-                                        type="date"
-                                        :rules="helper.required"
+            <v-card>
+                <v-toolbar height="10"></v-toolbar>
+                <v-card-text>
+                    <v-row>
+                        <!-- date-->
+                        <v-col lg="4" md="4" cols="12">
+                            <v-text-field
+                                v-model="saleForm.date"
+                                :label="saleLabel.date"
+                                variant="outlined"
+                                density="comfortable"
+                                hide-details="auto"
+                                type="date"
+                                :rules="helper.required"
+                            >
+                            </v-text-field>
+                        </v-col>
+                        <!-- Customer -->
+                        <v-col lg="4" md="4" cols="12">
+                            <v-autocomplete
+                                v-model="saleForm.client_id"
+                                @update:search="querySelections"
+                                :items="clientFilter"
+                                :label="saleLabel.client_id"
+                                variant="outlined"
+                                density="comfortable"
+                                hide-details="auto"
+                                clearable
+                                :rules="helper.required"
+                            ></v-autocomplete>
+                        </v-col>
+
+                        <!-- warehouse -->
+                        <v-col lg="4" md="4" cols="12">
+                            <v-select
+                                @update:modelValue="Selected_Warehouse"
+                                v-model="saleForm.warehouse_id"
+                                :items="warehouses"
+                                :label="saleLabel.warehouse_id"
+                                variant="outlined"
+                                density="comfortable"
+                                hide-details="auto"
+                                clearable
+                                :rules="helper.required"
+                            ></v-select>
+                        </v-col>
+
+                        <!-- Product -->
+                        <v-col cols="12">
+                            <v-autocomplete
+                                @update:modelValue="getResultValue"
+                                :loading="loadingFilter"
+                                :items="products"
+                                :model-value="search_input"
+                                variant="solo-filled"
+                                item-title="name"
+                                item-value="id"
+                                density="comfortable"
+                                hide-no-data
+                                hide-details
+                                label="Añadir Producto"
+                                :disabled="products.length == 0"
+                                clearable
+                                prepend-inner-icon="mdi-magnify"
+                            ></v-autocomplete>
+                        </v-col>
+
+                        <!-- products  -->
+                        <v-col cols="12">
+                            <p class="text-h6">Productos *</p>
+                            <v-table
+                                hover
+                                class="border rounded"
+                                density="comfortable"
+                            >
+                                <thead>
+                                <tr class="bg-secondary">
+                                    <th
+                                        class="text-white text-center"
                                     >
-                                    </v-text-field>
-                                </v-col>
-                                <!-- Customer -->
-                                <v-col lg="4" md="4" cols="12">
-                                    <v-autocomplete
-                                        v-model="saleForm.client_id"
-                                        @update:search="querySelections"
-                                        :items="clientFilter"
-                                        :label="saleLabel.client_id"
-                                        variant="outlined"
-                                        density="comfortable"
-                                        hide-details="auto"
-                                        clearable
-                                        :rules="helper.required"
-                                    ></v-autocomplete>
-                                </v-col>
-
-                                <!-- warehouse -->
-                                <v-col lg="4" md="4" cols="12">
-                                    <v-select
-                                        @update:modelValue="Selected_Warehouse"
-                                        v-model="saleForm.warehouse_id"
-                                        :items="warehouses"
-                                        :label="saleLabel.warehouse_id"
-                                        variant="outlined"
-                                        density="comfortable"
-                                        hide-details="auto"
-                                        clearable
-                                        :rules="helper.required"
-                                    ></v-select>
-                                </v-col>
-
-                                <!-- Product -->
-                                <v-col cols="12">
-                                    <v-autocomplete
-                                        @update:modelValue="getResultValue"
-                                        :loading="loadingFilter"
-                                        :items="products"
-                                        :model-value="search_input"
-                                        variant="solo-filled"
-                                        item-title="name"
-                                        item-value="id"
-                                        density="comfortable"
-                                        hide-no-data
-                                        hide-details
-                                        label="Añadir Producto"
-                                        :disabled="products.length == 0"
-                                        clearable
-                                        prepend-inner-icon="mdi-magnify"
-                                    ></v-autocomplete>
-                                </v-col>
-
-                                <!-- products  -->
-                                <v-col cols="12">
-                                    <p class="text-h6">Productos *</p>
-                                    <v-table
-                                        hover
-                                        class="border rounded"
-                                        density="comfortable"
+                                        #
+                                    </th>
+                                    <th
+                                        class="text-white text-center"
                                     >
-                                        <thead>
-                                            <tr class="bg-secondary">
-                                                <th
-                                                    class="text-white text-center"
-                                                >
-                                                    #
-                                                </th>
-                                                <th
-                                                    class="text-white text-center"
-                                                >
-                                                    Producto
-                                                </th>
-                                                <th
-                                                    class="text-white text-center"
-                                                >
-                                                    Precio x Unidad
-                                                </th>
-                                                <th
-                                                    class="text-white text-center"
-                                                >
-                                                    En Stock
-                                                </th>
-                                                <th
-                                                    class="text-white text-center"
-                                                >
-                                                    Cantidad
-                                                </th>
-                                                <th
-                                                    class="text-white text-center"
-                                                >
-                                                    Descuento
-                                                </th>
-                                                <th
-                                                    class="text-white text-center"
-                                                >
-                                                    Sub Total
-                                                </th>
-                                                <th
-                                                    class="text-white text-center"
-                                                ></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-if="detailsForm.length <= 0">
-                                                <td colspan="8">
-                                                    No hay datos disponibles
-                                                </td>
-                                            </tr>
-                                            <tr v-for="detail in detailsForm">
-                                                <td>
-                                                    {{ detail.detail_id }}
-                                                </td>
-                                                <td>
-                                                    <v-chip
-                                                        color="primary"
-                                                        size="small"
-                                                        >{{ detail.code }}
-                                                    </v-chip>
+                                        Producto
+                                    </th>
+                                    <th
+                                        class="text-white text-center"
+                                    >
+                                        Precio x Unidad
+                                    </th>
+                                    <th
+                                        class="text-white text-center"
+                                    >
+                                        En Stock
+                                    </th>
+                                    <th
+                                        class="text-white text-center"
+                                    >
+                                        Cantidad
+                                    </th>
+                                    <th
+                                        class="text-white text-center"
+                                    >
+                                        Descuento
+                                    </th>
+                                    <th
+                                        class="text-white text-center"
+                                    >
+                                        Sub Total
+                                    </th>
+                                    <th
+                                        class="text-white text-center"
+                                    ></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-if="detailsForm.length <= 0">
+                                    <td colspan="8">
+                                        No hay datos disponibles
+                                    </td>
+                                </tr>
+                                <tr v-for="detail in detailsForm">
+                                    <td>
+                                        {{ detail.detail_id }}
+                                    </td>
+                                    <td>
+                                        <v-chip
+                                            color="primary"
+                                            size="small"
+                                        >{{ detail.code }}
+                                        </v-chip>
 
-                                                    {{ detail.name }}
-                                                </td>
-                                                <td>
-                                                    <v-text-field
-                                                        variant="outlined"
-                                                        density="compact"
-                                                        hide-details="auto"
-                                                        :rules="helper.number"
-                                                        v-model="
+                                        {{ detail.name }}
+                                    </td>
+                                    <td>
+                                        <v-text-field
+                                            variant="outlined"
+                                            density="compact"
+                                            hide-details="auto"
+                                            :rules="helper.number"
+                                            v-model="
                                                             detail.Net_price
                                                         "
-                                                        @keyup="Calcul_Total"
-                                                    >
-                                                        <template
-                                                            v-slot:prepend
-                                                        >
-                                                            Bs
-                                                        </template>
-                                                    </v-text-field>
-                                                </td>
-                                                <td>
-                                                    <v-chip
-                                                        color="default"
-                                                        size="small"
-                                                        >{{ detail.stock }}
-                                                        {{ detail.unitSale }}
-                                                    </v-chip>
-                                                </td>
-                                                <td>
-                                                    <div class="quantity">
-                                                        <v-text-field
-                                                            variant="outlined"
-                                                            density="compact"
-                                                            hide-details="auto"
-                                                            :rules="
+                                            @keyup="Calcul_Total"
+                                        >
+                                            <template
+                                                v-slot:prepend
+                                            >
+                                                Bs
+                                            </template>
+                                        </v-text-field>
+                                    </td>
+                                    <td>
+                                        <v-chip
+                                            color="default"
+                                            size="small"
+                                        >{{ detail.stock }}
+                                            {{ detail.unitSale }}
+                                        </v-chip>
+                                    </td>
+                                    <td>
+                                        <div class="quantity">
+                                            <v-text-field
+                                                variant="outlined"
+                                                density="compact"
+                                                hide-details="auto"
+                                                :rules="
                                                                 helper.number
                                                             "
-                                                            v-model="
+                                                v-model="
                                                                 detail.quantity
                                                             "
-                                                            @keyup="
+                                                @keyup="
                                                                 Verified_Qty(
                                                                     detail,
                                                                     detail.detail_id
                                                                 )
                                                             "
-                                                            :min="0.0"
-                                                            :max="
+                                                :min="0.0"
+                                                :max="
                                                                 detail.current
                                                             "
-                                                        >
-                                                            <template
-                                                                v-slot:append
-                                                            >
-                                                                <v-icon
-                                                                    color="secundary"
-                                                                    @click="
+                                            >
+                                                <template
+                                                    v-slot:append
+                                                >
+                                                    <v-icon
+                                                        color="secundary"
+                                                        @click="
                                                                         increment(
                                                                             detail,
                                                                             detail.detail_id
                                                                         )
                                                                     "
-                                                                >
-                                                                    mdi-plus-box
-                                                                </v-icon>
-                                                            </template>
-                                                            <template
-                                                                v-slot:prepend
-                                                            >
-                                                                <v-icon
-                                                                    color="secundary"
-                                                                    @click="
+                                                    >
+                                                        mdi-plus-box
+                                                    </v-icon>
+                                                </template>
+                                                <template
+                                                    v-slot:prepend
+                                                >
+                                                    <v-icon
+                                                        color="secundary"
+                                                        @click="
                                                                         decrement(
                                                                             detail,
                                                                             detail.detail_id
                                                                         )
                                                                     "
-                                                                >
-                                                                    mdi-minus-box
-                                                                </v-icon>
-                                                            </template>
-                                                        </v-text-field>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    Bs
-                                                    {{
-                                                        helper.formatNumber(
-                                                            detail.DiscountNet *
-                                                                detail.quantity,
-                                                            2
-                                                        )
-                                                    }}
-                                                </td>
-                                                <td>
-                                                    Bs
-                                                    {{
-                                                        detail.subtotal.toFixed(
-                                                            2
-                                                        )
-                                                    }}
-                                                </td>
-                                                <td>
-                                                    <i
-                                                        @click="
-                                                            Modal_Updat_Detail(
-                                                                detail
-                                                            )
-                                                        "
-                                                        class="i-Edit text-25 text-success"
-                                                    ></i>
-                                                    <v-btn
-                                                        class="ma-1"
-                                                        color="success"
-                                                        icon="mdi-pen"
-                                                        size="x-small"
-                                                        variant="elevated"
-                                                        @click="
-                                                            Modal_Updat_Detail(
-                                                                detail
-                                                            )
-                                                        "
                                                     >
-                                                    </v-btn>
-                                                    <v-btn
-                                                        class="ma-1"
-                                                        color="error"
-                                                        icon="mdi-delete"
-                                                        size="x-small"
-                                                        variant="elevated"
-                                                        @click="
+                                                        mdi-minus-box
+                                                    </v-icon>
+                                                </template>
+                                            </v-text-field>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        Bs
+                                        {{
+                                            helper.formatNumber(
+                                                detail.DiscountNet *
+                                                detail.quantity,
+                                                2
+                                            )
+                                        }}
+                                    </td>
+                                    <td>
+                                        Bs
+                                        {{
+                                            detail.subtotal.toFixed(
+                                                2
+                                            )
+                                        }}
+                                    </td>
+                                    <td>
+                                        <i
+                                            @click="
+                                                            Modal_Updat_Detail(
+                                                                detail
+                                                            )
+                                                        "
+                                            class="i-Edit text-25 text-success"
+                                        ></i>
+                                        <v-btn
+                                            class="ma-1"
+                                            color="success"
+                                            icon="mdi-pen"
+                                            size="x-small"
+                                            variant="elevated"
+                                            @click="
+                                                            Modal_Updat_Detail(
+                                                                detail
+                                                            )
+                                                        "
+                                        >
+                                        </v-btn>
+                                        <v-btn
+                                            class="ma-1"
+                                            color="error"
+                                            icon="mdi-delete"
+                                            size="x-small"
+                                            variant="elevated"
+                                            @click="
                                                             delete_Product_Detail(
                                                                 detail.detail_id
                                                             )
                                                         "
-                                                    >
-                                                    </v-btn>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </v-table>
-                                </v-col>
-                            </v-row>
-                            <v-row>
-                                <v-col lg="4" md="4" cols="12">
-                                    <!-- Discount -->
-                                    <v-text-field
-                                        :label="saleLabel.discount"
-                                        variant="outlined"
-                                        density="compact"
-                                        hide-details="auto"
-                                        :rules="helper.number"
-                                        v-model="saleForm.discount"
-                                        @keyup="keyup_Discount()"
-                                    ></v-text-field>
-                                </v-col>
-                                <!-- Amount  -->
-                                <v-col lg="4" md="4" cols="12">
-                                    <v-text-field
-                                        v-model="payment.amount"
-                                        variant="outlined"
-                                        density="compact"
-                                        readonly
-                                        hide-details="auto"
-                                        type="text"
-                                        label="Total"
-                                        :rules="helper.numberWithDecimal"
-                                    ></v-text-field>
-                                </v-col>
-                                <!-- Received  Amount  -->
-                                <v-col lg="4" md="4" cols="12">
-                                    <v-text-field
-                                        v-model="payment.received_amount"
-                                        variant="outlined"
-                                        density="compact"
-                                        clearable
-                                        hide-details="auto"
-                                        type="text"
-                                        label="Monto Recibido"
-                                        :rules="helper.numberWithDecimal"
-                                        @keyup="change_payment_status()"
-                                    ></v-text-field>
-                                </v-col>
+                                        >
+                                        </v-btn>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </v-table>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col lg="4" md="4" cols="12">
+                            <!-- Discount -->
+                            <v-text-field
+                                :label="saleLabel.discount"
+                                variant="outlined"
+                                density="compact"
+                                hide-details="auto"
+                                :rules="helper.number"
+                                v-model="saleForm.discount"
+                                @keyup="keyup_Discount()"
+                            ></v-text-field>
+                        </v-col>
+                        <!-- Amount  -->
+                        <v-col lg="4" md="4" cols="12">
+                            <v-text-field
+                                v-model="payment.amount"
+                                variant="outlined"
+                                density="compact"
+                                readonly
+                                hide-details="auto"
+                                type="text"
+                                label="Total"
+                                :rules="helper.numberWithDecimal"
+                            ></v-text-field>
+                        </v-col>
+                        <!-- Received  Amount  -->
+                        <v-col lg="4" md="4" cols="12">
+                            <v-text-field
+                                v-model="payment.received_amount"
+                                variant="outlined"
+                                density="compact"
+                                clearable
+                                hide-details="auto"
+                                type="text"
+                                label="Monto Recibido"
+                                :rules="helper.numberWithDecimal"
+                                @keyup="change_payment_status()"
+                            ></v-text-field>
+                        </v-col>
 
-                                <!-- Status  -->
-                                <v-col lg="4" md="4" cols="12">
-                                    <v-select
-                                        v-model="saleForm.statut"
-                                        variant="outlined"
-                                        density="compact"
-                                        clearable
-                                        hide-details="auto"
-                                        :items="helper.statutSale()"
-                                        :label="saleLabel.statut"
-                                    ></v-select>
-                                </v-col>
+                        <!-- Status  -->
+                        <v-col lg="4" md="4" cols="12">
+                            <v-select
+                                v-model="saleForm.statut"
+                                variant="outlined"
+                                density="compact"
+                                clearable
+                                hide-details="auto"
+                                :items="helper.statutSale()"
+                                :label="saleLabel.statut"
+                            ></v-select>
+                        </v-col>
 
-                                <!-- Sales type  -->
-                                <v-col lg="4" md="4" cols="12">
-                                    <v-select
-                                        v-model="saleForm.sales_type_id"
-                                        variant="outlined"
-                                        density="compact"
-                                        hide-details="auto"
-                                        :items="sales_types"
-                                        :label="saleLabel.sales_type_id + ' *'"
-                                        :rules="helper.required"
-                                    ></v-select>
-                                </v-col>
+                        <!-- Sales type  -->
+                        <v-col lg="4" md="4" cols="12">
+                            <v-select
+                                v-model="saleForm.sales_type_id"
+                                variant="outlined"
+                                density="compact"
+                                hide-details="auto"
+                                :items="sales_types"
+                                :label="saleLabel.sales_type_id + ' *'"
+                                :rules="helper.required"
+                            ></v-select>
+                        </v-col>
 
-                                <!-- Payment choice -->
-                                <v-col lg="4" md="4" cols="12">
-                                    <v-select
-                                        v-model="payment.Reglement"
-                                        variant="outlined"
-                                        density="compact"
-                                        hide-details="auto"
-                                        :items="helper.reglamentPayment()"
-                                        label="Tipo de Pago"
-                                    ></v-select>
-                                </v-col>
+                        <!-- Payment choice -->
+                        <v-col lg="4" md="4" cols="12">
+                            <v-select
+                                v-model="payment.Reglement"
+                                variant="outlined"
+                                density="compact"
+                                hide-details="auto"
+                                :items="helper.reglamentPayment()"
+                                label="Tipo de Pago"
+                            ></v-select>
+                        </v-col>
 
-                                <!--                &lt;!&ndash; change  Amount  &ndash;&gt;-->
-                                <!--                <v-col md="4" v-if="payment.status != 'pending'">-->
-                                <!--                  <label>{{$t('Change')}} :</label>-->
-                                <!--                  <p-->
-                                <!--                    class="change_amount"-->
-                                <!--                  >{{parseFloat(payment.received_amount - payment.amount).toFixed(2)}}</p>-->
-                                <!--                </v-col>-->
+                        <!--                &lt;!&ndash; change  Amount  &ndash;&gt;-->
+                        <!--                <v-col md="4" v-if="payment.status != 'pending'">-->
+                        <!--                  <label>{{$t('Change')}} :</label>-->
+                        <!--                  <p-->
+                        <!--                    class="change_amount"-->
+                        <!--                  >{{parseFloat(payment.received_amount - payment.amount).toFixed(2)}}</p>-->
+                        <!--                </v-col>-->
 
-                                <v-col md="12" class="mt-3">
-                                    <v-textarea
-                                        v-model="saleForm.notes"
-                                        rows="4"
-                                        variant="outlined"
-                                        label="Notas"
-                                        placeholder="Notas"
-                                        hide-details="auto"
-                                    ></v-textarea>
-                                </v-col>
+                        <v-col md="12" class="mt-3">
+                            <v-textarea
+                                v-model="saleForm.notes"
+                                rows="4"
+                                variant="outlined"
+                                label="Notas"
+                                placeholder="Notas"
+                                hide-details="auto"
+                            ></v-textarea>
+                        </v-col>
 
-                                <v-col cols="12">
-                                    <v-btn
-                                        variant="flat"
-                                        color="primary"
-                                        :disabled="loading"
-                                        @click="Submit_Sale"
-                                        >Guardar</v-btn
-                                    >
-                                </v-col>
-                            </v-row>
-                        </v-card-text>
-                    </v-card>
-                </v-col>
-            </v-row>
+                        <v-col cols="12">
+                            <v-btn
+                                variant="flat"
+                                color="primary"
+                                :disabled="loading"
+                                @click="Submit_Sale"
+                            >Guardar
+                            </v-btn
+                            >
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
         </v-form>
 
         <!--    &lt;!&ndash; Modal Update detail Product &ndash;&gt;-->
