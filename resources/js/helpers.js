@@ -1,5 +1,6 @@
 import moment from "moment";
 
+let debug = true;
 export default {
     required: [(v) => !!v || "Requerido"],
     max: (max) => [
@@ -49,6 +50,9 @@ export default {
         },
     ],
     enableDay: (date) => {
+        if (debug) {
+            return false;
+        }
         let diff = moment(date, "YYYY-MM-DD").add(2, "d");
         diff = moment(diff).diff(moment(), "days");
         return diff <= 0;
@@ -69,24 +73,24 @@ export default {
     },
     statutSale: () => {
         return [
-            { title: "Completado", value: "completed" },
-            { title: "Pendiente", value: "pending" },
-            { title: "Ordenado", value: "ordered" },
+            {title: "Completado", value: "completed"},
+            {title: "Pendiente", value: "pending"},
+            {title: "Ordenado", value: "ordered"},
         ];
     },
     statusPayment: () => {
         return [
-            { title: "Pagado", value: "paid" },
-            { title: "Deuda", value: "unpaid" },
-            { title: "Parcial", value: "partial" },
+            {title: "Pagado", value: "paid"},
+            {title: "Deuda", value: "unpaid"},
+            {title: "Parcial", value: "partial"},
         ];
     },
     reglamentPayment: () => {
         return [
-            { title: "Efectivo", value: "Cash" },
-            { title: "Cheque", value: "cheque" },
-            { title: "Transferencia Bancaria", value: "bank transfer" },
-            { title: "Otros", value: "other" },
+            {title: "Efectivo", value: "Cash"},
+            {title: "Cheque", value: "cheque"},
+            {title: "Transferencia Bancaria", value: "bank transfer"},
+            {title: "Otros", value: "other"},
         ];
     },
 };
