@@ -156,19 +156,17 @@ async function Submit_Payment() {
 function Invoice_POS(id) {
   loading.value = true;
   dialogInvoice.value = false;
-  snackbar.value = true;
+  snackbar.value = false;
   axios
       .get("/sales_print_invoice/" + id)
       .then((response) => {
         invoice_pos.value = response.data;
         payment.values = response.data.payments;
         pos_settings.value = response.data.pos_settings;
-        setTimeout(() => {
           dialogInvoice.value = true;
-        }, 500);
-        if (response.data.pos_settings.is_printable) {
-          setTimeout(() => print_it(), 1000);
-        }
+        // if (response.data.pos_settings.is_printable) {
+        //   setTimeout(() => print_it(), 1000);
+        // }
       })
       .catch(() => {
       })
@@ -844,11 +842,14 @@ function Remove_Sale(id, sale_has_return) {
                   Añadir Pago
                 </v-list-item-title>
               </v-list-item>
-
-              <!--                <v-dropdown-item title="Invoice" @click="Invoice_POS(props.row.id)">-->
-              <!--                  <i class="nav-icon i-File-TXT font-weight-bold mr-2"></i>-->
-              <!--                  {{$t('Invoice_POS')}}-->
-              <!--                </v-dropdown-item>-->
+              <v-list-item
+                  @click="Invoice_POS(item.raw.id)"
+                  prepend-icon="mdi-printer-pos-outline"
+              >
+                <v-list-item-title>
+                  Impresion Orden
+                </v-list-item-title>
+              </v-list-item>
 
               <!--                <v-dropdown-item title="PDF" @click="Invoice_PDF(props.row , props.row.id)">-->
               <!--                  <i class="nav-icon i-File-TXT font-weight-bold mr-2"></i>-->

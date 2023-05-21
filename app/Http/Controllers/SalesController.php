@@ -592,7 +592,7 @@ class SalesController extends Controller
     public function Print_Invoice_POS(Request $request, $id)
     {
         $helpers = new helpers();
-        $details = array();
+        $details = collect();
 
         $sale = Sale::with('details.product.unitSale')
             ->where('deleted_at', '=', null)
@@ -642,7 +642,7 @@ class SalesController extends Controller
             $data['is_imei'] = $detail['product']['is_imei'];
             $data['imei_number'] = $detail->imei_number;
 
-            $details[] = $data;
+            $details->add($data);
         }
 
         $payments = PaymentSale::with('sale')
