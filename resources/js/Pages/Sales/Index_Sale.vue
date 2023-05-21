@@ -27,7 +27,6 @@ const dialogInvoice = ref(false);
 const dialogAddPayment = ref(false);
 const dialogShowPayment = ref(false);
 const dialogDeletePayment = ref(false);
-const dialogShipment = ref(false);
 const fields = ref([
   {title: "Fecha", key: "date"},
   {title: "Codigo", key: "Ref"},
@@ -80,6 +79,7 @@ const invoice_pos = ref({
 });
 
 const payments = ref([]);
+const payments_pos = ref([]);
 const payment = ref({});
 const paymentLabel = ref({
   date: "Fecha",
@@ -159,11 +159,11 @@ function Invoice_POS(id) {
   snackbar.value = false;
   axios
       .get("/sales_print_invoice/" + id)
-      .then((response) => {
-        invoice_pos.value = response.data;
-        payment.values = response.data.payments;
-        pos_settings.value = response.data.pos_settings;
-          dialogInvoice.value = true;
+      .then(({data}) => {
+        invoice_pos.value = data;
+        payments_pos.value = data.payments;
+        pos_settings.value = data.pos_settings;
+        dialogInvoice.value = true;
         // if (response.data.pos_settings.is_printable) {
         //   setTimeout(() => print_it(), 1000);
         // }
@@ -257,7 +257,6 @@ function New_Payment(saleItem) {
 function Edit_Payment(payment_item) {
   reset_form_payment();
   EditPaymentMode.value = true;
-  console.log(payment);
   payment.value.id = payment_item.id;
   payment.value.Ref = payment_item.Ref;
   payment.value.Reglement = payment_item.Reglement;
@@ -697,6 +696,118 @@ function Remove_Sale(id, sale_has_return) {
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- Modal Show Invoice POS-->
+    <v-dialog v-model="dialogInvoice" max-width="350">
+      <v-card>
+        <v-card-text>
+          <div id="invoice-POS">
+            <div class="info">
+              <h2 class="text-center">{{ invoice_pos.setting?.CompanyName }}</h2>
+              <v-col cols="12">
+
+                <span>Fecha : {{ invoice_pos.sale.date }} <br></span>
+                <span v-show="pos_settings.show_address">Direccion : {{ invoice_pos.setting.CompanyAdress??'' }} <br></span>
+                <span v-show="pos_settings.show_email">Correo : {{ invoice_pos.setting?.email }} <br></span>
+                <span v-show="pos_settings.show_phone">Telefono : {{ invoice_pos.setting?.CompanyPhone }} <br></span>
+                <span v-show="pos_settings.show_customer">Cliente : {{ invoice_pos.sale.client_name }} <br></span>
+              </v-col>
+            </div>
+            <v-table density="compact" hover>
+              <tbody>
+              <tr v-for="detail_invoice in invoice_pos.details">
+                <td colspan="3">
+                  {{ detail_invoice.name }}
+                  <br>
+                  <span>{{ helper.formatNumber(detail_invoice.quantity, 2) }} {{ detail_invoice.unit_sale }} x {{ helper.formatNumber(detail_invoice.total / detail_invoice.quantity, 2) }}</span>
+                </td>
+                <td style="text-align:right;vertical-align:bottom">{{ helper.formatNumber(detail_invoice.total, 2) }}
+                </td>
+              </tr>
+
+              <tr style="margin-top:10px" v-show="pos_settings.show_discount">
+                <td colspan="3" class="total">Impuesto</td>
+                <td style="text-align:right;" class="total">{{ invoice_pos.symbol }}
+                  {{ helper.formatNumber(invoice_pos.sale.taxe, 2) }} ({{ helper.formatNumber(invoice_pos.sale.tax_rate, 2) }}
+                  %)
+                </td>
+              </tr>
+
+              <tr style="margin-top:10px" v-show="pos_settings.show_discount">
+                <td colspan="3" class="total">Descuento</td>
+                <td style="text-align:right;" class="total">{{ invoice_pos.symbol }}
+                  {{ helper.formatNumber(invoice_pos.sale.discount, 2) }}
+                </td>
+              </tr>
+
+              <tr style="margin-top:10px">
+                <td colspan="3" class="total">Total</td>
+                <td style="text-align:right;" class="total">{{ invoice_pos.symbol }}
+                  {{ helper.formatNumber(invoice_pos.sale.GrandTotal, 2) }}
+                </td>
+              </tr>
+
+              <tr v-show="invoice_pos.sale.paid_amount < invoice_pos.sale.GrandTotal">
+                <td colspan="3" class="total">Pagado</td>
+                <td
+                    style="text-align:right;"
+                    class="total"
+                >{{ invoice_pos.symbol }} {{ helper.formatNumber(invoice_pos.sale.paid_amount, 2) }}
+                </td>
+              </tr>
+
+              <tr v-show="invoice_pos.sale.paid_amount < invoice_pos.sale.GrandTotal">
+                <td colspan="3" class="total">Deuda</td>
+                <td
+                    style="text-align:right;"
+                    class="total"
+                >{{ invoice_pos.symbol }}
+                  {{ parseFloat(invoice_pos.sale.GrandTotal - invoice_pos.sale.paid_amount).toFixed(2) }}
+                </td>
+              </tr>
+              </tbody>
+            </v-table>
+            <v-table
+                class="change mt-3"
+                style=" font-size: 12px;"
+                v-show="invoice_pos.sale.paid_amount > 0"
+                density="compact"
+                hover
+            >
+              <thead>
+              <tr style="background: #eee; ">
+                <th style="text-align: left;" colspan="1">Pagado Por:</th>
+                <th style="text-align: center;" colspan="2">Monto:</th>
+                <th style="text-align: right;" colspan="1">Cambio:</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="payment_pos in payments_pos">
+                <td style="text-align: left;" colspan="1">{{ helper.getReglamentPayment(payment_pos.Reglement)[0].title }}</td>
+                <td
+                    style="text-align: center;"
+                    colspan="2"
+                >{{ helper.formatNumber(payment_pos.montant, 2) }}
+                </td>
+                <td
+                    style="text-align: right;"
+                    colspan="1"
+                >{{ helper.formatNumber(payment_pos.change, 2) }}
+                </td>
+              </tr>
+              </tbody>
+            </v-table>
+          </div>
+        </v-card-text>
+        <v-card-actions >
+          <v-spacer></v-spacer>
+          <v-btn prepend-icon="mdi-printer" @click="helper.print_pos('invoice-POS')" color="primary" variant="outlined">
+            Imprimir
+          </v-btn>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-row align="center" class="mb-3">
       <v-spacer></v-spacer>
       <v-col cols="auto" class="text-right">
@@ -869,91 +980,12 @@ function Remove_Sale(id, sale_has_return) {
       </v-data-table>
     </v-card>
   </layout>
-
-
-  <!--     &lt;!&ndash; Modal Edit Shipment &ndash;&gt;-->
-  <!--    <validation-observer ref="shipment_ref">-->
-  <!--      <v-modal hide-footer size="md" id="modal_shipment" :title="$t('Edit')">-->
-  <!--        <v-form @submit.prevent="Submit_Shipment">-->
-  <!--          <v-row>-->
-  <!--            &lt;!&ndash; Status  &ndash;&gt;-->
-  <!--            <v-col md="12">-->
-  <!--              <validation-provider name="Status" :rules="{ required: true}">-->
-  <!--                <v-form-group slot-scope="{ valid, errors }" :label="$t('Status') + ' ' + '*'">-->
-  <!--                  <v-select-->
-  <!--                    :class="{'is-invalid': !!errors.length}"-->
-  <!--                    :state="errors[0] ? false : (valid ? true : null)"-->
-  <!--                    v-model="shipment.status"-->
-  <!--                    :reduce="label => label.value"-->
-  <!--                    :placeholder="$t('Choose_Status')"-->
-  <!--                    :options="-->
-  <!--                                [-->
-  <!--                                  {label: 'Ordered', value: 'ordered'},-->
-  <!--                                  {label: 'Packed', value: 'packed'},-->
-  <!--                                  {label: 'Shipped', value: 'shipped'},-->
-  <!--                                  {label: 'Delivered', value: 'delivered'},-->
-  <!--                                  {label: 'Cancelled', value: 'cancelled'},-->
-  <!--                                ]"-->
-  <!--                  ></v-select>-->
-  <!--                  <v-form-invalid-feedback>{{ errors[0] }}</v-form-invalid-feedback>-->
-  <!--                </v-form-group>-->
-  <!--              </validation-provider>-->
-  <!--            </v-col>-->
-
-  <!--            <v-col md="12">-->
-  <!--              <v-form-group :label="$t('delivered_to')">-->
-  <!--                <v-form-input-->
-  <!--                  label="delivered_to"-->
-  <!--                  v-model="shipment.delivered_to"-->
-  <!--                  :placeholder="$t('delivered_to')"-->
-  <!--                ></v-form-input>-->
-  <!--              </v-form-group>-->
-  <!--            </v-col>-->
-
-  <!--            <v-col md="12">-->
-  <!--              <v-form-group :label="$t('Adress')">-->
-  <!--                <textarea-->
-  <!--                  v-model="shipment.shipping_address"-->
-  <!--                  rows="4"-->
-  <!--                  class="form-control"-->
-  <!--                  :placeholder="$t('Enter_Address')"-->
-  <!--                ></textarea>-->
-  <!--              </v-form-group>-->
-  <!--            </v-col>-->
-
-  <!--            <v-col md="12">-->
-  <!--              <v-form-group :label="$t('Please_provide_any_details')">-->
-  <!--                <textarea-->
-  <!--                  v-model="shipment.shipping_details"-->
-  <!--                  rows="4"-->
-  <!--                  class="form-control"-->
-  <!--                  :placeholder="$t('Please_provide_any_details')"-->
-  <!--                ></textarea>-->
-  <!--              </v-form-group>-->
-  <!--            </v-col>-->
-
-  <!--            <v-col md="12" class="mt-3">-->
-  <!--              <v-button-->
-  <!--                variant="primary"-->
-  <!--                type="submit"-->
-  <!--                :disabled="Submit_Processing_shipment"-->
-  <!--              >{{$t('submit')}}</v-button>-->
-  <!--              <div v-once class="typo__p" v-if="Submit_Processing_shipment">-->
-  <!--                <div class="spinner sm spinner-primary mt-3"></div>-->
-  <!--              </div>-->
-  <!--            </v-col>-->
-  <!--          </v-row>-->
-  <!--        </v-form>-->
-  <!--      </v-modal>-->
-  <!--    </validation-observer>-->
-
 </template>
-
 <style>
-.total {
+.total{
   font-weight: bold;
-  font-size: 14px;
+  /*font-size: 14px;*/
   /* text-transform: uppercase;
-height: 50px; */
+  height: 50px; */
 }
 </style>

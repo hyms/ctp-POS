@@ -75,15 +75,15 @@ class helpers
     // Get Currency COde
     public function Get_Currency_Code()
     {
-        $settings = Setting::with('Currency')->where('deleted_at', '=', null)->first();
+//        $settings = Setting::with('Currency')->where('deleted_at', '=', null)->first();
         $code = 'Bs';
-        if ($settings && $settings->currency_id) {
-            if (Currency::where('id', $settings->currency_id)
-                ->where('deleted_at', '=', null)
-                ->first()) {
-                $code = $settings['Currency']->code;
-            }
-        }
+//        if ($settings && $settings->currency_id) {
+//            if (Currency::where('id', $settings->currency_id)
+//                ->where('deleted_at', '=', null)
+//                ->first()) {
+//                $code = $settings['Currency']->code;
+//            }
+//        }
         return $code;
     }
 

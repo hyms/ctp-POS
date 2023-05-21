@@ -2,6 +2,12 @@ import moment from "moment";
 // import pos_css from "@/../css/pos_print.css";
 
 let debug = true;
+const reglaments = [
+    {title: "Efectivo", value: "cash"},
+    {title: "Cheque", value: "cheque"},
+    {title: "Transferencia Bancaria", value: "bank_transfer"},
+    {title: "Otros", value: "other"},
+];
 export default {
     required: [(v) => !!v || "Requerido"],
     max: (max) => [
@@ -86,17 +92,20 @@ export default {
             {title: "Parcial", value: "partial"},
         ];
     },
-    reglamentPayment: () => {
-        return [
-            {title: "Efectivo", value: "Cash"},
-            {title: "Cheque", value: "cheque"},
-            {title: "Transferencia Bancaria", value: "bank transfer"},
-            {title: "Otros", value: "other"},
-        ];
+    getReglamentPayment: (v) => {
+        let result = reglaments.filter((i) => i.value.toLowerCase() == v.toLowerCase());
+        if (result == null || result.length==0) {
+            result = [{title: "", value: ""}];
+        }
+        console.log(result);
+        return result;
     },
-    print_pos: () => {
-        let pos_css = import('@/../css/pos_print.css?url');
-        let divContents = document.getElementById("invoice-POS").innerHTML;
+    reglamentPayment: () => {
+        return reglaments;
+    },
+    print_pos: (element_id) => {
+        const pos_css = new URL('@/../css/pos_print.css', import.meta.url).href
+        let divContents = document.getElementById(element_id).innerHTML;
         let a = window.open("", "", "height=500, width=500");
         a.document.write('<html><link rel="stylesheet" href="' + pos_css + '">');
         a.document.write("<body >");

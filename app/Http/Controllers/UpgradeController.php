@@ -41,7 +41,15 @@ class UpgradeController extends Controller
 //                }
 //            }
             DB::transaction(function () {
-
+                $id = DB::table('settings')->insertGetId([
+                    'CompanyName' => "Prographics",
+                    'email' => "",
+                    'CompanyPhone' => "",
+                    'CompanyAdress' => "",
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                    'deleted_at' =>null,
+                ]);
 
                 $items = DB::table('clientes')->get()->collect();
                 $items->each(function ($item) {
@@ -260,7 +268,7 @@ class UpgradeController extends Controller
                                     "sale_id" => $mov->ordenTrabajo,
                                     "montant" => $mov->monto,
                                     "change" => 0,
-                                    "Reglement" => "Efectivo",
+                                    "Reglement" => "cash",
                                     "notes" => $mov->observaciones,
                                     "created_at" => $mov->created_at,
                                     "updated_at" => $mov->updated_at,
