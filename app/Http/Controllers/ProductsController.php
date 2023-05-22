@@ -123,7 +123,7 @@ class ProductsController extends Controller
                             'name' => $variant,
                         ]);
                     }
-                    ProductVariant::create($Product_variants_data);
+                    ProductVariant::insert($Product_variants_data->toArray());
                 }
 
                 //--Store Product Warehouse
@@ -149,7 +149,7 @@ class ProductsController extends Controller
                             ]);
                         }
                     }
-                    product_warehouse::create($product_warehouse);
+                    product_warehouse::insert($product_warehouse->toArray());
                 }
 
             }, 10);
@@ -252,7 +252,7 @@ class ProductsController extends Controller
                                         ]);
 
                                     }
-                                    product_warehouse::create($product_warehouse);
+                                    product_warehouse::insert($product_warehouse->toArray());
                                 }
                             }
                         }
@@ -282,7 +282,7 @@ class ProductsController extends Controller
                                         'product_variant_id' => $ProductVarDT->id,
                                     ]);
                                 }
-                                product_warehouse::create($product_warehouse_DT);
+                                product_warehouse::insert($product_warehouse_DT->toArray());
                             }
                         }
 
@@ -313,7 +313,7 @@ class ProductsController extends Controller
                                 ]);
 
                             }
-                            product_warehouse::create($product_warehouse);
+                            product_warehouse::insert($product_warehouse->toArray());
                         }
                     }
                 }

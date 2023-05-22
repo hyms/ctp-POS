@@ -73,8 +73,7 @@ class WarehouseController extends Controller
                             'product_variant_id' => null,
                         ]);
                     }
-
-                    product_warehouse::create($product_warehouse);
+                    product_warehouse::insert($product_warehouse->toArray());
                 }
             }
 

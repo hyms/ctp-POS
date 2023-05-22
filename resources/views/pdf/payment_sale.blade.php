@@ -3,13 +3,13 @@
    <head>
       <meta charset="utf-8">
       <title>Payment_{{$payment['Ref']}}</title>
-      <link rel="stylesheet" href="{{asset('/css/pdf_style.css')}}" media="all" />
+      @vite('resources/css/pdf_style.css')
    </head>
 
    <body>
       <header class="clearfix">
          <div id="logo">
-         <img src="{{asset('/images/'.$setting['logo'])}}">
+{{--         <img src="{{asset('/images/'.$setting['logo'])}}">--}}
          </div>
          <div id="company">
             <div><strong> Date: </strong>{{$payment['date']}}</div>

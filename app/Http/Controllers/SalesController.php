@@ -222,7 +222,7 @@ class SalesController extends Controller
                     }
                 }
             }
-            SaleDetail::create($orderDetails);
+            SaleDetail::insert($orderDetails->toArray());
 
             $role = Auth::user()->roles()->first();
 //            $view_records = Role::findOrFail($role->id)->inRole('record_view');
@@ -358,12 +358,11 @@ class SalesController extends Controller
                         $orderDetails['product_id'] = $item['product_id'];
                         $orderDetails['product_variant_id'] = $item['product_variant_id'];
                         $orderDetails['total'] = $item['subtotal'];
-                        $orderDetails['imei_number'] = $item['imei_number'];
 
                         if ($old_sale_details->doesntContain('id', '=', $item->get('id'))) {
                             $orderDetails['date'] = Carbon::now();
                             $orderDetails['sale_unit_id'] = $unit_prod ? $unit_prod->id : Null;
-                            SaleDetail::Create($orderDetails);
+                            SaleDetail::create($orderDetails);
                         } else {
                             SaleDetail::where('id', $item['id'])->update($orderDetails);
                         }
@@ -485,7 +484,7 @@ class SalesController extends Controller
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
 
-        $details = array();
+        $details = collect();
 
         // Check If User Has Permission view All Records
 //        if (!$view_records) {
@@ -572,7 +571,7 @@ class SalesController extends Controller
             $data['is_imei'] = $detail['product']['is_imei'];
             $data['imei_number'] = $detail->imei_number;
 
-            $details[] = $data;
+            $details->add($data);
         }
 
         $company = Setting::where('deleted_at', '=', null)->first();
@@ -594,18 +593,19 @@ class SalesController extends Controller
         $helpers = new helpers();
         $details = collect();
 
-        $sale = Sale::with('details.product.unitSale')
+        $sale = Sale::with(['details.product.unitSale','warehouse'])
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
 
         $item['id'] = $sale->id;
         $item['Ref'] = $sale->Ref;
-        $item['date'] = $sale->date;
+        $item['date'] = Carbon::parse($sale->date)->format('d-m-Y');
         $item['discount'] = number_format($sale->discount, 2, '.', '');
         $item['shipping'] = number_format($sale->shipping, 2, '.', '');
         $item['taxe'] = number_format($sale->TaxNet, 2, '.', '');
         $item['tax_rate'] = $sale->tax_rate;
         $item['client_name'] = $sale['client']->company_name;
+        $item['warehouse'] = $sale['warehouse']->name;
         $item['GrandTotal'] = number_format($sale->GrandTotal, 2, '.', '');
         $item['paid_amount'] = number_format($sale->paid_amount, 2, '.', '');
 

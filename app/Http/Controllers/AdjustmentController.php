@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use phpDocumentor\Reflection\Types\Collection;
 
 class AdjustmentController extends Controller
 {
@@ -80,9 +81,9 @@ class AdjustmentController extends Controller
             $order->user_id = Auth::user()->id;
             $order->save();
 
-
+            $orderDetails = collect();
             foreach ($data as $key => $value) {
-                $orderDetails = [
+                $item = [
                     'adjustment_id' => $order->id,
                     'quantity' => $value['quantity'],
                     'product_id' => $value['product_id'],
@@ -98,9 +99,9 @@ class AdjustmentController extends Controller
                     }
                     $product_warehouse->save();
                 }
-                AdjustmentDetail::create($orderDetails);
+                $orderDetails->add($item);
             }
-
+            AdjustmentDetail::insert($orderDetails->toArray());
         }, 10);
 
         return response()->json(['success' => true]);

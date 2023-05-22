@@ -97,7 +97,6 @@ export default {
         if (result == null || result.length==0) {
             result = [{title: "", value: ""}];
         }
-        console.log(result);
         return result;
     },
     reglamentPayment: () => {

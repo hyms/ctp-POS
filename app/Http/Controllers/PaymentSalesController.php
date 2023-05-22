@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\Sale;
 use App\Models\Setting;
 use App\utils\helpers;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -136,9 +137,6 @@ class PaymentSalesController extends Controller
 
                 if ($due === 0.0 || $due < 0.0) {
                     $payment_statut = 'paid';
-                    if ($due < 0.0) {
-                        $total_paid = $total_paid + $request['change'];
-                    }
                 } else if ($due !== $sale->GrandTotal) {
                     $payment_statut = 'partial';
                 } else if ($due === $sale->GrandTotal) {
@@ -310,7 +308,7 @@ class PaymentSalesController extends Controller
         $settings = Setting::where('deleted_at', '=', null)->first();
         $symbol = $helpers->Get_Currency_Code();
 
-        $pdf = \PDF::loadView('pdf.payment_sale', [
+        $pdf = PDF::loadView('pdf.payment_sale', [
             'symbol' => $symbol,
             'setting' => $settings,
             'payment' => $payment_data,

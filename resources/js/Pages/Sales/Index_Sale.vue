@@ -55,7 +55,7 @@ const jsonFields = ref({
 const pos_settings = ref({});
 const EditPaymentMode = ref(false);
 const shipment = ref({});
-const sale_due = ref("");
+const sale_due = ref(0);
 const due = ref(0);
 const invoice_pos = ref({
   sale: {
@@ -118,7 +118,7 @@ function Verified_paidAmount() {
     snackbar.value = true;
     snackbarColor.value = "warning";
     snackbarText.value =
-        "El monto de pago es mal alto que el monto recibido";
+        "El monto de pago es mas alto que el a pagar";
     payment.value.montant = 0;
   } else if (payment.value.montant > due.value) {
     snackbar.value = true;
@@ -141,6 +141,9 @@ function Verified_Received_Amount() {
 async function Submit_Payment() {
   snackbar.value = false;
   const validate = await form.value.validate();
+  if (payment.value.montant > payment.value.received_amount) {
+    payment.value.montant = payment.value.received_amount;
+  }
   if (!validate.valid) {
     snackbar.value = true;
     snackbarColor.value = "error";
@@ -246,7 +249,7 @@ function New_Payment(saleItem) {
     payment.value.date = new Date().toISOString().slice(0, 10);
     Number_Order_Payment();
     payment.value.montant = saleItem.due;
-    payment.value.Reglement = "Cash";
+    payment.value.Reglement = "cash";
     payment.value.received_amount = saleItem.due;
     due.value = parseFloat(saleItem.due);
     dialogAddPayment.value = true;
@@ -267,8 +270,9 @@ function Edit_Payment(payment_item) {
       payment_item.montant + payment_item.change
   ).toFixed(2);
   payment.value.notes = payment_item.notes;
-
-  due.value = parseFloat(sale_due.value) + payment_item.montant;
+  console.log(payment_item)
+  due.value = parseFloat(sale_due.value) - payment_item.montant;
+  console.log()
   dialogAddPayment.value = true;
 }
 
@@ -414,7 +418,7 @@ function Get_Payments(id) {
       .get("/get_payments_by_sale/" + id)
       .then(({data}) => {
         payments.value = data.payments;
-        sale.value.due = data.due;
+        sale_due.value = data.due;
         dialogShowPayment.value = true;
       })
       .catch(() => {
@@ -525,17 +529,17 @@ function Remove_Sale(id, sale_has_return) {
                     Bs
                     {{ helper.formatNumber(payment.montant, 2) }}
                   </td>
-                  <td>{{ payment.Reglement }}</td>
+                  <td>{{ helper.getReglamentPayment(payment.Reglement)[0].title }}</td>
                   <td>
-                    <v-btn
-                        title="Imprimir"
-                        size="x-small"
-                        color="info"
-                        @click="Payment_Sale_PDF(payment,payment.id)"
-                        icon="mdi-printer"
-                        class="ma-1"
-                    >
-                    </v-btn>
+<!--                    <v-btn-->
+<!--                        title="Imprimir"-->
+<!--                        size="x-small"-->
+<!--                        color="info"-->
+<!--                        @click="Payment_Sale_PDF(payment,payment.id)"-->
+<!--                        icon="mdi-printer"-->
+<!--                        class="ma-1"-->
+<!--                    >-->
+<!--                    </v-btn>-->
                     <v-btn
                         title="Editar"
                         size="x-small"
@@ -616,10 +620,9 @@ function Remove_Sale(id, sale_has_return) {
               <!-- Received  Amount  -->
               <v-col md="4" cols="12">
                 <v-text-field
-                    :label="paymentLabel.received_amount"
+                    label="Deuda"
                     v-model="payment.received_amount"
-                    :placeholder="paymentLabel.received_amount"
-                    @keyup="Verified_Received_Amount(payment.received_amount)"
+                    placeholder="Deuda"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
@@ -638,6 +641,7 @@ function Remove_Sale(id, sale_has_return) {
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
+                    @keyup="Verified_paidAmount"
                 >
                 </v-text-field>
               </v-col>
@@ -645,9 +649,9 @@ function Remove_Sale(id, sale_has_return) {
               <!-- change Amount  -->
               <v-col md="4" cols="12">
                 <v-text-field
-                    label="Cambio"
+                    label="Saldo"
                     :model-value="parseFloat(payment.received_amount - payment.montant).toFixed(2)"
-                    placeholder="Cambio"
+                    placeholder="Saldo"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
@@ -702,14 +706,17 @@ function Remove_Sale(id, sale_has_return) {
         <v-card-text>
           <div id="invoice-POS">
             <div class="info">
-              <h2 class="text-center">{{ invoice_pos.setting?.CompanyName }}</h2>
+              <h2 class="text-center font-weight-bold">{{ invoice_pos.sale.Ref }}</h2>
+              <h4 class="text-center font-weight-bold">{{ invoice_pos.setting?.CompanyName }}</h4>
               <v-col cols="12">
-
-                <span>Fecha : {{ invoice_pos.sale.date }} <br></span>
-                <span v-show="pos_settings.show_address">Direccion : {{ invoice_pos.setting.CompanyAdress??'' }} <br></span>
-                <span v-show="pos_settings.show_email">Correo : {{ invoice_pos.setting?.email }} <br></span>
-                <span v-show="pos_settings.show_phone">Telefono : {{ invoice_pos.setting?.CompanyPhone }} <br></span>
-                <span v-show="pos_settings.show_customer">Cliente : {{ invoice_pos.sale.client_name }} <br></span>
+                <p>
+                  <span>Fecha : {{ invoice_pos.sale.date }} <br></span>
+                  <span v-if="pos_settings.show_address">Direccion : {{ invoice_pos.setting.CompanyAdress ?? '' }} <br></span>
+                  <span v-if="pos_settings.show_email">Correo : {{ invoice_pos.setting?.email }} <br></span>
+                  <span v-if="pos_settings.show_phone">Telefono : {{ invoice_pos.setting?.CompanyPhone }} <br></span>
+                  <span v-if="pos_settings.show_customer">Cliente : {{ invoice_pos.sale.client_name }} <br></span>
+                  <span>Agencia : {{ invoice_pos.sale.warehouse }} <br></span>
+                </p>
               </v-col>
             </div>
             <v-table density="compact" hover>
@@ -718,7 +725,9 @@ function Remove_Sale(id, sale_has_return) {
                 <td colspan="3">
                   {{ detail_invoice.name }}
                   <br>
-                  <span>{{ helper.formatNumber(detail_invoice.quantity, 2) }} {{ detail_invoice.unit_sale }} x {{ helper.formatNumber(detail_invoice.total / detail_invoice.quantity, 2) }}</span>
+                  <span>{{ helper.formatNumber(detail_invoice.quantity, 2) }} {{
+                      detail_invoice.unit_sale
+                    }} x {{ helper.formatNumber(detail_invoice.total / detail_invoice.quantity, 2) }}</span>
                 </td>
                 <td style="text-align:right;vertical-align:bottom">{{ helper.formatNumber(detail_invoice.total, 2) }}
                 </td>
@@ -727,7 +736,8 @@ function Remove_Sale(id, sale_has_return) {
               <tr style="margin-top:10px" v-show="pos_settings.show_discount">
                 <td colspan="3" class="total">Impuesto</td>
                 <td style="text-align:right;" class="total">{{ invoice_pos.symbol }}
-                  {{ helper.formatNumber(invoice_pos.sale.taxe, 2) }} ({{ helper.formatNumber(invoice_pos.sale.tax_rate, 2) }}
+                  {{ helper.formatNumber(invoice_pos.sale.taxe, 2) }}
+                  ({{ helper.formatNumber(invoice_pos.sale.tax_rate, 2) }}
                   %)
                 </td>
               </tr>
@@ -777,12 +787,15 @@ function Remove_Sale(id, sale_has_return) {
               <tr style="background: #eee; ">
                 <th style="text-align: left;" colspan="1">Pagado Por:</th>
                 <th style="text-align: center;" colspan="2">Monto:</th>
-                <th style="text-align: right;" colspan="1">Cambio:</th>
+                <th style="text-align: right;" colspan="1">Saldo:</th>
               </tr>
               </thead>
               <tbody>
               <tr v-for="payment_pos in payments_pos">
-                <td style="text-align: left;" colspan="1">{{ helper.getReglamentPayment(payment_pos.Reglement)[0].title }}</td>
+                <td style="text-align: left;" colspan="1">{{
+                    helper.getReglamentPayment(payment_pos.Reglement)[0].title
+                  }}
+                </td>
                 <td
                     style="text-align: center;"
                     colspan="2"
@@ -798,7 +811,7 @@ function Remove_Sale(id, sale_has_return) {
             </v-table>
           </div>
         </v-card-text>
-        <v-card-actions >
+        <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn prepend-icon="mdi-printer" @click="helper.print_pos('invoice-POS')" color="primary" variant="outlined">
             Imprimir
@@ -982,7 +995,7 @@ function Remove_Sale(id, sale_has_return) {
   </layout>
 </template>
 <style>
-.total{
+.total {
   font-weight: bold;
   /*font-size: 14px;*/
   /* text-transform: uppercase;
