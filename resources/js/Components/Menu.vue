@@ -165,7 +165,7 @@ function getPermission(role) {
 
 function getAllPermission(data) {
     for (const val of data) {
-        let value = this.getPermission(val.role);
+        let value = getPermission(val.role);
         if (value) {
             return true;
         }

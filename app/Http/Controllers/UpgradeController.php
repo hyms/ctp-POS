@@ -48,9 +48,9 @@ class UpgradeController extends Controller
                     'CompanyAdress' => "",
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
-                    'deleted_at' =>null,
+                    'deleted_at' => null,
                 ]);
-
+                Log::info("finish settings migration");
                 $items = DB::table('clientes')->get()->collect();
                 $items->each(function ($item) {
                     $id = DB::table('clients')->insertGetId([
@@ -200,6 +200,7 @@ class UpgradeController extends Controller
                 Log::info("finish products migration");
 
                 $items = DB::table('stock')->get();
+                Log::info("stock count " . $items->count());
                 $items->each(function ($item) {
 
                     $id = DB::table('product_warehouse')->insertGetId([
@@ -216,112 +217,120 @@ class UpgradeController extends Controller
                 });
                 Log::info("finish product_warehouse migration");
 
-                $items = DB::table('ordenesTrabajo')->get();
-                $items->each(function ($item) {
-                    if($item->estado>=0 && $item->estado < 10) {
-                        if (empty($item->tipoOrden)) {
-                            $item->tipoOrden = 1;
-                        }
-                        $details = DB::table('detallesOrden')->where('ordenTrabajo', '=', $item->id)->get();
-                        $GrandTotal = 0;
-                        $paid_amount = 0;
-                        $sale_datail = collect();
-                        foreach ($details as $detail) {
-                            $product_id = DB::table('stock')->where('id', '=', $detail->stock)->first()?->producto;
-                            $sale_unit_id = DB::table('products')->where('id', '=', $product_id)->first()?->unit_sale_id;
-                            $GrandTotal += $detail->total;
-                            $sale_datail->add([
-                                "id" => $detail->id,
-                                "date" => Carbon::parse($item->created_at),
-                                "sale_id" => $detail->ordenTrabajo,
-                                "product_id" => $product_id,
-                                "product_variant_id" => null,
-                                "sale_unit_id" => $sale_unit_id,
-                                "price" => $detail->costo,
-                                "TaxNet" => 0,
-                                "tax_method" => 0,
-                                "discount" => 0,
-                                "discount_method" => 0,
-                                "total" => $detail->total,
-                                "quantity" => $detail->cantidad,
-                                "created_at" => $detail->created_at,
-                                "updated_at" => $detail->updated_at,
-                            ]);
-                        }
-                        $sale_payment = collect();
-                        $moving = DB::table('movimientoCajas')->where('ordenTrabajo', '=', $item->id)->get();
-                        foreach ($moving as $mov) {
-                            if ($mov->monto > 0 and $GrandTotal > $paid_amount) {
-                                if ($mov->tipo == 4) {
-                                    $detalle = DB::table('recibos')->where('movimientoCaja', '=', $item->id)->get()->first();
-                                    if (isset($detalle))
-                                        $mov->observaciones = $detalle->detalle;
-                                }
-                                if ($mov->monto > $GrandTotal) {
-                                    $mov->monto = $GrandTotal;
-                                }
-                                $sale_payment->add([
-//                        "id" => "",
-                                    "user_id" => $mov->user,
-                                    "date" => $mov->created_at,
-                                    "Ref" => $mov->id,
-                                    "sale_id" => $mov->ordenTrabajo,
-                                    "montant" => $mov->monto,
-                                    "change" => 0,
-                                    "Reglement" => "cash",
-                                    "notes" => $mov->observaciones,
-                                    "created_at" => $mov->created_at,
-                                    "updated_at" => $mov->updated_at,
-                                    "deleted_at" => $mov->deleted_at
-                                ]);
-                                $paid_amount += $mov->monto;
+                $items = DB::table('ordenesTrabajo');
+                $totalItems = $items->count();
+                $paginate = 200;
+                $pages = (int)$totalItems / $paginate;
+                for ($i = 0; $i <= $pages; $i++) {
+                    $items = DB::table('ordenesTrabajo')->skip($paginate * $i)->take($paginate)->get();
+                    Log::info("ordenesTrabajo start page" . $i);
+                    $items->each(function ($item) {
+                        if ($item->estado >= 0 && $item->estado < 10) {
+                            if (empty($item->tipoOrden)) {
+                                $item->tipoOrden = 1;
                             }
-                        }
+                            $details = DB::table('detallesOrden')->where('ordenTrabajo', '=', $item->id)->get();
+                            $GrandTotal = 0;
+                            $paid_amount = 0;
+                            $sale_datail = collect();
+                            foreach ($details as $detail) {
+                                $product_id = DB::table('stock')->where('id', '=', $detail->stock)->first()?->producto;
+                                $sale_unit_id = DB::table('products')->where('id', '=', $product_id)->first()?->unit_sale_id;
+                                $GrandTotal += $detail->total;
+                                $sale_datail->add([
+                                    "id" => $detail->id,
+                                    "date" => Carbon::parse($item->created_at),
+                                    "sale_id" => $detail->ordenTrabajo,
+                                    "product_id" => $product_id,
+                                    "product_variant_id" => null,
+                                    "sale_unit_id" => $sale_unit_id,
+                                    "price" => $detail->costo,
+                                    "TaxNet" => 0,
+                                    "tax_method" => 0,
+                                    "discount" => 0,
+                                    "discount_method" => 0,
+                                    "total" => $detail->total,
+                                    "quantity" => $detail->cantidad,
+                                    "created_at" => $detail->created_at,
+                                    "updated_at" => $detail->updated_at,
+                                ]);
+                            }
+                            $sale_payment = collect();
+                            $moving = DB::table('movimientoCajas')->where('ordenTrabajo', '=', $item->id)->get();
+                            foreach ($moving as $mov) {
+                                if ($mov->monto > 0 and $GrandTotal > $paid_amount) {
+                                    if ($mov->tipo == 4) {
+                                        $detalle = DB::table('recibos')->where('movimientoCaja', '=', $item->id)->get()->first();
+                                        if (isset($detalle))
+                                            $mov->observaciones = $detalle->detalle;
+                                    }
+                                    if ($mov->monto > $GrandTotal) {
+                                        $mov->monto = $GrandTotal;
+                                    }
+                                    $sale_payment->add([
+//                        "id" => "",
+                                        "user_id" => $mov->user,
+                                        "date" => $mov->created_at,
+                                        "Ref" => $mov->id,
+                                        "sale_id" => $mov->ordenTrabajo,
+                                        "montant" => $mov->monto,
+                                        "change" => 0,
+                                        "Reglement" => "cash",
+                                        "notes" => $mov->observaciones,
+                                        "created_at" => $mov->created_at,
+                                        "updated_at" => $mov->updated_at,
+                                        "deleted_at" => $mov->deleted_at
+                                    ]);
+                                    $paid_amount += $mov->monto;
+                                }
+                            }
 //                        if ($item->estado == 0) {
 //                            $paid_amount = $GrandTotal;
 //                        }
-                        $payment_statut = '';
-                        $due = $GrandTotal - $paid_amount;
-                        if ($due === 0.0 || $due < 0.0) {
-                        $paid_amount=$GrandTotal;
-                            $payment_statut = 'paid';
-                        } else if ($due != $GrandTotal) {
-                            $payment_statut = 'partial';
-                        } else if ($due == $GrandTotal) {
-                            $payment_statut = 'unpaid';
+                            $payment_statut = '';
+                            $due = $GrandTotal - $paid_amount;
+                            if ($due === 0.0 || $due < 0.0) {
+                                $paid_amount = $GrandTotal;
+                                $payment_statut = 'paid';
+                            } else if ($due != $GrandTotal) {
+                                $payment_statut = 'partial';
+                            } else if ($due == $GrandTotal) {
+                                $payment_statut = 'unpaid';
+                            }
+                            $id = DB::table('sales')->insertGetId([
+                                "id" => $item->id,
+                                "user_pos" => $item->userDiseñador,
+                                "user_id" => $item->userVenta ?? $item->userDiseñador,
+                                "date" => Carbon::parse($item->created_at),
+                                "Ref" => $item->codigoServicio ?? $item->correlativo,
+                                "is_pos" => 0,
+                                "client_id" => $item->cliente,
+                                "warehouse_id" => $item->sucursal,
+                                "TaxNet" => 0,
+                                "tax_rate" => 0,
+                                "discount" => 0,
+                                "shipping" => 0,
+                                "GrandTotal" => $GrandTotal,
+                                "paid_amount" => $paid_amount,
+                                "payment_statut" => $payment_statut,
+                                "statut" => ($item->estado == 1) ? 'pending' : 'completed',
+                                "shipping_status" => "",
+                                "notes" => $item->observaciones,
+                                "created_at" => $item->created_at,
+                                "updated_at" => $item->updated_at,
+                                "deleted_at" => $item->deleted_at,
+                                "sales_type_id" => $item->tipoOrden,
+                            ]);
+                            foreach ($sale_datail as $detail) {
+                                $id = DB::table('sale_details')->insertGetId($detail);
+                            }
+                            foreach ($sale_payment as $payment) {
+                                $id = DB::table('payment_sales')->insertGetId($payment);
+                            }
                         }
-                        $id = DB::table('sales')->insertGetId([
-                            "id" => $item->id,
-                            "user_pos" => $item->userDiseñador,
-                            "user_id" => $item->userVenta ?? $item->userDiseñador,
-                            "date" => Carbon::parse($item->created_at),
-                            "Ref" => $item->codigoServicio ?? $item->correlativo,
-                            "is_pos" => 0,
-                            "client_id" => $item->cliente,
-                            "warehouse_id" => $item->sucursal,
-                            "TaxNet" => 0,
-                            "tax_rate" => 0,
-                            "discount" => 0,
-                            "shipping" => 0,
-                            "GrandTotal" => $GrandTotal,
-                            "paid_amount" => $paid_amount,
-                            "payment_statut" => $payment_statut,
-                            "statut" => ($item->estado == 1) ? 'pending' : 'completed',
-                            "shipping_status" => "",
-                            "notes" => $item->observaciones,
-                            "created_at" => $item->created_at,
-                            "updated_at" => $item->updated_at,
-                            "deleted_at" => $item->deleted_at,
-                            "sales_type_id" => $item->tipoOrden,
-                        ]);
-                        foreach ($sale_datail as $detail) {
-                            $id = DB::table('sale_details')->insertGetId($detail);
-                        }
-                        foreach ($sale_payment as $payment) {
-                            $id = DB::table('payment_sales')->insertGetId($payment);
-                        }
-                    }
-                });
+                    });
+                }
+
                 Log::info("finish sales migration");
 
 //                $items = DB::table('movimientoCajas')->whereNotNull('ordenTrabajo')->get();
@@ -348,9 +357,11 @@ class UpgradeController extends Controller
 //                    }
 //                });
                 Log::info("finish payment_sales migration");
+
             });
         } catch (Exception $ex) {
             $errors = $ex->getMessage();
+            Log::error($ex->getMessage());
         }
         return response()->json([
             'errorsMessage' => $errors,
