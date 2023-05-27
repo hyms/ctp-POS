@@ -2,23 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Adjustment;
+use App\Models\AdjustmentDetail;
 use App\Models\Client;
 use App\Models\Expense;
-use App\Models\Unit;
 use App\Models\PaymentPurchase;
 use App\Models\PaymentPurchaseReturns;
 use App\Models\PaymentSale;
 use App\Models\PaymentSaleReturns;
 use App\Models\Product;
-use App\Models\Transfer;
-use App\Models\TransferDetail;
-use App\Models\Adjustment;
-use App\Models\AdjustmentDetail;
-use App\Models\ProductVariant;
 use App\Models\product_warehouse;
+use App\Models\ProductVariant;
 use App\Models\Provider;
 use App\Models\Purchase;
-use App\Models\Setting;
 use App\Models\PurchaseDetail;
 use App\Models\PurchaseReturn;
 use App\Models\PurchaseReturnDetails;
@@ -29,18 +25,19 @@ use App\Models\Sale;
 use App\Models\SaleDetail;
 use App\Models\SaleReturn;
 use App\Models\SaleReturnDetails;
+use App\Models\Setting;
+use App\Models\Transfer;
+use App\Models\TransferDetail;
+use App\Models\Unit;
 use App\Models\User;
 use App\Models\UserWarehouse;
 use App\Models\Warehouse;
 use App\utils\helpers;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use DB;
+use Illuminate\Support\Facades\DB;
 
-class ReportController extends BaseController
+class ReportController extends Controller
 {
 
 

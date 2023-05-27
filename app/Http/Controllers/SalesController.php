@@ -2,35 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SalesType;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Exception;
-use Illuminate\Support\Str;
-use Inertia\Inertia;
 use App\Mail\SaleMail;
 use App\Models\Client;
-use App\Models\Unit;
 use App\Models\PaymentSale;
+use App\Models\PosSetting;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\product_warehouse;
+use App\Models\ProductVariant;
 use App\Models\Quotation;
-use App\Models\Shipment;
-use App\Models\Role;
-use App\Models\SaleReturn;
 use App\Models\Sale;
 use App\Models\SaleDetail;
+use App\Models\SaleReturn;
+use App\Models\SalesType;
 use App\Models\Setting;
-use App\Models\PosSetting;
-use App\Models\User;
+use App\Models\Unit;
 use App\Models\UserWarehouse;
 use App\Models\Warehouse;
 use App\utils\helpers;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Inertia\Inertia;
 
 class SalesController extends Controller
 {
@@ -381,6 +377,7 @@ class SalesController extends Controller
                 $current_Sale->update([
                     'date' => $request['date'],
                     'client_id' => $request['client_id'],
+                    'user_id' =>  Auth::user()->id,
                     'warehouse_id' => $request['warehouse_id'],
                     'notes' => $request['notes'],
                     'statut' => $request['statut'],

@@ -1,6 +1,6 @@
 <script setup>
-import { router, usePage } from "@inertiajs/vue3";
-import { ref, computed, onMounted } from "vue";
+import {router, usePage} from "@inertiajs/vue3";
+import {computed, onMounted, ref} from "vue";
 
 const isDrawerOpen = ref(null);
 const menuItems = ref([
@@ -37,7 +37,7 @@ const menuItems = ref([
         subItems: [],
     },
     {
-        label: "Ajustes",
+        label: "Ajustes de Stock",
         url: "",
         role: "venta",
         icon: "",
