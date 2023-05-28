@@ -1,4 +1,5 @@
 import moment from "moment";
+import {router} from "@inertiajs/vue3";
 // import pos_css from "@/../css/pos_print.css";
 
 let debug = true;
@@ -8,6 +9,52 @@ const reglaments = [
     {title: "Transferencia Bancaria", value: "bank_transfer"},
     {title: "Otros", value: "other"},
 ];
+const toggleFullScreen = () => {
+    let doc = window.document;
+    let docEl = doc.documentElement;
+
+    let requestFullScreen =
+        docEl.requestFullscreen ||
+        docEl.mozRequestFullScreen ||
+        docEl.webkitRequestFullScreen ||
+        docEl.msRequestFullscreen;
+    let cancelFullScreen =
+        doc.exitFullscreen ||
+        doc.mozCancelFullScreen ||
+        doc.webkitExitFullscreen ||
+        doc.msExitFullscreen;
+
+    if (
+        !doc.fullscreenElement &&
+        !doc.mozFullScreenElement &&
+        !doc.webkitFullscreenElement &&
+        !doc.msFullscreenElement
+    ) {
+        requestFullScreen.call(docEl);
+    } else {
+        cancelFullScreen.call(doc);
+    }
+};
+const print_pos = (element_id) => {
+    const pos_css = new URL('@/../css/pos_print.css', import.meta.url).href
+    let divContents = document.getElementById(element_id).innerHTML;
+    let a = window.open("", "", "height=500, width=500");
+    a.document.write('<html><link rel="stylesheet" href="' + pos_css + '">');
+    a.document.write("<body >");
+    a.document.write(divContents);
+    a.document.write("</body></html>");
+    a.document.close();
+
+    setTimeout(() => {
+        a.print();
+    }, 1000);
+}
+const linkVisit = (url, type = "get") => {
+    router.visit(url, {
+        method: type,
+        preserveState: true,
+    });
+}
 export default {
     required: [(v) => !!v || "Requerido"],
     max: (max) => [
@@ -102,18 +149,7 @@ export default {
     reglamentPayment: () => {
         return reglaments;
     },
-    print_pos: (element_id) => {
-        const pos_css = new URL('@/../css/pos_print.css', import.meta.url).href
-        let divContents = document.getElementById(element_id).innerHTML;
-        let a = window.open("", "", "height=500, width=500");
-        a.document.write('<html><link rel="stylesheet" href="' + pos_css + '">');
-        a.document.write("<body >");
-        a.document.write(divContents);
-        a.document.write("</body></html>");
-        a.document.close();
-
-        setTimeout(() => {
-            a.print();
-        }, 1000);
-    }
+    print_pos,
+    toggleFullScreen,
+    linkVisit
 };

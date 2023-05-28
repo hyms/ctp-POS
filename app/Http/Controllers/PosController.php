@@ -18,6 +18,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 use Stripe;
 
 class PosController extends Controller
@@ -266,7 +267,7 @@ class PosController extends Controller
     public function GetELementPos(Request $request)
     {
 //        $this->authorizeForUser($request->user('api'), 'Sales_pos', Sale::class);
-        $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
+        $clients = Client::where('deleted_at', '=', null)->get(['id', 'company_name as name']);
         $settings = Setting::where('deleted_at', '=', null)->first();
 
         //get warehouses assigned to user
@@ -297,7 +298,8 @@ class PosController extends Controller
         }
         $categories = Category::where('deleted_at', '=', null)->get(['id', 'name']);
 
-        return response()->json([
+        Inertia::share('titlePage', 'POS');
+        return Inertia::render('Pos', [
             'defaultWarehouse' => $defaultWarehouse,
             'defaultClient' => $defaultClient,
             'clients' => $clients,
@@ -305,5 +307,4 @@ class PosController extends Controller
             'categories' => $categories,
         ]);
     }
-
 }

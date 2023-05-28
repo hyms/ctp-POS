@@ -882,19 +882,21 @@ onMounted(() => {
                         class="i-Edit text-25 text-success"
                     ></i>
                     <v-btn
-                        class="ma-1"
+                        class="ma-1 rounded"
                         color="success"
                         icon="mdi-pen"
-                        size="x-small"
+                        size="small"
+                        density="comfortable"
                         variant="elevated"
                         @click="Modal_Updat_Detail(detail)"
                     >
                     </v-btn>
                     <v-btn
-                        class="ma-1"
+                        class="ma-1 rounded"
                         color="error"
                         icon="mdi-delete"
-                        size="x-small"
+                        size="small"
+                        density="comfortable"
                         variant="elevated"
                         @click="delete_Product_Detail(detail.detail_id)"
                     >

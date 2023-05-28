@@ -89,7 +89,7 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     //------------------------------------------------------------------\\
 
     //------------------------------- PRODUCTS --------------------------\\
-    Route::prefix('products')->group(function () {
+    Route::prefix('product')->group(function () {
         Route::get('/create', [ProductsController::class, 'create']);
         Route::get('/{id}', [ProductsController::class, 'show']);
         Route::get('/edit/{id}', [ProductsController::class, 'edit']);
@@ -117,10 +117,12 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
         Route::post('units', [UnitsController::class, 'store']);
         Route::put('units/{id}', [UnitsController::class, 'update']);
         Route::delete('units/{id}', [UnitsController::class, 'destroy']);
-        Route::get('get_sub_units_by_base', [UnitsController::class, 'Get_Units_SubBase']);
-        Route::get('get_units', [UnitsController::class, 'Get_sales_units']);
         //------------------------------------------------------------------\\
     });
+    //------------------------------- Units --------------------------\\
+    Route::get('get_sub_units_by_base', [UnitsController::class, 'Get_Units_SubBase']);
+    Route::get('get_units', [UnitsController::class, 'Get_sales_units']);
+    //------------------------------- Units --------------------------\\
 
     Route::prefix('adjustments')->group(function () {
         //------------------------------- Adjustments --------------------------\\
@@ -279,7 +281,7 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     //---------------------- POS (point of sales) ----------------------\\
     Route::post('pos/create_pos', [PosController::class, 'CreatePOS']);
     Route::get('pos/get_products_pos', [PosController::class, 'GetProductsByParametre']);
-    Route::get('pos/data_create_pos', [PosController::class, 'GetELementPos']);
+    Route::get('pos/', [PosController::class, 'GetELementPos']);
     //------------------------------------------------------------------\\
 
     //------------------------------- Permission Groups user -----------\\
