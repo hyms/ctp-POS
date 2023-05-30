@@ -94,9 +94,9 @@ class PosController extends Controller
                 }
                 if ($unit && $product_warehouse) {
                     if ($unit->operator == '/') {
-                        $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
+                        $product_warehouse->qty -= $value['quantity'] / $unit->operator_value;
                     } else {
-                        $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
+                        $product_warehouse->qty -= $value['quantity'] * $unit->operator_value;
                     }
                     $product_warehouse->save();
                 }
@@ -175,7 +175,7 @@ class PosController extends Controller
                 })
                     ->where(function ($query) use ($request) {
                         if ($request->stock == '1') {
-                            return $query->where('qte', '>', 0);
+                            return $query->where('qty', '>', 0);
                         }
                     });
             })
@@ -226,16 +226,16 @@ class PosController extends Controller
 //            $item['image'] = $firstimage[0];
 
             if ($product_warehouse['product']['unitSale']->operator == '/') {
-                $item['qte_sale'] = $product_warehouse->qte * $product_warehouse['product']['unitSale']->operator_value;
+                $item['qte_sale'] = $product_warehouse->qty * $product_warehouse['product']['unitSale']->operator_value;
                 $price = $product_warehouse['product']->price / $product_warehouse['product']['unitSale']->operator_value;
 
             } else {
-                $item['qte_sale'] = $product_warehouse->qte / $product_warehouse['product']['unitSale']->operator_value;
+                $item['qte_sale'] = $product_warehouse->qty / $product_warehouse['product']['unitSale']->operator_value;
                 $price = $product_warehouse['product']->price * $product_warehouse['product']['unitSale']->operator_value;
 
             }
             $item['unitSale'] = $product_warehouse['product']['unitSale']->ShortName;
-            $item['qte'] = $product_warehouse->qte;
+            $item['qte'] = $product_warehouse->qty;
 
             if ($product_warehouse['product']->TaxNet !== 0.0) {
 

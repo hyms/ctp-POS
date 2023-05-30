@@ -444,7 +444,7 @@ class ProductsController extends Controller
 
     public function Products_by_Warehouse(request $request, $id)
     {
-        $data = [];
+        $data = collect();
         $product_warehouse_data = product_warehouse::with('warehouse', 'product', 'productVariant')
             ->where(function ($query) use ($request, $id) {
                 return $query->where('warehouse_id', $id)
@@ -513,10 +513,10 @@ class ProductsController extends Controller
                 $item['Net_price'] = $price;
             }
 
-            $data[] = $item;
+            $data->add($item);
         }
 
-        return response()->json($data);
+        return response()->json($data->toArray());
     }
 
     //------------ Get product By ID -----------------\\
