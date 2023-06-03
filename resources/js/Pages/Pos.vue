@@ -1193,630 +1193,685 @@ function created() {
 
       <!-- Card right Of Products -->
       <v-col lg="7" md="6" cols="12">
-                  <v-card>
-                    <v-card-text>
+        <v-card>
+          <v-card-text>
+            <v-row>
+              <v-col md="6" cols="12">
+                <v-btn block color="info">
+                  <i class="i-Two-Windows"></i>
+                  <!--                          {{$t('ListofCategory')}}-->
+                  Lista de Categorias
+                </v-btn>
+              </v-col>
+              <!--              <v-col md="6">-->
+              <!--                <button v-v-toggle.sidebar-brand class="btn btn-outline-info mt-1 btn-block">-->
+              <!--                  <i class="i-Library"></i>-->
+              <!--                  {{$t('ListofBrand')}}-->
+              <!--                </button>-->
+              <!--              </v-col>-->
+
+
+              <!-- Product -->
+              <v-col cols="12" class="mt-2 mv-2">
+                <v-data-iterator
+                    items-per-page="12"
+                    v-model:page="page"
+                    :items="products_pos"
+                    :search="search"
+                >
+                  <template v-slot:header>
+                    <div class="mb-3">
+                      <v-text-field
+                          v-model="search"
+                          clearable
+                          hide-details
+                          prepend-inner-icon="mdi-magnify"
+                          placeholder="Search"
+                          variant="solo"
+                          density="comfortable"
+                      ></v-text-field>
+                    </div>
+
+                  </template>
+
+                  <template v-slot:no-data>
+                    <v-alert type="warning">No existen productos</v-alert>
+                  </template>
+
+                  <template v-slot:default="props">
                     <v-row>
-                      <v-col md="6" cols="12">
-                        <v-btn block color="info">
-                          <i class="i-Two-Windows"></i>
-<!--                          {{$t('ListofCategory')}}-->
-                          Lista de Categorias
-                        </v-btn>
+                      <v-col
+                          v-for="item in props.items"
+                          :key="item.id"
+                          cols="12"
+                          sm="6"
+                          md="4"
+                          lg="3"
+                      >
+                        <v-card variant="elevated" @click="">
+                          <v-card-item>
+                            <p class="font-weight-bold text-h6">{{ item.raw.name }}</p>
+                            <p class="text-medium-emphasis text-subtitle-2">COD: {{ item.raw.code }}</p>
+
+                            <v-chip color="primary" size="x-small" class="ma-1">Bs
+                              {{ helper.formatNumber(item.raw.Net_price, 2) }}
+                            </v-chip>
+                            <v-chip size="x-small" color="info" class="ma-1">
+                              {{ helper.formatNumber(item.raw.qte_sale, 2) }}
+                              {{ item.raw.unitSale }}
+                            </v-chip>
+                          </v-card-item>
+                        </v-card>
                       </v-col>
-        <!--              <v-col md="6">-->
-        <!--                <button v-v-toggle.sidebar-brand class="btn btn-outline-info mt-1 btn-block">-->
-        <!--                  <i class="i-Library"></i>-->
-        <!--                  {{$t('ListofBrand')}}-->
-        <!--                </button>-->
-        <!--              </v-col>-->
-
-
-                      <!-- Product -->
-                      <v-col cols="12" class="mt-2 mv-2">
-                        <v-autocomplete
-                            @update:modelValue="SearchProduct"
-                            :items="product_filter"
-                            :model-value="search_input"
-                            variant="solo-filled"
-                            item-title="name"
-                            item-value="id"
-                            density="comfortable"
-                            hide-no-data
-                            hide-details
-                            label="Añadir Producto"
-                            :disabled="products_pos.length == 0"
-                            clearable
-                            prepend-inner-icon="mdi-magnify"
-                        ></v-autocomplete>
-        <!--                <div id="autocomplete" class="autocomplete">-->
-        <!--                  <input-->
-        <!--                      :placeholder="$t('Scan_Search_Product_by_Code_Name')"-->
-        <!--                      @input='e => search_input = e.target.value'-->
-        <!--                      @keyup="search(search_input)"-->
-        <!--                      @focus="handleFocus"-->
-        <!--                      @blur="handleBlur"-->
-        <!--                      ref="product_autocomplete"-->
-        <!--                      class="autocomplete-input" />-->
-        <!--                  <ul class="autocomplete-result-list" v-show="focused">-->
-        <!--                    <li class="autocomplete-result" v-for="product_fil in product_filter" @mousedown="SearchProduct(product_fil)">{{getResultValue(product_fil)}}</li>-->
-        <!--                  </ul>-->
-        <!--                </div>-->
-                      </v-col>
-
-                      <div class="col-md-12 d-flex flex-row flex-wrap bd-highlight list-item mt-2">
-                        <div
-                            @click="Check_Product_Exist(product , product.id)"
-                            v-for="product in products_pos"
-                            class="card o-hidden bd-highlight m-1"
-                        >
-        <!--                  <div class="list-thumb d-flex">-->
-        <!--                    <img alt :src="'/images/products/'+product.image">-->
-        <!--                  </div>-->
-                          <div class="flex-grow-1 d-bock">
-                            <div
-                                class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"
-                            >
-                              <div class="w-40 w-sm-100 item-title">{{product.name}}</div>
-                              <p class="text-muted text-small w-15 w-sm-100 mv-2">{{product.code}}</p>
-<!---->
-                              <v-chip color="primary">Bs {{helper.formatNumber(product.Net_price , 2)}}</v-chip>
-                              <p
-                                  class="m-0 text-muted text-small w-15 w-sm-100 d-none d-lg-block item-badges"
-                              >
-                                <v-chip color="info">{{helper.formatNumber(product.qte_sale , 2)}} {{product.unitSale}}</v-chip>
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
                     </v-row>
-                    </v-card-text>
-                  </v-card>
-                </v-col>
+                  </template>
 
-        <!--        &lt;!&ndash; Sidebar Brand &ndash;&gt;-->
-        <!--        <v-sidebar id="sidebar-brand" :title="$t('ListofBrand')" bg-variant="white" right shadow>-->
-        <!--          <div class="px-3 py-2">-->
-        <!--            <v-row>-->
-        <!--              <div class="col-md-12 d-flex flex-row flex-wrap bd-highlight list-item mt-2">-->
-        <!--                <div-->
-        <!--                    @click="GetAllBrands()"-->
-        <!--                    :class="{ 'brand-Active' : brand_id == ''}"-->
-        <!--                    class="card o-hidden bd-highlight m-1"-->
-        <!--                >-->
-        <!--                  <div class="list-thumb d-flex">-->
-        <!--                    <img alt :src="'/images/no-image.png'">-->
-        <!--                  </div>-->
-        <!--                  <div class="flex-grow-1 d-bock">-->
-        <!--                    <div-->
-        <!--                        class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"-->
-        <!--                    >-->
-        <!--                      <div class="item-title">{{$t('All_Brand')}}</div>-->
-        <!--                    </div>-->
-        <!--                  </div>-->
-        <!--                </div>-->
-        <!--                <div-->
-        <!--                    class="card o-hidden bd-highlight m-1"-->
-        <!--                    v-for="brand in paginated_Brands"-->
-        <!--                    :key="brand.id"-->
-        <!--                    @click="Products_by_Brands(brand.id)"-->
-        <!--                    :class="{ 'brand-Active' : brand.id === brand_id}"-->
-        <!--                >-->
-        <!--                  <img alt :src="'/images/brands/'+brand.image">-->
-        <!--                  <div class="flex-grow-1 d-bock">-->
-        <!--                    <div-->
-        <!--                        class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"-->
-        <!--                    >-->
-        <!--                      <div class="item-title">{{brand.name}}</div>-->
-        <!--                    </div>-->
-        <!--                  </div>-->
-        <!--                </div>-->
-        <!--              </div>-->
-        <!--            </v-row>-->
+                </v-data-iterator>
 
-        <!--            <v-row>-->
-        <!--              <v-col md="12" class="mt-4">-->
-        <!--                <v-pagination-->
-        <!--                    @change="BrandonPageChanged"-->
-        <!--                    :total-rows="brand_totalRows"-->
-        <!--                    :per-page="brand_perPage"-->
-        <!--                    v-model="brand_currentPage"-->
-        <!--                    class="my-0 gull-pagination align-items-center"-->
-        <!--                    align="center"-->
-        <!--                    first-text-->
-        <!--                    last-text-->
-        <!--                >-->
-        <!--                  <p class="list-arrow m-0" slot="prev-text">-->
-        <!--                    <i class="i-Arrow-Left text-40"></i>-->
-        <!--                  </p>-->
-        <!--                  <p class="list-arrow m-0" slot="next-text">-->
-        <!--                    <i class="i-Arrow-Right text-40"></i>-->
-        <!--                  </p>-->
-        <!--                </v-pagination>-->
-        <!--              </v-col>-->
-        <!--            </v-row>-->
-        <!--          </div>-->
-        <!--        </v-sidebar>-->
+                <!--                        <v-autocomplete-->
+                <!--                            @update:modelValue="SearchProduct"-->
+                <!--                            :items="product_filter"-->
+                <!--                            :model-value="search_input"-->
+                <!--                            variant="solo-filled"-->
+                <!--                            item-title="name"-->
+                <!--                            item-value="id"-->
+                <!--                            density="comfortable"-->
+                <!--                            hide-no-data-->
+                <!--                            hide-details-->
+                <!--                            label="Añadir Producto"-->
+                <!--                            :disabled="products_pos.length == 0"-->
+                <!--                            clearable-->
+                <!--                            prepend-inner-icon="mdi-magnify"-->
+                <!--                        ></v-autocomplete>-->
+                <!--                <div id="autocomplete" class="autocomplete">-->
+                <!--                  <input-->
+                <!--                      :placeholder="$t('Scan_Search_Product_by_Code_Name')"-->
+                <!--                      @input='e => search_input = e.target.value'-->
+                <!--                      @keyup="search(search_input)"-->
+                <!--                      @focus="handleFocus"-->
+                <!--                      @blur="handleBlur"-->
+                <!--                      ref="product_autocomplete"-->
+                <!--                      class="autocomplete-input" />-->
+                <!--                  <ul class="autocomplete-result-list" v-show="focused">-->
+                <!--                    <li class="autocomplete-result" v-for="product_fil in product_filter" @mousedown="SearchProduct(product_fil)">{{getResultValue(product_fil)}}</li>-->
+                <!--                  </ul>-->
+                <!--                </div>-->
+              </v-col>
 
-        <!--        &lt;!&ndash; Sidebar category &ndash;&gt;-->
-        <!--        <v-sidebar-->
-        <!--            id="sidebar-category"-->
-        <!--            :title="$t('ListofCategory')"-->
-        <!--            bg-variant="white"-->
-        <!--            right-->
-        <!--            shadow-->
-        <!--        >-->
-        <!--          <div class="px-3 py-2">-->
-        <!--            <v-row>-->
-        <!--              <div class="col-md-12 d-flex flex-row flex-wrap bd-highlight list-item mt-2">-->
-        <!--                <div-->
-        <!--                    @click="getAllCategory()"-->
-        <!--                    :class="{ 'brand-Active' : category_id == ''}"-->
-        <!--                    class="card o-hidden bd-highlight m-1"-->
-        <!--                >-->
-        <!--                  <div class="list-thumb d-flex">-->
-        <!--                    <img alt :src="'/images/no-image.png'">-->
-        <!--                  </div>-->
-        <!--                  <div class="flex-grow-1 d-bock">-->
-        <!--                    <div-->
-        <!--                        class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"-->
-        <!--                    >-->
-        <!--                      <div class="item-title">{{$t('All_Category')}}</div>-->
-        <!--                    </div>-->
-        <!--                  </div>-->
-        <!--                </div>-->
-        <!--                <div-->
-        <!--                    class="card o-hidden bd-highlight m-1"-->
-        <!--                    v-for="category in paginated_Category"-->
-        <!--                    :key="category.id"-->
-        <!--                    @click="Products_by_Category(category.id)"-->
-        <!--                    :class="{ 'brand-Active' : category.id === category_id}"-->
-        <!--                >-->
-        <!--                  <img alt :src="'/images/no-image.png'">-->
-        <!--                  <div class="flex-grow-1 d-bock">-->
-        <!--                    <div-->
-        <!--                        class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"-->
-        <!--                    >-->
-        <!--                      <div class="item-title">{{category.name}}</div>-->
-        <!--                    </div>-->
-        <!--                  </div>-->
-        <!--                </div>-->
-        <!--              </div>-->
-        <!--            </v-row>-->
+              <!--                      <div class="col-md-12 d-flex flex-row flex-wrap bd-highlight list-item mt-2">-->
+              <!--                        <div-->
+              <!--                            @click="Check_Product_Exist(product , product.id)"-->
+              <!--                            v-for="product in products_pos"-->
+              <!--                            class="card o-hidden bd-highlight m-1"-->
+              <!--                        >-->
+              <!--        &lt;!&ndash;                  <div class="list-thumb d-flex">&ndash;&gt;-->
+              <!--        &lt;!&ndash;                    <img alt :src="'/images/products/'+product.image">&ndash;&gt;-->
+              <!--        &lt;!&ndash;                  </div>&ndash;&gt;-->
+              <!--                          <div class="flex-grow-1 d-bock">-->
+              <!--                            <div-->
+              <!--                                class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"-->
+              <!--                            >-->
+              <!--                              <div class="w-40 w-sm-100 item-title">{{product.name}}</div>-->
+              <!--                              <p class="text-muted text-small w-15 w-sm-100 mv-2">{{product.code}}</p>-->
+              <!--&lt;!&ndash;&ndash;&gt;-->
+              <!--                              <v-chip color="primary">Bs {{helper.formatNumber(product.Net_price , 2)}}</v-chip>-->
+              <!--                              <p-->
+              <!--                                  class="m-0 text-muted text-small w-15 w-sm-100 d-none d-lg-block item-badges"-->
+              <!--                              >-->
+              <!--                                <v-chip color="info">{{helper.formatNumber(product.qte_sale , 2)}} {{product.unitSale}}</v-chip>-->
+              <!--                              </p>-->
+              <!--                            </div>-->
+              <!--                          </div>-->
+              <!--                        </div>-->
+              <!--                      </div>-->
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
 
-        <!--            <v-row>-->
-        <!--              <v-col md="12" class="mt-4">-->
-        <!--                <v-pagination-->
-        <!--                    @change="Category_onPageChanged"-->
-        <!--                    :total-rows="category_totalRows"-->
-        <!--                    :per-page="category_perPage"-->
-        <!--                    v-model="category_currentPage"-->
-        <!--                    class="my-0 gull-pagination align-items-center"-->
-        <!--                    align="center"-->
-        <!--                    first-text-->
-        <!--                    last-text-->
-        <!--                >-->
-        <!--                  <p class="list-arrow m-0" slot="prev-text">-->
-        <!--                    <i class="i-Arrow-Left text-40"></i>-->
-        <!--                  </p>-->
-        <!--                  <p class="list-arrow m-0" slot="next-text">-->
-        <!--                    <i class="i-Arrow-Right text-40"></i>-->
-        <!--                  </p>-->
-        <!--                </v-pagination>-->
-        <!--              </v-col>-->
-        <!--            </v-row>-->
-        <!--          </div>-->
-        <!--        </v-sidebar>-->
+      <!--        &lt;!&ndash; Sidebar Brand &ndash;&gt;-->
+      <!--        <v-sidebar id="sidebar-brand" :title="$t('ListofBrand')" bg-variant="white" right shadow>-->
+      <!--          <div class="px-3 py-2">-->
+      <!--            <v-row>-->
+      <!--              <div class="col-md-12 d-flex flex-row flex-wrap bd-highlight list-item mt-2">-->
+      <!--                <div-->
+      <!--                    @click="GetAllBrands()"-->
+      <!--                    :class="{ 'brand-Active' : brand_id == ''}"-->
+      <!--                    class="card o-hidden bd-highlight m-1"-->
+      <!--                >-->
+      <!--                  <div class="list-thumb d-flex">-->
+      <!--                    <img alt :src="'/images/no-image.png'">-->
+      <!--                  </div>-->
+      <!--                  <div class="flex-grow-1 d-bock">-->
+      <!--                    <div-->
+      <!--                        class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"-->
+      <!--                    >-->
+      <!--                      <div class="item-title">{{$t('All_Brand')}}</div>-->
+      <!--                    </div>-->
+      <!--                  </div>-->
+      <!--                </div>-->
+      <!--                <div-->
+      <!--                    class="card o-hidden bd-highlight m-1"-->
+      <!--                    v-for="brand in paginated_Brands"-->
+      <!--                    :key="brand.id"-->
+      <!--                    @click="Products_by_Brands(brand.id)"-->
+      <!--                    :class="{ 'brand-Active' : brand.id === brand_id}"-->
+      <!--                >-->
+      <!--                  <img alt :src="'/images/brands/'+brand.image">-->
+      <!--                  <div class="flex-grow-1 d-bock">-->
+      <!--                    <div-->
+      <!--                        class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"-->
+      <!--                    >-->
+      <!--                      <div class="item-title">{{brand.name}}</div>-->
+      <!--                    </div>-->
+      <!--                  </div>-->
+      <!--                </div>-->
+      <!--              </div>-->
+      <!--            </v-row>-->
 
-        <!--        &lt;!&ndash; Modal Show Invoice POS&ndash;&gt;-->
-        <!--        <v-modal hide-footer size="sm" scrollable id="Show_invoice" :title="$t('Invoice_POS')">-->
-        <!--          <div id="invoice-POS">-->
-        <!--            <div style="max-width:400px;margin:0px auto">-->
-        <!--              <div class="info">-->
-        <!--                <h2 class="text-center">{{invoice_pos.setting.CompanyName}}</h2>-->
-        <!--                <p>-->
-        <!--                  <span>{{$t('date')}} : {{invoice_pos.sale.date}} <br></span>-->
-        <!--                  <span v-show="pos_settings.show_address">{{$t('Adress')}} : {{invoice_pos.setting.CompanyAdress}} <br></span>-->
-        <!--                  <span v-show="pos_settings.show_email">{{$t('Email')}} : {{invoice_pos.setting.email}} <br></span>-->
-        <!--                  <span v-show="pos_settings.show_phone">{{$t('Phone')}} : {{invoice_pos.setting.CompanyPhone}} <br></span>-->
-        <!--                  <span v-show="pos_settings.show_customer">{{$t('Customer')}} : {{invoice_pos.sale.client_name}} <br></span>-->
-        <!--                </p>-->
-        <!--              </div>-->
+      <!--            <v-row>-->
+      <!--              <v-col md="12" class="mt-4">-->
+      <!--                <v-pagination-->
+      <!--                    @change="BrandonPageChanged"-->
+      <!--                    :total-rows="brand_totalRows"-->
+      <!--                    :per-page="brand_perPage"-->
+      <!--                    v-model="brand_currentPage"-->
+      <!--                    class="my-0 gull-pagination align-items-center"-->
+      <!--                    align="center"-->
+      <!--                    first-text-->
+      <!--                    last-text-->
+      <!--                >-->
+      <!--                  <p class="list-arrow m-0" slot="prev-text">-->
+      <!--                    <i class="i-Arrow-Left text-40"></i>-->
+      <!--                  </p>-->
+      <!--                  <p class="list-arrow m-0" slot="next-text">-->
+      <!--                    <i class="i-Arrow-Right text-40"></i>-->
+      <!--                  </p>-->
+      <!--                </v-pagination>-->
+      <!--              </v-col>-->
+      <!--            </v-row>-->
+      <!--          </div>-->
+      <!--        </v-sidebar>-->
 
-        <!--              <table class="table_data">-->
-        <!--                <tbody>-->
-        <!--                <tr v-for="detail_invoice in invoice_pos.details">-->
-        <!--                  <td colspan="3">-->
-        <!--                    {{detail_invoice.name}}-->
-        <!--                    <br v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null">-->
-        <!--                    <span v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null ">{{$t('IMEI_SN')}} : {{detail_invoice.imei_number}}</span>-->
-        <!--                    <br>-->
-        <!--                    <span>{{formatNumber(detail_invoice.quantity,2)}} {{detail_invoice.unit_sale}} x {{formatNumber(detail_invoice.total/detail_invoice.quantity,2)}}</span>-->
-        <!--                  </td>-->
-        <!--                  <td-->
-        <!--                      style="text-align:right;vertical-align:bottom"-->
-        <!--                  >{{formatNumber(detail_invoice.total,2)}}</td>-->
-        <!--                </tr>-->
+      <!--        &lt;!&ndash; Sidebar category &ndash;&gt;-->
+      <!--        <v-sidebar-->
+      <!--            id="sidebar-category"-->
+      <!--            :title="$t('ListofCategory')"-->
+      <!--            bg-variant="white"-->
+      <!--            right-->
+      <!--            shadow-->
+      <!--        >-->
+      <!--          <div class="px-3 py-2">-->
+      <!--            <v-row>-->
+      <!--              <div class="col-md-12 d-flex flex-row flex-wrap bd-highlight list-item mt-2">-->
+      <!--                <div-->
+      <!--                    @click="getAllCategory()"-->
+      <!--                    :class="{ 'brand-Active' : category_id == ''}"-->
+      <!--                    class="card o-hidden bd-highlight m-1"-->
+      <!--                >-->
+      <!--                  <div class="list-thumb d-flex">-->
+      <!--                    <img alt :src="'/images/no-image.png'">-->
+      <!--                  </div>-->
+      <!--                  <div class="flex-grow-1 d-bock">-->
+      <!--                    <div-->
+      <!--                        class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"-->
+      <!--                    >-->
+      <!--                      <div class="item-title">{{$t('All_Category')}}</div>-->
+      <!--                    </div>-->
+      <!--                  </div>-->
+      <!--                </div>-->
+      <!--                <div-->
+      <!--                    class="card o-hidden bd-highlight m-1"-->
+      <!--                    v-for="category in paginated_Category"-->
+      <!--                    :key="category.id"-->
+      <!--                    @click="Products_by_Category(category.id)"-->
+      <!--                    :class="{ 'brand-Active' : category.id === category_id}"-->
+      <!--                >-->
+      <!--                  <img alt :src="'/images/no-image.png'">-->
+      <!--                  <div class="flex-grow-1 d-bock">-->
+      <!--                    <div-->
+      <!--                        class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"-->
+      <!--                    >-->
+      <!--                      <div class="item-title">{{category.name}}</div>-->
+      <!--                    </div>-->
+      <!--                  </div>-->
+      <!--                </div>-->
+      <!--              </div>-->
+      <!--            </v-row>-->
 
-        <!--                <tr style="margin-top:10px" v-show="pos_settings.show_discount">-->
-        <!--                  <td colspan="3" class="total">{{$t('OrderTax')}}</td>-->
-        <!--                  <td style="text-align:right;" class="total">{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.taxe ,2)}} ({{formatNumber(invoice_pos.sale.tax_rate,2)}} %)</td>-->
-        <!--                </tr>-->
+      <!--            <v-row>-->
+      <!--              <v-col md="12" class="mt-4">-->
+      <!--                <v-pagination-->
+      <!--                    @change="Category_onPageChanged"-->
+      <!--                    :total-rows="category_totalRows"-->
+      <!--                    :per-page="category_perPage"-->
+      <!--                    v-model="category_currentPage"-->
+      <!--                    class="my-0 gull-pagination align-items-center"-->
+      <!--                    align="center"-->
+      <!--                    first-text-->
+      <!--                    last-text-->
+      <!--                >-->
+      <!--                  <p class="list-arrow m-0" slot="prev-text">-->
+      <!--                    <i class="i-Arrow-Left text-40"></i>-->
+      <!--                  </p>-->
+      <!--                  <p class="list-arrow m-0" slot="next-text">-->
+      <!--                    <i class="i-Arrow-Right text-40"></i>-->
+      <!--                  </p>-->
+      <!--                </v-pagination>-->
+      <!--              </v-col>-->
+      <!--            </v-row>-->
+      <!--          </div>-->
+      <!--        </v-sidebar>-->
 
-        <!--                <tr style="margin-top:10px" v-show="pos_settings.show_discount">-->
-        <!--                  <td colspan="3" class="total">{{$t('Discount')}}</td>-->
-        <!--                  <td style="text-align:right;" class="total">{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.discount ,2)}}</td>-->
-        <!--                </tr>-->
+      <!--        &lt;!&ndash; Modal Show Invoice POS&ndash;&gt;-->
+      <!--        <v-modal hide-footer size="sm" scrollable id="Show_invoice" :title="$t('Invoice_POS')">-->
+      <!--          <div id="invoice-POS">-->
+      <!--            <div style="max-width:400px;margin:0px auto">-->
+      <!--              <div class="info">-->
+      <!--                <h2 class="text-center">{{invoice_pos.setting.CompanyName}}</h2>-->
+      <!--                <p>-->
+      <!--                  <span>{{$t('date')}} : {{invoice_pos.sale.date}} <br></span>-->
+      <!--                  <span v-show="pos_settings.show_address">{{$t('Adress')}} : {{invoice_pos.setting.CompanyAdress}} <br></span>-->
+      <!--                  <span v-show="pos_settings.show_email">{{$t('Email')}} : {{invoice_pos.setting.email}} <br></span>-->
+      <!--                  <span v-show="pos_settings.show_phone">{{$t('Phone')}} : {{invoice_pos.setting.CompanyPhone}} <br></span>-->
+      <!--                  <span v-show="pos_settings.show_customer">{{$t('Customer')}} : {{invoice_pos.sale.client_name}} <br></span>-->
+      <!--                </p>-->
+      <!--              </div>-->
 
-        <!--                <tr style="margin-top:10px" v-show="pos_settings.show_discount">-->
-        <!--                  <td colspan="3" class="total">{{$t('Shipping')}}</td>-->
-        <!--                  <td style="text-align:right;" class="total">{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.shipping ,2)}}</td>-->
-        <!--                </tr>-->
+      <!--              <table class="table_data">-->
+      <!--                <tbody>-->
+      <!--                <tr v-for="detail_invoice in invoice_pos.details">-->
+      <!--                  <td colspan="3">-->
+      <!--                    {{detail_invoice.name}}-->
+      <!--                    <br v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null">-->
+      <!--                    <span v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null ">{{$t('IMEI_SN')}} : {{detail_invoice.imei_number}}</span>-->
+      <!--                    <br>-->
+      <!--                    <span>{{formatNumber(detail_invoice.quantity,2)}} {{detail_invoice.unit_sale}} x {{formatNumber(detail_invoice.total/detail_invoice.quantity,2)}}</span>-->
+      <!--                  </td>-->
+      <!--                  <td-->
+      <!--                      style="text-align:right;vertical-align:bottom"-->
+      <!--                  >{{formatNumber(detail_invoice.total,2)}}</td>-->
+      <!--                </tr>-->
 
-        <!--                <tr style="margin-top:10px">-->
-        <!--                  <td colspan="3" class="total">{{$t('Total')}}</td>-->
-        <!--                  <td-->
-        <!--                      style="text-align:right;"-->
-        <!--                      class="total"-->
-        <!--                  >{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.GrandTotal ,2)}}</td>-->
-        <!--                </tr>-->
+      <!--                <tr style="margin-top:10px" v-show="pos_settings.show_discount">-->
+      <!--                  <td colspan="3" class="total">{{$t('OrderTax')}}</td>-->
+      <!--                  <td style="text-align:right;" class="total">{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.taxe ,2)}} ({{formatNumber(invoice_pos.sale.tax_rate,2)}} %)</td>-->
+      <!--                </tr>-->
 
-        <!--                <tr v-show="invoice_pos.sale.paid_amount < invoice_pos.sale.GrandTotal">-->
-        <!--                  <td colspan="3" class="total">{{$t('Paid')}}</td>-->
-        <!--                  <td-->
-        <!--                      style="text-align:right;"-->
-        <!--                      class="total"-->
-        <!--                  >{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.paid_amount ,2)}}</td>-->
-        <!--                </tr>-->
+      <!--                <tr style="margin-top:10px" v-show="pos_settings.show_discount">-->
+      <!--                  <td colspan="3" class="total">{{$t('Discount')}}</td>-->
+      <!--                  <td style="text-align:right;" class="total">{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.discount ,2)}}</td>-->
+      <!--                </tr>-->
 
-        <!--                <tr v-show="invoice_pos.sale.paid_amount < invoice_pos.sale.GrandTotal">-->
-        <!--                  <td colspan="3" class="total">{{$t('Due')}}</td>-->
-        <!--                  <td-->
-        <!--                      style="text-align:right;"-->
-        <!--                      class="total"-->
-        <!--                  >{{invoice_pos.symbol}} {{parseFloat(invoice_pos.sale.GrandTotal - invoice_pos.sale.paid_amount).toFixed(2)}}</td>-->
-        <!--                </tr>-->
-        <!--                </tbody>-->
-        <!--              </table>-->
+      <!--                <tr style="margin-top:10px" v-show="pos_settings.show_discount">-->
+      <!--                  <td colspan="3" class="total">{{$t('Shipping')}}</td>-->
+      <!--                  <td style="text-align:right;" class="total">{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.shipping ,2)}}</td>-->
+      <!--                </tr>-->
 
-        <!--              <table-->
-        <!--                  class="change mt-3"-->
-        <!--                  style=" font-size: 10px;"-->
-        <!--                  v-show="invoice_pos.sale.paid_amount > 0"-->
-        <!--              >-->
-        <!--                <thead>-->
-        <!--                <tr style="background: #eee; ">-->
-        <!--                  <th style="text-align: left;" colspan="1">{{$t('PayeBy')}}:</th>-->
-        <!--                  <th style="text-align: center;" colspan="2">{{$t('Amount')}}:</th>-->
-        <!--                  <th style="text-align: right;" colspan="1">{{$t('Change')}}:</th>-->
-        <!--                </tr>-->
-        <!--                </thead>-->
+      <!--                <tr style="margin-top:10px">-->
+      <!--                  <td colspan="3" class="total">{{$t('Total')}}</td>-->
+      <!--                  <td-->
+      <!--                      style="text-align:right;"-->
+      <!--                      class="total"-->
+      <!--                  >{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.GrandTotal ,2)}}</td>-->
+      <!--                </tr>-->
 
-        <!--                <tbody>-->
-        <!--                <tr v-for="payment_pos in payments">-->
-        <!--                  <td style="text-align: left;" colspan="1">{{payment_pos.Reglement}}</td>-->
-        <!--                  <td-->
-        <!--                      style="text-align: center;"-->
-        <!--                      colspan="2"-->
-        <!--                  >{{formatNumber(payment_pos.montant ,2)}}</td>-->
-        <!--                  <td-->
-        <!--                      style="text-align: right;"-->
-        <!--                      colspan="1"-->
-        <!--                  >{{formatNumber(payment_pos.change ,2)}}</td>-->
-        <!--                </tr>-->
-        <!--                </tbody>-->
-        <!--              </table>-->
+      <!--                <tr v-show="invoice_pos.sale.paid_amount < invoice_pos.sale.GrandTotal">-->
+      <!--                  <td colspan="3" class="total">{{$t('Paid')}}</td>-->
+      <!--                  <td-->
+      <!--                      style="text-align:right;"-->
+      <!--                      class="total"-->
+      <!--                  >{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.paid_amount ,2)}}</td>-->
+      <!--                </tr>-->
 
-        <!--              <div id="legalcopy" class="ml-2">-->
-        <!--                <p class="legal" v-show="pos_settings.show_note">-->
-        <!--                  <strong>{{pos_settings.note_customer}}</strong>-->
-        <!--                </p>-->
-        <!--                <div id="bar" v-show="pos_settings.show_barcode">-->
-        <!--                  <barcode-->
-        <!--                      class="barcode"-->
-        <!--                      :format="barcodeFormat"-->
-        <!--                      :value="invoice_pos.sale.Ref"-->
-        <!--                      textmargin="0"-->
-        <!--                      fontoptions="bold"-->
-        <!--                      fontSize="15"-->
-        <!--                      height="25"-->
-        <!--                      width="1"-->
-        <!--                  ></barcode>-->
-        <!--                </div>-->
-        <!--              </div>-->
-        <!--            </div>-->
-        <!--          </div>-->
-        <!--          <button @click="print_pos()" class="btn btn-outline-primary">-->
-        <!--            <i class="i-Billing"></i>-->
-        <!--            {{$t('print')}}-->
-        <!--          </button>-->
-        <!--        </v-modal>-->
+      <!--                <tr v-show="invoice_pos.sale.paid_amount < invoice_pos.sale.GrandTotal">-->
+      <!--                  <td colspan="3" class="total">{{$t('Due')}}</td>-->
+      <!--                  <td-->
+      <!--                      style="text-align:right;"-->
+      <!--                      class="total"-->
+      <!--                  >{{invoice_pos.symbol}} {{parseFloat(invoice_pos.sale.GrandTotal - invoice_pos.sale.paid_amount).toFixed(2)}}</td>-->
+      <!--                </tr>-->
+      <!--                </tbody>-->
+      <!--              </table>-->
 
-        <!--        &lt;!&ndash; Modal Add Payment&ndash;&gt;-->
-        <!--        <validation-observer ref="Add_payment">-->
-        <!--          <v-modal hide-footer size="lg" id="Add_Payment" :title="$t('AddPayment')">-->
-        <!--            <v-form @submit.prevent="Submit_Payment">-->
-        <!--              <v-row>-->
-        <!--                <v-col md="6">-->
-        <!--                  <v-row>-->
-        <!--                    &lt;!&ndash; Received  Amount  &ndash;&gt;-->
-        <!--                    <v-col lg="12" md="12" sm="12">-->
-        <!--                      <validation-provider-->
-        <!--                          name="Received Amount"-->
-        <!--                          :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
-        <!--                          v-slot="validationContext"-->
-        <!--                      >-->
-        <!--                        <v-form-group :label="$t('Received_Amount') + ' ' + '*'">-->
-        <!--                          <v-form-input-->
-        <!--                              @keyup="Verified_Received_Amount(payment.received_amount)"-->
-        <!--                              label="Received_Amount"-->
-        <!--                              :placeholder="$t('Received_Amount')"-->
-        <!--                              v-model.number="payment.received_amount"-->
-        <!--                              :state="getValidationState(validationContext)"-->
-        <!--                              aria-describedby="Received_Amount-feedback"-->
-        <!--                          ></v-form-input>-->
-        <!--                          <v-form-invalid-feedback-->
-        <!--                              id="Received_Amount-feedback"-->
-        <!--                          >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-        <!--                        </v-form-group>-->
-        <!--                      </validation-provider>-->
-        <!--                    </v-col>-->
+      <!--              <table-->
+      <!--                  class="change mt-3"-->
+      <!--                  style=" font-size: 10px;"-->
+      <!--                  v-show="invoice_pos.sale.paid_amount > 0"-->
+      <!--              >-->
+      <!--                <thead>-->
+      <!--                <tr style="background: #eee; ">-->
+      <!--                  <th style="text-align: left;" colspan="1">{{$t('PayeBy')}}:</th>-->
+      <!--                  <th style="text-align: center;" colspan="2">{{$t('Amount')}}:</th>-->
+      <!--                  <th style="text-align: right;" colspan="1">{{$t('Change')}}:</th>-->
+      <!--                </tr>-->
+      <!--                </thead>-->
 
-        <!--                    &lt;!&ndash; Paying  Amount  &ndash;&gt;-->
-        <!--                    <v-col lg="12" md="12" sm="12">-->
-        <!--                      <validation-provider-->
-        <!--                          name="Paying Amount"-->
-        <!--                          :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
-        <!--                          v-slot="validationContext"-->
-        <!--                      >-->
-        <!--                        <v-form-group :label="$t('Paying_Amount') + ' ' + '*'">-->
-        <!--                          <v-form-input-->
-        <!--                              label="Paying_Amount"-->
-        <!--                              @keyup="Verified_paidAmount(payment.amount)"-->
-        <!--                              :placeholder="$t('Paying_Amount')"-->
-        <!--                              v-model.number="payment.amount"-->
-        <!--                              :state="getValidationState(validationContext)"-->
-        <!--                              aria-describedby="Paying_Amount-feedback"-->
-        <!--                          ></v-form-input>-->
-        <!--                          <v-form-invalid-feedback-->
-        <!--                              id="Paying_Amount-feedback"-->
-        <!--                          >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-        <!--                        </v-form-group>-->
-        <!--                      </validation-provider>-->
-        <!--                    </v-col>-->
+      <!--                <tbody>-->
+      <!--                <tr v-for="payment_pos in payments">-->
+      <!--                  <td style="text-align: left;" colspan="1">{{payment_pos.Reglement}}</td>-->
+      <!--                  <td-->
+      <!--                      style="text-align: center;"-->
+      <!--                      colspan="2"-->
+      <!--                  >{{formatNumber(payment_pos.montant ,2)}}</td>-->
+      <!--                  <td-->
+      <!--                      style="text-align: right;"-->
+      <!--                      colspan="1"-->
+      <!--                  >{{formatNumber(payment_pos.change ,2)}}</td>-->
+      <!--                </tr>-->
+      <!--                </tbody>-->
+      <!--              </table>-->
 
-        <!--                    &lt;!&ndash; change  Amount  &ndash;&gt;-->
-        <!--                    <v-col lg="12" md="12" sm="12">-->
-        <!--                      <label>{{$t('Change')}} :</label>-->
-        <!--                      <p-->
-        <!--                          class="change_amount"-->
-        <!--                      >{{parseFloat(payment.received_amount - payment.amount).toFixed(2)}}</p>-->
-        <!--                    </v-col>-->
+      <!--              <div id="legalcopy" class="ml-2">-->
+      <!--                <p class="legal" v-show="pos_settings.show_note">-->
+      <!--                  <strong>{{pos_settings.note_customer}}</strong>-->
+      <!--                </p>-->
+      <!--                <div id="bar" v-show="pos_settings.show_barcode">-->
+      <!--                  <barcode-->
+      <!--                      class="barcode"-->
+      <!--                      :format="barcodeFormat"-->
+      <!--                      :value="invoice_pos.sale.Ref"-->
+      <!--                      textmargin="0"-->
+      <!--                      fontoptions="bold"-->
+      <!--                      fontSize="15"-->
+      <!--                      height="25"-->
+      <!--                      width="1"-->
+      <!--                  ></barcode>-->
+      <!--                </div>-->
+      <!--              </div>-->
+      <!--            </div>-->
+      <!--          </div>-->
+      <!--          <button @click="print_pos()" class="btn btn-outline-primary">-->
+      <!--            <i class="i-Billing"></i>-->
+      <!--            {{$t('print')}}-->
+      <!--          </button>-->
+      <!--        </v-modal>-->
 
-        <!--                    &lt;!&ndash; Payment choice &ndash;&gt;-->
-        <!--                    <v-col lg="12" md="12" sm="12">-->
-        <!--                      <validation-provider name="Payment choice" :rules="{ required: true}">-->
-        <!--                        <v-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice') + ' ' + '*'">-->
-        <!--                          <v-select-->
-        <!--                              :class="{'is-invalid': !!errors.length}"-->
-        <!--                              :state="errors[0] ? false : (valid ? true : null)"-->
-        <!--                              v-model="payment.Reglement"-->
-        <!--                              @input="Selected_PaymentMethod"-->
-        <!--                              :reduce="label => label.value"-->
-        <!--                              :placeholder="$t('PleaseSelect')"-->
-        <!--                              :options="-->
-        <!--                              [-->
-        <!--                              {label: 'Cash', value: 'Cash'},-->
-        <!--                              {label: 'credit card', value: 'credit card'},-->
-        <!--                              {label: 'TPE', value: 'tpe'},-->
-        <!--                              {label: 'cheque', value: 'cheque'},-->
-        <!--                              {label: 'Western Union', value: 'Western Union'},-->
-        <!--                              {label: 'bank transfer', value: 'bank transfer'},-->
-        <!--                              {label: 'other', value: 'other'},-->
-        <!--                              ]"-->
-        <!--                          ></v-select>-->
-        <!--                          <v-form-invalid-feedback>{{ errors[0] }}</v-form-invalid-feedback>-->
-        <!--                        </v-form-group>-->
-        <!--                      </validation-provider>-->
-        <!--                    </v-col>-->
+      <!--        &lt;!&ndash; Modal Add Payment&ndash;&gt;-->
+      <!--        <validation-observer ref="Add_payment">-->
+      <!--          <v-modal hide-footer size="lg" id="Add_Payment" :title="$t('AddPayment')">-->
+      <!--            <v-form @submit.prevent="Submit_Payment">-->
+      <!--              <v-row>-->
+      <!--                <v-col md="6">-->
+      <!--                  <v-row>-->
+      <!--                    &lt;!&ndash; Received  Amount  &ndash;&gt;-->
+      <!--                    <v-col lg="12" md="12" sm="12">-->
+      <!--                      <validation-provider-->
+      <!--                          name="Received Amount"-->
+      <!--                          :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
+      <!--                          v-slot="validationContext"-->
+      <!--                      >-->
+      <!--                        <v-form-group :label="$t('Received_Amount') + ' ' + '*'">-->
+      <!--                          <v-form-input-->
+      <!--                              @keyup="Verified_Received_Amount(payment.received_amount)"-->
+      <!--                              label="Received_Amount"-->
+      <!--                              :placeholder="$t('Received_Amount')"-->
+      <!--                              v-model.number="payment.received_amount"-->
+      <!--                              :state="getValidationState(validationContext)"-->
+      <!--                              aria-describedby="Received_Amount-feedback"-->
+      <!--                          ></v-form-input>-->
+      <!--                          <v-form-invalid-feedback-->
+      <!--                              id="Received_Amount-feedback"-->
+      <!--                          >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
+      <!--                        </v-form-group>-->
+      <!--                      </validation-provider>-->
+      <!--                    </v-col>-->
 
-        <!--                    <v-col md="12" v-if="payment.Reglement == 'credit card'">-->
-        <!--                      <form id="payment-form">-->
-        <!--                        <label-->
-        <!--                            for="card-element"-->
-        <!--                            class="leading-7 text-sm text-gray-600"-->
-        <!--                        >{{$t('Credit_Card_Info')}}</label>-->
-        <!--                        <div id="card-element">-->
-        <!--                          &lt;!&ndash; Elements will create input elements here &ndash;&gt;-->
-        <!--                        </div>-->
-        <!--                        &lt;!&ndash; We'll put the error messages in this element &ndash;&gt;-->
-        <!--                        <div id="card-errors" class="is-invalid" role="alert"></div>-->
-        <!--                      </form>-->
-        <!--                    </v-col>-->
+      <!--                    &lt;!&ndash; Paying  Amount  &ndash;&gt;-->
+      <!--                    <v-col lg="12" md="12" sm="12">-->
+      <!--                      <validation-provider-->
+      <!--                          name="Paying Amount"-->
+      <!--                          :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
+      <!--                          v-slot="validationContext"-->
+      <!--                      >-->
+      <!--                        <v-form-group :label="$t('Paying_Amount') + ' ' + '*'">-->
+      <!--                          <v-form-input-->
+      <!--                              label="Paying_Amount"-->
+      <!--                              @keyup="Verified_paidAmount(payment.amount)"-->
+      <!--                              :placeholder="$t('Paying_Amount')"-->
+      <!--                              v-model.number="payment.amount"-->
+      <!--                              :state="getValidationState(validationContext)"-->
+      <!--                              aria-describedby="Paying_Amount-feedback"-->
+      <!--                          ></v-form-input>-->
+      <!--                          <v-form-invalid-feedback-->
+      <!--                              id="Paying_Amount-feedback"-->
+      <!--                          >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
+      <!--                        </v-form-group>-->
+      <!--                      </validation-provider>-->
+      <!--                    </v-col>-->
 
-        <!--                    &lt;!&ndash; payment Note &ndash;&gt;-->
-        <!--                    <v-col lg="12" md="12" sm="12" class="mt-2">-->
-        <!--                      <v-form-group :label="$t('Payment_note')">-->
-        <!--                        <v-form-textarea-->
-        <!--                            id="textarea"-->
-        <!--                            v-model="payment.notes"-->
-        <!--                            rows="3"-->
-        <!--                            max-rows="6"-->
-        <!--                        ></v-form-textarea>-->
-        <!--                      </v-form-group>-->
-        <!--                    </v-col>-->
+      <!--                    &lt;!&ndash; change  Amount  &ndash;&gt;-->
+      <!--                    <v-col lg="12" md="12" sm="12">-->
+      <!--                      <label>{{$t('Change')}} :</label>-->
+      <!--                      <p-->
+      <!--                          class="change_amount"-->
+      <!--                      >{{parseFloat(payment.received_amount - payment.amount).toFixed(2)}}</p>-->
+      <!--                    </v-col>-->
 
-        <!--                    &lt;!&ndash; sale Note &ndash;&gt;-->
-        <!--                    <v-col lg="12" md="12" sm="12" class="mt-2">-->
-        <!--                      <v-form-group :label="$t('sale_note')">-->
-        <!--                        <v-form-textarea-->
-        <!--                            id="textarea"-->
-        <!--                            v-model="sale.notes"-->
-        <!--                            rows="3"-->
-        <!--                            max-rows="6"-->
-        <!--                        ></v-form-textarea>-->
-        <!--                      </v-form-group>-->
-        <!--                    </v-col>-->
+      <!--                    &lt;!&ndash; Payment choice &ndash;&gt;-->
+      <!--                    <v-col lg="12" md="12" sm="12">-->
+      <!--                      <validation-provider name="Payment choice" :rules="{ required: true}">-->
+      <!--                        <v-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice') + ' ' + '*'">-->
+      <!--                          <v-select-->
+      <!--                              :class="{'is-invalid': !!errors.length}"-->
+      <!--                              :state="errors[0] ? false : (valid ? true : null)"-->
+      <!--                              v-model="payment.Reglement"-->
+      <!--                              @input="Selected_PaymentMethod"-->
+      <!--                              :reduce="label => label.value"-->
+      <!--                              :placeholder="$t('PleaseSelect')"-->
+      <!--                              :options="-->
+      <!--                              [-->
+      <!--                              {label: 'Cash', value: 'Cash'},-->
+      <!--                              {label: 'credit card', value: 'credit card'},-->
+      <!--                              {label: 'TPE', value: 'tpe'},-->
+      <!--                              {label: 'cheque', value: 'cheque'},-->
+      <!--                              {label: 'Western Union', value: 'Western Union'},-->
+      <!--                              {label: 'bank transfer', value: 'bank transfer'},-->
+      <!--                              {label: 'other', value: 'other'},-->
+      <!--                              ]"-->
+      <!--                          ></v-select>-->
+      <!--                          <v-form-invalid-feedback>{{ errors[0] }}</v-form-invalid-feedback>-->
+      <!--                        </v-form-group>-->
+      <!--                      </validation-provider>-->
+      <!--                    </v-col>-->
 
+      <!--                    <v-col md="12" v-if="payment.Reglement == 'credit card'">-->
+      <!--                      <form id="payment-form">-->
+      <!--                        <label-->
+      <!--                            for="card-element"-->
+      <!--                            class="leading-7 text-sm text-gray-600"-->
+      <!--                        >{{$t('Credit_Card_Info')}}</label>-->
+      <!--                        <div id="card-element">-->
+      <!--                          &lt;!&ndash; Elements will create input elements here &ndash;&gt;-->
+      <!--                        </div>-->
+      <!--                        &lt;!&ndash; We'll put the error messages in this element &ndash;&gt;-->
+      <!--                        <div id="card-errors" class="is-invalid" role="alert"></div>-->
+      <!--                      </form>-->
+      <!--                    </v-col>-->
 
-        <!--                  </v-row>-->
-        <!--                </v-col>-->
+      <!--                    &lt;!&ndash; payment Note &ndash;&gt;-->
+      <!--                    <v-col lg="12" md="12" sm="12" class="mt-2">-->
+      <!--                      <v-form-group :label="$t('Payment_note')">-->
+      <!--                        <v-form-textarea-->
+      <!--                            id="textarea"-->
+      <!--                            v-model="payment.notes"-->
+      <!--                            rows="3"-->
+      <!--                            max-rows="6"-->
+      <!--                        ></v-form-textarea>-->
+      <!--                      </v-form-group>-->
+      <!--                    </v-col>-->
 
-        <!--                <v-col md="6">-->
-        <!--                  <v-card>-->
-        <!--                    <v-list-group>-->
-        <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
-        <!--                        {{$t('TotalProducts')}}-->
-        <!--                        <v-badge variant="primary" pill>{{details.length}}</v-badge>-->
-        <!--                      </v-list-group-item>-->
-
-        <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
-        <!--                        {{$t('OrderTax')}}-->
-        <!--                        <span-->
-        <!--                            class="font-weight-bold"-->
-        <!--                        >{{currentUser.currency}} {{sale.TaxNet.toFixed(2)}} ({{sale.tax_rate}} %)</span>-->
-        <!--                      </v-list-group-item>-->
-        <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
-        <!--                        {{$t('Discount')}}-->
-        <!--                        <span-->
-        <!--                            class="font-weight-bold"-->
-        <!--                        >{{currentUser.currency}} {{sale.discount.toFixed(2)}}</span>-->
-        <!--                      </v-list-group-item>-->
-
-        <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
-        <!--                        {{$t('Shipping')}}-->
-        <!--                        <span-->
-        <!--                            class="font-weight-bold"-->
-        <!--                        >{{currentUser.currency}} {{sale.shipping.toFixed(2)}}</span>-->
-        <!--                      </v-list-group-item>-->
-
-        <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
-        <!--                        {{$t('Total_Payable')}}-->
-        <!--                        <span-->
-        <!--                            class="font-weight-bold"-->
-        <!--                        >{{currentUser.currency}} {{GrandTotal.toFixed(2)}}</span>-->
-        <!--                      </v-list-group-item>-->
-        <!--                    </v-list-group>-->
-        <!--                  </v-card>-->
-        <!--                </v-col>-->
-
-        <!--                <v-col md="12" class="mt-3">-->
-        <!--                  <v-button-->
-        <!--                      variant="primary"-->
-        <!--                      type="submit"-->
-        <!--                      :disabled="paymentProcessing"-->
-        <!--                  >{{$t('submit')}}</v-button>-->
-        <!--                  <div v-once class="typo__p" v-if="paymentProcessing">-->
-        <!--                    <div class="spinner sm spinner-primary mt-3"></div>-->
-        <!--                  </div>-->
-        <!--                </v-col>-->
-        <!--              </v-row>-->
-        <!--            </v-form>-->
-        <!--          </v-modal>-->
-        <!--        </validation-observer>-->
-
-        <!--        <validation-observer ref="Create_Customer">-->
-        <!--          <v-modal hide-footer size="lg" id="New_Customer" :title="$t('Add')">-->
-        <!--            <v-form @submit.prevent="Submit_Customer">-->
-        <!--              <v-row>-->
-        <!--                &lt;!&ndash; Customer Name &ndash;&gt;-->
-        <!--                <v-col md="6" sm="12">-->
-        <!--                  <validation-provider-->
-        <!--                      name="Name Customer"-->
-        <!--                      :rules="{ required: true}"-->
-        <!--                      v-slot="validationContext"-->
-        <!--                  >-->
-        <!--                    <v-form-group :label="$t('CustomerName') + ' ' + '*'">-->
-        <!--                      <v-form-input-->
-        <!--                          :state="getValidationState(validationContext)"-->
-        <!--                          aria-describedby="name-feedback"-->
-        <!--                          label="name"-->
-        <!--                          v-model="client.name"-->
-        <!--                          :placeholder="$t('CustomerName')"-->
-        <!--                      ></v-form-input>-->
-        <!--                      <v-form-invalid-feedback id="name-feedback">{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-        <!--                    </v-form-group>-->
-        <!--                  </validation-provider>-->
-        <!--                </v-col>-->
-
-        <!--                &lt;!&ndash; Customer Email &ndash;&gt;-->
-        <!--                <v-col md="6" sm="12">-->
-        <!--                  <v-form-group :label="$t('Email')">-->
-        <!--                    <v-form-input-->
-        <!--                        label="email"-->
-        <!--                        v-model="client.email"-->
-        <!--                        :placeholder="$t('Email')"-->
-        <!--                    ></v-form-input>-->
-        <!--                  </v-form-group>-->
-        <!--                </v-col>-->
-
-        <!--                &lt;!&ndash; Customer Phone &ndash;&gt;-->
-        <!--                <v-col md="6" sm="12">-->
-        <!--                  <v-form-group :label="$t('Phone')">-->
-        <!--                    <v-form-input-->
-        <!--                        label="Phone"-->
-        <!--                        v-model="client.phone"-->
-        <!--                        :placeholder="$t('Phone')"-->
-        <!--                    ></v-form-input>-->
-        <!--                  </v-form-group>-->
-        <!--                </v-col>-->
-
-        <!--                &lt;!&ndash; Customer Country &ndash;&gt;-->
-        <!--                <v-col md="6" sm="12">-->
-        <!--                  <v-form-group :label="$t('Country')">-->
-        <!--                    <v-form-input-->
-        <!--                        label="Country"-->
-        <!--                        v-model="client.country"-->
-        <!--                        :placeholder="$t('Country')"-->
-        <!--                    ></v-form-input>-->
-        <!--                  </v-form-group>-->
-        <!--                </v-col>-->
-
-        <!--                &lt;!&ndash; Customer City &ndash;&gt;-->
-        <!--                <v-col md="6" sm="12">-->
-        <!--                  <v-form-group :label="$t('City')">-->
-        <!--                    <v-form-input-->
-        <!--                        label="City"-->
-        <!--                        v-model="client.city"-->
-        <!--                        :placeholder="$t('City')"-->
-        <!--                    ></v-form-input>-->
-        <!--                  </v-form-group>-->
-        <!--                </v-col>-->
-
-        <!--                &lt;!&ndash; Customer Tax Number &ndash;&gt;-->
-        <!--                <v-col md="6" sm="12">-->
-        <!--                  <v-form-group :label="$t('Tax_Number')">-->
-        <!--                    <v-form-input-->
-        <!--                        label="Tax Number"-->
-        <!--                        v-model="client.tax_number"-->
-        <!--                        :placeholder="$t('Tax_Number')"-->
-        <!--                    ></v-form-input>-->
-        <!--                  </v-form-group>-->
-        <!--                </v-col>-->
+      <!--                    &lt;!&ndash; sale Note &ndash;&gt;-->
+      <!--                    <v-col lg="12" md="12" sm="12" class="mt-2">-->
+      <!--                      <v-form-group :label="$t('sale_note')">-->
+      <!--                        <v-form-textarea-->
+      <!--                            id="textarea"-->
+      <!--                            v-model="sale.notes"-->
+      <!--                            rows="3"-->
+      <!--                            max-rows="6"-->
+      <!--                        ></v-form-textarea>-->
+      <!--                      </v-form-group>-->
+      <!--                    </v-col>-->
 
 
-        <!--                &lt;!&ndash; Customer Adress &ndash;&gt;-->
-        <!--                <v-col md="12" sm="12">-->
-        <!--                  <v-form-group :label="$t('Adress')">-->
-        <!--                      <textarea-->
-        <!--                          label="Adress"-->
-        <!--                          class="form-control"-->
-        <!--                          rows="4"-->
-        <!--                          v-model="client.adresse"-->
-        <!--                          :placeholder="$t('Adress')"-->
-        <!--                      ></textarea>-->
-        <!--                  </v-form-group>-->
-        <!--                </v-col>-->
+      <!--                  </v-row>-->
+      <!--                </v-col>-->
 
-        <!--                <v-col md="12" class="mt-3">-->
-        <!--                  <v-button variant="primary" type="submit">{{$t('submit')}}</v-button>-->
-        <!--                </v-col>-->
-        <!--              </v-row>-->
-        <!--            </v-form>-->
-        <!--          </v-modal>-->
-        <!--        </validation-observer>-->
-        <!--      </v-row>-->
-        <!--    </div>-->
+      <!--                <v-col md="6">-->
+      <!--                  <v-card>-->
+      <!--                    <v-list-group>-->
+      <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
+      <!--                        {{$t('TotalProducts')}}-->
+      <!--                        <v-badge variant="primary" pill>{{details.length}}</v-badge>-->
+      <!--                      </v-list-group-item>-->
+
+      <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
+      <!--                        {{$t('OrderTax')}}-->
+      <!--                        <span-->
+      <!--                            class="font-weight-bold"-->
+      <!--                        >{{currentUser.currency}} {{sale.TaxNet.toFixed(2)}} ({{sale.tax_rate}} %)</span>-->
+      <!--                      </v-list-group-item>-->
+      <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
+      <!--                        {{$t('Discount')}}-->
+      <!--                        <span-->
+      <!--                            class="font-weight-bold"-->
+      <!--                        >{{currentUser.currency}} {{sale.discount.toFixed(2)}}</span>-->
+      <!--                      </v-list-group-item>-->
+
+      <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
+      <!--                        {{$t('Shipping')}}-->
+      <!--                        <span-->
+      <!--                            class="font-weight-bold"-->
+      <!--                        >{{currentUser.currency}} {{sale.shipping.toFixed(2)}}</span>-->
+      <!--                      </v-list-group-item>-->
+
+      <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
+      <!--                        {{$t('Total_Payable')}}-->
+      <!--                        <span-->
+      <!--                            class="font-weight-bold"-->
+      <!--                        >{{currentUser.currency}} {{GrandTotal.toFixed(2)}}</span>-->
+      <!--                      </v-list-group-item>-->
+      <!--                    </v-list-group>-->
+      <!--                  </v-card>-->
+      <!--                </v-col>-->
+
+      <!--                <v-col md="12" class="mt-3">-->
+      <!--                  <v-button-->
+      <!--                      variant="primary"-->
+      <!--                      type="submit"-->
+      <!--                      :disabled="paymentProcessing"-->
+      <!--                  >{{$t('submit')}}</v-button>-->
+      <!--                  <div v-once class="typo__p" v-if="paymentProcessing">-->
+      <!--                    <div class="spinner sm spinner-primary mt-3"></div>-->
+      <!--                  </div>-->
+      <!--                </v-col>-->
+      <!--              </v-row>-->
+      <!--            </v-form>-->
+      <!--          </v-modal>-->
+      <!--        </validation-observer>-->
+
+      <!--        <validation-observer ref="Create_Customer">-->
+      <!--          <v-modal hide-footer size="lg" id="New_Customer" :title="$t('Add')">-->
+      <!--            <v-form @submit.prevent="Submit_Customer">-->
+      <!--              <v-row>-->
+      <!--                &lt;!&ndash; Customer Name &ndash;&gt;-->
+      <!--                <v-col md="6" sm="12">-->
+      <!--                  <validation-provider-->
+      <!--                      name="Name Customer"-->
+      <!--                      :rules="{ required: true}"-->
+      <!--                      v-slot="validationContext"-->
+      <!--                  >-->
+      <!--                    <v-form-group :label="$t('CustomerName') + ' ' + '*'">-->
+      <!--                      <v-form-input-->
+      <!--                          :state="getValidationState(validationContext)"-->
+      <!--                          aria-describedby="name-feedback"-->
+      <!--                          label="name"-->
+      <!--                          v-model="client.name"-->
+      <!--                          :placeholder="$t('CustomerName')"-->
+      <!--                      ></v-form-input>-->
+      <!--                      <v-form-invalid-feedback id="name-feedback">{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
+      <!--                    </v-form-group>-->
+      <!--                  </validation-provider>-->
+      <!--                </v-col>-->
+
+      <!--                &lt;!&ndash; Customer Email &ndash;&gt;-->
+      <!--                <v-col md="6" sm="12">-->
+      <!--                  <v-form-group :label="$t('Email')">-->
+      <!--                    <v-form-input-->
+      <!--                        label="email"-->
+      <!--                        v-model="client.email"-->
+      <!--                        :placeholder="$t('Email')"-->
+      <!--                    ></v-form-input>-->
+      <!--                  </v-form-group>-->
+      <!--                </v-col>-->
+
+      <!--                &lt;!&ndash; Customer Phone &ndash;&gt;-->
+      <!--                <v-col md="6" sm="12">-->
+      <!--                  <v-form-group :label="$t('Phone')">-->
+      <!--                    <v-form-input-->
+      <!--                        label="Phone"-->
+      <!--                        v-model="client.phone"-->
+      <!--                        :placeholder="$t('Phone')"-->
+      <!--                    ></v-form-input>-->
+      <!--                  </v-form-group>-->
+      <!--                </v-col>-->
+
+      <!--                &lt;!&ndash; Customer Country &ndash;&gt;-->
+      <!--                <v-col md="6" sm="12">-->
+      <!--                  <v-form-group :label="$t('Country')">-->
+      <!--                    <v-form-input-->
+      <!--                        label="Country"-->
+      <!--                        v-model="client.country"-->
+      <!--                        :placeholder="$t('Country')"-->
+      <!--                    ></v-form-input>-->
+      <!--                  </v-form-group>-->
+      <!--                </v-col>-->
+
+      <!--                &lt;!&ndash; Customer City &ndash;&gt;-->
+      <!--                <v-col md="6" sm="12">-->
+      <!--                  <v-form-group :label="$t('City')">-->
+      <!--                    <v-form-input-->
+      <!--                        label="City"-->
+      <!--                        v-model="client.city"-->
+      <!--                        :placeholder="$t('City')"-->
+      <!--                    ></v-form-input>-->
+      <!--                  </v-form-group>-->
+      <!--                </v-col>-->
+
+      <!--                &lt;!&ndash; Customer Tax Number &ndash;&gt;-->
+      <!--                <v-col md="6" sm="12">-->
+      <!--                  <v-form-group :label="$t('Tax_Number')">-->
+      <!--                    <v-form-input-->
+      <!--                        label="Tax Number"-->
+      <!--                        v-model="client.tax_number"-->
+      <!--                        :placeholder="$t('Tax_Number')"-->
+      <!--                    ></v-form-input>-->
+      <!--                  </v-form-group>-->
+      <!--                </v-col>-->
+
+
+      <!--                &lt;!&ndash; Customer Adress &ndash;&gt;-->
+      <!--                <v-col md="12" sm="12">-->
+      <!--                  <v-form-group :label="$t('Adress')">-->
+      <!--                      <textarea-->
+      <!--                          label="Adress"-->
+      <!--                          class="form-control"-->
+      <!--                          rows="4"-->
+      <!--                          v-model="client.adresse"-->
+      <!--                          :placeholder="$t('Adress')"-->
+      <!--                      ></textarea>-->
+      <!--                  </v-form-group>-->
+      <!--                </v-col>-->
+
+      <!--                <v-col md="12" class="mt-3">-->
+      <!--                  <v-button variant="primary" type="submit">{{$t('submit')}}</v-button>-->
+      <!--                </v-col>-->
+      <!--              </v-row>-->
+      <!--            </v-form>-->
+      <!--          </v-modal>-->
+      <!--        </validation-observer>-->
+      <!--      </v-row>-->
+      <!--    </div>-->
     </v-row>
   </Layout>
 </template>
