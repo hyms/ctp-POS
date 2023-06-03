@@ -1,11 +1,13 @@
 <script setup>
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import Layout from "@/Layouts/Pos.vue";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import helper from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
 import MenuUser from "@/Components/Menu_user.vue";
 import Full_screen from "@/Components/full_screen.vue";
+
+const currency = computed(() => usePage().props.currency);
 
 const props = defineProps({
   defaultWarehouse: Object,
@@ -35,6 +37,7 @@ const payment = ref({
 });
 const focused = ref(false);
 const timer = ref(null);
+const searchProducts = ref('');
 const search_input = ref('');
 const product_filter = ref([]);
 const clientFilter = ref([]);
@@ -44,6 +47,7 @@ const Ref = ref("");
 const units = ref([]);
 const payments = ref([]);
 const products = ref([]);
+const products_page = ref(0);
 const products_pos = ref([]);
 const details = ref([]);
 const detail = ref({});
@@ -278,7 +282,7 @@ function Get_Products_By_Warehouse(id) {
 
 //----------------------------------------- Add Detail of Sale -------------------------\\
 function add_product(code) {
-  audio.value.play();
+  // audio.value.play();
   if (details.value.some(detail => detail.code === code)) {
     increment_qty_scanner(code);
   } else {
@@ -489,8 +493,8 @@ function CreatePOS() {
 }
 
 //---------------------------------Get Product Details ------------------------\\
-function Get_Product_Details(product, product_id) {
-  axios.get("products/" + product_id).then(response => {
+function Get_Product_Details(product_item, product_id) {
+  axios.get("/product/" + product_id).then(response => {
     product.value.discount = 0;
     product.value.DiscountNet = 0;
     product.value.discount_Method = "2";
@@ -503,11 +507,11 @@ function Get_Product_Details(product, product_id) {
     product.value.tax_method = response.data.tax_method;
     product.value.tax_percent = response.data.tax_percent;
     product.value.unitSale = response.data.unitSale;
-    product.value.product_variant_id = product.product_variant_id;
-    product.value.code = product.code;
+    product.value.product_variant_id = product_item.product_variant_id;
+    product.value.code = product_item.code;
     product.value.fix_price = response.data.fix_price;
     product.value.sale_unit_id = response.data.sale_unit_id;
-    add_product(product.code);
+    add_product(product_item.code);
     CalculTotal();
 
   });
@@ -575,11 +579,11 @@ function increment_qty_scanner(code) {
 }
 
 //----------------------------------- Increment QTY ------------------------------\\
-function increment(id) {
+function increment(detail_item,id) {
   snackbar.value = false;
   for (let i = 0; i < details.value.length; i++) {
     if (details.value[i].detail_id == id) {
-      if (details.value[i].quantity + 1 > details.value[i].current) {
+      if (detail_item.quantity + 1 > detail_item.current) {
         snackbar.value = true;
         snackbarText.value = "stock bajo";
         snackbarColor.value = "error";
@@ -592,11 +596,11 @@ function increment(id) {
 }
 
 //----------------------------------- decrement QTY ------------------------------\\
-function decrement(detail, id) {
+function decrement(detail_item, id) {
   snackbar.value = false;
   for (let i = 0; i < details.value.length; i++) {
     if (details.value[i].detail_id == id) {
-      if (detail.quantity - 1 > detail.current || detail.quantity - 1 < 1) {
+      if (detail_item.quantity - 1 > detail_item.current || detail_item.quantity - 1 < 1) {
         snackbar.value = true;
         snackbarText.value = "stock bajo";
         snackbarColor.value = "error";
@@ -744,19 +748,19 @@ function search() {
 }
 
 //---------------------------------- Check if Product Exist in Order List ---------------------\\
-function Check_Product_Exist(product, id) {
+function Check_Product_Exist(product_item, id) {
   // audio.value.play();
   // Start the progress bar.
   product.value = {};
-  product.value.current = product.qte_sale;
-  product.value.fix_stock = product.qte;
-  if (product.qte_sale < 1) {
-    product.value.quantity = product.qte_sale;
+  product.value.current = product_item.qte_sale;
+  product.value.fix_stock = product_item.qte;
+  if (product_item.qte_sale < 1) {
+    product.value.quantity = product_item.qte_sale;
   } else {
     product.value.quantity = 1;
   }
-  Get_Product_Details(product, id);
-  search_input.value = '';
+  Get_Product_Details(product_item, id);
+  // search_input.value = '';
   // this.$refs.product_autocomplete.value = "";
   product_filter.value = [];
 }
@@ -889,29 +893,29 @@ function created() {
                       <tr v-if="details.length <= 0">
                         <td colspan="5">No hay datos</td>
                       </tr>
-                      <tr v-for="(detail, index) in details" :key="index">
+                      <tr v-for="(detail_item, index) in details" :key="index">
                         <td>
-                          <span>{{ detail.code }}</span>
+                          <span>{{ detail_item.code }}</span>
                           <br>
-                          <span class="badge badge-success">{{ detail.name }}</span>
-                          <v-icon @click="Modal_Updat_Detail(detail)" icon="mdi-pencil-box-outline"></v-icon>
+                          <span class="badge badge-success">{{ detail_item.name }}</span>
+                          <v-icon @click="Modal_Updat_Detail(detail_item)" icon="mdi-pencil-box-outline"></v-icon>
                         </td>
-                        <td>{{ currentUser.currency }} {{ helper.formatNumber(detail.Total_price, 2) }}</td>
-                        <td>
+                        <td>{{ currency }} {{ helper.formatNumber(detail_item.Total_price, 2) }}</td>
+                        <td style="min-width: 140px">
                           <v-text-field
                               variant="outlined"
                               density="compact"
                               hide-details="auto"
                               :rules="helper.number"
-                              v-model="detail.quantity"
-                              @keyup="Verified_Qty(detail,detail.detail_id)"
+                              v-model="detail_item.quantity"
+                              @keyup="Verified_Qty(detail_item,detail_item.detail_id)"
                               :min="0.0"
-                              :max="detail.current"
+                              :max="detail_item.current"
                           >
                             <template v-slot:append>
                               <v-icon
                                   color="secundary"
-                                  @click="increment(detail,detail.detail_id)"
+                                  @click="increment(detail_item,detail_item.detail_id)"
                               >
                                 mdi-plus-box
                               </v-icon>
@@ -919,17 +923,17 @@ function created() {
                             <template v-slot:prepend>
                               <v-icon
                                   color="secundary"
-                                  @click="decrement(detail, detail.detail_id ) "
+                                  @click="decrement(detail_item, detail_item.detail_id ) "
                               >
                                 mdi-minus-box
                               </v-icon>
                             </template>
                           </v-text-field>
                         </td>
-                        <td class="text-center">{{ currentUser.currency }} {{ detail.subtotal.toFixed(2) }}</td>
+                        <td class="text-center">{{ currency }} {{ detail_item.subtotal.toFixed(2) }}</td>
                         <td>
                           <v-btn
-                              @click="delete_Product_Detail(detail.detail_id)"
+                              @click="delete_Product_Detail(detail_item.detail_id)"
                               title="Delete"
                               icon="mdi-delete"
                               color="error"
@@ -953,7 +957,7 @@ function created() {
                   <v-col cols="12">
                     <v-card color="secondary" variant="tonal">
                       <v-card-text class="text-center">
-                        <h2><strong>Total :</strong> Bs {{ GrandTotal.toFixed(2) }}</h2>
+                        <h2><strong>Total :</strong> {{currency}} {{ GrandTotal.toFixed(2) }}</h2>
                       </v-card-text>
                     </v-card>
 
@@ -991,7 +995,7 @@ function created() {
                     <!--                            v-slot="validationContext"-->
                     <!--                        >-->
                     <!--                          <v-form-group :label="$t('Discount')" append="%">-->
-                    <!--                            <v-input-group :append="currentUser.currency">-->
+                    <!--                            <v-input-group :append="currency">-->
                     <!--                              <v-form-input-->
                     <!--                                  :state="getValidationState(validationContext)"-->
                     <!--                                  aria-describedby="Discount-feedback"-->
@@ -1214,15 +1218,13 @@ function created() {
               <!-- Product -->
               <v-col cols="12" class="mt-2 mv-2">
                 <v-data-iterator
-                    items-per-page="12"
-                    v-model:page="page"
                     :items="products_pos"
-                    :search="search"
+                    :search="searchProducts"
                 >
                   <template v-slot:header>
                     <div class="mb-3">
                       <v-text-field
-                          v-model="search"
+                          v-model="searchProducts"
                           clearable
                           hide-details
                           prepend-inner-icon="mdi-magnify"
@@ -1248,12 +1250,12 @@ function created() {
                           md="4"
                           lg="3"
                       >
-                        <v-card variant="elevated" color="white" @click="">
+                        <v-card variant="elevated" color="white" @click="Check_Product_Exist( item.raw ,  item.raw.id)">
                           <v-card-item>
                             <p class="font-weight-bold text-h6">{{ item.raw.name }}</p>
                             <p class="text-medium-emphasis text-subtitle-2">COD: {{ item.raw.code }}</p>
 
-                            <v-chip color="primary" size="x-small" class="ma-1">Bs
+                            <v-chip color="primary" size="x-small" class="ma-1">{{currency}}
                               {{ helper.formatNumber(item.raw.Net_price, 2) }}
                             </v-chip>
                             <v-chip size="x-small" color="info" class="ma-1">
@@ -1265,133 +1267,12 @@ function created() {
                       </v-col>
                     </v-row>
                   </template>
-
                 </v-data-iterator>
-
-                <!--                        <v-autocomplete-->
-                <!--                            @update:modelValue="SearchProduct"-->
-                <!--                            :items="product_filter"-->
-                <!--                            :model-value="search_input"-->
-                <!--                            variant="solo-filled"-->
-                <!--                            item-title="name"-->
-                <!--                            item-value="id"-->
-                <!--                            density="comfortable"-->
-                <!--                            hide-no-data-->
-                <!--                            hide-details-->
-                <!--                            label="Añadir Producto"-->
-                <!--                            :disabled="products_pos.length == 0"-->
-                <!--                            clearable-->
-                <!--                            prepend-inner-icon="mdi-magnify"-->
-                <!--                        ></v-autocomplete>-->
-                <!--                <div id="autocomplete" class="autocomplete">-->
-                <!--                  <input-->
-                <!--                      :placeholder="$t('Scan_Search_Product_by_Code_Name')"-->
-                <!--                      @input='e => search_input = e.target.value'-->
-                <!--                      @keyup="search(search_input)"-->
-                <!--                      @focus="handleFocus"-->
-                <!--                      @blur="handleBlur"-->
-                <!--                      ref="product_autocomplete"-->
-                <!--                      class="autocomplete-input" />-->
-                <!--                  <ul class="autocomplete-result-list" v-show="focused">-->
-                <!--                    <li class="autocomplete-result" v-for="product_fil in product_filter" @mousedown="SearchProduct(product_fil)">{{getResultValue(product_fil)}}</li>-->
-                <!--                  </ul>-->
-                <!--                </div>-->
               </v-col>
-
-              <!--                      <div class="col-md-12 d-flex flex-row flex-wrap bd-highlight list-item mt-2">-->
-              <!--                        <div-->
-              <!--                            @click="Check_Product_Exist(product , product.id)"-->
-              <!--                            v-for="product in products_pos"-->
-              <!--                            class="card o-hidden bd-highlight m-1"-->
-              <!--                        >-->
-              <!--        &lt;!&ndash;                  <div class="list-thumb d-flex">&ndash;&gt;-->
-              <!--        &lt;!&ndash;                    <img alt :src="'/images/products/'+product.image">&ndash;&gt;-->
-              <!--        &lt;!&ndash;                  </div>&ndash;&gt;-->
-              <!--                          <div class="flex-grow-1 d-bock">-->
-              <!--                            <div-->
-              <!--                                class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"-->
-              <!--                            >-->
-              <!--                              <div class="w-40 w-sm-100 item-title">{{product.name}}</div>-->
-              <!--                              <p class="text-muted text-small w-15 w-sm-100 mv-2">{{product.code}}</p>-->
-              <!--&lt;!&ndash;&ndash;&gt;-->
-              <!--                              <v-chip color="primary">Bs {{helper.formatNumber(product.Net_price , 2)}}</v-chip>-->
-              <!--                              <p-->
-              <!--                                  class="m-0 text-muted text-small w-15 w-sm-100 d-none d-lg-block item-badges"-->
-              <!--                              >-->
-              <!--                                <v-chip color="info">{{helper.formatNumber(product.qte_sale , 2)}} {{product.unitSale}}</v-chip>-->
-              <!--                              </p>-->
-              <!--                            </div>-->
-              <!--                          </div>-->
-              <!--                        </div>-->
-              <!--                      </div>-->
             </v-row>
           </v-card-text>
         </v-card>
       </v-col>
-
-      <!--        &lt;!&ndash; Sidebar Brand &ndash;&gt;-->
-      <!--        <v-sidebar id="sidebar-brand" :title="$t('ListofBrand')" bg-variant="white" right shadow>-->
-      <!--          <div class="px-3 py-2">-->
-      <!--            <v-row>-->
-      <!--              <div class="col-md-12 d-flex flex-row flex-wrap bd-highlight list-item mt-2">-->
-      <!--                <div-->
-      <!--                    @click="GetAllBrands()"-->
-      <!--                    :class="{ 'brand-Active' : brand_id == ''}"-->
-      <!--                    class="card o-hidden bd-highlight m-1"-->
-      <!--                >-->
-      <!--                  <div class="list-thumb d-flex">-->
-      <!--                    <img alt :src="'/images/no-image.png'">-->
-      <!--                  </div>-->
-      <!--                  <div class="flex-grow-1 d-bock">-->
-      <!--                    <div-->
-      <!--                        class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"-->
-      <!--                    >-->
-      <!--                      <div class="item-title">{{$t('All_Brand')}}</div>-->
-      <!--                    </div>-->
-      <!--                  </div>-->
-      <!--                </div>-->
-      <!--                <div-->
-      <!--                    class="card o-hidden bd-highlight m-1"-->
-      <!--                    v-for="brand in paginated_Brands"-->
-      <!--                    :key="brand.id"-->
-      <!--                    @click="Products_by_Brands(brand.id)"-->
-      <!--                    :class="{ 'brand-Active' : brand.id === brand_id}"-->
-      <!--                >-->
-      <!--                  <img alt :src="'/images/brands/'+brand.image">-->
-      <!--                  <div class="flex-grow-1 d-bock">-->
-      <!--                    <div-->
-      <!--                        class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"-->
-      <!--                    >-->
-      <!--                      <div class="item-title">{{brand.name}}</div>-->
-      <!--                    </div>-->
-      <!--                  </div>-->
-      <!--                </div>-->
-      <!--              </div>-->
-      <!--            </v-row>-->
-
-      <!--            <v-row>-->
-      <!--              <v-col md="12" class="mt-4">-->
-      <!--                <v-pagination-->
-      <!--                    @change="BrandonPageChanged"-->
-      <!--                    :total-rows="brand_totalRows"-->
-      <!--                    :per-page="brand_perPage"-->
-      <!--                    v-model="brand_currentPage"-->
-      <!--                    class="my-0 gull-pagination align-items-center"-->
-      <!--                    align="center"-->
-      <!--                    first-text-->
-      <!--                    last-text-->
-      <!--                >-->
-      <!--                  <p class="list-arrow m-0" slot="prev-text">-->
-      <!--                    <i class="i-Arrow-Left text-40"></i>-->
-      <!--                  </p>-->
-      <!--                  <p class="list-arrow m-0" slot="next-text">-->
-      <!--                    <i class="i-Arrow-Right text-40"></i>-->
-      <!--                  </p>-->
-      <!--                </v-pagination>-->
-      <!--              </v-col>-->
-      <!--            </v-row>-->
-      <!--          </div>-->
-      <!--        </v-sidebar>-->
 
       <!--        &lt;!&ndash; Sidebar category &ndash;&gt;-->
       <!--        <v-sidebar-->
@@ -1729,27 +1610,27 @@ function created() {
       <!--                        {{$t('OrderTax')}}-->
       <!--                        <span-->
       <!--                            class="font-weight-bold"-->
-      <!--                        >{{currentUser.currency}} {{sale.TaxNet.toFixed(2)}} ({{sale.tax_rate}} %)</span>-->
+      <!--                        >{{currency}} {{sale.TaxNet.toFixed(2)}} ({{sale.tax_rate}} %)</span>-->
       <!--                      </v-list-group-item>-->
       <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
       <!--                        {{$t('Discount')}}-->
       <!--                        <span-->
       <!--                            class="font-weight-bold"-->
-      <!--                        >{{currentUser.currency}} {{sale.discount.toFixed(2)}}</span>-->
+      <!--                        >{{currency}} {{sale.discount.toFixed(2)}}</span>-->
       <!--                      </v-list-group-item>-->
 
       <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
       <!--                        {{$t('Shipping')}}-->
       <!--                        <span-->
       <!--                            class="font-weight-bold"-->
-      <!--                        >{{currentUser.currency}} {{sale.shipping.toFixed(2)}}</span>-->
+      <!--                        >{{currency}} {{sale.shipping.toFixed(2)}}</span>-->
       <!--                      </v-list-group-item>-->
 
       <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
       <!--                        {{$t('Total_Payable')}}-->
       <!--                        <span-->
       <!--                            class="font-weight-bold"-->
-      <!--                        >{{currentUser.currency}} {{GrandTotal.toFixed(2)}}</span>-->
+      <!--                        >{{currency}} {{GrandTotal.toFixed(2)}}</span>-->
       <!--                      </v-list-group-item>-->
       <!--                    </v-list-group>-->
       <!--                  </v-card>-->

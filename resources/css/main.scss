@@ -2,4 +2,10 @@ $font-size-root: 0.9rem !default;
 .v-list-item__prepend .v-icon{
     margin-inline-end: 10px;
 }
+.v-input--horizontal .v-input__append {
+    margin-inline-start: 10px;
+}
+.v-input--horizontal .v-input__prepend {
+    margin-inline-end: 10px;
+}
 @import 'vuetify/styles';

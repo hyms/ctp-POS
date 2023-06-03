@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\utils\helpers;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -36,6 +37,7 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $helpers = new helpers();
         return array_merge(parent::share($request), [
             'appName' => config('app.name'),
 //            'auth' => [
@@ -51,6 +53,7 @@ class HandleInertiaRequests extends Middleware
                 'desing' => [0, 1, 2, 3, 4, 5],
                 'all' => [0, 1, 2, 3, 4, 5],
             ],
+            'currency'=> $helpers->Get_Currency_Code()
         ]);
     }
 }
