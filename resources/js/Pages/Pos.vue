@@ -1248,7 +1248,7 @@ function created() {
                           md="4"
                           lg="3"
                       >
-                        <v-card variant="elevated" @click="">
+                        <v-card variant="elevated" color="white" @click="">
                           <v-card-item>
                             <p class="font-weight-bold text-h6">{{ item.raw.name }}</p>
                             <p class="text-medium-emphasis text-subtitle-2">COD: {{ item.raw.code }}</p>
