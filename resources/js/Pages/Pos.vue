@@ -3,6 +3,7 @@ import {computed, ref} from "vue";
 import Layout from "@/Layouts/Pos.vue";
 import {router, usePage} from "@inertiajs/vue3";
 import helper from "@/helpers";
+import labels from "@/labels";
 import Snackbar from "@/Components/snackbar.vue";
 import MenuUser from "@/Components/Menu_user.vue";
 import Full_screen from "@/Components/full_screen.vue";
@@ -21,6 +22,7 @@ const props = defineProps({
 const form = ref(null);
 const formAddPayment = ref(null);
 const formCreateCustomer = ref(null);
+const formUpdateDetail = ref(null);
 const loading = ref(false);
 const snackbar = ref(false);
 const snackbarText = ref("");
@@ -137,34 +139,34 @@ function querySelectionClient(v) {
 async function Submit_Pos() {
   snackbar.value = false;
   const validate = await form.value.validate();
-  if (!validate) {
+  if (!validate.valid) {
     if (sale.value.client_id == "" || sale.value.client_id === null) {
       snackbar.value = true;
       snackbarColor.value = "error";
-      snackbarText.value = "Debe seleccionar un cliente";
+      snackbarText.value = labels.no_select_client;
     } else if (
         sale.value.warehouse_id == "" ||
         sale.value.warehouse_id === null
     ) {
       snackbar.value = true;
       snackbarColor.value = "error";
-      snackbarText.value = "Debe seleccionar una agencia";
+      snackbarText.value = labels.no_select_warehouse;
     } else {
       snackbar.value = true;
       snackbarColor.value = "error";
-      snackbarText.value = "Debe llenar correctamente los datos";
+      snackbarText.value = labels.no_fill_data;
     }
   } else {
     if (verifiedForm()) {
-      Submit_Payment()
+      created()
     }
   }
 }
 
 //---Submit Validation Update Detail
 async function submit_Update_Detail() {
-  const validate = await form.value.validate();
-  if (validate) {
+  const validate = await formUpdateDetail.value.validate();
+  if (validate.valid) {
     Update_Detail();
   }
 }
@@ -173,7 +175,7 @@ async function submit_Update_Detail() {
 async function Submit_Payment() {
   snackbar.value = false;
   const validate = await formAddPayment.value.validate();
-  if (validate) {
+  if (validate.valid) {
     if (payment.value.amount > payment.value.received_amount) {
       payment.value.received_amount = 0;
     } else if (payment.value.amount > GrandTotal.value) {
@@ -191,7 +193,7 @@ async function Submit_Customer() {
   if (!validate) {
     snackbar.value = true;
     snackbarColor.value = "error";
-    snackbarText.value = "Debe llenar correctamente los datos";
+    snackbarText.value = labels.no_fill_data;
   } else {
     Create_Client();
   }
@@ -201,7 +203,7 @@ async function Submit_Customer() {
 function Create_Client() {
   loading.value = true;
   axios
-      .post("clients", {
+      .post("/clients", {
         name: client.value.name,
         email: client.value.email,
         phone: client.value.phone,
@@ -213,14 +215,14 @@ function Create_Client() {
       .then(response => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Processo exitoso";
+        snackbarText.value = labels.success_message;
         Get_Client_Without_Paginate();
         dialogCustomer.value = false;
       })
       .catch(error => {
         snackbar.value = true;
         snackbarColor.value = "error";
-        snackbarText.value = "hubo un error";
+        snackbarText.value = labels.error_message;
         console.log(error)
       })
       .finally(() => {
@@ -305,7 +307,7 @@ function order_detail_id() {
 //---------------------- get_units ------------------------------\\
 function get_units(value) {
   axios
-      .get("get_units?id=" + value)
+      .get("/get_units?id=" + value)
       .then(({data}) => (units.value = data));
 }
 
@@ -408,7 +410,7 @@ function verifiedForm() {
   snackbar.value = false;
   if (details.value.length <= 0) {
     snackbar.value = true;
-    snackbarText.value = "debe adicionar un producto";
+    snackbarText.value = labels.no_add_product;
     snackbarColor.value = "warning";
     return false;
   } else {
@@ -416,14 +418,14 @@ function verifiedForm() {
     for (let i = 0; i < details.value.length; i++) {
       if (
           details.value[i].quantity == "" ||
-          details.value[i].quantity === 0
+          (details.value[i].quantity * 1) === 0
       ) {
         count += 1;
       }
     }
     if (count > 0) {
       snackbar.value = true;
-      snackbarText.value = "debe añadir cantidades";
+      snackbarText.value = labels.no_add_qty;
       snackbarColor.value = "warning";
       return false;
     } else {
@@ -483,7 +485,7 @@ function CreatePOS() {
       })
       .catch(error => {
         snackbar.value = true;
-        snackbarText.value = "hubo un error en la transaccion";
+        snackbarText.value = labels.error_message;
         snackbarColor.value = "error";
         console.log(error)
       })
@@ -550,7 +552,7 @@ function Verified_Qty(detail, id) {
       }
       if (detail.quantity > detail.current) {
         snackbar.value = true;
-        snackbarText.value = "stock bajo";
+        snackbarText.value = labels.low_qty;
         snackbarColor.value = "error";
         details.value[i].quantity = detail.current;
       } else {
@@ -568,7 +570,7 @@ function increment_qty_scanner(code) {
     if (details.value[i].code === code) {
       if (details.value[i].quantity + 1 > details.value[i].current) {
         snackbar.value = true;
-        snackbarText.value = "stock bajo";
+        snackbarText.value = labels.low_qty;
         snackbarColor.value = "error";
       } else {
         details.value[i].quantity++;
@@ -579,13 +581,13 @@ function increment_qty_scanner(code) {
 }
 
 //----------------------------------- Increment QTY ------------------------------\\
-function increment(detail_item,id) {
+function increment(detail_item, id) {
   snackbar.value = false;
   for (let i = 0; i < details.value.length; i++) {
     if (details.value[i].detail_id == id) {
       if (detail_item.quantity + 1 > detail_item.current) {
         snackbar.value = true;
-        snackbarText.value = "stock bajo";
+        snackbarText.value = labels.low_qty;
         snackbarColor.value = "error";
       } else {
         details.value[i].quantity++;
@@ -602,7 +604,7 @@ function decrement(detail_item, id) {
     if (details.value[i].detail_id == id) {
       if (detail_item.quantity - 1 > detail_item.current || detail_item.quantity - 1 < 1) {
         snackbar.value = true;
-        snackbarText.value = "stock bajo";
+        snackbarText.value = labels.low_qty;
         snackbarColor.value = "error";
       } else {
         details.value[i].quantity--;
@@ -742,7 +744,7 @@ function search() {
     }
   } else {
     snackbar.value = true;
-    snackbarText.value = "Seleccione una agencia";
+    snackbarText.value = labels.no_select_warehouse;
     snackbarColor.value = "warning";
   }
 }
@@ -802,8 +804,8 @@ function getProducts(page = 1) {
 }
 
 //-------------------- Created Function -----\\
+
 function created() {
-  // GetElementsPos();
   payment.value.amount = helper.formatNumber(GrandTotal.value, 2);
   payment.value.received_amount = helper.formatNumber(GrandTotal.value, 2);
   payment.value.Reglement = "cash";
@@ -841,7 +843,7 @@ function created() {
                       v-model="sale.client_id"
                       @update:search="querySelectionClient"
                       :items="clientFilter"
-                      label="Cliente"
+                      :label="labels.sale.client_id"
                       item-title="name"
                       item-value="id"
                       variant="outlined"
@@ -863,7 +865,7 @@ function created() {
                       v-model="sale.warehouse_id"
                       @update:search="Selected_Warehouse"
                       :items="warehouses"
-                      label="Agencia"
+                      :label="labels.sale.warehouse_id"
                       item-title="name"
                       item-value="id"
                       variant="outlined"
@@ -880,10 +882,10 @@ function created() {
                     <v-table density="compact" hover>
                       <thead>
                       <tr>
-                        <th>Producto</th>
-                        <th>Precio</th>
-                        <th class="text-center">Cantidad</th>
-                        <th class="text-center">SubTotal</th>
+                        <th>{{labels.sale.details.product}}</th>
+                        <th>{{ labels.sale.details.price }}</th>
+                        <th class="text-center">{{ labels.sale.details.qty }}</th>
+                        <th class="text-center">{{ labels.sale.details.sub_total }}</th>
                         <th class="text-center">
                           <v-icon icon="mdi-delete"></v-icon>
                         </th>
@@ -891,7 +893,7 @@ function created() {
                       </thead>
                       <tbody>
                       <tr v-if="details.length <= 0">
-                        <td colspan="5">No hay datos</td>
+                        <td colspan="5">{{ labels.no_data_table }}</td>
                       </tr>
                       <tr v-for="(detail_item, index) in details" :key="index">
                         <td>
@@ -916,17 +918,15 @@ function created() {
                               <v-icon
                                   color="secundary"
                                   @click="increment(detail_item,detail_item.detail_id)"
-                              >
-                                mdi-plus-box
-                              </v-icon>
+                                  icon="mdi-plus-box"
+                              ></v-icon>
                             </template>
                             <template v-slot:prepend>
                               <v-icon
                                   color="secundary"
                                   @click="decrement(detail_item, detail_item.detail_id ) "
-                              >
-                                mdi-minus-box
-                              </v-icon>
+                                  icon="mdi-minus-box"
+                              ></v-icon>
                             </template>
                           </v-text-field>
                         </td>
@@ -957,7 +957,7 @@ function created() {
                   <v-col cols="12">
                     <v-card color="secondary" variant="tonal">
                       <v-card-text class="text-center">
-                        <h2><strong>Total :</strong> {{currency}} {{ GrandTotal.toFixed(2) }}</h2>
+                        <h2><strong>Total :</strong> {{ currency }} {{ GrandTotal.toFixed(2) }}</h2>
                       </v-card-text>
                     </v-card>
 
@@ -1039,13 +1039,13 @@ function created() {
 
 
           <!-- Update Detail Product -->
-          <v-dialog max-width="600" v-model="dialogAddPayment">
+          <v-dialog max-width="600" v-model="dialogUpdateDetail">
             <v-card>
               <v-toolbar>
                 <v-toolbar-title :text="detail.name"></v-toolbar-title>
               </v-toolbar>
               <v-card-text>
-                <v-form @submit.prevent="submit_Update_Detail">
+                <v-form @submit.prevent="submit_Update_Detail" ref="formUpdateDetail">
                   <v-row>
                     <!-- Unit Price -->
                     <v-col lg="6" md="6" cols="12">
@@ -1203,8 +1203,7 @@ function created() {
               <v-col md="6" cols="12">
                 <v-btn block color="info">
                   <i class="i-Two-Windows"></i>
-                  <!--                          {{$t('ListofCategory')}}-->
-                  Lista de Categorias
+                  {{labels.list_category}}
                 </v-btn>
               </v-col>
               <!--              <v-col md="6">-->
@@ -1255,7 +1254,7 @@ function created() {
                             <p class="font-weight-bold text-h6">{{ item.raw.name }}</p>
                             <p class="text-medium-emphasis text-subtitle-2">COD: {{ item.raw.code }}</p>
 
-                            <v-chip color="primary" size="x-small" class="ma-1">{{currency}}
+                            <v-chip color="primary" size="x-small" class="ma-1">{{ currency }}
                               {{ helper.formatNumber(item.raw.Net_price, 2) }}
                             </v-chip>
                             <v-chip size="x-small" color="info" class="ma-1">
@@ -1468,188 +1467,185 @@ function created() {
       <!--          </button>-->
       <!--        </v-modal>-->
 
-      <!--        &lt;!&ndash; Modal Add Payment&ndash;&gt;-->
-      <!--        <validation-observer ref="Add_payment">-->
-      <!--          <v-modal hide-footer size="lg" id="Add_Payment" :title="$t('AddPayment')">-->
-      <!--            <v-form @submit.prevent="Submit_Payment">-->
-      <!--              <v-row>-->
-      <!--                <v-col md="6">-->
-      <!--                  <v-row>-->
-      <!--                    &lt;!&ndash; Received  Amount  &ndash;&gt;-->
-      <!--                    <v-col lg="12" md="12" sm="12">-->
-      <!--                      <validation-provider-->
-      <!--                          name="Received Amount"-->
-      <!--                          :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
-      <!--                          v-slot="validationContext"-->
-      <!--                      >-->
-      <!--                        <v-form-group :label="$t('Received_Amount') + ' ' + '*'">-->
-      <!--                          <v-form-input-->
-      <!--                              @keyup="Verified_Received_Amount(payment.received_amount)"-->
-      <!--                              label="Received_Amount"-->
-      <!--                              :placeholder="$t('Received_Amount')"-->
-      <!--                              v-model.number="payment.received_amount"-->
-      <!--                              :state="getValidationState(validationContext)"-->
-      <!--                              aria-describedby="Received_Amount-feedback"-->
-      <!--                          ></v-form-input>-->
-      <!--                          <v-form-invalid-feedback-->
-      <!--                              id="Received_Amount-feedback"-->
-      <!--                          >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-      <!--                        </v-form-group>-->
-      <!--                      </validation-provider>-->
-      <!--                    </v-col>-->
+      <!-- Modal Add Payment-->
+      <v-dialog v-model="dialogAddPayment" width="800">
+        <v-card>
+          <v-toolbar>
+            <v-toolbar-title>Agregar pago</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon="mdi-close" size="small" density="comfortable" variant="tonal" @click="dialogAddPayment=false"></v-btn>
+          </v-toolbar>
+          <v-card-text>
+                        <v-form @submit.prevent="Submit_Payment" ref="dialogAddPayment">
+                          <v-row>
+                            <v-col md="6" cols="12">
+                              <v-row>
+                                <!-- Received  Amount  -->
+                                <v-col cols="12">
+                                  <v-text-field
+                                      @keyup="Verified_Received_Amount(payment.received_amount)"
+                                      label="Monto Recibido"
+                                      v-model="payment.received_amount"
+                                      placeholder="Monto Recibido"
+                                      variant="outlined"
+                                      density="comfortable"
+                                      hide-details="auto"
+                                  >
+                                  </v-text-field>
+                                </v-col>
+                                <!-- Paying  Amount  -->
+                                <v-col cols="12">
+                                  <v-text-field
+                                      @keyup="Verified_paidAmount(payment.amount)"
+                                      label="Monto Pagado"
+                                      v-model="payment.amount"
+                                      placeholder="Monto Pagado"
+                                      variant="outlined"
+                                      density="comfortable"
+                                      hide-details="auto"
+                                  >
+                                  </v-text-field>
+                                </v-col>
+                                <!-- change  Amount  -->
+                                <v-col cols="12">
+                                  <label>Cambio :</label>
+                                  <p class="text-disabled" >
+                                    {{parseFloat(payment.received_amount - payment.amount).toFixed(2)}}
+                                  </p>
+                                </v-col>
 
-      <!--                    &lt;!&ndash; Paying  Amount  &ndash;&gt;-->
-      <!--                    <v-col lg="12" md="12" sm="12">-->
-      <!--                      <validation-provider-->
-      <!--                          name="Paying Amount"-->
-      <!--                          :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
-      <!--                          v-slot="validationContext"-->
-      <!--                      >-->
-      <!--                        <v-form-group :label="$t('Paying_Amount') + ' ' + '*'">-->
-      <!--                          <v-form-input-->
-      <!--                              label="Paying_Amount"-->
-      <!--                              @keyup="Verified_paidAmount(payment.amount)"-->
-      <!--                              :placeholder="$t('Paying_Amount')"-->
-      <!--                              v-model.number="payment.amount"-->
-      <!--                              :state="getValidationState(validationContext)"-->
-      <!--                              aria-describedby="Paying_Amount-feedback"-->
-      <!--                          ></v-form-input>-->
-      <!--                          <v-form-invalid-feedback-->
-      <!--                              id="Paying_Amount-feedback"-->
-      <!--                          >{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-      <!--                        </v-form-group>-->
-      <!--                      </validation-provider>-->
-      <!--                    </v-col>-->
+                                <!-- Payment choice -->
+                                <v-col cols="12">
+                                  <v-select
+                                      v-model="payment.Reglement"
+                                      :items="helper.reglamentPayment()"
+                                      :rules="helper.required"
+                                      :label="labels.payment.role"
+                                      item-title="title"
+                                      item-value="value"
+                                      variant="outlined"
+                                      density="comfortable"
+                                      hide-details="auto"
+                                  ></v-select>
+            <!--                      <validation-provider name="Payment choice" :rules="{ required: true}">-->
+            <!--                        <v-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice') + ' ' + '*'">-->
+            <!--                          <v-select-->
+            <!--                              :class="{'is-invalid': !!errors.length}"-->
+            <!--                              :state="errors[0] ? false : (valid ? true : null)"-->
+            <!--                              v-model="payment.Reglement"-->
+            <!--                              @input="Selected_PaymentMethod"-->
+            <!--                              :reduce="label => label.value"-->
+            <!--                              :placeholder="$t('PleaseSelect')"-->
+            <!--                              :options="-->
+            <!--                              [-->
+            <!--                              {label: 'Cash', value: 'Cash'},-->
+            <!--                              {label: 'credit card', value: 'credit card'},-->
+            <!--                              {label: 'TPE', value: 'tpe'},-->
+            <!--                              {label: 'cheque', value: 'cheque'},-->
+            <!--                              {label: 'Western Union', value: 'Western Union'},-->
+            <!--                              {label: 'bank transfer', value: 'bank transfer'},-->
+            <!--                              {label: 'other', value: 'other'},-->
+            <!--                              ]"-->
+            <!--                          ></v-select>-->
+            <!--                          <v-form-invalid-feedback>{{ errors[0] }}</v-form-invalid-feedback>-->
+            <!--                        </v-form-group>-->
+            <!--                      </validation-provider>-->
+            <!--                    </v-col>-->
 
-      <!--                    &lt;!&ndash; change  Amount  &ndash;&gt;-->
-      <!--                    <v-col lg="12" md="12" sm="12">-->
-      <!--                      <label>{{$t('Change')}} :</label>-->
-      <!--                      <p-->
-      <!--                          class="change_amount"-->
-      <!--                      >{{parseFloat(payment.received_amount - payment.amount).toFixed(2)}}</p>-->
-      <!--                    </v-col>-->
+            <!--                    <v-col md="12" v-if="payment.Reglement == 'credit card'">-->
+            <!--                      <form id="payment-form">-->
+            <!--                        <label-->
+            <!--                            for="card-element"-->
+            <!--                            class="leading-7 text-sm text-gray-600"-->
+            <!--                        >{{$t('Credit_Card_Info')}}</label>-->
+            <!--                        <div id="card-element">-->
+            <!--                          &lt;!&ndash; Elements will create input elements here &ndash;&gt;-->
+            <!--                        </div>-->
+            <!--                        &lt;!&ndash; We'll put the error messages in this element &ndash;&gt;-->
+            <!--                        <div id="card-errors" class="is-invalid" role="alert"></div>-->
+            <!--                      </form>-->
+            <!--                    </v-col>-->
 
-      <!--                    &lt;!&ndash; Payment choice &ndash;&gt;-->
-      <!--                    <v-col lg="12" md="12" sm="12">-->
-      <!--                      <validation-provider name="Payment choice" :rules="{ required: true}">-->
-      <!--                        <v-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice') + ' ' + '*'">-->
-      <!--                          <v-select-->
-      <!--                              :class="{'is-invalid': !!errors.length}"-->
-      <!--                              :state="errors[0] ? false : (valid ? true : null)"-->
-      <!--                              v-model="payment.Reglement"-->
-      <!--                              @input="Selected_PaymentMethod"-->
-      <!--                              :reduce="label => label.value"-->
-      <!--                              :placeholder="$t('PleaseSelect')"-->
-      <!--                              :options="-->
-      <!--                              [-->
-      <!--                              {label: 'Cash', value: 'Cash'},-->
-      <!--                              {label: 'credit card', value: 'credit card'},-->
-      <!--                              {label: 'TPE', value: 'tpe'},-->
-      <!--                              {label: 'cheque', value: 'cheque'},-->
-      <!--                              {label: 'Western Union', value: 'Western Union'},-->
-      <!--                              {label: 'bank transfer', value: 'bank transfer'},-->
-      <!--                              {label: 'other', value: 'other'},-->
-      <!--                              ]"-->
-      <!--                          ></v-select>-->
-      <!--                          <v-form-invalid-feedback>{{ errors[0] }}</v-form-invalid-feedback>-->
-      <!--                        </v-form-group>-->
-      <!--                      </validation-provider>-->
-      <!--                    </v-col>-->
+            <!--                    &lt;!&ndash; payment Note &ndash;&gt;-->
+            <!--                    <v-col lg="12" md="12" sm="12" class="mt-2">-->
+            <!--                      <v-form-group :label="$t('Payment_note')">-->
+            <!--                        <v-form-textarea-->
+            <!--                            id="textarea"-->
+            <!--                            v-model="payment.notes"-->
+            <!--                            rows="3"-->
+            <!--                            max-rows="6"-->
+            <!--                        ></v-form-textarea>-->
+            <!--                      </v-form-group>-->
+            <!--                    </v-col>-->
 
-      <!--                    <v-col md="12" v-if="payment.Reglement == 'credit card'">-->
-      <!--                      <form id="payment-form">-->
-      <!--                        <label-->
-      <!--                            for="card-element"-->
-      <!--                            class="leading-7 text-sm text-gray-600"-->
-      <!--                        >{{$t('Credit_Card_Info')}}</label>-->
-      <!--                        <div id="card-element">-->
-      <!--                          &lt;!&ndash; Elements will create input elements here &ndash;&gt;-->
-      <!--                        </div>-->
-      <!--                        &lt;!&ndash; We'll put the error messages in this element &ndash;&gt;-->
-      <!--                        <div id="card-errors" class="is-invalid" role="alert"></div>-->
-      <!--                      </form>-->
-      <!--                    </v-col>-->
+            <!--                    &lt;!&ndash; sale Note &ndash;&gt;-->
+            <!--                    <v-col lg="12" md="12" sm="12" class="mt-2">-->
+            <!--                      <v-form-group :label="$t('sale_note')">-->
+            <!--                        <v-form-textarea-->
+            <!--                            id="textarea"-->
+            <!--                            v-model="sale.notes"-->
+            <!--                            rows="3"-->
+            <!--                            max-rows="6"-->
+            <!--                        ></v-form-textarea>-->
+            <!--                      </v-form-group>-->
+                                </v-col>
 
-      <!--                    &lt;!&ndash; payment Note &ndash;&gt;-->
-      <!--                    <v-col lg="12" md="12" sm="12" class="mt-2">-->
-      <!--                      <v-form-group :label="$t('Payment_note')">-->
-      <!--                        <v-form-textarea-->
-      <!--                            id="textarea"-->
-      <!--                            v-model="payment.notes"-->
-      <!--                            rows="3"-->
-      <!--                            max-rows="6"-->
-      <!--                        ></v-form-textarea>-->
-      <!--                      </v-form-group>-->
-      <!--                    </v-col>-->
+                              </v-row>
+                            </v-col>
 
-      <!--                    &lt;!&ndash; sale Note &ndash;&gt;-->
-      <!--                    <v-col lg="12" md="12" sm="12" class="mt-2">-->
-      <!--                      <v-form-group :label="$t('sale_note')">-->
-      <!--                        <v-form-textarea-->
-      <!--                            id="textarea"-->
-      <!--                            v-model="sale.notes"-->
-      <!--                            rows="3"-->
-      <!--                            max-rows="6"-->
-      <!--                        ></v-form-textarea>-->
-      <!--                      </v-form-group>-->
-      <!--                    </v-col>-->
+                            <v-col md="6">
+            <!--                  <v-card>-->
+            <!--                    <v-list-group>-->
+            <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
+            <!--                        {{$t('TotalProducts')}}-->
+            <!--                        <v-badge variant="primary" pill>{{details.length}}</v-badge>-->
+            <!--                      </v-list-group-item>-->
 
+            <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
+            <!--                        {{$t('OrderTax')}}-->
+            <!--                        <span-->
+            <!--                            class="font-weight-bold"-->
+            <!--                        >{{currency}} {{sale.TaxNet.toFixed(2)}} ({{sale.tax_rate}} %)</span>-->
+            <!--                      </v-list-group-item>-->
+            <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
+            <!--                        {{$t('Discount')}}-->
+            <!--                        <span-->
+            <!--                            class="font-weight-bold"-->
+            <!--                        >{{currency}} {{sale.discount.toFixed(2)}}</span>-->
+            <!--                      </v-list-group-item>-->
 
-      <!--                  </v-row>-->
-      <!--                </v-col>-->
+            <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
+            <!--                        {{$t('Shipping')}}-->
+            <!--                        <span-->
+            <!--                            class="font-weight-bold"-->
+            <!--                        >{{currency}} {{sale.shipping.toFixed(2)}}</span>-->
+            <!--                      </v-list-group-item>-->
 
-      <!--                <v-col md="6">-->
-      <!--                  <v-card>-->
-      <!--                    <v-list-group>-->
-      <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
-      <!--                        {{$t('TotalProducts')}}-->
-      <!--                        <v-badge variant="primary" pill>{{details.length}}</v-badge>-->
-      <!--                      </v-list-group-item>-->
+            <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
+            <!--                        {{$t('Total_Payable')}}-->
+            <!--                        <span-->
+            <!--                            class="font-weight-bold"-->
+            <!--                        >{{currency}} {{GrandTotal.toFixed(2)}}</span>-->
+            <!--                      </v-list-group-item>-->
+            <!--                    </v-list-group>-->
+            <!--                  </v-card>-->
+            <!--                </v-col>-->
 
-      <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
-      <!--                        {{$t('OrderTax')}}-->
-      <!--                        <span-->
-      <!--                            class="font-weight-bold"-->
-      <!--                        >{{currency}} {{sale.TaxNet.toFixed(2)}} ({{sale.tax_rate}} %)</span>-->
-      <!--                      </v-list-group-item>-->
-      <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
-      <!--                        {{$t('Discount')}}-->
-      <!--                        <span-->
-      <!--                            class="font-weight-bold"-->
-      <!--                        >{{currency}} {{sale.discount.toFixed(2)}}</span>-->
-      <!--                      </v-list-group-item>-->
-
-      <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
-      <!--                        {{$t('Shipping')}}-->
-      <!--                        <span-->
-      <!--                            class="font-weight-bold"-->
-      <!--                        >{{currency}} {{sale.shipping.toFixed(2)}}</span>-->
-      <!--                      </v-list-group-item>-->
-
-      <!--                      <v-list-group-item class="d-flex justify-content-between align-items-center">-->
-      <!--                        {{$t('Total_Payable')}}-->
-      <!--                        <span-->
-      <!--                            class="font-weight-bold"-->
-      <!--                        >{{currency}} {{GrandTotal.toFixed(2)}}</span>-->
-      <!--                      </v-list-group-item>-->
-      <!--                    </v-list-group>-->
-      <!--                  </v-card>-->
-      <!--                </v-col>-->
-
-      <!--                <v-col md="12" class="mt-3">-->
-      <!--                  <v-button-->
-      <!--                      variant="primary"-->
-      <!--                      type="submit"-->
-      <!--                      :disabled="paymentProcessing"-->
-      <!--                  >{{$t('submit')}}</v-button>-->
-      <!--                  <div v-once class="typo__p" v-if="paymentProcessing">-->
-      <!--                    <div class="spinner sm spinner-primary mt-3"></div>-->
-      <!--                  </div>-->
-      <!--                </v-col>-->
-      <!--              </v-row>-->
-      <!--            </v-form>-->
-      <!--          </v-modal>-->
-      <!--        </validation-observer>-->
+            <!--                <v-col md="12" class="mt-3">-->
+            <!--                  <v-button-->
+            <!--                      variant="primary"-->
+            <!--                      type="submit"-->
+            <!--                      :disabled="paymentProcessing"-->
+            <!--                  >{{$t('submit')}}</v-button>-->
+            <!--                  <div v-once class="typo__p" v-if="paymentProcessing">-->
+            <!--                    <div class="spinner sm spinner-primary mt-3"></div>-->
+            <!--                  </div>-->
+                            </v-col>
+                          </v-row>
+                        </v-form>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
 
       <!--        <validation-observer ref="Create_Customer">-->
       <!--          <v-modal hide-footer size="lg" id="New_Customer" :title="$t('Add')">-->

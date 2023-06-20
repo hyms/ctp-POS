@@ -88,7 +88,7 @@ async function Submit_Product() {
 //---------------------- Get Sub Units with Unit id ------------------------------\\
 function Get_Units_SubBase(value) {
     axios
-        .get("/products/get_sub_units_by_base?id=" + value)
+        .get("/get_sub_units_by_base?id=" + value)
         .then(({ data }) => {
             units_sub.value = data;
         });

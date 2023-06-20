@@ -6,6 +6,7 @@ import ExportBtn from "@/Components/ExportBtn.vue";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
 import {router} from "@inertiajs/vue3";
 import helper from "@/helpers";
+import labels from "@/labels";
 import Filter_form from "@/Pages/Sales/filter_form.vue";
 import InvoiceDialog from "@/Components/InvoiceDialog.vue";
 
@@ -82,14 +83,7 @@ const invoice_pos = ref({
 const payments = ref([]);
 const payments_pos = ref([]);
 const payment = ref({});
-const paymentLabel = ref({
-  date: "Fecha",
-  Ref: "Codigo",
-  montant: "A Pagar",
-  received_amount: "Deuda",
-  Reglement: "Forma de pago",
-  notes: "Detalle",
-});
+
 const Sale_id = ref("");
 const sale = ref({});
 
@@ -496,7 +490,7 @@ function Remove_Sale(id, sale_has_return) {
     <delete-dialog
         :model="dialogDeletePayment"
         :on-save="Remove_Payment"
-        :on-close="()=>{dialogDeletePayment=false}"
+        :on-close="()=>{dialogDeletePayment.value=false}"
     ></delete-dialog>
     <!-- Modal Show Payments-->
     <v-dialog v-model="dialogShowPayment" width="800">
@@ -611,7 +605,7 @@ function Remove_Sale(id, sale_has_return) {
                     v-model="payment.Reglement"
                     :items="helper.reglamentPayment()"
                     :rules="helper.required"
-                    :label="paymentLabel.role"
+                    :label="labels.payment.role"
                     item-title="title"
                     item-value="value"
                     variant="outlined"

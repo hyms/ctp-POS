@@ -89,16 +89,14 @@ Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
     //------------------------------------------------------------------\\
 
     //------------------------------- PRODUCTS --------------------------\\
-    Route::prefix('product')->group(function () {
-        Route::get('/create', [ProductsController::class, 'create']);
-        Route::get('/{id}', [ProductsController::class, 'show']);
-        Route::get('/edit/{id}', [ProductsController::class, 'edit']);
-        Route::get('/list', [ProductsController::class, 'index']);
-        Route::post('/', [ProductsController::class, 'store']);
-        Route::put('/{id}', [ProductsController::class, 'update']);
-        Route::delete('/{id}', [ProductsController::class, 'destroy']);
-        Route::post('/import/csv', [ProductsController::class, 'import_products']);
-    });
+    Route::get('products/create', [ProductsController::class, 'create']);
+    Route::get('product/{id}', [ProductsController::class, 'show']);
+    Route::get('products/edit/{id}', [ProductsController::class, 'edit']);
+    Route::get('products/list', [ProductsController::class, 'index']);
+    Route::post('products', [ProductsController::class, 'store']);
+    Route::put('products/{id}', [ProductsController::class, 'update']);
+    Route::delete('products/{id}', [ProductsController::class, 'destroy']);
+    Route::post('products/import/csv', [ProductsController::class, 'import_products']);
     Route::get('get_Products_by_warehouse/{id}', [ProductsController::class, 'Products_by_Warehouse']);
     Route::get('products/detail/{id}', [ProductsController::class, 'Get_Products_Details']);
     Route::get('get_products_stock_alerts', [ProductsController::class, 'Products_Alert']);
