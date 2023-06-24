@@ -9,6 +9,7 @@ use App\Models\product_warehouse;
 use App\Models\ProductVariant;
 use App\Models\Sale;
 use App\Models\SaleDetail;
+use App\Models\SalesType;
 use App\Models\Setting;
 use App\Models\Unit;
 use App\Models\UserWarehouse;
@@ -44,13 +45,15 @@ class PosController extends Controller
 
             $order->is_pos = 1;
             $order->date = Carbon::now();
-            $order->Ref = app('App\Http\Controllers\SalesController')->getNumberOrder();
+            $order->sales_type_id = $request->sales_type;
+            $order->Ref = app(SalesController::class)->getNumberOrder($request->sales_type);
             $order->client_id = $request->client_id;
             $order->warehouse_id = $request->warehouse_id;
             $order->tax_rate = $request->tax_rate;
             $order->TaxNet = $request->TaxNet;
             $order->discount = $request->discount;
             $order->shipping = $request->shipping;
+            $order->shipping_status = "";
             $order->GrandTotal = $request->GrandTotal;
             $order->notes = $request->notes;
             $order->statut = 'completed';
@@ -79,7 +82,6 @@ class PosController extends Controller
                     'tax_method' => $value['tax_method'],
                     'discount' => $value['discount'],
                     'discount_method' => $value['discount_Method'],
-                    'imei_number' => $value['imei_number'],
                 ]);
 
                 if ($value['product_variant_id'] !== null) {
@@ -297,12 +299,14 @@ class PosController extends Controller
             }
         }
         $categories = Category::where('deleted_at', '=', null)->get(['id', 'name']);
+        $sales_types = SalesType::where('deleted_at', '=', null)->get(['id', 'name']);
 
         Inertia::share('titlePage', 'POS');
         return Inertia::render('Pos', [
             'defaultWarehouse' => $defaultWarehouse,
             'defaultClient' => $defaultClient,
             'clients' => $clients,
+            'sales_types' => $sales_types,
             'warehouses' => $warehouses,
             'categories' => $categories,
         ]);

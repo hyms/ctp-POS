@@ -505,6 +505,7 @@ function Update_Sale() {
     let id = props.sale.id;
     axios
         .put(`/sales/${id}`, {
+          sales_type: saleForm.value.sales_type_id,
           date: saleForm.value.date,
           client_id: saleForm.value.client_id,
           GrandTotal: GrandTotal.value,

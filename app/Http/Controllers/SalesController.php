@@ -249,7 +249,7 @@ class SalesController extends Controller
 
                         PaymentSale::create([
                             'sale_id' => $order->id,
-                            'Ref' => app('App\Http\Controllers\PaymentSalesController')->getNumberOrder(),
+                            'Ref' => app(PaymentSalesController::class)->getNumberOrder(),
                             'date' => Carbon::now(),
                             'Reglement' => $request->payment['Reglement'],
                             'montant' => $request['amount'],
