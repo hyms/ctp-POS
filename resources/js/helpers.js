@@ -49,6 +49,25 @@ const print_pos = (element_id) => {
         a.print();
     }, 1000);
 }
+//------------------------------Get Month -------------------------\\
+const GetMonth=()=> {
+    let months = [
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre"
+    ];
+    const now = new Date();
+    return months[now.getMonth()];
+}
 const linkVisit = (url, type = "get") => {
     router.visit(url, {
         method: type,
@@ -151,5 +170,6 @@ export default {
     },
     print_pos,
     toggleFullScreen,
-    linkVisit
+    linkVisit,
+    GetMonth,
 };

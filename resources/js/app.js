@@ -10,6 +10,8 @@ import * as labs from "vuetify/labs/components";
 import { es } from "vuetify/locale";
 import moment from "moment";
 
+
+
 import "@/../css/main.scss";
 
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
@@ -52,6 +54,8 @@ const vuetify = createVuetify({
         },
     },
 });
+
+
 
 createInertiaApp({
     resolve: (name) =>

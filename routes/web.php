@@ -42,7 +42,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/upgrade', [UpgradeController::class, 'index'])->name('upgrade');
 Route::post('/upgrade', [UpgradeController::class, 'upgrade'])->name('upgrade');
 
-Route::get('/', [DashboardController::class, 'index']
+Route::get('/', [DashboardController::class, 'dashboard_data']
 )->middleware(['auth', 'verified'])->name('dashboard');
 
 require __DIR__ . '/auth.php';

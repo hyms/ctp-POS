@@ -51,4 +51,8 @@ export default {
     add_pay:"Agregar pago",
     total_products:"Total de productos",
     submit:"Guardar",
+    filter_by_warehouse:"Filtrar por agencia",
+    choose_warehouse:"Elija una agencia",
+    // this_week_sales_purchases:"Ventas y compras de la semana",
+    this_week_sales_purchases:"Ventas de la semana",
 }
