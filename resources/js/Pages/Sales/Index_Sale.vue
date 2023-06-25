@@ -738,55 +738,17 @@ function Remove_Sale(id, sale_has_return) {
       >
         <template v-slot:item.statut="{ item }">
           <v-chip
-              color="primary"
+              :color="helper.statutSaleColor(item.raw.statut)"
               variant="tonal"
               size="x-small"
-              v-if="item.raw.statut == 'completed'"
-          >Completado
-          </v-chip
-          >
-          <v-chip
-              color="secondary"
-              variant="tonal"
-              size="x-small"
-              v-else-if="item.raw.statut == 'pending'"
-          >Pendiente
-          </v-chip
-          >
-          <v-chip
-              color="info"
-              variant="tonal"
-              size="x-small"
-              v-else-if="item.raw.statut == 'ordered'"
-          >Ordenado
-          </v-chip
-          >
+          >{{helper.statutSale(item.raw.statut)}}</v-chip>
         </template>
         <template v-slot:item.payment_status="{ item }">
           <v-chip
-              color="success"
+              :color="helper.statusPaymentColor(item.raw.payment_status)"
               variant="tonal"
               size="x-small"
-              v-if="item.raw.payment_status == 'paid'"
-          >Pagado
-          </v-chip
-          >
-          <v-chip
-              color="warning"
-              variant="tonal"
-              size="x-small"
-              v-else-if="item.raw.payment_status == 'partial'"
-          >Parcial
-          </v-chip
-          >
-          <v-chip
-              color="error"
-              variant="tonal"
-              size="x-small"
-              v-else-if="item.raw.payment_status == 'unpaid'"
-          >Deuda
-          </v-chip
-          >
+          >{{helper.statusPayment(item.raw.payment_status)}}</v-chip>
         </template>
         <template v-slot:item.Ref="{ item }">
           <v-btn

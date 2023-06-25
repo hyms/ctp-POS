@@ -1,9 +1,9 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import helper from "@/helpers";
 import labels from "@/labels";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import VChart from 'vue-echarts'
 
 import {use} from "echarts/core";
@@ -15,7 +15,7 @@ import {use} from "echarts/core";
 // import "echarts/lib/component/legend";
 import {CanvasRenderer} from "echarts/renderers";
 import {BarChart, PieChart, LineChart} from 'echarts/charts'
-import {LegendComponent, TooltipComponent} from 'echarts/components'
+import {LegendComponent, TooltipComponent, GridComponent} from 'echarts/components'
 
 use([
   BarChart,
@@ -23,6 +23,7 @@ use([
   LineChart,
   LegendComponent,
   TooltipComponent,
+  GridComponent,
   CanvasRenderer
 ]);
 
@@ -54,11 +55,31 @@ const echartProduct = ref({});
 const echartCustomer = ref({});
 const echartPayment = ref({});
 
+const columns_sales = ref([
+  {title: labels.sale.Ref, key: "Ref"},
+  {title: labels.sale.client_id, key: "client_name"},
+  {title: labels.sale.warehouse_id, key: "warehouse_name"},
+  {title: labels.sale.statut, key: "statut"},
+  {title: labels.sale.GrandTotal, key: "GrandTotal"},
+  {title: labels.sale.paid_amount, key: "paid_amount"},
+  {title: labels.sale.due, key: "due"},
+  {title: labels.sale.payment_status, key: "payment_status"},
+]);
+const columns_stock = ref([
+  {title: labels.product_code, key: "code"},
+  {title: labels.product_name, key: "name"},
+  {title: labels.warehouse, key: "warehouse"},
+  {title: labels.quantity, key: "quantity"},
+  {title: labels.alert_quantity, key: "stock_alert"},
+]);
+const columns_products = ref([
+  {title: labels.product_name, key: "name"},
+  {title: labels.total_sales, key: "total_sales"},
+  {title: labels.total_amount, key: "total"},
+]);
+
 //---------------------- Event Select Warehouse ------------------------------\\
 function Selected_Warehouse(value) {
-  // if (value === null) {
-  //   warehouse_id.value = "";
-  // }
   // warehouse_id.value = value;
   // all_dashboard_data();
   router.get("/", {warehouse_id: value}, {
@@ -79,12 +100,12 @@ function all_dashboard_data() {
   loading.value = true;
 
   router.on("success", (event) => {
-    // console.log(event.detail.page.url);
     let url = event.detail.page.url.split('?');
-    let url_query = url[1].split('=');
-    console.log(url_query);
-    if (url_query.length > 1) {
-      warehouse_id.value = props.warehouses.find(value => value.id == url_query[1] && url_query[1] != "");
+    if (url.length > 1) {
+      let url_query = url[1].split('=');
+      if (url_query.length > 1) {
+        warehouse_id.value = props.warehouses.find(value => value.id == url_query[1] && url_query[1] != "");
+      }
     }
   });
   setTimeout(() => {
@@ -95,14 +116,14 @@ function all_dashboard_data() {
     const dark_heading = "#c2c6dc";
 
     echartCustomer.value = {
-      color: ["#6D28D9", "#8B5CF6", "#A78BFA", "#C4B5FD", "#7C3AED"],
+      color: ["#3c858d", "#05828e", "#588d93", "#8fa8ab", "#0E3B42"],
       tooltip: {
         show: true,
         backgroundColor: "rgba(0, 0, 0, .8)"
       },
 
       formatter: function (params) {
-        return `${params.name}: (${params.data.value} sales) (${
+        return `${params.name}: (${params.data.value} ${labels.sales}) (${
             params.percent
         }%)`;
       },
@@ -164,18 +185,19 @@ function all_dashboard_data() {
     //     }
     //   ]
     // };
+
     echartProduct.value = {
-      color: ["#6D28D9", "#8B5CF6", "#A78BFA", "#C4B5FD", "#7C3AED"],
+      color: ["#3c858d", "#05828e", "#588d93", "#8fa8ab", "#0E3B42"],
       tooltip: {
         show: true,
         backgroundColor: "rgba(0, 0, 0, .8)"
       },
       formatter: function (params) {
-        return `${params.name}: (${params.value}sales)`;
+        return `${params.name}: (${params.value} ${labels.sales})`;
       },
       series: [
         {
-          name: "Top Selling Products",
+          name: labels.top_selling_products,
           type: "pie",
           radius: "50%",
           center: "50%",
@@ -197,7 +219,7 @@ function all_dashboard_data() {
         orient: "horizontal",
         x: "right",
         // data: ["Sales", "Purchases"]
-        data: ["Sales"]
+        data: [labels.sales]
       },
       grid: {
         left: "8px",
@@ -240,7 +262,7 @@ function all_dashboard_data() {
           type: "value",
 
           axisLabel: {
-            color: dark_heading
+            color: dark_heading,
             // formatter: "${value}"
           },
           axisLine: {
@@ -261,11 +283,11 @@ function all_dashboard_data() {
 
       series: [
         {
-          name: "Sales",
+          name: labels.sales,
           data: props.sales_report.original.data,
-          label: {show: false, color: "#8B5CF6"},
+          label: {show: true, color: "#5e8592"},
           type: "bar",
-          color: "#A78BFA",
+          color: "#3c858d",
           smooth: true,
           itemStyle: {
             emphasis: {
@@ -304,8 +326,24 @@ function all_dashboard_data() {
 
 onMounted(() => {
   all_dashboard_data();
+  CurrentMonth.value=helper.GetMonth();
 })
+const roles = computed(() => usePage().props.rolesP);
+const user = computed(() => usePage().props.user);
 
+function getPermission(role) {
+  // console.log(user.value);
+  for (const key in roles.value) {
+    for (const [key, item] of Object.entries(roles.value)) {
+      if (key === role) {
+        if (item.includes(user.value.role)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
 </script>
 
 <template>
@@ -318,7 +356,7 @@ onMounted(() => {
     <!--                    <v-card-subtitle></v-card-subtitle>-->
     <!--                </v-card>-->
     <!-- warehouse -->
-    <v-row>
+    <v-row v-if="getPermission('admin')">
       <v-col sm="4" cols="12">
         <v-select
             @update:modelValue="Selected_Warehouse"
@@ -334,27 +372,100 @@ onMounted(() => {
         ></v-select>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row v-if="getPermission('admin')">
       <v-col md="8" cols="12">
-        <v-card class="mb-30" :loading="loading">
-          <v-card-item>
-            <h4 class="card-title m-0">{{ labels.this_week_sales_purchases }}</h4>
+        <v-card density="comfortable" :loading="loading">
+          <v-card-title>
+            {{ labels.this_week_sales_purchases }}
+          </v-card-title>
+          <v-card-text>
             <div class="chart-wrapper">
-              <v-chart v-if="!loading" :options="echartSales" :autoresize="true"></v-chart>
+              <v-chart v-if="!loading" :option="echartSales" :autoresize="true"></v-chart>
             </div>
-          </v-card-item>
+          </v-card-text>
         </v-card>
       </v-col>
       <v-col md="4" cols="12">
-        <!--        <b-card class="mb-30">-->
-        <!--          <h4 class="card-title m-0">{{$t('Top_Selling_Products')}} ({{new Date().getFullYear()}})</h4>-->
-        <!--          <div class="chart-wrapper">-->
-        <!--            <div v-once class="typo__p text-right" v-if="loading">-->
-        <!--              <div class="spinner sm spinner-primary mt-3"></div>-->
-        <!--            </div>-->
-        <!--            <v-chart v-if="!loading" :options="echartProduct" :autoresize="true"></v-chart>-->
-        <!--          </div>-->
-        <!--        </b-card>-->
+        <v-card density="comfortable" :loading="loading">
+          <v-card-title>
+            {{ labels.top_customers }} ({{CurrentMonth}})
+          </v-card-title>
+          <v-card-text>
+            <div class="chart-wrapper">
+<!--              <v-chart v-if="!loading" :option="echartProduct" :autoresize="true"></v-chart>-->
+              <v-chart v-if="!loading" :option="echartCustomer" :autoresize="true"></v-chart>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row v-if="getPermission('admin')">
+      <!-- Stock Alert -->
+      <v-col cols="12" md="8">
+        <v-card density="comfortable" :loading="loading">
+          <v-card-title>
+            {{ labels.stock_alert }}
+          </v-card-title>
+          <v-data-table :headers="columns_stock"
+                        :items="stock_alerts"
+                        hover
+                        density="compact"
+                        :no-data-text="labels.no_data_table">
+            <template v-slot:item.stock_alert="{ item }">
+              <v-chip
+                  color="error"
+                  variant="tonal"
+                  size="small"
+              >{{ item.raw.stock_alert }}
+              </v-chip>
+            </template>
+          </v-data-table>
+        </v-card>
+      </v-col>
+
+      <v-col cols="12" md="4">
+        <v-card density="comfortable" :loading="loading">
+          <v-card-title>
+            {{labels.top_selling_products}} ({{CurrentMonth}})
+          </v-card-title>
+          <v-data-table :headers="columns_products"
+                        :items="products"
+                        hover
+                        density="compact"
+                        :no-data-text="labels.no_data_table">
+          </v-data-table>
+        </v-card>
+      </v-col>
+    </v-row>
+    <!-- Last Sales -->
+    <v-row >
+      <v-col cols="12">
+        <v-card>
+          <v-card-title>
+            {{labels.recent_sales}}
+          </v-card-title>
+          <v-data-table :headers="columns_sales"
+                        :items="sales"
+                        hover
+                        density="compact"
+                        :no-data-text="labels.no_data_table">
+            <template v-slot:item.statut="{ item }">
+              <v-chip
+                  :color="helper.statutSaleColor(item.raw.statut)"
+                  variant="tonal"
+                  size="x-small"
+              >{{helper.statutSale(item.raw.statut)}}</v-chip>
+            </template>
+            <template v-slot:item.payment_status="{ item }">
+              <v-chip
+                  :color="helper.statusPaymentColor(item.raw.payment_status)"
+                  variant="tonal"
+                  size="x-small"
+              >{{helper.statusPayment(item.raw.payment_status)}}</v-chip>
+            </template>
+          </v-data-table>
+        </v-card>
+
       </v-col>
     </v-row>
   </Layout>

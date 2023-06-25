@@ -1,16 +1,11 @@
 <script setup>
 import {router, usePage} from "@inertiajs/vue3";
 import {computed, ref} from "vue";
+import helpers from "@/helpers";
 
 const roles = computed(() => usePage().props.rolesP);
 const user = computed(() => usePage().props.user);
 
-function linkVisit(url, type = "get") {
-  router.visit(url, {
-    method: type,
-    preserveState: true,
-  });
-}
 </script>
 
 <template>

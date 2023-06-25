@@ -28,6 +28,9 @@ export default {
             sub_total: "SubTotal",
         },
         notes:"Notas de Venta",
+        statut:"Estado",
+        due:"Deuda",
+        payment_status:"Estado de pago",
     },
 
     //no data
@@ -55,4 +58,17 @@ export default {
     choose_warehouse:"Elija una agencia",
     // this_week_sales_purchases:"Ventas y compras de la semana",
     this_week_sales_purchases:"Ventas de la semana",
+    top_selling_products:"Productos más vendidos",
+    top_customers:"Top 5 mejores clientes",
+    stock_alert:"Alerta de stock",
+    sales:"Ventas",
+    product_code:"Código de producto",
+    product_name:"Nombre de producto",
+    warehouse:"Agencia",
+    quantity:"Cantidad",
+    alert_quantity:"Alerta de Cantidad",
+    total_sales:"Ventas totales",
+    total_amount:"monto",
+    recent_sales:"Ventas Recientes",
+
 }
