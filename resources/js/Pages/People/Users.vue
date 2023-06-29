@@ -5,6 +5,7 @@ import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
 
 import helper from "@/helpers";
+import labels from "@/labels";
 import {router} from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -18,8 +19,6 @@ const props = defineProps({
 const form = ref(null);
 const search = ref("");
 const loading = ref(false);
-const alertType = ref("info");
-const alertText = ref("");
 const alert = ref(false);
 const snackbar = ref(false);
 const snackbarText = ref("");
@@ -57,26 +56,14 @@ const user = ref({
   is_all_warehouses: 1,
 });
 const assigned_warehouses = ref([]);
-const userLabels = ref({
-  firstname: "Nombre",
-  lastname: "Apellido",
-  username: "Usuario",
-  password: "Contraseña",
-  NewPassword: "Nueva Contraseña",
-  email: "Correo",
-  phone: "Telefono",
-  ci: "CI",
-  statut: "Estado",
-  role: "Role",
-  is_all_warehouses: "Todas las sucursales",
-});
+
 
 //------ Checked Status User
 function isChecked(user) {
   loading.value = true;
   snackbar.value = false;
   axios
-      .post("users_switch_activated/" + user.id, {
+      .post("/users_switch_activated/" + user.id, {
         statut: !!!user.statut,
         id: user.id,
       })
@@ -139,12 +126,11 @@ function Create_User() {
         dialog.value = false;
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Proceso exitoso";
+        snackbarText.value = labels.success_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
         });
-        ;
       })
       .catch((error) => {
         console.log(error);
@@ -189,12 +175,11 @@ function Update_User() {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Proceso exitoso";
+        snackbarText.value = labels.success_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
         });
-        ;
         dialog.value = false;
       })
       .catch((error) => {
@@ -288,22 +273,21 @@ function onClose() {
         @update:modelValue="dialog === false ? reset_Form() : dialog"
     >
       <v-card>
-        <v-toolbar
-            border
-            density="compact"
-            :title="(editmode ? 'Modificar' : 'Nuevo') + ' Usuario'"
-        >
-        </v-toolbar>
-
-        <v-card-text>
-          <v-form ref="form">
+        <v-form ref="form">
+          <v-toolbar
+              border
+              density="compact"
+              :title="(editmode ? 'Modificar' : 'Nuevo') + ' Usuario'"
+          >
+          </v-toolbar>
+          <v-card-text>
             <v-row>
               <!-- First name -->
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="userLabels.firstname + ' *'"
+                    :label="labels.user.firstname + ' *'"
                     v-model="user.firstname"
-                    :placeholder="userLabels.firstname"
+                    :placeholder="labels.user.firstname"
                     :rules="helper.required.concat(helper.min(3)).concat(helper.max(30))"
                     variant="outlined"
                     density="comfortable"
@@ -315,9 +299,9 @@ function onClose() {
               <!-- Last name -->
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="userLabels.lastname + ' *'"
+                    :label="labels.user.lastname + ' *'"
                     v-model="user.lastname"
-                    :placeholder="userLabels.lastname"
+                    :placeholder="labels.user.lastname"
                     :rules="helper.required.concat(helper.min(3)).concat(helper.max(30))"
                     variant="outlined"
                     density="comfortable"
@@ -329,9 +313,9 @@ function onClose() {
               <!-- Username -->
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="userLabels.username + ' *'"
+                    :label="labels.user.username + ' *'"
                     v-model="user.username"
-                    :placeholder="userLabels.username"
+                    :placeholder="labels.user.username"
                     :rules="helper.required.concat(helper.min(3)).concat(helper.max(30))"
                     variant="outlined"
                     density="comfortable"
@@ -343,9 +327,9 @@ function onClose() {
               <!-- Phone -->
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="userLabels.phone + ' *'"
+                    :label="labels.user.phone + ' *'"
                     v-model="user.phone"
-                    :placeholder="userLabels.phone"
+                    :placeholder="labels.user.phone"
                     :rules="helper.required.concat(helper.number)"
                     variant="outlined"
                     density="comfortable"
@@ -357,9 +341,9 @@ function onClose() {
               <!-- Email -->
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="userLabels.email + ' *'"
+                    :label="labels.user.email + ' *'"
                     v-model="user.email"
-                    :placeholder="userLabels.email"
+                    :placeholder="labels.user.email"
                     :rules="helper.required"
                     variant="outlined"
                     density="comfortable"
@@ -372,9 +356,9 @@ function onClose() {
               <!-- password -->
               <v-col md="6" sm="12" v-if="!editmode">
                 <v-text-field
-                    :label="userLabels.password + ' *'"
+                    :label="labels.user.password + ' *'"
                     v-model="user.password"
-                    :placeholder="userLabels.password"
+                    :placeholder="labels.user.password"
                     :rules="helper.required.concat(helper.min(6)).concat(helper.max(14))"
                     variant="outlined"
                     density="comfortable"
@@ -390,7 +374,7 @@ function onClose() {
                     v-model="user.role"
                     :items="roles"
                     :rules="helper.required"
-                    :label="userLabels.role"
+                    :label="labels.user.role"
                     item-title="title"
                     item-value="value"
                     variant="outlined"
@@ -402,9 +386,9 @@ function onClose() {
               <!-- New Password -->
               <v-col cols="12" md="6" v-if="editmode">
                 <v-text-field
-                    :label="userLabels.NewPassword + ' *'"
+                    :label="labels.user.NewPassword + ' *'"
                     v-model="user.NewPassword"
-                    :placeholder="userLabels.NewPassword"
+                    :placeholder="labels.user.NewPassword"
                     :rules="helper.min(6).concat(helper.max(14))"
                     variant="outlined"
                     density="comfortable"
@@ -415,9 +399,9 @@ function onClose() {
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="userLabels.ci"
+                    :label="labels.user.ci"
                     v-model="user.ci"
-                    :placeholder="userLabels.ci"
+                    :placeholder="labels.user.ci"
                     :rules="helper.number"
                     variant="outlined"
                     density="comfortable"
@@ -428,7 +412,7 @@ function onClose() {
               <!-- assigned_warehouses -->
               <v-col cols="12" sm="4">
                 <p class="font-weight-bold mt-3">
-                  Sucursales Asignadas
+                  {{ labels.warehouse_assign }}
                 </p>
               </v-col>
 
@@ -436,14 +420,14 @@ function onClose() {
                 <v-checkbox
                     v-model="user.is_all_warehouses"
                     :model-value="!!user.is_all_warehouses"
-                    :label="userLabels.is_all_warehouses"
+                    :label="labels.user.is_all_warehouses"
                     density="comfortable"
                     hide-details="auto"
                 ></v-checkbox>
                 <v-select
                     v-model="assigned_warehouses"
                     :items="warehouses"
-                    label="Algunas sucursales"
+                    :label="labels.warehouse_some"
                     item-title="title"
                     item-value="value"
                     multiple
@@ -454,32 +438,32 @@ function onClose() {
                 ></v-select>
               </v-col>
             </v-row>
-          </v-form>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-              size="small"
-              variant="outlined"
-              color="error"
-              class="ma-1"
-              @click="onClose"
-          >
-            Cancelar
-          </v-btn>
-          <v-btn
-              size="small"
-              color="primary"
-              variant="flat"
-              class="ma-1"
-              @click="onSave"
-              :loading="loading"
-              :disabled="loading"
-          >
-            Guardar
-          </v-btn>
-        </v-card-actions>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+                size="small"
+                variant="outlined"
+                color="error"
+                class="ma-1"
+                @click="onClose"
+            >
+              {{ labels.cancel }}
+            </v-btn>
+            <v-btn
+                type="submit"
+                size="small"
+                color="primary"
+                variant="flat"
+                class="ma-1"
+                @click="onSave"
+                :loading="loading"
+                :disabled="loading"
+            >
+              {{ labels.submit }}
+            </v-btn>
+          </v-card-actions>
+        </v-form>
       </v-card>
     </v-dialog>
 
@@ -509,7 +493,7 @@ function onClose() {
             prepend-icon="mdi-account-plus"
             @click="New_User"
         >
-          Añadir
+          {{ labels.add }}
         </v-btn>
       </v-col>
       <v-col cols="12">
@@ -520,9 +504,8 @@ function onClose() {
             hover
             class="elevation-2"
             density="compact"
-            no-data-text="No existen datos a mostrar"
+            :no-data-text="labels.no_data_table"
             :loading="loading"
-            loading-text="Cargando..."
         >
           <template v-slot:item.statut="{ item }">
             <v-switch

@@ -3,6 +3,7 @@ import {ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import {router} from "@inertiajs/vue3";
 import helper from "@/helpers";
+import labels from "@/labels";
 import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
@@ -16,19 +17,7 @@ const loading = ref(false);
 const snackbar = ref(false);
 const snackbarText = ref("");
 const snackbarColor = ref("info");
-const userLabels = ref({
-  firstname: "Nombre",
-  lastname: "Apellido",
-  username: "Usuario",
-  password: "Contraseña",
-  NewPassword: "Nueva Contraseña",
-  email: "Correo",
-  phone: "Telefono",
-  ci: "CI",
-  statut: "Estado",
-  role: "Role",
-  is_all_warehouses: "Todas las sucursales",
-});
+
 
 //------------- Submit Update Profile
 async function Submit_Profile() {
@@ -53,7 +42,7 @@ function Update_Profile() {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Actualizacion exitosa";
+        snackbarText.value = labels.success_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
@@ -83,16 +72,18 @@ function Update_Profile() {
     </snackbar>
 
     <v-card>
-      <v-card-text>
-        <!--  Profile -->
-        <v-form @submit.prevent="Submit_Profile" ref="form">
+      <v-form @submit.prevent="Submit_Profile" ref="form">
+        <v-toolbar height="10"></v-toolbar>
+        <v-card-text>
+          <!--  Profile -->
+
           <v-row>
             <!-- First name -->
-            <v-col md="6" sm="12">
+            <v-col md="6" cols="12">
               <v-text-field
-                  :label="userLabels.firstname + ' *'"
+                  :label="labels.user.firstname + ' *'"
                   v-model="user.firstname"
-                  :placeholder="userLabels.firstname"
+                  :placeholder="labels.user.firstname"
                   :rules="
                                     helper.required
                                         .concat(helper.max(20))
@@ -106,11 +97,11 @@ function Update_Profile() {
             </v-col>
 
             <!-- Last name -->
-            <v-col md="6" sm="12">
+            <v-col md="6" cols="12">
               <v-text-field
-                  :label="userLabels.lastname + ' *'"
+                  :label="labels.user.lastname + ' *'"
                   v-model="user.lastname"
-                  :placeholder="userLabels.lastname"
+                  :placeholder="labels.user.lastname"
                   :rules="
                                     helper.required
                                         .concat(helper.max(20))
@@ -124,11 +115,11 @@ function Update_Profile() {
             </v-col>
 
             <!-- Phone -->
-            <v-col md="6" sm="12">
+            <v-col md="6" cols="12">
               <v-text-field
-                  :label="userLabels.phone + ' *'"
+                  :label="labels.user.phone + ' *'"
                   v-model="user.phone"
-                  :placeholder="userLabels.phone"
+                  :placeholder="labels.user.phone"
                   :rules="helper.required"
                   variant="outlined"
                   density="comfortable"
@@ -138,11 +129,11 @@ function Update_Profile() {
             </v-col>
 
             <!-- Email -->
-            <v-col md="6" sm="12">
+            <v-col md="6" cols="12">
               <v-text-field
-                  :label="userLabels.email + ' *'"
+                  :label="labels.user.email + ' *'"
                   v-model="user.email"
-                  :placeholder="userLabels.email"
+                  :placeholder="labels.user.email"
                   :rules="helper.required"
                   variant="outlined"
                   density="comfortable"
@@ -155,9 +146,9 @@ function Update_Profile() {
             <!-- New Password -->
             <v-col md="6">
               <v-text-field
-                  :label="userLabels.NewPassword + ' *'"
+                  :label="labels.user.NewPassword + ' *'"
                   v-model="user.NewPassword"
-                  :placeholder="userLabels.NewPassword"
+                  :placeholder="labels.user.NewPassword"
                   :rules="helper.min(6).concat(helper.max(14))"
                   variant="outlined"
                   density="comfortable"
@@ -167,8 +158,10 @@ function Update_Profile() {
               </v-text-field>
             </v-col>
           </v-row>
+        </v-card-text>
+        <v-card-actions>
           <v-row>
-            <v-col md="12" class="mt-3">
+            <v-col cols="12" class="text-center">
               <v-btn
                   variant="elevated"
                   type="submit"
@@ -179,8 +172,8 @@ function Update_Profile() {
               </v-btn>
             </v-col>
           </v-row>
-        </v-form>
-      </v-card-text>
+        </v-card-actions>
+      </v-form>
     </v-card>
   </Layout>
 </template>

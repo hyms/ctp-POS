@@ -3,6 +3,7 @@ import {ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import helper from "@/helpers";
+import labels from "@/labels";
 import {router} from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
 
@@ -32,10 +33,7 @@ const sales_type = ref({
   name: "",
   code: "",
 });
-const sales_typeLabels = ref({
-  name: "Nombre",
-  code: "Codigo",
-});
+
 
 //------------- Submit Validation Create & Edit SalesType
 async function Submit_SalesType() {
@@ -80,7 +78,7 @@ function Create_SalesType() {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Proceso exitoso";
+        snackbarText.value = labels.success_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
@@ -105,14 +103,14 @@ function Update_SalesType() {
   loading.value = true;
   snackbar.value = false;
   axios
-      .put("sales_types/" + sales_type.value.id, {
+      .put("/sales_types/" + sales_type.value.id, {
         name: sales_type.value.name,
         code: sales_type.value.code,
       })
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Proceso exitoso";
+        snackbarText.value = labels.success_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
@@ -159,11 +157,11 @@ function Remove_SalesType() {
   loading.value = true;
   snackbar.value = false;
   axios
-      .delete("sales_types/" + sales_type.value.id)
+      .delete("/sales_types/" + sales_type.value.id)
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Borrado exitoso";
+        snackbarText.value = labels.delete_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
@@ -203,24 +201,23 @@ function Remove_SalesType() {
         @update:modelValue="dialog === false ? reset_Form() : dialog"
     >
       <v-card>
+        <v-form ref="form">
+
         <v-toolbar
             border
             density="compact"
-            :title="
-                        (editmode ? 'Modificar' : 'Nuevo') + ' Tipo de Venta'
-                    "
+            :title="(editmode ? 'Modificar' : 'Nuevo') + ' Tipo de Venta'"
         >
         </v-toolbar>
 
         <v-card-text>
-          <v-form ref="form">
             <v-row>
               <!-- Code SalesType -->
               <v-col cols="12">
                 <v-text-field
-                    :label="sales_typeLabels.code + ' *'"
+                    :label="labels.sales_type.code + ' *'"
                     v-model="sales_type.code"
-                    :placeholder="sales_typeLabels.code"
+                    :placeholder="labels.sales_type.code"
                     :rules="helper.required"
                     variant="outlined"
                     density="comfortable"
@@ -232,9 +229,9 @@ function Remove_SalesType() {
               <!-- Name SalesType -->
               <v-col cols="12">
                 <v-text-field
-                    :label="sales_typeLabels.name + ' *'"
+                    :label="labels.sales_type.name + ' *'"
                     v-model="sales_type.name"
-                    :placeholder="sales_typeLabels.name"
+                    :placeholder="labels.sales_type.name"
                     :rules="helper.required"
                     variant="outlined"
                     density="comfortable"
@@ -243,7 +240,6 @@ function Remove_SalesType() {
                 </v-text-field>
               </v-col>
             </v-row>
-          </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -254,9 +250,10 @@ function Remove_SalesType() {
               class="ma-1"
               @click="onClose"
           >
-            Cancelar
+            {{ labels.cancel }}
           </v-btn>
           <v-btn
+              type="submit"
               size="small"
               color="primary"
               variant="elevated"
@@ -265,9 +262,10 @@ function Remove_SalesType() {
               :loading="loading"
               :disabled="loading"
           >
-            Guardar
+            {{ labels.submit }}
           </v-btn>
         </v-card-actions>
+        </v-form>
       </v-card>
     </v-dialog>
 
@@ -291,7 +289,7 @@ function Remove_SalesType() {
             prepend-icon="mdi-account-plus"
             @click="New_SalesType"
         >
-          Añadir
+          {{ labels.add }}
         </v-btn>
       </v-col>
     </v-row>
@@ -304,9 +302,8 @@ function Remove_SalesType() {
             hover
             class="elevation-2"
             density="compact"
-            no-data-text="No existen datos a mostrar"
+            :no-data-text="labels.no_data_table"
             :loading="loading"
-            loading-text="Cargando..."
         >
           <template v-slot:item.actions="{ item }">
             <v-btn

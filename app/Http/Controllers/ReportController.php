@@ -40,21 +40,20 @@ use Illuminate\Support\Facades\DB;
 class ReportController extends Controller
 {
 
-
     //----------- Get Last 5 Sales --------------\\
 
     public function Get_last_Sales()
     {
 
-        $Role = Auth::user()->roles()->first();
-        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+//        $Role = Auth::user()->roles()->first();
+//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $Sales = Sale::with('details', 'client', 'facture')->where('deleted_at', '=', null)
-            ->where(function ($query) use ($ShowRecord) {
-                if (!$ShowRecord) {
-                    return $query->where('user_id', '=', Auth::user()->id);
-                }
-            })
+//            ->where(function ($query) use ($ShowRecord) {
+//                if (!$ShowRecord) {
+//                    return $query->where('user_id', '=', Auth::user()->id);
+//                }
+//            })
             ->orderBy('id', 'desc')
             ->take(5)
             ->get();
@@ -81,7 +80,7 @@ class ReportController extends Controller
     public function Client_Report(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
+//        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
 
         // How many items do you want to display.
         $perPage = $request->limit;

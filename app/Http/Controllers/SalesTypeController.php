@@ -18,7 +18,7 @@ class SalesTypeController extends Controller
 
         $salesType = SalesType::where('deleted_at', '=', null)->get();
         Inertia::share('titlePage', 'Tipos de Venta');
-        return Inertia::render('Settings/SalesType',[
+        return Inertia::render('Settings/Sales_Type',[
             'sales_types' => $salesType,
         ]);
     }

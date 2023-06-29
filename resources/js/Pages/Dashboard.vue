@@ -68,7 +68,7 @@ const columns_sales = ref([
 const columns_stock = ref([
   {title: labels.product_code, key: "code"},
   {title: labels.product_name, key: "name"},
-  {title: labels.warehouse, key: "warehouse"},
+  {title: labels.warehouse_text, key: "warehouse"},
   {title: labels.quantity, key: "quantity"},
   {title: labels.alert_quantity, key: "stock_alert"},
 ]);

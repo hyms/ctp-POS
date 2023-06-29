@@ -3,6 +3,7 @@ import {ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import helper from "@/helpers";
+import labels from "@/labels";
 import {router} from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
 
@@ -39,13 +40,7 @@ const warehouse = ref({
   country: "",
   city: "",
 });
-const warehouseLabels = ref({
-  name: "Nombre",
-  mobile: "Telefono",
-  email: "Correo",
-  country: "Pais",
-  city: "Ciudad",
-});
+
 
 //------------------------------ Modal (create Warehouse) -------------------------------\\
 function New_Warehouse() {
@@ -67,7 +62,7 @@ function Create_Warehouse() {
   loading.value = true;
   snackbar.value = false;
   axios
-      .post("warehouses", {
+      .post("/warehouses", {
         name: warehouse.value.name,
         mobile: warehouse.value.mobile,
         email: warehouse.value.email,
@@ -77,12 +72,11 @@ function Create_Warehouse() {
         dialog.value = false;
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Proceso exitoso";
+        snackbarText.value = labels.success_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
         });
-        ;
       })
       .catch((error) => {
         console.log(error);
@@ -102,7 +96,7 @@ function Update_Warehouse() {
   loading.value = true;
   snackbar.value = false;
   axios
-      .put("warehouses/" + warehouse.value.id, {
+      .put("/warehouses/" + warehouse.value.id, {
         name: warehouse.value.name,
         mobile: warehouse.value.mobile,
         email: warehouse.value.email,
@@ -111,12 +105,12 @@ function Update_Warehouse() {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Proceso exitoso";
+        snackbarText.value = labels.success_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
         dialog.value = false;
       })
       .catch((error) => {
@@ -172,17 +166,17 @@ function Remove_Warehouse() {
   loading.value = true;
   snackbar.value = false;
   axios
-      .delete("warehouses/" + warehouse.value.id)
+      .delete("/warehouses/" + warehouse.value.id)
       .then(({data}) => {
         dialogDelete.value = false;
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Borrado exitoso";
+        snackbarText.value = labels.delete_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
       })
       .catch((error) => {
         console.log(error);
@@ -223,22 +217,22 @@ function onCloseDelete() {
         @update:modelValue="dialog === false ? reset_Form() : dialog"
     >
       <v-card>
-        <v-toolbar
-            border
-            density="compact"
-            :title="(editmode ? 'Modificar' : 'Nuevo') + ' Almacen'"
-        >
-        </v-toolbar>
+        <v-form ref="form">
+          <v-toolbar
+              border
+              density="compact"
+              :title="(editmode ? 'Modificar' : 'Nuevo') + ' Almacen'"
+          >
+          </v-toolbar>
 
-        <v-card-text>
-          <v-form ref="form">
+          <v-card-text>
             <v-row>
               <!-- First name -->
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="warehouseLabels.name + ' *'"
+                    :label="labels.warehouse.name + ' *'"
                     v-model="warehouse.name"
-                    :placeholder="warehouseLabels.name"
+                    :placeholder="labels.warehouse.name"
                     :rules="helper.required"
                     variant="outlined"
                     density="comfortable"
@@ -250,9 +244,9 @@ function onCloseDelete() {
               <!-- Last name -->
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="warehouseLabels.mobile"
+                    :label="labels.warehouse.mobile"
                     v-model="warehouse.mobile"
-                    :placeholder="warehouseLabels.mobile"
+                    :placeholder="labels.warehouse.mobile"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
@@ -263,9 +257,9 @@ function onCloseDelete() {
               <!-- Username -->
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="warehouseLabels.city"
+                    :label="labels.warehouse.city"
                     v-model="warehouse.city"
-                    :placeholder="warehouseLabels.city"
+                    :placeholder="labels.warehouse.city"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
@@ -276,9 +270,9 @@ function onCloseDelete() {
               <!-- Phone -->
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="warehouseLabels.email"
+                    :label="labels.warehouse.email"
                     v-model="warehouse.email"
-                    :placeholder="warehouseLabels.email"
+                    :placeholder="labels.warehouse.email"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
@@ -286,32 +280,33 @@ function onCloseDelete() {
                 </v-text-field>
               </v-col>
             </v-row>
-          </v-form>
-        </v-card-text>
+          </v-card-text>
 
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-              size="small"
-              variant="outlined"
-              color="error"
-              class="ma-1"
-              @click="onClose"
-          >
-            Cancelar
-          </v-btn>
-          <v-btn
-              size="small"
-              color="primary"
-              variant="elevated"
-              class="ma-1"
-              @click="onSave"
-              :loading="loading"
-              :disabled="loading"
-          >
-            Guardar
-          </v-btn>
-        </v-card-actions>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+                size="small"
+                variant="outlined"
+                color="error"
+                class="ma-1"
+                @click="onClose"
+            >
+              {{ labels.cancel }}
+            </v-btn>
+            <v-btn
+                type="submit"
+                size="small"
+                color="primary"
+                variant="elevated"
+                class="ma-1"
+                @click="onSave"
+                :loading="loading"
+                :disabled="loading"
+            >
+              {{ labels.submit }}
+            </v-btn>
+          </v-card-actions>
+        </v-form>
       </v-card>
     </v-dialog>
     <v-row>
@@ -334,7 +329,7 @@ function onCloseDelete() {
             prepend-icon="mdi-account-plus"
             @click="New_Warehouse"
         >
-          Añadir
+          {{ labels.add }}
         </v-btn>
       </v-col>
       <v-col cols="12">
@@ -345,9 +340,8 @@ function onCloseDelete() {
               :search="search"
               hover
               density="compact"
-              no-data-text="No existen datos a mostrar"
+              :no-data-text="labels.no_data_table"
               :loading="loading"
-              loading-text="Cargando..."
           >
             <template v-slot:item.actions="{ item }">
               <v-btn

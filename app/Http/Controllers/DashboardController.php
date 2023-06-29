@@ -205,8 +205,8 @@ class DashboardController extends Controller
             })
 
             ->join('clients', 'sales.client_id', '=', 'clients.id')
-            ->select(DB::raw('clients.name'), DB::raw("count(*) as value"))
-            ->groupBy('clients.name')
+            ->select(DB::raw('clients.company_name as name'), DB::raw("count(*) as value"))
+            ->groupBy('clients.company_name')
             ->orderBy('value', 'desc')
             ->take(5)
             ->get();
@@ -437,7 +437,7 @@ class DashboardController extends Controller
 
             $item_sale['Ref'] = $Sale['Ref'];
             $item_sale['statut'] = $Sale['statut'];
-            $item_sale['client_name'] = $Sale['client']['name'];
+            $item_sale['client_name'] = $Sale['client']['company_name'];
             $item_sale['warehouse_name'] = $Sale['warehouse']['name'];
             $item_sale['GrandTotal'] = $Sale['GrandTotal'];
             $item_sale['paid_amount'] = $Sale['paid_amount'];
