@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Models\PaymentWithCreditCard;
-use \Nwidart\Modules\Facades\Module;
+use Nexmo\Client\Credentials\Basic;
+use Nwidart\Modules\Facades\Module;
 use App\Models\sms_gateway;
 
 class PaymentSalesController extends Controller
@@ -369,7 +370,7 @@ class PaymentSalesController extends Controller
         } elseif ($gateway->title == "nexmo") {
             try {
 
-                $basic = new \Nexmo\Client\Credentials\Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
+                $basic = new Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
                 $client = new \Nexmo\Client($basic);
                 $nexmo_from = env("NEXMO_FROM");
 

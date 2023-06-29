@@ -85,7 +85,7 @@ class DashboardController extends Controller
             $dates->put($date, 0);
         }
 
-        $date_range = \Carbon\Carbon::today()->subDays(6);
+        $date_range = Carbon::today()->subDays(6);
         // Get the sales counts
         $sales = Sale::where('date', '>=', $date_range)
             ->where('deleted_at', '=', null)
@@ -140,7 +140,7 @@ class DashboardController extends Controller
             $dates->put($date, 0);
         }
 
-        $date_range = \Carbon\Carbon::today()->subDays(6);
+        $date_range = Carbon::today()->subDays(6);
 
         // Get the purchases counts
         $purchases = Purchase::where('date', '>=', $date_range)
@@ -331,7 +331,7 @@ class DashboardController extends Controller
         //---------------- sales
 
         $data['today_sales'] = Sale::where('deleted_at', '=', null)
-            ->where('date', \Carbon\Carbon::today())
+            ->where('date', Carbon::today())
 //            ->where(function ($query) use ($view_records) {
 //                if (!$view_records) {
 //                    return $query->where('user_id', '=', Auth::user()->id);
@@ -353,7 +353,7 @@ class DashboardController extends Controller
         //--------------- return_sales
 
         $data['return_sales'] = SaleReturn::where('deleted_at', '=', null)
-            ->where('date', \Carbon\Carbon::today())
+            ->where('date', Carbon::today())
 //            ->where(function ($query) use ($view_records) {
 //                if (!$view_records) {
 //                    return $query->where('user_id', '=', Auth::user()->id);
@@ -471,7 +471,7 @@ class DashboardController extends Controller
             $dates->put($date, 0);
         }
 
-        $date_range = \Carbon\Carbon::today()->subDays(6);
+        $date_range = Carbon::today()->subDays(6);
         // Get the sales counts
         $Payment_Sale = PaymentSale::with('sale')->where('date', '>=', $date_range)
 //            ->where(function ($query) use ($view_records) {

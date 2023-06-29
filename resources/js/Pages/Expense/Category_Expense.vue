@@ -3,6 +3,7 @@ import {ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import helper from "@/helpers";
+import labels from "@/labels";
 import {router} from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
 
@@ -21,10 +22,6 @@ const category = ref({
   id: "",
   name: "",
   description: "",
-});
-const categoryLabel = ref({
-  name: "Nombre",
-  description: "Descripcion",
 });
 
 const fields = ref([
@@ -87,12 +84,12 @@ function Create_Category() {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Proceso exitoso";
+        snackbarText.value = labels.success_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
         dialog.value = false;
       })
       .catch((error) => {
@@ -120,12 +117,12 @@ function Update_Category() {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Proceso exitoso";
+        snackbarText.value = labels.success_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
         dialog.value = false;
       })
       .catch((error) => {
@@ -162,12 +159,11 @@ function Delete_Category(id) {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Borrado exitoso";
+        snackbarText.value = labels.delete_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
         });
-        ;
         dialogDelete.value = false;
       })
       .catch((error) => {
@@ -203,25 +199,22 @@ function Delete_Category(id) {
         @update:modelValue="dialog === false ? reset_Form() : dialog"
     >
       <v-card>
-        <v-toolbar
-            border
-            density="compact"
-            :title="
-                        (editmode ? 'Modificar' : 'Nueva') +
-                        ' Categoria de gasto'
-                    "
-        >
-        </v-toolbar>
+        <v-form ref="form">
+          <v-toolbar
+              border
+              density="compact"
+              :title="(editmode ? 'Modificar' : 'Nueva') +' Categoria de gasto'"
+          >
+          </v-toolbar>
 
-        <v-card-text>
-          <v-form ref="form">
+          <v-card-text>
             <v-row>
               <!-- Name Category -->
               <v-col cols="12">
                 <v-text-field
-                    :label="categoryLabel.name + ' *'"
+                    :label="labels.category.name + ' *'"
                     v-model="category.name"
-                    :placeholder="categoryLabel.name"
+                    :placeholder="labels.category.name"
                     :rules="helper.required"
                     variant="outlined"
                     density="comfortable"
@@ -233,9 +226,9 @@ function Delete_Category(id) {
               <!-- Description Category -->
               <v-col cols="12">
                 <v-textarea
-                    :label="categoryLabel.description"
+                    :label="labels.category.description"
                     v-model="category.description"
-                    :placeholder="categoryLabel.description"
+                    :placeholder="labels.category.description"
                     rows="4"
                     variant="outlined"
                     density="comfortable"
@@ -244,31 +237,32 @@ function Delete_Category(id) {
                 </v-textarea>
               </v-col>
             </v-row>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-              size="small"
-              variant="outlined"
-              color="error"
-              class="ma-1"
-              @click="onClose"
-          >
-            Cancelar
-          </v-btn>
-          <v-btn
-              size="small"
-              color="primary"
-              variant="elevated"
-              class="ma-1"
-              @click="Submit_Category"
-              :loading="loading"
-              :disabled="loading"
-          >
-            Guardar
-          </v-btn>
-        </v-card-actions>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+                size="small"
+                variant="outlined"
+                color="error"
+                class="ma-1"
+                @click="onClose"
+            >
+              {{ labels.cancel }}
+            </v-btn>
+            <v-btn
+                type="submit"
+                size="small"
+                color="primary"
+                variant="elevated"
+                class="ma-1"
+                @click="Submit_Category"
+                :loading="loading"
+                :disabled="loading"
+            >
+              {{ labels.submit }}
+            </v-btn>
+          </v-card-actions>
+        </v-form>
       </v-card>
     </v-dialog>
     <v-row align="center">
@@ -278,7 +272,7 @@ function Delete_Category(id) {
             prepend-icon="mdi-magnify"
             density="compact"
             hide-details
-            label="Buscar"
+            :label="labels.search"
             single-line
             variant="underlined"
         ></v-text-field>
@@ -291,7 +285,7 @@ function Delete_Category(id) {
             prepend-icon="mdi-account-plus"
             @click="New_Category"
         >
-          Añadir
+          {{ labels.add }}
         </v-btn>
       </v-col>
     </v-row>
@@ -304,9 +298,8 @@ function Delete_Category(id) {
             hover
             class="elevation-2"
             density="compact"
-            no-data-text="No existen datos a mostrar"
+            :no-data-text="labels.no_data_table"
             :loading="loading"
-            loading-text="Cargando..."
         >
           <template v-slot:item.actions="{ item }">
             <v-btn

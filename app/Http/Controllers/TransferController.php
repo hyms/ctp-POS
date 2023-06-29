@@ -119,7 +119,7 @@ class TransferController extends BaseController
             'transfer.to_warehouse' => 'required',
         ]);
 
-        \DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
             $order = new Transfer;
 
             $order->date = $request->transfer['date'];
@@ -277,7 +277,7 @@ class TransferController extends BaseController
             'transfer.from_warehouse' => 'required',
         ]);
 
-        \DB::transaction(function () use ($request, $id) {
+        DB::transaction(function () use ($request, $id) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $current_Transfer = Transfer::findOrFail($id);
@@ -571,7 +571,7 @@ class TransferController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'delete', Transfer::class);
 
-        \DB::transaction(function () use ($id, $request) {
+        DB::transaction(function () use ($id, $request) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $current_Transfer = Transfer::findOrFail($id);
@@ -708,7 +708,7 @@ class TransferController extends BaseController
 
         $this->authorizeForUser($request->user('api'), 'delete', Transfer::class);
 
-        \DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $selectedIds = $request->selectedIds;

@@ -61,7 +61,7 @@ class BrandsController extends Controller
             'name' => 'required',
         ]);
 
-        \DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
 
             if ($request->hasFile('image')) {
 
@@ -106,7 +106,7 @@ class BrandsController extends Controller
          request()->validate([
              'name' => 'required',
          ]);
-         \DB::transaction(function () use ($request, $id) {
+         DB::transaction(function () use ($request, $id) {
              $Brand = Brand::findOrFail($id);
              $currentImage = $Brand->image;
  

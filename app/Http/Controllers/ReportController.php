@@ -36,6 +36,7 @@ use App\utils\helpers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PDF;
 
 class ReportController extends Controller
 {
@@ -2690,7 +2691,7 @@ class ReportController extends Controller
             $item['sale_id'] = $detail['sale']->id;
             $item['client_name'] = $detail['sale']['client']->name;
             $item['warehouse_name'] = $detail['sale']['warehouse']->name;
-            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;;
+            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;
             $item['total'] = $detail->total;
             $item['product_name'] = $product_name;
             $item['unit_sale'] = $unit->ShortName;
@@ -2791,7 +2792,7 @@ class ReportController extends Controller
             $item['quotation_id'] = $detail['quotation']->id;
             $item['client_name'] = $detail['quotation']['client']->name;
             $item['warehouse_name'] = $detail['quotation']['warehouse']->name;
-            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;;
+            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;
             $item['total'] = $detail->total;
             $item['product_name'] = $product_name;
             $item['unit_sale'] = $unit->ShortName;
@@ -2892,7 +2893,7 @@ class ReportController extends Controller
             $item['purchase_id'] = $detail['purchase']->id;
             $item['provider_name'] = $detail['purchase']['provider']->name;
             $item['warehouse_name'] = $detail['purchase']['warehouse']->name;
-            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;;
+            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;
             $item['total'] = $detail->total;
             $item['product_name'] = $product_name;
             $item['unit_purchase'] = $unit->ShortName;
@@ -2993,8 +2994,8 @@ class ReportController extends Controller
             $item['return_purchase_id'] = $detail['PurchaseReturn']->id;
             $item['provider_name'] = $detail['PurchaseReturn']['provider']->name;
             $item['warehouse_name'] = $detail['PurchaseReturn']['warehouse']->name;
-            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;;
-            $item['total'] = $detail->total;
+            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;
+                    $item['total'] = $detail->total;
             $item['product_name'] = $product_name;
             $item['unit_purchase'] = $unit->ShortName;
 
@@ -3338,7 +3339,7 @@ class ReportController extends Controller
         $symbol = $helpers->Get_Currency();
         $settings = Setting::where('deleted_at', '=', null)->first();
 
-        $pdf = \PDF::loadView('pdf.report_client_pdf', [
+        $pdf = PDF::loadView('pdf.report_client_pdf', [
             'symbol' => $symbol,
             'client' => $data,
             'sales' => $sales_details,
@@ -3408,7 +3409,7 @@ class ReportController extends Controller
          $symbol = $helpers->Get_Currency();
          $settings = Setting::where('deleted_at', '=', null)->first();
  
-         $pdf = \PDF::loadView('pdf.report_provider_pdf', [
+         $pdf = PDF::loadView('pdf.report_provider_pdf', [
              'symbol' => $symbol,
              'provider' => $data,
              'purchases' => $purchases_details,

@@ -85,7 +85,7 @@ function Create_Category() {
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
         dialog.value = false;
       })
       .catch((error) => {
@@ -118,7 +118,7 @@ function Update_Category() {
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
         dialog.value = false;
       })
       .catch((error) => {
@@ -170,7 +170,7 @@ function Remove_Category() {
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
         dialogDelete.value = false;
       })
       .catch((error) => {

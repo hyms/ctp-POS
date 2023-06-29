@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\TestDbController;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
@@ -171,7 +172,7 @@ class SetupController extends Controller
             Storage::disk('public')->put('installed', 'Contents');
 
             
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             
             return $e->getMessage();
             

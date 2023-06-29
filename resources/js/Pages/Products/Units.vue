@@ -115,7 +115,7 @@ function Create_Unit() {
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
         dialog.value = false;
       })
       .catch((error) => {
@@ -152,7 +152,7 @@ function Update_Unit() {
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
         dialog.value = false;
       })
       .catch((error) => {
@@ -205,7 +205,7 @@ function Remove_Unit() {
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
         dialogDelete.value = false;
       })
       .catch((error) => {

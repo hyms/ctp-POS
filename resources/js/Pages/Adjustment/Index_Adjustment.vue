@@ -81,7 +81,7 @@ function Remove_Adjustment() {
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
         dialogDelete.value = false;
       })
       .catch((error) => {

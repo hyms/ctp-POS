@@ -276,7 +276,7 @@ function Remove_SalesType() {
             prepend-icon="mdi-magnify"
             density="compact"
             hide-details
-            label="Buscar"
+            :label="labels.search"
             single-line
             variant="underlined"
         ></v-text-field>

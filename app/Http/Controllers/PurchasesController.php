@@ -23,8 +23,10 @@ use App\Models\User;
 use App\Models\UserWarehouse;
 use App\utils\helpers;
 use Carbon\Carbon;
+use Nexmo\Client;
+use Nexmo\Client\Credentials\Basic;
 use Twilio\Rest\Client as Client_Twilio;
-use \Nwidart\Modules\Facades\Module;
+use Nwidart\Modules\Facades\Module;
 use App\Models\sms_gateway;
 use DB;
 use PDF;
@@ -169,7 +171,7 @@ class PurchasesController extends BaseController
             'warehouse_id' => 'required',
         ]);
 
-        \DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
             $order = new Purchase;
 
             $order->date = $request->date;
@@ -257,7 +259,7 @@ class PurchasesController extends BaseController
             'supplier_id' => 'required',
         ]);
 
-        \DB::transaction(function () use ($request, $id) {
+        DB::transaction(function () use ($request, $id) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $current_Purchase = Purchase::findOrFail($id);
@@ -445,7 +447,7 @@ class PurchasesController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'delete', Purchase::class);
 
-        \DB::transaction(function () use ($id, $request) {
+        DB::transaction(function () use ($id, $request) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $current_Purchase = Purchase::findOrFail($id);
@@ -533,7 +535,7 @@ class PurchasesController extends BaseController
 
         $this->authorizeForUser($request->user('api'), 'delete', Purchase::class);
 
-        \DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $selectedIds = $request->selectedIds;
@@ -1121,8 +1123,8 @@ class PurchasesController extends BaseController
         }elseif($gateway->title == "nexmo"){
             try {
 
-                $basic  = new \Nexmo\Client\Credentials\Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
-                $client = new \Nexmo\Client($basic);
+                $basic  = new Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
+                $client = new Client($basic);
                 $nexmo_from = env("NEXMO_FROM");
         
                 $message = $client->message()->send([

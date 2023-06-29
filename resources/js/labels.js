@@ -58,6 +58,10 @@ export default {
         name: "Nombre",
         code: "Codigo",
     },
+    category:{
+        name: "Nombre",
+        description: "Descripcion",
+    },
     //no data
     no_fill_data: "Debe llenar correctamente los datos",
     no_add_product: "debe adicionar un producto",
@@ -79,6 +83,7 @@ export default {
     list_category: "Lista de Categorias",
     add_pay: "Agregar pago",
     total_products: "Total de productos",
+    search: "Buscar",
     submit: "Guardar",
     cancel: "Cancelar",
     add: "Añadir",

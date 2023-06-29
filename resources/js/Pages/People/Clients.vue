@@ -153,7 +153,7 @@ function Submit_import() {
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
         dialog.value = false;
       })
       .catch((error) => {
@@ -252,7 +252,7 @@ function Update_Client() {
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
         dialog.value = false;
       })
       .catch((error) => {
@@ -297,7 +297,7 @@ function Remove_Client() {
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
         dialogDelete.value = false;
       })
       .catch((error) => {
@@ -411,7 +411,7 @@ function Submit_Pay_due() {
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
         dialogDelete.value = false;
       })
       .catch((error) => {

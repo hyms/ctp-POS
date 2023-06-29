@@ -99,7 +99,7 @@ class ShipmentController extends BaseController
             'status' => 'required',
         ]);
 
-        \DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
             $shipment = Shipment::firstOrNew([ 'Ref' => $request['Ref']]);
 
             $shipment->user_id = Auth::user()->id;
@@ -160,7 +160,7 @@ class ShipmentController extends BaseController
             'status' => 'required',
         ]);
 
-        \DB::transaction(function () use ($request , $id) {
+        DB::transaction(function () use ($request , $id) {
 
             Shipment::whereId($id)->update($request->all());
 
@@ -181,7 +181,7 @@ class ShipmentController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'delete', Shipment::class);
 
-        \DB::transaction(function () use ($request , $id) {
+        DB::transaction(function () use ($request , $id) {
 
             $shipment = Shipment::find($id);
             $shipment->delete();

@@ -4,6 +4,7 @@ import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
 import helper from "@/helpers";
+import labels from "@/labels";
 import {router} from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
 
@@ -49,16 +50,16 @@ function Remove_Expense() {
   loading.value = true;
   snackbar.value = false;
   axios
-      .delete("expenses/" + expense.value.id)
+      .delete("/expenses/" + expense.value.id)
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Borrado exitoso";
+        snackbarText.value = labels.delete_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
         dialogDelete.value = false;
       })
       .catch((error) => {
@@ -103,7 +104,7 @@ function Delete_Expense(id) {
             prepend-icon="mdi-magnify"
             density="compact"
             hide-details
-            label="Buscar"
+            :label="labels.search"
             single-line
             variant="underlined"
         ></v-text-field>
@@ -122,7 +123,7 @@ function Delete_Expense(id) {
             prepend-icon="mdi-account-plus"
             @click="router.visit('/expenses/create')"
         >
-          Añadir
+          {{ labels.add }}
         </v-btn>
       </v-col>
     </v-row>
@@ -135,7 +136,7 @@ function Delete_Expense(id) {
             hover
             class="elevation-2"
             density="compact"
-            no-data-text="No existen datos a mostrar"
+            :no-data-text="labels.no_data_table"
         >
           <template v-slot:item.actions="{ item }">
             <v-btn
@@ -144,9 +145,7 @@ function Delete_Expense(id) {
                 icon="mdi-pencil"
                 size="x-small"
                 variant="outlined"
-                @click="
-                                router.visit('/expenses/edit/' + item.raw.id)
-                            "
+                @click="router.visit('/expenses/edit/' + item.raw.id)"
             >
             </v-btn>
             <v-btn

@@ -137,7 +137,7 @@ function Remove_Product() {
           preserveState: true,
           preserveScroll: true,
         });
-        ;
+
       })
       .catch((error) => {
         console.log(error);

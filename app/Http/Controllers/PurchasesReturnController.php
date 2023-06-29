@@ -24,6 +24,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Nexmo\Client;
+use Nexmo\Client\Credentials\Basic;
 use Twilio\Rest\Client as Client_Twilio;
 use DB;
 use PDF;
@@ -166,7 +168,7 @@ class PurchasesReturnController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'create', PurchaseReturn::class);
 
-        \DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
             $order = new PurchaseReturn;
 
             $order->date = $request->date;
@@ -255,7 +257,7 @@ class PurchasesReturnController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'update', PurchaseReturn::class);
 
-        \DB::transaction(function () use ($request, $id) {
+        DB::transaction(function () use ($request, $id) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $current_PurchaseReturn = PurchaseReturn::findOrFail($id);
@@ -430,7 +432,7 @@ class PurchasesReturnController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'delete', PurchaseReturn::class);
 
-        \DB::transaction(function () use ($id, $request) {
+        DB::transaction(function () use ($id, $request) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $current_PurchaseReturn = PurchaseReturn::findOrFail($id);
@@ -511,7 +513,7 @@ class PurchasesReturnController extends BaseController
 
         $this->authorizeForUser($request->user('api'), 'delete', PurchaseReturn::class);
 
-        \DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $selectedIds = $request->selectedIds;
@@ -1194,8 +1196,8 @@ class PurchasesReturnController extends BaseController
         }elseif($gateway->title == "nexmo"){
             try {
 
-                $basic  = new \Nexmo\Client\Credentials\Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
-                $client = new \Nexmo\Client($basic);
+                $basic  = new Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
+                $client = new Client($basic);
                 $nexmo_from = env("NEXMO_FROM");
         
                 $message = $client->message()->send([

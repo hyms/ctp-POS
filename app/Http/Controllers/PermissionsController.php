@@ -61,7 +61,7 @@ class PermissionsController extends BaseController
                 'role.name' => 'required',
             ]);
 
-            \DB::transaction(function () use ($request) {
+            DB::transaction(function () use ($request) {
 
                 //-- Create New Role
                 $Role = new Role;
@@ -115,7 +115,7 @@ class PermissionsController extends BaseController
                 'role.name' => 'required',
             ]);
 
-            \DB::transaction(function () use ($request, $id) {
+            DB::transaction(function () use ($request, $id) {
 
                 Role::whereId($id)->update($request['role']);
 

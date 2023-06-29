@@ -7,7 +7,9 @@ use App\Models\Provider;
 use App\Models\PurchaseReturn;
 use App\Models\Role;
 use App\Models\Setting;
-use \Nwidart\Modules\Facades\Module;
+use Nexmo\Client;
+use Nexmo\Client\Credentials\Basic;
+use Nwidart\Modules\Facades\Module;
 use App\Models\sms_gateway;
 use App\utils\helpers;
 use Carbon\Carbon;
@@ -120,7 +122,7 @@ class PaymentPurchaseReturnsController extends BaseController
         $this->authorizeForUser($request->user('api'), 'create', PaymentPurchaseReturns::class);
 
         if($request['montant'] > 0){
-            \DB::transaction(function () use ($request) {
+            DB::transaction(function () use ($request) {
                 $role = Auth::user()->roles()->first();
                 $view_records = Role::findOrFail($role->id)->inRole('record_view');
                 $PurchaseReturn = PurchaseReturn::findOrFail($request['purchase_return_id']);
@@ -177,7 +179,7 @@ class PaymentPurchaseReturnsController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'update', PaymentPurchaseReturns::class);
 
-        \DB::transaction(function () use ($id, $request) {
+        DB::transaction(function () use ($id, $request) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $payment = PaymentPurchaseReturns::findOrFail($id);
@@ -226,7 +228,7 @@ class PaymentPurchaseReturnsController extends BaseController
         $this->authorizeForUser($request->user('api'), 'delete', PaymentPurchaseReturns::class);
 
         
-        \DB::transaction(function () use ($id, $request) {
+        DB::transaction(function () use ($id, $request) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $payment = PaymentPurchaseReturns::findOrFail($id);
@@ -319,7 +321,7 @@ class PaymentPurchaseReturnsController extends BaseController
         $settings = Setting::where('deleted_at', '=', null)->first();
         $symbol = $helpers->Get_Currency_Code();
 
-        $pdf = \PDF::loadView('pdf.Payment_Purchase_Return', [
+        $pdf = PDF::loadView('pdf.Payment_Purchase_Return', [
             'symbol' => $symbol,
             'setting' => $settings,
             'payment' => $payment_data,
@@ -361,8 +363,8 @@ class PaymentPurchaseReturnsController extends BaseController
         }elseif($gateway->title == "nexmo"){
             try {
 
-                $basic  = new \Nexmo\Client\Credentials\Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
-                $client = new \Nexmo\Client($basic);
+                $basic  = new Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
+                $client = new Client($basic);
                 $nexmo_from = env("NEXMO_FROM");
         
                 $message = $client->message()->send([

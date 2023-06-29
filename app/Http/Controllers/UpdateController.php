@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\TestDbController;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
@@ -120,7 +121,7 @@ class UpdateController extends Controller
                 $permissions_data = Permission::pluck('id')->toArray();
                 $role->permissions()->attach($permissions_data);
                 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 
                 return $e->getMessage();
                 

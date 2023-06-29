@@ -14,7 +14,7 @@ use File;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Http\Request;
 use Intervention\Image\ImageManagerStatic as Image;
-use \Nwidart\Modules\Facades\Module;
+use Nwidart\Modules\Facades\Module;
 use Illuminate\Support\Facades\Config;
 
 class SettingsController extends Controller

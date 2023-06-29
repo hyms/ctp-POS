@@ -17,11 +17,12 @@ use App\Models\User;
 use App\Models\UserWarehouse;
 use App\utils\helpers;
 use Carbon\Carbon;
+use Nexmo\Client\Credentials\Basic;
 use Twilio\Rest\Client as Client_Twilio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use \Nwidart\Modules\Facades\Module;
+use Nwidart\Modules\Facades\Module;
 use App\Models\sms_gateway;
 use DB;
 use PDF;
@@ -145,7 +146,7 @@ class QuotationsController extends BaseController
             'warehouse_id' => 'required',
         ]);
 
-        \DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
 
             $order = new Quotation;
 
@@ -200,7 +201,7 @@ class QuotationsController extends BaseController
             'client_id' => 'required',
         ]);
 
-        \DB::transaction(function () use ($request, $id) {
+        DB::transaction(function () use ($request, $id) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $current_Quotation = Quotation::findOrFail($id);
@@ -281,7 +282,7 @@ class QuotationsController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'delete', Quotation::class);
 
-        \DB::transaction(function () use ($id, $request) {
+        DB::transaction(function () use ($id, $request) {
 
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
@@ -308,7 +309,7 @@ class QuotationsController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'delete', Quotation::class);
 
-        \DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
 
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
@@ -790,7 +791,7 @@ class QuotationsController extends BaseController
         }elseif($gateway->title == "nexmo"){
             try {
 
-                $basic  = new \Nexmo\Client\Credentials\Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
+                $basic  = new Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
                 $client = new \Nexmo\Client($basic);
                 $nexmo_from = env("NEXMO_FROM");
         
