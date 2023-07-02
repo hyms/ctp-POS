@@ -62,6 +62,15 @@ export default {
         name: "Nombre",
         description: "Descripcion",
     },
+    expense:{
+        date: "Fecha",
+        warehouse_id: "Agencia",
+        category_id: "Categoria",
+        details: "Detalle",
+        amount: "Monto",
+        ref:"Codigo"
+    },
+
     //no data
     no_fill_data: "Debe llenar correctamente los datos",
     no_add_product: "debe adicionar un producto",
@@ -79,14 +88,17 @@ export default {
     error_message: "Hubo un error en la transaccion",
     delete_message: "Borrado exitoso",
 
-    //others text
-    list_category: "Lista de Categorias",
+    //buttons
     add_pay: "Agregar pago",
-    total_products: "Total de productos",
+    list_category: "Lista de Categorias",
+    filters: "Filtros",
     search: "Buscar",
     submit: "Guardar",
     cancel: "Cancelar",
     add: "Añadir",
+
+    //others text
+    total_products: "Total de productos",
     filter_by_warehouse: "Filtrar por agencia",
     choose_warehouse: "Elija una agencia",
     // this_week_sales_purchases:"Ventas y compras de la semana",
@@ -105,4 +117,6 @@ export default {
     recent_sales: "Ventas Recientes",
     warehouse_assign: "Sucursales Asignadas",
     warehouse_some: "Algunas Sucursales",
+    start_date: "Fecha desde",
+    end_date: "Fecha hasta",
 }

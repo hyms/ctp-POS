@@ -3,6 +3,7 @@ import {ref, onMounted, watch} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import {router} from "@inertiajs/vue3";
 import helper from "@/helpers";
+import labels from "@/labels";
 import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
@@ -25,13 +26,7 @@ const expenseForm = ref({
   details: "",
   amount: "",
 });
-const expenseLabel = ref({
-  date: "Fecha",
-  warehouse_id: "Agencia",
-  category_id: "Categoria",
-  details: "Detalle",
-  amount: "Monto",
-});
+
 
 //------------- Submit Validation Create Expense
 async function Submit_Expense() {
@@ -56,7 +51,7 @@ function Create_Expense() {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Actualizacion exitosa";
+        snackbarText.value = labels.success_message;
         router.visit("/expenses");
       })
       .catch((error) => {
@@ -84,7 +79,7 @@ function Update_Expense() {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Actualizacion exitosa";
+        snackbarText.value = labels.success_message;
         router.visit("/expenses");
       })
       .catch((error) => {
@@ -145,9 +140,9 @@ onMounted(() => {
             <!-- date  -->
             <v-col lg="4" md="6" cols="12">
               <v-text-field
-                  :label="expenseLabel.date + ' *'"
+                  :label="labels.expense.date + ' *'"
                   v-model="expenseForm.date"
-                  :placeholder="expenseLabel.date"
+                  :placeholder="labels.expense.date"
                   :rules="helper.required"
                   variant="outlined"
                   density="comfortable"
@@ -162,7 +157,7 @@ onMounted(() => {
               <v-select
                   v-model="expenseForm.warehouse_id"
                   :items="warehouses"
-                  :label="expenseLabel.warehouse_id"
+                  :label="labels.expense.warehouse_id"
                   item-title="name"
                   item-value="id"
                   variant="outlined"
@@ -178,7 +173,7 @@ onMounted(() => {
               <v-select
                   v-model="expenseForm.category_id"
                   :items="expense_category"
-                  :label="expenseLabel.category_id"
+                  :label="labels.expense.category_id"
                   item-title="name"
                   item-value="id"
                   variant="outlined"
@@ -190,16 +185,12 @@ onMounted(() => {
             </v-col>
 
             <!-- Amount  -->
-            <v-col lg="4" md="4" cols="12">
+            <v-col md="4" cols="12">
               <v-text-field
-                  :label="expenseLabel.amount + ' *'"
+                  :label="labels.expense.amount + ' *'"
                   v-model="expenseForm.amount"
-                  :placeholder="expenseLabel.amount"
-                  :rules="
-                                    helper.required.concat(
-                                        helper.numberWithDecimal
-                                    )
-                                "
+                  :placeholder="labels.expense.amount"
+                  :rules="helper.required.concat(helper.numberWithDecimal)"
                   variant="outlined"
                   density="comfortable"
                   hide-details="auto"
@@ -208,12 +199,12 @@ onMounted(() => {
             </v-col>
 
             <!-- Details -->
-            <v-col lg="8" md="8" cols="12">
+            <v-col md="8" cols="12">
               <v-textarea
                   rows="4"
-                  :label="expenseLabel.details + ' *'"
+                  :label="labels.expense.details + ' *'"
                   v-model="expenseForm.details"
-                  :placeholder="expenseLabel.details"
+                  :placeholder="labels.expense.details"
                   :rules="helper.required"
                   variant="outlined"
                   density="comfortable"
@@ -228,7 +219,7 @@ onMounted(() => {
                   color="primary"
                   :loading="loading"
                   :disabled="loading"
-              >Guardar
+              >{{ labels.submit }}
               </v-btn>
             </v-col>
           </v-row>

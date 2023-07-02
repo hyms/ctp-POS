@@ -3,6 +3,7 @@ import {ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
+import FilterForm from "./filter_form.vue";
 import helper from "@/helpers";
 import labels from "@/labels";
 import {router} from "@inertiajs/vue3";
@@ -12,6 +13,7 @@ const props = defineProps({
   expenses: Object,
   Expenses_category: Object,
   warehouses: Object,
+  filter_form: Object,
   errors: Object,
 });
 //declare variable
@@ -111,6 +113,7 @@ function Delete_Expense(id) {
       </v-col>
       <v-spacer></v-spacer>
       <v-col cols="auto" class="text-right">
+        <FilterForm :warehouses="warehouses" :categories="Expenses_category" :filter_form="filter_form"></FilterForm>
         <ExportBtn
             :data="expenses"
             :fields="jsonFields"

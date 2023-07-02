@@ -29,10 +29,37 @@ class ExpensesController extends Controller
 //        $role = Auth::user()->roles()->first();
 //        $view_records = Role::findOrFail($role->id)->inRole('record_view');
 
+        $filter = collect($request->get('filter'));
+
         // Check If User Has Permission View  All Records
         $Expenses = Expense::with('expense_category', 'warehouse')
-            ->where('deleted_at', '=', null)
-            ->get();
+            ->where('deleted_at', '=', null);
+
+        if ($filter->count() > 0) {
+            $filterData = false;
+            if (!empty($filter->get('start_date')) && $filter->get('end_date')) {
+                $Expenses = $Expenses->whereBetween('date', [Carbon::parse($filter->get('start_date')), Carbon::parse($filter->get('end_date'))]);
+                $filterData = true;
+            }
+            if (!empty($filter->get('ref'))) {
+                $Expenses = $Expenses->where('Ref', 'like', "%{$filter->get('ref')}%");
+                $filterData = true;
+            }
+            if (!empty($filter->get('warehouse'))) {
+                $Expenses = $Expenses->where('warehouse_id', '=', $filter->get('warehouse'));
+                $filterData = true;
+            }
+            if (!empty($filter->get('category'))) {
+                $Expenses = $Expenses->where('expense_category_id', '=', $filter->get('category'));
+                $filterData = true;
+            }
+            if (!$filterData) {
+                $Expenses = $Expenses->limit(1000);
+            }
+        } else {
+            $Expenses = $Expenses->limit(500);
+        }
+        $Expenses = $Expenses->get();
         $data = collect();
         foreach ($Expenses as $Expense) {
 
@@ -56,6 +83,7 @@ class ExpensesController extends Controller
             'expenses' => $data,
             'Expenses_category' => $Expenses_category,
             'warehouses' => $warehouses,
+            'filter_form' => $filter
         ]);
 
     }

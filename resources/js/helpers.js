@@ -50,7 +50,7 @@ const print_pos = (element_id) => {
     }, 1000);
 }
 //------------------------------Get Month -------------------------\\
-const GetMonth=()=> {
+const GetMonth = () => {
     let months = [
         "Enero",
         "Febrero",
@@ -144,47 +144,47 @@ export default {
     formatDate: (date) => {
         return moment(date).format("DD-MM-YYYY");
     },
-    statutSale: (value=null) => {
-        const statut=[
+    statutSale: (value = null) => {
+        const statut = [
             {title: "Completado", value: "completed"},
             {title: "Pendiente", value: "pending"},
             {title: "Ordenado", value: "ordered"},
         ];
-        if(value==null) {
+        if (value == null) {
             return statut;
         }
-        return statut.find(item=>item.value==value).title
+        return statut.find(item => item.value == value).title
     },
     statutSaleColor: (value) => {
-        const statut=[
+        const statut = [
             {color: "primary", value: "completed"},
             {color: "secondary", value: "pending"},
             {color: "info", value: "ordered"},
         ];
-        return statut.find(item=>item.value==value).color;
+        return statut.find(item => item.value == value).color;
     },
-    statusPayment: (value=null) => {
-        const payment_statut= [
+    statusPayment: (value = null) => {
+        const payment_statut = [
             {title: "Pagado", value: "paid"},
             {title: "Deuda", value: "unpaid"},
             {title: "Parcial", value: "partial"},
         ];
-        if(value==null) {
+        if (value == null) {
             return payment_statut;
         }
-        return payment_statut.find(item=>item.value==value).title
+        return payment_statut.find(item => item.value == value).title
     },
     statusPaymentColor: (value) => {
-        const payment_statut= [
+        const payment_statut = [
             {color: "success", value: "paid"},
             {color: "error", value: "unpaid"},
             {color: "warning", value: "partial"},
         ];
-        return payment_statut.find(item=>item.value==value).color;
+        return payment_statut.find(item => item.value == value).color;
     },
     getReglamentPayment: (v) => {
         let result = reglaments.filter((i) => i.value.toLowerCase() == v.toLowerCase());
-        if (result == null || result.length==0) {
+        if (result == null || result.length == 0) {
             result = [{title: "", value: ""}];
         }
         return result;
@@ -196,4 +196,12 @@ export default {
     toggleFullScreen,
     linkVisit,
     GetMonth,
+    getObjectValue: (value, object) => {
+        return object.find(item => item.id == value)
+    },
+    getValueObject: (object) => {
+        if (typeof object === 'object' && object !== null)
+            return object.id
+        return object;
+    }
 };
