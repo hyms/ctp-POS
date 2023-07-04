@@ -94,7 +94,7 @@ const props = defineProps({
           >
             <thead>
             <tr style="background: #eee; ">
-              <th style="text-align: left;" colspan="1">Pagado Por:</th>
+              <th style="text-align: left;" colspan="1">Pagado en:</th>
               <th style="text-align: center;" colspan="2">Monto:</th>
               <th style="text-align: right;" colspan="1">Saldo:</th>
             </tr>

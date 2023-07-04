@@ -1,11 +1,14 @@
 <script setup>
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
 import helper from "@/helpers";
-import {router} from "@inertiajs/vue3";
+import labels from "@/labels";
+import {router, usePage} from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
+
+const currency = computed(() => usePage().props.currency);
 
 const props = defineProps({
   clients: Array,
@@ -26,6 +29,7 @@ const dialogDelete = ref(false);
 const dialogImport = ref(false);
 const dialogPayDue = ref(false);
 const dialogDetail = ref(false);
+const dialogInvoice = ref(false);
 
 const ImportProcessing = ref(false);
 const paymentProcessing = ref(false);
@@ -50,6 +54,7 @@ const payment_return = ref({
   Reglement: "",
 });
 const selectedIds = ref([]);
+const payment_codes = ref("");
 
 const import_clients = ref("");
 const client = ref({
@@ -64,16 +69,7 @@ const client = ref({
   adresse: "",
   nit_ci: "",
 });
-const clientLabel = ref({
-  name: "Nombre",
-  company_name: "Nombre de Empresa",
-  code: "Codigo",
-  email: "Correo",
-  phone: "Telefono",
-  city: "Ciudad",
-  adresse: "Direccion",
-  nit_ci: "NIT",
-});
+
 
 const fields = ref([
   {title: "Codigo", key: "code"},
@@ -148,7 +144,7 @@ function Submit_import() {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Proceso exitoso";
+        snackbarText.value = labels.success_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
@@ -196,7 +192,7 @@ function Create_Client() {
   loading.value = true;
   snackbar.value = false;
   axios
-      .post("clients", {
+      .post("/clients", {
         name: client.value.name,
         company_name: client.value.company_name,
         email: client.value.email,
@@ -209,7 +205,7 @@ function Create_Client() {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Proceso exitoso";
+        snackbarText.value = labels.success_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
@@ -234,7 +230,7 @@ function Update_Client() {
   loading.value = true;
   snackbar.value = false;
   axios
-      .put("clients/" + client.value.id, {
+      .put("/clients/" + client.value.id, {
         name: client.value.name,
         company_name: client.value.company_name,
         email: client.value.email,
@@ -247,7 +243,7 @@ function Update_Client() {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Proceso exitoso";
+        snackbarText.value = labels.success_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
@@ -288,11 +284,11 @@ function Remove_Client() {
   loading.value = true;
   snackbar.value = false;
   axios
-      .delete("clients/" + client.value.id)
+      .delete("/clients/" + client.value.id)
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Borrado exitoso";
+        snackbarText.value = labels.delete_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
@@ -331,7 +327,7 @@ async function Submit_Payment_sell_due() {
   if (!validate.valid) {
     snackbar.value = true;
     snackbarColor.value = "error";
-    snackbarText.value = "Por favor llene correctamente los campos";
+    snackbarText.value = labels.no_fill_data;
   } else if (payment.value.amount > payment.value.due) {
     payment.value.amount = 0;
   } else {
@@ -348,7 +344,7 @@ function Verified_paidAmount() {
   } else if (payment.value.amount > payment.value.due) {
     snackbar.value = true;
     snackbarColor.value = "warning";
-    snackbarText.value = "El pago no puede ser mayor a la deuda";
+    snackbarText.value = labels.payment_mayor_due;
     payment.value.amount = 0;
   }
 }
@@ -373,9 +369,8 @@ function Pay_due(row) {
   payment.value.client_name = row.name;
   payment.value.due = row.due;
   payment.value.date = new Date().toISOString().slice(0, 10);
-  setTimeout(() => {
-    dialogPayDue.value = true;
-  }, 500);
+  dialogPayDue.value = true;
+  dialogInvoice.value = false;
 }
 
 //------------------------------ Print Customer_Invoice -------------------------\\
@@ -396,8 +391,9 @@ function print_it() {
 function Submit_Pay_due() {
   loading.value = true;
   snackbar.value = false;
+  payment_codes.value = "";
   axios
-      .post("clients_pay_due", {
+      .post("/clients_pay_due", {
         client_id: payment.value.client_id,
         amount: payment.value.amount,
         notes: payment.value.notes,
@@ -406,13 +402,14 @@ function Submit_Pay_due() {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Proceso exitoso";
+        snackbarText.value = labels.success_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
         });
-
-        dialogDelete.value = false;
+        payment_codes.value = data.payment_codes;
+        dialogPayDue.value = false;
+        dialogInvoice.value = true;
       })
       .catch((error) => {
         console.log(error);
@@ -476,16 +473,16 @@ function Submit_Pay_due() {
 // }
 //
 // //------------------------------ Show Modal Pay_return_due-------------------------------\\
-function Pay_return_due(row) {
-  // this.reset_Form_payment_return_due();
-  // this.payment_return.client_id = row.id;
-  // this.payment_return.client_name = row.name;
-  // this.payment_return.return_Due = row.return_Due;
-  // this.payment_return.date = new Date().toISOString().slice(0, 10);
-  // setTimeout(() => {
-  //     this.$bvModal.show("modal_Pay_return_due");
-  // }, 500);
-}
+// function Pay_return_due(row) {
+// this.reset_Form_payment_return_due();
+// this.payment_return.client_id = row.id;
+// this.payment_return.client_name = row.name;
+// this.payment_return.return_Due = row.return_Due;
+// this.payment_return.date = new Date().toISOString().slice(0, 10);
+// setTimeout(() => {
+//     this.$bvModal.show("modal_Pay_return_due");
+// }, 500);
+// }
 
 // //------------------------------ Print Customer_Invoice -------------------------\\
 // function print_return_due() {
@@ -514,7 +511,7 @@ function Pay_return_due(row) {
 //         .then(({ data }) => {
 //             snackbar.value = true;
 //             snackbarColor.value = "success";
-//             snackbarText.value = "Proceso exitoso";
+//             snackbarText.value = labels.success_message;
 //             router.reload({
 //           preserveState: true,
 //           preserveScroll: true,
@@ -658,63 +655,63 @@ function Pay_return_due(row) {
         <v-toolbar
             border
             density="compact"
-            title="Detalle del Cliente"
+            :title=labels.client_detail
         ></v-toolbar>
         <v-card-text>
           <v-table density="compact" hover>
             <tbody>
             <tr>
               <!-- Customer Code -->
-              <td>{{ clientLabel.code }}</td>
+              <td>{{ labels.client.code }}</td>
               <td class="font-weight-bold">
                 {{ client.code }}
               </td>
             </tr>
             <tr>
               <!-- Customer Company Name -->
-              <td>{{ clientLabel.company_name }}</td>
+              <td>{{ labels.client.company_name }}</td>
               <td class="font-weight-bold">
                 {{ client.company_name }}
               </td>
             </tr>
             <tr>
               <!-- Customer Name -->
-              <td>{{ clientLabel.name }}</td>
+              <td>{{ labels.client.name }}</td>
               <td class="font-weight-bold">
                 {{ client.name }}
               </td>
             </tr>
             <tr>
               <!-- Customer Phone -->
-              <td>{{ clientLabel.phone }}</td>
+              <td>{{ labels.client.phone }}</td>
               <td class="font-weight-bold">
                 {{ client.phone }}
               </td>
             </tr>
             <tr>
               <!-- Customer Email -->
-              <td>{{ clientLabel.email }}</td>
+              <td>{{ labels.client.email }}</td>
               <td class="font-weight-bold">
                 {{ client.email }}
               </td>
             </tr>
             <tr>
               <!-- Customer City -->
-              <td>{{ clientLabel.city }}</td>
+              <td>{{ labels.client.city }}</td>
               <td class="font-weight-bold">
                 {{ client.city }}
               </td>
             </tr>
             <tr>
               <!-- Customer Adress -->
-              <td>{{ clientLabel.adresse }}</td>
+              <td>{{ labels.client.adresse }}</td>
               <td class="font-weight-bold">
                 {{ client.adresse }}
               </td>
             </tr>
             <tr>
               <!-- Tax Number -->
-              <td>{{ clientLabel.nit_ci }}</td>
+              <td>{{ labels.client.nit_ci }}</td>
               <td class="font-weight-bold">
                 {{ client.nit_ci }}
               </td>
@@ -722,9 +719,9 @@ function Pay_return_due(row) {
 
             <tr>
               <!-- Total_Sale_Due -->
-              <td>Total Deuda</td>
+              <td>{{ labels.total_sale_due }}</td>
               <td class="font-weight-bold">
-                Bs
+                {{ currency }}
                 {{ client.due }}
               </td>
             </tr>
@@ -733,7 +730,7 @@ function Pay_return_due(row) {
             <!--                                &lt;!&ndash; Total_Sell_Return_Due &ndash;&gt;-->
             <!--                                <td>Total Deuda de Devolucion</td>-->
             <!--                                <td>-->
-            <!--                                    Bs-->
+            <!--                                    {{ currency }}-->
             <!--                                    {{ client.return_Due }}-->
             <!--                                </td>-->
             <!--                            </tr>-->
@@ -748,7 +745,7 @@ function Pay_return_due(row) {
               class="ma-1"
               @click="dialogDetail = false"
           >
-            Cerrar
+            {{ labels.close }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -766,15 +763,15 @@ function Pay_return_due(row) {
             border
             :title="(editmode ? 'Editar ' : 'Añadir ') + 'Cliente'"
         ></v-toolbar>
-        <v-card-text>
-          <v-form @submit.prevent="onSave" ref="form">
+        <v-form @submit.prevent="onSave" ref="form">
+          <v-card-text>
             <v-row>
               <!-- Customer Name -->
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="clientLabel.name + ' *'"
+                    :label="labels.client.name + ' *'"
                     v-model="client.name"
-                    :placeholder="clientLabel.name"
+                    :placeholder="labels.client.name"
                     :rules="helper.required"
                     variant="outlined"
                     density="comfortable"
@@ -786,9 +783,9 @@ function Pay_return_due(row) {
               <!-- Customer Company_name -->
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="clientLabel.company_name + ' *'"
+                    :label="labels.client.company_name + ' *'"
                     v-model="client.company_name"
-                    :placeholder="clientLabel.company_name"
+                    :placeholder="labels.client.company_name"
                     :rules="helper.required"
                     variant="outlined"
                     density="comfortable"
@@ -800,9 +797,9 @@ function Pay_return_due(row) {
               <!-- Customer Email -->
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="clientLabel.email"
+                    :label="labels.client.email"
                     v-model="client.email"
-                    :placeholder="clientLabel.email"
+                    :placeholder="labels.client.email"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
@@ -813,9 +810,9 @@ function Pay_return_due(row) {
               <!-- Customer Phone -->
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="clientLabel.phone"
+                    :label="labels.client.phone"
                     v-model="client.phone"
-                    :placeholder="clientLabel.phone"
+                    :placeholder="labels.client.phone"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
@@ -826,9 +823,9 @@ function Pay_return_due(row) {
               <!-- Customer City -->
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="clientLabel.city"
+                    :label="labels.client.city"
                     v-model="client.city"
-                    :placeholder="clientLabel.city"
+                    :placeholder="labels.client.city"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
@@ -839,9 +836,9 @@ function Pay_return_due(row) {
               <!-- Customer Tax Number -->
               <v-col cols="12" md="6">
                 <v-text-field
-                    :label="clientLabel.nit_ci"
+                    :label="labels.client.nit_ci"
                     v-model="client.nit_ci"
-                    :placeholder="clientLabel.nit_ci"
+                    :placeholder="labels.client.nit_ci"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
@@ -852,40 +849,40 @@ function Pay_return_due(row) {
               <v-col md="12" sm="12">
                 <v-textarea
                     rows="4"
-                    :label="clientLabel.adresse"
+                    :label="labels.client.adresse"
                     v-model="client.adresse"
-                    :placeholder="clientLabel.adresse"
+                    :placeholder="labels.client.adresse"
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
                 ></v-textarea>
               </v-col>
             </v-row>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-              size="small"
-              variant="outlined"
-              color="error"
-              class="ma-1"
-              @click="onClose"
-          >
-            Cancelar
-          </v-btn>
-          <v-btn
-              size="small"
-              color="primary"
-              variant="flat"
-              class="ma-1"
-              @click="onSave"
-              :loading="loading"
-              :disabled="loading"
-          >
-            Guardar
-          </v-btn>
-        </v-card-actions>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+                size="small"
+                variant="outlined"
+                color="error"
+                class="ma-1"
+                @click="onClose"
+            >
+              {{ labels.cancel }}
+            </v-btn>
+            <v-btn
+                size="small"
+                color="primary"
+                variant="flat"
+                class="ma-1"
+                type="submit"
+                :loading="loading"
+                :disabled="loading"
+            >
+              {{ labels.submit }}
+            </v-btn>
+          </v-card-actions>
+        </v-form>
       </v-card>
     </v-dialog>
     <!-- Modal Remove Customer -->
@@ -930,7 +927,7 @@ function Pay_return_due(row) {
             prepend-icon="mdi-account-plus"
             @click="New_Client"
         >
-          Añadir
+          {{ labels.add }}
         </v-btn>
       </v-col>
     </v-row>
@@ -943,9 +940,8 @@ function Pay_return_due(row) {
             hover
             class="elevation-2"
             density="compact"
-            no-data-text="No existen datos a mostrar"
+            :no-data-text=labels.no_data_table
             :loading="loading"
-            loading-text="Cargando..."
         >
           <template v-slot:item.actions="{ item }">
             <v-menu>
@@ -961,15 +957,15 @@ function Pay_return_due(row) {
                 </v-btn>
               </template>
               <v-list density="compact">
-                <!--                                <v-list-item-->
-                <!--                                    v-if="item.raw.due > 0"-->
-                <!--                                    @click="Pay_due(item.raw)"-->
-                <!--                                    prepend-icon="mdi-currency-usd"-->
-                <!--                                >-->
-                <!--                                    <v-list-item-title>-->
-                <!--                                    Pagar todas la deudas a la vez-->
-                <!--                                    </v-list-item-title>-->
-                <!--                                </v-list-item>-->
+                <v-list-item
+                    v-if="item.raw.due > 0"
+                    @click="Pay_due(item.raw)"
+                    prepend-icon="mdi-currency-usd"
+                >
+                  <v-list-item-title>
+                    Pagar todas la deudas a la vez
+                  </v-list-item-title>
+                </v-list-item>
 
                 <!--                                <v-list-item-->
                 <!--                                    v-if="item.raw.return_Due > 0"-->
@@ -1016,142 +1012,79 @@ function Pay_return_due(row) {
     </v-row>
   </layout>
 
-  <!--        &lt;!&ndash; Modal Pay_due&ndash;&gt;-->
-  <!--        <validation-observer ref="ref_pay_due">-->
-  <!--            <v-dialog hide-footer size="md" id="modal_Pay_due" title="Pay Due">-->
-  <!--                <v-form @submit.prevent="Submit_Payment_sell_due">-->
-  <!--                    <v-row>-->
-  <!--                        &lt;!&ndash; Paying Amount  &ndash;&gt;-->
-  <!--                        <v-col lg="6" md="12" sm="12">-->
-  <!--                            <validation-provider-->
-  <!--                                name="Amount"-->
-  <!--                                :rules="{-->
-  <!--                                    required: true,-->
-  <!--                                    regex: /^\d*\.?\d*$/,-->
-  <!--                                }"-->
-  <!--                                v-slot="validationContext"-->
-  <!--                            >-->
-  <!--                                <v-form-group-->
-  <!--                                    :label="$t('Paying_Amount') + ' ' + '*'"-->
-  <!--                                >-->
-  <!--                                    <v-form-input-->
-  <!--                                        @keyup="-->
-  <!--                                            Verified_paidAmount(payment.amount)-->
-  <!--                                        "-->
-  <!--                                        label="Amount"-->
-  <!--                                        :placeholder="$t('Paying_Amount')"-->
-  <!--                                        v-model.number="payment.amount"-->
-  <!--                                        :state="-->
-  <!--                                            getValidationState(-->
-  <!--                                                validationContext-->
-  <!--                                            )-->
-  <!--                                        "-->
-  <!--                                        aria-describedby="Amount-feedback"-->
-  <!--                                    ></v-form-input>-->
-  <!--                                    <v-form-invalid-feedback-->
-  <!--                                        id="Amount-feedback"-->
-  <!--                                        >{{ validationContext.errors[0] }}-->
-  <!--                                    </v-form-invalid-feedback>-->
-  <!--                                    <span class="badge badge-danger"-->
-  <!--                                        >{{ $t("Due") }} :-->
-  <!--                                        {{ currentUser.currency }}-->
-  <!--                                        {{ payment.due }}</span-->
-  <!--                                    >-->
-  <!--                                </v-form-group>-->
-  <!--                            </validation-provider>-->
-  <!--                        </v-col>-->
+  <!-- Modal Pay_due-->
+  <v-dialog
+      v-model="dialogPayDue"
+      max-width="600px"
+      scrollable
+      @update:modelValue="dialogPayDue === false ? reset_Form_payment() : dialogPayDue"
+  >
+    <v-card>
+      <v-toolbar
+          density="compact"
+          border
+          title="Pagar Deuda"
+      ></v-toolbar>
+      <v-form @submit.prevent="Submit_Payment_sell_due" ref="formPayDue">
+        <v-card-text>
+          <v-row>
+            <!-- Paying Amount  -->
+            <v-col md="6" cols="12">
+              <v-text-field
+                  :label="labels.payment.amount + ' *'"
+                  v-model="payment.amount"
+                  :placeholder="labels.payment.amount"
+                  :rules="helper.required.concat(helper.numberWithDecimal)"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details="auto"
+              >
+              </v-text-field>
+            </v-col>
 
-  <!--                        &lt;!&ndash; Payment choice &ndash;&gt;-->
-  <!--                        <v-col lg="6" md="12" sm="12">-->
-  <!--                            <validation-provider-->
-  <!--                                name="Payment choice"-->
-  <!--                                :rules="{ required: true }"-->
-  <!--                            >-->
-  <!--                                <v-form-group-->
-  <!--                                    slot-scope="{ valid, errors }"-->
-  <!--                                    :label="$t('Paymentchoice') + ' ' + '*'"-->
-  <!--                                >-->
-  <!--                                    <v-select-->
-  <!--                                        :class="{-->
-  <!--                                            'is-invalid': !!errors.length,-->
-  <!--                                        }"-->
-  <!--                                        :state="-->
-  <!--                                            errors[0]-->
-  <!--                                                ? false-->
-  <!--                                                : valid-->
-  <!--                                                ? true-->
-  <!--                                                : null-->
-  <!--                                        "-->
-  <!--                                        v-model="payment.Reglement"-->
-  <!--                                        :reduce="(label) => label.value"-->
-  <!--                                        :placeholder="$t('PleaseSelect')"-->
-  <!--                                        :options="[-->
-  <!--                                            { label: 'Cash', value: 'Cash' },-->
-  <!--                                            {-->
-  <!--                                                label: 'credit card',-->
-  <!--                                                value: 'credit card',-->
-  <!--                                            },-->
-  <!--                                            { label: 'TPE', value: 'tpe' },-->
-  <!--                                            {-->
-  <!--                                                label: 'cheque',-->
-  <!--                                                value: 'cheque',-->
-  <!--                                            },-->
-  <!--                                            {-->
-  <!--                                                label: 'Western Union',-->
-  <!--                                                value: 'Western Union',-->
-  <!--                                            },-->
-  <!--                                            {-->
-  <!--                                                label: 'bank transfer',-->
-  <!--                                                value: 'bank transfer',-->
-  <!--                                            },-->
-  <!--                                            { label: 'other', value: 'other' },-->
-  <!--                                        ]"-->
-  <!--                                    ></v-select>-->
-  <!--                                    <v-form-invalid-feedback-->
-  <!--                                        >{{ errors[0] }}-->
-  <!--                                    </v-form-invalid-feedback>-->
-  <!--                                </v-form-group>-->
-  <!--                            </validation-provider>-->
-  <!--                        </v-col>-->
+            <!-- Payment choice -->
+            <v-col md="6" cols="12">
+              <v-select
+                  v-model="payment.Reglement"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details="auto"
+                  :items="helper.reglamentPayment()"
+                  label="Tipo de Pago"
+                  :rules="helper.required"
+              ></v-select>
+            </v-col>
 
-  <!--                        &lt;!&ndash; Note &ndash;&gt;-->
-  <!--                        <v-col lg="12" md="12" sm="12" class="mt-3">-->
-  <!--                            <v-form-group-->
-  <!--                                :label="$t('Please_provide_any_details')"-->
-  <!--                            >-->
-  <!--                                <v-form-textarea-->
-  <!--                                    id="textarea"-->
-  <!--                                    v-model="payment.notes"-->
-  <!--                                    rows="3"-->
-  <!--                                    max-rows="6"-->
-  <!--                                ></v-form-textarea>-->
-  <!--                            </v-form-group>-->
-  <!--                        </v-col>-->
+            <!-- Note -->
+            <v-col cols="12">
+              <v-textarea
+                  v-model="payment.notes"
+                  rows="4"
+                  variant="outlined"
+                  :label="labels.payment.notes"
+                  :placeholder="labels.payment.notes"
+                  hide-details="auto"
+              ></v-textarea>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+              color="primary"
+              variant="elevated"
+              type="submit"
+              :disabled="paymentProcessing"
+          >{{ labels.submit }}
+          </v-btn>
+        </v-card-actions>
+      </v-form>
+    </v-card>
+  </v-dialog>
 
-  <!--                        <v-col md="12" class="mt-3">-->
-  <!--                            <v-btn-->
-  <!--                                variant="primary"-->
-  <!--                                type="submit"-->
-  <!--                                :disabled="paymentProcessing"-->
-  <!--                                >{{ $t("submit") }}-->
-  <!--                            </v-btn>-->
-  <!--                            <div-->
-  <!--                                v-once-->
-  <!--                                class="typo__p"-->
-  <!--                                v-if="paymentProcessing"-->
-  <!--                            >-->
-  <!--                                <div-->
-  <!--                                    class="spinner sm spinner-primary mt-3"-->
-  <!--                                ></div>-->
-  <!--                            </div>-->
-  <!--                        </v-col>-->
-  <!--                    </v-row>-->
-  <!--                </v-form>-->
-  <!--            </v-dialog>-->
-  <!--        </validation-observer>-->
 
   <!--        &lt;!&ndash; Modal Pay_return_Due&ndash;&gt;-->
-  <!--        <validation-observer ref="ref_pay_return_due">-->
+  <!--        <validation-o{{ currency }}erver ref="ref_pay_return_due">-->
   <!--            <v-dialog-->
   <!--                hide-footer-->
   <!--                size="md"-->
@@ -1289,83 +1222,72 @@ function Pay_return_due(row) {
   <!--                    </v-row>-->
   <!--                </v-form>-->
   <!--            </v-dialog>-->
-  <!--        </validation-observer>-->
+  <!--        </validation-o{{ currency }}erver>-->
 
-  <!--        &lt;!&ndash; Modal Show Customer_Invoice&ndash;&gt;-->
-  <!--        <v-dialog-->
-  <!--            hide-footer-->
-  <!--            size="sm"-->
-  <!--            scrollable-->
-  <!--            id="Show_invoice"-->
-  <!--            :title="$t('Customer_Credit_Note')"-->
-  <!--        >-->
-  <!--            <div id="invoice-POS">-->
-  <!--                <div style="max-width: 400px; margin: 0px auto">-->
-  <!--                    <div class="info">-->
-  <!--                        <h2 class="text-center">-->
-  <!--                            {{ company_info.CompanyName }}-->
-  <!--                        </h2>-->
+  <!-- Modal Show Customer_Invoice-->
+  <v-dialog :model-value="dialogInvoice" max-width="400">
+    <v-card>
+      <v-card-text>
+        <div id="invoice-POS">
+          <div class="info">
+            <h2 class="text-center">
+              {{ company_info?.CompanyName }}
+            </h2>
 
-  <!--                        <p>-->
-  <!--                            <span-->
-  <!--                                >{{ $t("date") }} : {{ payment.date }} <br-->
-  <!--                            /></span>-->
-  <!--                            <span-->
-  <!--                                >{{ $t("Adress") }} :-->
-  <!--                                {{ company_info.CompanyAdress }} <br-->
-  <!--                            /></span>-->
-  <!--                            <span-->
-  <!--                                >{{ $t("Phone") }} :-->
-  <!--                                {{ company_info.CompanyPhone }} <br-->
-  <!--                            /></span>-->
-  <!--                            <span-->
-  <!--                                >{{ $t("Customer") }} :-->
-  <!--                                {{ payment.client_name }} <br-->
-  <!--                            /></span>-->
-  <!--                        </p>-->
-  <!--                    </div>-->
+            <p>
+              <span>Fecha : {{ payment.date }} <br/></span>
+              <span>Cliente : {{ payment.client_name }} <br/></span>
+            </p>
+          </div>
 
-  <!--                    <table class="change mt-3" style="font-size: 10px">-->
-  <!--                        <thead>-->
-  <!--                            <tr style="background: #eee">-->
-  <!--                                <th style="text-align: left" colspan="1">-->
-  <!--                                    {{ $t("PayeBy") }}:-->
-  <!--                                </th>-->
-  <!--                                <th style="text-align: center" colspan="2">-->
-  <!--                                    {{ $t("Amount") }}:-->
-  <!--                                </th>-->
-  <!--                                <th style="text-align: right" colspan="1">-->
-  <!--                                    {{ $t("Due") }}:-->
-  <!--                                </th>-->
-  <!--                            </tr>-->
-  <!--                        </thead>-->
+          <v-table density="compact" hover>
+            <thead>
+            <tr style="background: #eee">
+              <th style="text-align: left" colspan="1">
+                Pago de:
+              </th>
+              <th style="text-align: left" colspan="1">
+                Pago en:
+              </th>
+              <th style="text-align: center" colspan="1">
+                {{ labels.sale.paid_amount }}:
+              </th>
+              <th style="text-align: right" colspan="1">
+                {{ labels.sale.due }}:
+              </th>
+            </tr>
+            </thead>
 
-  <!--                        <tbody>-->
-  <!--                            <tr>-->
-  <!--                                <td style="text-align: left" colspan="1">-->
-  <!--                                    {{ payment.Reglement }}-->
-  <!--                                </td>-->
-  <!--                                <td style="text-align: center" colspan="2">-->
-  <!--                                    {{ formatNumber(payment.amount, 2) }}-->
-  <!--                                </td>-->
-  <!--                                <td style="text-align: right" colspan="1">-->
-  <!--                                    {{-->
-  <!--                                        formatNumber(-->
-  <!--                                            payment.due - payment.amount,-->
-  <!--                                            2-->
-  <!--                                        )-->
-  <!--                                    }}-->
-  <!--                                </td>-->
-  <!--                            </tr>-->
-  <!--                        </tbody>-->
-  <!--                    </table>-->
-  <!--                </div>-->
-  <!--            </div>-->
-  <!--            <button @click="print_it()" class="btn btn-outline-primary">-->
-  <!--                <i class="i-Billing"></i>-->
-  <!--                {{ $t("print") }}-->
-  <!--            </button>-->
-  <!--        </v-dialog>-->
+            <tbody>
+            <tr>
+              <td style="text-align: left" colspan="1">
+                <div v-html="helper.newLine(payment_codes)">
+                </div>
+              </td>
+              <td style="text-align: left" colspan="1">
+                {{ helper.getReglamentPayment(payment.Reglement)[0].title }}
+              </td>
+              <td style="text-align: center" colspan="1">
+                {{ helper.formatNumber(payment.amount, 2) }}
+              </td>
+              <td style="text-align: right" colspan="1">
+                {{ helper.formatNumber(payment.due, 2) }}
+              </td>
+            </tr>
+            </tbody>
+          </v-table>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn prepend-icon="mdi-printer" @click="helper.print_pos('invoice-POS')" color="primary"
+                   variant="outlined">
+              {{ labels.print }}
+            </v-btn>
+            <v-spacer></v-spacer>
+          </v-card-actions>
+        </div>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 
   <!--        &lt;!&ndash; Modal Show_invoice_return&ndash;&gt;-->
   <!--        <v-dialog-->
@@ -1443,5 +1365,5 @@ function Pay_return_due(row) {
   <!--                <i class="i-Billing"></i>-->
   <!--                {{ $t("print") }}-->
   <!--            </button>-->
-  <!--        </v-dialog>-->
+
 </template>

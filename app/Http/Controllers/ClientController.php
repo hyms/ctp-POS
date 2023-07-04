@@ -244,7 +244,7 @@ class ClientController extends Controller
             ])->get();
 
             $paid_amount_total = $request->amount;
-
+             $payment_codes="";
             foreach($client_sales_due as $key => $client_sale){
                 if($paid_amount_total == 0)
                 break;
@@ -267,8 +267,8 @@ class ClientController extends Controller
                 $payment_sale->change = 0;
                 $payment_sale->notes = $request['notes'];
                 $payment_sale->user_id = Auth::user()->id;
+                $payment_codes .= $client_sale->Ref . " ";
                 $payment_sale->save();
-
                 $client_sale->paid_amount += $amount;
                 $client_sale->payment_statut = $payment_status;
                 $client_sale->save();
@@ -277,7 +277,7 @@ class ClientController extends Controller
             }
         }
         
-         return response()->json(['success' => true]);
+         return response()->json(['success' => true,'payment_codes'=>$payment_codes]);
  
      }
 

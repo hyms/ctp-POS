@@ -74,6 +74,9 @@ const linkVisit = (url, type = "get") => {
         preserveState: true,
     });
 }
+const newLine = (value)=>{
+    return value.toString().replaceAll(' ',"<br>");
+}
 export default {
     required: [(v) => !!v || "Requerido"],
     max: (max) => [
@@ -203,5 +206,6 @@ export default {
         if (typeof object === 'object' && object !== null)
             return object.id
         return object;
-    }
+    },
+    newLine,
 };

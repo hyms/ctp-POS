@@ -2,6 +2,16 @@ import {ref} from "vue";
 
 export default {
     //forms
+    client: {
+        name: "Nombre",
+        company_name: "Nombre de Empresa",
+        code: "Codigo",
+        email: "Correo",
+        phone: "Telefono",
+        city: "Ciudad",
+        adresse: "Direccion",
+        nit_ci: "NIT",
+    },
     warehouse: {
         name: "Nombre",
         mobile: "Telefono",
@@ -95,10 +105,13 @@ export default {
     search: "Buscar",
     submit: "Guardar",
     cancel: "Cancelar",
+    close: "Cerrar",
     add: "Añadir",
+    print: "Imprimir",
 
     //others text
     total_products: "Total de productos",
+    total_sale_due: "Total deuda",
     filter_by_warehouse: "Filtrar por agencia",
     choose_warehouse: "Elija una agencia",
     // this_week_sales_purchases:"Ventas y compras de la semana",
@@ -119,4 +132,6 @@ export default {
     warehouse_some: "Algunas Sucursales",
     start_date: "Fecha desde",
     end_date: "Fecha hasta",
+    payment_mayor_due: "El pago no puede ser mayor a la deuda",
+    client_detail:"Detalle del Cliente",
 }
