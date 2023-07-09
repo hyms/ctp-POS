@@ -36,6 +36,7 @@ use App\utils\helpers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 use PDF;
 
 class ReportController extends Controller
@@ -597,33 +598,33 @@ class ReportController extends Controller
     
         public function Report_Sales(request $request)
         {
-            $this->authorizeForUser($request->user('api'), 'Reports_sales', Sale::class);
+//            $this->authorizeForUser($request->user('api'), 'Reports_sales', Sale::class);
             // How many items do you want to display.
-            $perPage = $request->limit;
-            $pageStart = \Request::get('page', 1);
+//            $perPage = $request->limit;
+//            $pageStart = \Request::get('page', 1);
             // Start displaying items from this number;
-            $offSet = ($pageStart * $perPage) - $perPage;
-            $order = $request->SortField;
-            $dir = $request->SortType;
+//            $offSet = ($pageStart * $perPage) - $perPage;
+//            $order = $request->SortField;
+//            $dir = $request->SortType;
             $helpers = new helpers();
             // Filter fields With Params to retrieve
     
-            $param = array(
-                0 => 'like',
-                1 => 'like',
-                2 => '=',
-                3 => 'like',
-                4 => '=',
-            );
-            $columns = array(
-                0 => 'Ref',
-                1 => 'statut',
-                2 => 'client_id',
-                3 => 'payment_statut',
-                4 => 'warehouse_id',
-            );
+//            $param = array(
+//                0 => 'like',
+//                1 => 'like',
+//                2 => '=',
+//                3 => 'like',
+//                4 => '=',
+//            );
+//            $columns = array(
+//                0 => 'Ref',
+//                1 => 'statut',
+//                2 => 'client_id',
+//                3 => 'payment_statut',
+//                4 => 'warehouse_id',
+//            );
             
-            $data = array();
+            $data = collect();
     
             $Sales = Sale::select('sales.*')
                 ->with('facture', 'client', 'warehouse')
@@ -632,41 +633,40 @@ class ReportController extends Controller
                 ->whereBetween('sales.date', array($request->from, $request->to));
     
             //  Check If User Has Permission Show All Records
-            $Sales = $helpers->Show_Records($Sales);
+//            $Sales = $helpers->Show_Records($Sales);
             //Multiple Filter
-            $Filtred = $helpers->filter($Sales, $columns, $param, $request)
-           // Search With Multiple Param
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('search'), function ($query) use ($request) {
-                    return $query->where('Ref', 'LIKE', "%{$request->search}%")
-                        ->orWhere('statut', 'LIKE', "%{$request->search}%")
-                        ->orWhere('GrandTotal', $request->search)
-                        ->orWhere('payment_statut', 'like', "%{$request->search}%")
-                        ->orWhere('shipping_status', 'like', "%{$request->search}%")
-                        ->orWhere(function ($query) use ($request) {
-                            return $query->whereHas('client', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        })
-                        ->orWhere(function ($query) use ($request) {
-                            return $query->whereHas('warehouse', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        });
-                });
-            });
+//            $Filtred = $helpers->filter($Sales, $columns, $param, $request)
+//           // Search With Multiple Param
+//            ->where(function ($query) use ($request) {
+//                return $query->when($request->filled('search'), function ($query) use ($request) {
+//                    return $query->where('Ref', 'LIKE', "%{$request->search}%")
+//                        ->orWhere('statut', 'LIKE', "%{$request->search}%")
+//                        ->orWhere('GrandTotal', $request->search)
+//                        ->orWhere('payment_statut', 'like', "%{$request->search}%")
+//                        ->orWhere('shipping_status', 'like', "%{$request->search}%")
+//                        ->orWhere(function ($query) use ($request) {
+//                            return $query->whereHas('client', function ($q) use ($request) {
+//                                $q->where('name', 'LIKE', "%{$request->search}%");
+//                            });
+//                        })
+//                        ->orWhere(function ($query) use ($request) {
+//                            return $query->whereHas('warehouse', function ($q) use ($request) {
+//                                $q->where('name', 'LIKE', "%{$request->search}%");
+//                            });
+//                        });
+//                });
+//            });
     
-            $totalRows = $Filtred->count();
-            if($perPage == "-1"){
-                $perPage = $totalRows;
-            }
-            $Sales = $Filtred->offset($offSet)
-                ->limit($perPage)
-                ->orderBy('sales.' . $order, $dir)
-                ->get();
-    
+//            $totalRows = $Filtred->count();
+//            if($perPage == "-1"){
+//                $perPage = $totalRows;
+//            }
+//            $Sales = $Filtred->offset($offSet)
+//                ->limit($perPage)
+//                ->orderBy('sales.' . $order, $dir)
+//                ->get();
+            $Sales = $Sales->get();
             foreach ($Sales as $Sale) {
-    
                 $item['id'] = $Sale['id'];
                 $item['date'] = $Sale['date'];
                 $item['Ref'] = $Sale['Ref'];
@@ -684,7 +684,7 @@ class ReportController extends Controller
                 $item['due'] = $Sale['GrandTotal'] - $Sale['paid_amount'];
                 $item['payment_status'] = $Sale['payment_statut'];
     
-                $data[] = $item;
+                $data->add($item);
             }
     
             $customers = client::where('deleted_at', '=', null)->get(['id', 'name']);
@@ -698,9 +698,10 @@ class ReportController extends Controller
                $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
            }
     
-            return response()->json(
+//            return response()->json(
+            return Inertia::render('Reports/payments/payments_sales',
                 [
-                    'totalRows' => $totalRows,
+//                    'totalRows' => $totalRows,
                     'sales' => $data,
                     'customers' => $customers, 
                     'warehouses' => $warehouses

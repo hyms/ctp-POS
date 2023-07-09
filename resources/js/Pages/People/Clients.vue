@@ -373,20 +373,6 @@ function Pay_due(row) {
   dialogInvoice.value = false;
 }
 
-//------------------------------ Print Customer_Invoice -------------------------\\
-function print_it() {
-  let divContents = document.getElementById("invoice-POS").innerHTML;
-  let a = window.open("", "", "height=500, width=500");
-  a.document.write('<link rel="stylesheet" href="/css/pos_print.css"><html>');
-  a.document.write("<body >");
-  a.document.write(divContents);
-  a.document.write("</body></html>");
-  a.document.close();
-  setTimeout(() => {
-    a.print();
-  }, 1000);
-}
-
 //---------------------------------------- Submit_Pay_due-------------------------------\\
 function Submit_Pay_due() {
   loading.value = true;

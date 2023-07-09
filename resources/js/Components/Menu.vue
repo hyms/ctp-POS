@@ -109,6 +109,19 @@ const menuItems = ref([
     ],
   },
   {
+    label: "Informes",
+    url: "",
+    role: "admin",
+    icon: "",
+    subItems: [
+      {
+        label: "Pagos de Ventas",
+        url: "/payment_sale",
+        role: "admin",
+      },
+    ],
+  },
+  {
     label: "Configuraciones",
     url: "",
     role: "admin",

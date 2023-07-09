@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Models\PaymentWithCreditCard;
+use Inertia\Inertia;
 use Nexmo\Client\Credentials\Basic;
 use Nwidart\Modules\Facades\Module;
 use App\Models\sms_gateway;
@@ -32,26 +33,29 @@ class PaymentSalesController extends Controller
 //        $perPage = $request->limit;
 //        $pageStart = Request::get('page', 1);
 //         Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-        $order = $request->SortField;
-        $dir = $request->SortType;
-        $helpers = new helpers();
-        $role = Auth::user()->roles()->first();
-        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+//        $offSet = ($pageStart * $perPage) - $perPage;
+//        $order = $request->SortField;
+//        $dir = $request->SortType;
+//        $helpers = new helpers();
+//        $role = Auth::user()->roles()->first();
+//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
         // Filter fields With Params to retriever
-        $param = array(0 => 'like', 1 => '=', 2 => 'like');
-        $columns = array(0 => 'Ref', 1 => 'sale_id', 2 => 'Reglement');
-        $data = array();
-
+//        $param = array(0 => 'like', 1 => '=', 2 => 'like');
+//        $columns = array(0 => 'Ref', 1 => 'sale_id', 2 => 'Reglement');
+        $data = collect();
+        if($request->collect()->count()==0){
+            $request['from'] = Carbon::now();
+            $request['to'] = Carbon::now();
+        }
         // Check If User Has Permission View  All Records
         $Payments = PaymentSale::with('sale.client')
             ->where('deleted_at', '=', null)
             ->whereBetween('date', array($request->from, $request->to))
-            ->where(function ($query) use ($view_records) {
-                if (!$view_records) {
-                    return $query->where('user_id', '=', Auth::user()->id);
-                }
-            })
+//            ->where(function ($query) use ($view_records) {
+//                if (!$view_records) {
+//                    return $query->where('user_id', '=', Auth::user()->id);
+//                }
+//            })
             // Multiple Filter
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('client_id'), function ($query) use ($request) {
@@ -60,33 +64,35 @@ class PaymentSalesController extends Controller
                     });
                 });
             });
-        $Filtred = $helpers->filter($Payments, $columns, $param, $request)
-            // Search With Multiple Param
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('search'), function ($query) use ($request) {
-                    return $query->where('Ref', 'LIKE', "%{$request->search}%")
-                        ->orWhere('date', 'LIKE', "%{$request->search}%")
-                        ->orWhere('Reglement', 'LIKE', "%{$request->search}%")
-                        ->orWhere(function ($query) use ($request) {
-                            return $query->whereHas('sale', function ($q) use ($request) {
-                                $q->where('Ref', 'LIKE', "%{$request->search}%");
-                            });
-                        })
-                        ->orWhere(function ($query) use ($request) {
-                            return $query->whereHas('sale.client', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        });
-                });
-            });
+//        $Filtred = $helpers->filter($Payments, $columns, $param, $request)
+//            // Search With Multiple Param
+//            ->where(function ($query) use ($request) {
+//                return $query->when($request->filled('search'), function ($query) use ($request) {
+//                    return $query->where('Ref', 'LIKE', "%{$request->search}%")
+//                        ->orWhere('date', 'LIKE', "%{$request->search}%")
+//                        ->orWhere('Reglement', 'LIKE', "%{$request->search}%")
+//                        ->orWhere(function ($query) use ($request) {
+//                            return $query->whereHas('sale', function ($q) use ($request) {
+//                                $q->where('Ref', 'LIKE', "%{$request->search}%");
+//                            });
+//                        })
+//                        ->orWhere(function ($query) use ($request) {
+//                            return $query->whereHas('sale.client', function ($q) use ($request) {
+//                                $q->where('name', 'LIKE', "%{$request->search}%");
+//                            });
+//                        });
+//                });
+//            });
 
-        $totalRows = $Filtred->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $Payments = $Filtred->offset($offSet)
-            ->limit($perPage)
-            ->orderBy($order, $dir)
+//        $totalRows = $Filtred->count();
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
+//        $Payments = $Filtred->offset($offSet)
+//            ->limit($perPage)
+//            ->orderBy($order, $dir)
+//            ->get();
+        $Payments = $Payments
             ->get();
 
         foreach ($Payments as $Payment) {
@@ -94,18 +100,18 @@ class PaymentSalesController extends Controller
             $item['date'] = $Payment->date;
             $item['Ref'] = $Payment->Ref;
             $item['Ref_Sale'] = $Payment['sale']->Ref;
-            $item['client_name'] = $Payment['sale']['client']->name;
+            $item['client_name'] = $Payment['sale']['client']->company_name;
             $item['Reglement'] = $Payment->Reglement;
             $item['montant'] = $Payment->montant;
             // $item['montant'] = number_format($Payment->montant, 2, '.', '');
-            $data[] = $item;
+            $data->add($item);
         }
 
         $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
-        $sales = Sale::get(['Ref', 'id']);
+        $sales = Sale::whereIn('id',$Payments->pluck('sale_id'))->get(['Ref', 'id']);
 
-        return response()->json([
-            'totalRows' => $totalRows,
+        return Inertia::render('Reports/payments/payments_sales',[
+//            'totalRows' => $totalRows,
             'payments' => $data,
             'sales' => $sales,
             'clients' => $clients,
