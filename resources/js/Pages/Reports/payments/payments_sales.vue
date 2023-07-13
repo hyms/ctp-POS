@@ -1,14 +1,19 @@
 <script setup>
 import {onMounted, ref} from "vue";
+import Layout from "@/Layouts/Authenticated.vue";
+import Snackbar from "@/Components/snackbar.vue";
+import ExportBtn from "@/Components/ExportBtn.vue";
+import {router} from "@inertiajs/vue3";
+import helper from "@/helpers";
+import labels from "@/labels";
 import moment from 'moment'
 
 const props = defineProps({
-  sales: Object,
-  customers: Object,
-  warehouses: Object,
+  payments:Object,
+  sales:Object,
+  clients:Object,
 })
-const loading = ref("");
-const payments = ref([]);
+const loading = ref(false);
 const today_mode = ref(true);
 
 const form = ref({
@@ -24,6 +29,14 @@ const fields = ref([
   {title: "Forma de Pago", key: "Reglement"},
   {title: "Monto", key: "montant"},
 ]);
+const jsonFields = ref({
+  "Fecha": "date",
+  "Codigo": "Ref",
+  "Codigo Venta": "Ref_Sale",
+  "Cliente": "client_name",
+  "Forma de Pago": "Reglement",
+  "Monto": "montant",
+});
 //     return {
 //       Filter_client: "",
 //       Filter_Ref: "",
@@ -31,14 +44,14 @@ const fields = ref([
 //       Filter_Reg: "",
 //     };
 //
-    function sumCount(rowObj) {
+function sumCount(rowObj) {
 
-    	let sum = 0;
-      for (let i = 0; i < rowObj.children.length; i++) {
-        sum += rowObj.children[i].montant;
-      }
-      return sum;
-    }
+  let sum = 0;
+  for (let i = 0; i < rowObj.children.length; i++) {
+    sum += rowObj.children[i].montant;
+  }
+  return sum;
+}
 
 //     //------ Reset Filter
 //     Reset_Filter() {
@@ -50,78 +63,79 @@ const fields = ref([
 //       this.Payments_Sales(this.serverParams.page);
 //     },
 //
-    //---------------------------------------- Set To Strings-------------------------\\
-    function setToStrings() {
-      // Simply replaces null values with strings=''
-      if (this.Filter_client === null) {
-        this.Filter_client = "";
-      } else if (this.Filter_sale === null) {
-        this.Filter_sale = "";
-      }
-    }
+//---------------------------------------- Set To Strings-------------------------\\
+function setToStrings() {
+  // Simply replaces null values with strings=''
+  if (this.Filter_client === null) {
+    this.Filter_client = "";
+  } else if (this.Filter_sale === null) {
+    this.Filter_sale = "";
+  }
+}
 
-    function get_data_loaded() {
-      if (today_mode.value) {
-        let today = new Date()
+function get_data_loaded() {
+  if (today_mode.value) {
+    let today = new Date()
 
-        form.value.startDate = today.getFullYear();
-        form.value.endDate = new Date().toJSON().slice(0, 10);
-      }
-    }
+    form.value.startDate = today.getFullYear();
+    form.value.endDate = new Date().toJSON().slice(0, 10);
+  }
+}
 
-    //-------------------------------- Get All Payments Sales ---------------------\\
-    function Payments_Sales() {
-      // Start the progress bar.
-     loading.value=true;
-      setToStrings();
-      get_data_loaded();
+//-------------------------------- Get All Payments Sales ---------------------\\
+function Payments_Sales() {
+  // Start the progress bar.
+  loading.value = true;
+  setToStrings();
+  get_data_loaded();
 
-      axios
-        .get(
-          "/payment_sale?page=" +
-            page +
-            "&Ref=" +
-            this.Filter_Ref +
-            "&client_id=" +
-            this.Filter_client +
-            "&sale_id=" +
-            this.Filter_sale +
-            "&Reglement=" +
-            this.Filter_Reg +
-            "&SortField=" +
-            this.serverParams.sort.field +
-            "&SortType=" +
-            this.serverParams.sort.type +
-            "&search=" +
-            this.search +
-            "&limit=" +
-            this.limit +
-            "&to=" +
-            this.endDate +
-            "&from=" +
-            this.startDate
-        )
+  // axios
+  //     .get(
+  //         "/payment_sale?page=" +
+  //         page +
+  //         "&Ref=" +
+  //         this.Filter_Ref +
+  //         "&client_id=" +
+  //         this.Filter_client +
+  //         "&sale_id=" +
+  //         this.Filter_sale +
+  //         "&Reglement=" +
+  //         this.Filter_Reg +
+  //         "&SortField=" +
+  //         this.serverParams.sort.field +
+  //         "&SortType=" +
+  //         this.serverParams.sort.type +
+  //         "&search=" +
+  //         this.search +
+  //         "&limit=" +
+  //         this.limit +
+  //         "&to=" +
+  //         this.endDate +
+  //         "&from=" +
+  //         this.startDate
+  //     )
+  //
+  //     .then(response => {
+  //       this.payments = response.data.payments;
+  //       this.clients = response.data.clients;
+  //       this.sales = response.data.sales;
+  //       this.totalRows = response.data.totalRows;
+  //       this.rows[0].children = this.payments;
+  //       // Complete the animation of theprogress bar.
+  //       NProgress.done();
+  //       this.isLoading = false;
+  //       this.today_mode = false;
+  //     })
+  //     .catch(response => {
+  //       // Complete the animation of theprogress bar.
+  //       NProgress.done();
+  //       setTimeout(() => {
+  //         this.isLoading = false;
+  //         this.today_mode = false;
+  //       }, 500);
+  //     });
+}
 
-        .then(response => {
-          this.payments = response.data.payments;
-          this.clients = response.data.clients;
-          this.sales = response.data.sales;
-          this.totalRows = response.data.totalRows;
-          this.rows[0].children = this.payments;
-          // Complete the animation of theprogress bar.
-          NProgress.done();
-          this.isLoading = false;
-          this.today_mode = false;
-        })
-        .catch(response => {
-          // Complete the animation of theprogress bar.
-          NProgress.done();
-          setTimeout(() => {
-            this.isLoading = false;
-            this.today_mode = false;
-          }, 500);
-        });
-    }
 //   //----------------------------- Created function-------------------\\
 //   created: function() {
 //     this.Payments_Sales(1);
@@ -129,51 +143,60 @@ const fields = ref([
 // };
 </script>
 <template>
-  <!--  <div class="main-content">-->
-  <!--    <breadcumb :page="$t('SalesInvoice')" :folder="$t('Reports')"/>-->
+  <layout :loading="loading">
+    <v-row>
+      <v-spacer></v-spacer>
+      <v-col cols="12" sm="4" md="3" class="text-center">
+        <v-text-field v-model="form.startDate"
+                      variant="outlined"
+                      density="compact"
+                      clearable
+                      hide-details="auto"
+                      type="date"
+                      :label="labels.start_date"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="12" sm="4" md="3" class="text-center">
+        <v-text-field v-model="form.endDate"
+                      variant="outlined"
+                      density="compact"
+                      clearable
+                      hide-details="auto"
+                      type="date"
+                      :label="labels.end_date"></v-text-field>
+      </v-col>
+      <v-spacer></v-spacer>
+    </v-row>
 
-  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+    <v-row align="center" class="mb-3">
+      <v-spacer></v-spacer>
+      <v-col cols="auto" class="text-right">
+        <!--        <filter_form-->
+        <!--            :filter_form="filter_form"-->
+        <!--            :customers="customers"-->
+        <!--            :sales_types="sales_types"-->
+        <!--        ></filter_form>-->
+        <ExportBtn
+            :data="payments"
+            :fields="jsonFields"
+            name-file="Ventas"
+        ></ExportBtn>
+      </v-col>
+    </v-row>
+    <v-card>
+      <v-data-table
+          :headers="fields"
+          :items="payments"
+          hover
+          density="compact"
+          :no-data-text="labels.no_data_table"
+          :loading="loading"
+      >
+      </v-data-table>
+    </v-card>
+  </layout>
 
-  <!--      <b-col md="12" class="text-center" v-if="!isLoading">-->
-  <!--        <date-range-picker -->
-  <!--          v-model="dateRange" -->
-  <!--          :startDate="startDate" -->
-  <!--          :endDate="endDate" -->
-  <!--           @update="Submit_filter_dateRange"-->
-  <!--          :locale-data="locale" > -->
 
-  <!--          <template v-slot:input="picker" style="min-width: 350px;">-->
-  <!--              {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}-->
-  <!--          </template>        -->
-  <!--        </date-range-picker>-->
-  <!--      </b-col>-->
-
-  <!--    <b-card class="wrapper" v-if="!isLoading">-->
-  <!--      <vue-good-table-->
-  <!--        mode="remote"-->
-  <!--        :columns="columns"-->
-  <!--        :totalRows="totalRows"-->
-  <!--        :rows="rows"-->
-  <!--        :group-options="{-->
-  <!--          enabled: true,-->
-  <!--          headerPosition: 'bottom',-->
-  <!--        }"-->
-  <!--        @on-page-change="onPageChange"-->
-  <!--        @on-per-page-change="onPerPageChange"-->
-  <!--        @on-sort-change="onSortChange"-->
-  <!--        @on-search="onSearch"-->
-  <!--        :search-options="{-->
-  <!--        placeholder: $t('Search_this_table'),-->
-  <!--        enabled: true,-->
-  <!--      }"-->
-  <!--        :pagination-options="{-->
-  <!--        enabled: true,-->
-  <!--        mode: 'records',-->
-  <!--        nextLabel: 'next',-->
-  <!--        prevLabel: 'prev',-->
-  <!--      }"-->
-  <!--        styleClass="table-hover tableOne vgt-table"-->
-  <!--      >-->
   <!--        <div slot="table-actions" class="mt-2 mb-3">-->
   <!--          <b-button variant="outline-info ripple m-1" size="sm" v-b-toggle.sidebar-right>-->
   <!--            <i class="i-Filter-2"></i>-->
@@ -194,21 +217,21 @@ const fields = ref([
   <!--          </vue-excel-xlsx>-->
   <!--        </div>-->
   <!--      </vue-good-table>-->
-  <!--    </b-card>-->
+  <!--    </v-card>-->
 
   <!--    &lt;!&ndash; Sidebar Filter &ndash;&gt;-->
   <!--    <b-sidebar id="sidebar-right" :title="$t('Filter')" bg-variant="white" right shadow>-->
   <!--      <div class="px-3 py-2">-->
   <!--        <b-row>-->
   <!--          &lt;!&ndash; Reference &ndash;&gt;-->
-  <!--          <b-col md="12">-->
+  <!--          <v-col md="12">-->
   <!--            <b-form-group :label="$t('Reference')">-->
   <!--              <b-form-input label="Reference" :placeholder="$t('Reference')" v-model="Filter_Ref"></b-form-input>-->
   <!--            </b-form-group>-->
-  <!--          </b-col>-->
+  <!--          </v-col>-->
 
   <!--          &lt;!&ndash; Customers  &ndash;&gt;-->
-  <!--          <b-col md="12">-->
+  <!--          <v-col md="12">-->
   <!--            <b-form-group :label="$t('Customer')">-->
   <!--              <v-select-->
   <!--                :reduce="label => label.value"-->
@@ -217,10 +240,10 @@ const fields = ref([
   <!--                :options="clients.map(clients => ({label: clients.name, value: clients.id}))"-->
   <!--              />-->
   <!--            </b-form-group>-->
-  <!--          </b-col>-->
+  <!--          </v-col>-->
 
   <!--          &lt;!&ndash; Sale  &ndash;&gt;-->
-  <!--          <b-col md="12">-->
+  <!--          <v-col md="12">-->
   <!--            <b-form-group :label="$t('Sale')">-->
   <!--              <v-select-->
   <!--                :reduce="label => label.value"-->
@@ -229,10 +252,10 @@ const fields = ref([
   <!--                :options="sales.map(sales => ({label: sales.Ref, value: sales.id}))"-->
   <!--              />-->
   <!--            </b-form-group>-->
-  <!--          </b-col>-->
+  <!--          </v-col>-->
 
   <!--          &lt;!&ndash; Payment choice &ndash;&gt;-->
-  <!--          <b-col md="12">-->
+  <!--          <v-col md="12">-->
   <!--            <b-form-group :label="$t('Paymentchoice')">-->
   <!--              <v-select-->
   <!--                v-model="Filter_Reg"-->
@@ -250,9 +273,9 @@ const fields = ref([
   <!--                          ]"-->
   <!--              ></v-select>-->
   <!--            </b-form-group>-->
-  <!--          </b-col>-->
+  <!--          </v-col>-->
 
-  <!--          <b-col md="6" sm="12">-->
+  <!--          <v-col md="6" sm="12">-->
   <!--            <b-button-->
   <!--              @click="Payments_Sales(serverParams.page)"-->
   <!--              variant="primary ripple m-1"-->
@@ -262,13 +285,13 @@ const fields = ref([
   <!--              <i class="i-Filter-2"></i>-->
   <!--              {{ $t("Filter") }}-->
   <!--            </b-button>-->
-  <!--          </b-col>-->
-  <!--          <b-col md="6" sm="12">-->
+  <!--          </v-col>-->
+  <!--          <v-col md="6" sm="12">-->
   <!--            <b-button @click="Reset_Filter()" variant="danger ripple m-1" size="sm" block>-->
   <!--              <i class="i-Power-2"></i>-->
   <!--              {{ $t("Reset") }}-->
   <!--            </b-button>-->
-  <!--          </b-col>-->
+  <!--          </v-col>-->
   <!--        </b-row>-->
   <!--      </div>-->
   <!--    </b-sidebar>-->

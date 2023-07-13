@@ -44,7 +44,7 @@ class PaymentSalesController extends Controller
 //        $columns = array(0 => 'Ref', 1 => 'sale_id', 2 => 'Reglement');
         $data = collect();
         if($request->collect()->count()==0){
-            $request['from'] = Carbon::now();
+            $request['from'] = Carbon::now()->subMonth(5);
             $request['to'] = Carbon::now();
         }
         // Check If User Has Permission View  All Records
@@ -100,7 +100,7 @@ class PaymentSalesController extends Controller
             $item['date'] = $Payment->date;
             $item['Ref'] = $Payment->Ref;
             $item['Ref_Sale'] = $Payment['sale']->Ref;
-            $item['client_name'] = $Payment['sale']['client']->company_name;
+            $item['client_name'] = $Payment['sale']['client']?->company_name;
             $item['Reglement'] = $Payment->Reglement;
             $item['montant'] = $Payment->montant;
             // $item['montant'] = number_format($Payment->montant, 2, '.', '');
