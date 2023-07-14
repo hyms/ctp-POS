@@ -53,6 +53,13 @@ const vuetify = createVuetify({
             customLight,
         },
     },
+    defaults: {
+        VCard: {density:'compact'},
+        VTable: {density:'compact'},
+        VTextField: {density:'compact'},
+        VSelect: {density:'compact'},
+        VAutocomplete:{density:'compact'},
+    },
 });
 
 
