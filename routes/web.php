@@ -43,12 +43,12 @@ Route::get('/upgrade', [UpgradeController::class, 'index'])->name('upgrade');
 Route::post('/upgrade', [UpgradeController::class, 'upgrade'])->name('upgrade');
 
 Route::get('/', [DashboardController::class, 'dashboard_data']
-)->middleware(['auth', 'verified'])->name('dashboard');
+)->middleware(['auth', 'verified','auth.session'])->name('dashboard');
 
 require __DIR__ . '/auth.php';
 
 
-Route::group(['prefix' => '', 'middleware' => 'auth'], function () {
+Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], function () {
 
     //------------------------------- Users --------------------------\\
     Route::get('users', [UserController::class, 'index']);
