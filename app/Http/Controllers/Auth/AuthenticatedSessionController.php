@@ -44,7 +44,7 @@ class AuthenticatedSessionController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-
+            Auth::logoutOtherDevices($credentials['password']);
             return redirect()->intended(RouteServiceProvider::HOME);
         }
 
