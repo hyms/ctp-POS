@@ -78,8 +78,8 @@ function querySelections(v) {
         </template>
 
         <v-card max-width="500">
-            <v-card-text>
-                <v-form>
+          <v-form @submit.prevent="search">
+          <v-card-text>
                     <v-row>
                         <v-col cols="12" sm="6">
                             <v-text-field
@@ -166,8 +166,8 @@ function querySelections(v) {
                             ></v-select>
                         </v-col>
                     </v-row>
-                </v-form>
             </v-card-text>
+          <v-divider></v-divider>
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
@@ -179,6 +179,7 @@ function querySelections(v) {
                     Cancelar
                 </v-btn>
                 <v-btn
+                    type="submit"
                     variant="tonal"
                     size="small"
                     color="primary"
@@ -187,6 +188,7 @@ function querySelections(v) {
                     Buscar
                 </v-btn>
             </v-card-actions>
+          </v-form>
         </v-card>
     </v-menu>
 </template>

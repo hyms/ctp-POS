@@ -1,25 +1,24 @@
 import "./bootstrap";
 
 import "@mdi/font/css/materialdesignicons.css";
-import { createApp, h } from "vue";
+import {createApp, h} from "vue";
 // import "vuetify/styles";
-import { createVuetify } from "vuetify";
+import {createVuetify} from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import * as labs from "vuetify/labs/components";
-import { es } from "vuetify/locale";
+import {es} from "vuetify/locale";
 import moment from "moment";
-
 
 
 import "@/../css/main.scss";
 
-import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
+import {resolvePageComponent} from "laravel-vite-plugin/inertia-helpers";
 // import 'vuetify/dist/vuetify.min.css'
 
 moment.locale("es");
 
-import { createInertiaApp } from "@inertiajs/vue3";
+import {createInertiaApp} from "@inertiajs/vue3";
 
 const customLight = {
     colors: {
@@ -42,7 +41,7 @@ const vuetify = createVuetify({
     locale: {
         locale: "es",
         fallback: "es",
-        messages: { es },
+        messages: {es},
     },
     icons: {
         defaultSet: "mdi",
@@ -54,14 +53,18 @@ const vuetify = createVuetify({
         },
     },
     defaults: {
-        VCard: {density:'compact'},
-        VTable: {density:'compact'},
-        VTextField: {density:'compact'},
-        VSelect: {density:'compact'},
-        VAutocomplete:{density:'compact'},
+        VCard: {density: 'compact'},
+        VTable: {density: 'compact'},
+        VTextField: {density: 'compact'},
+        VSelect: {density: 'compact'},
+        VAutocomplete: {density: 'compact'},
+        VDataTable: {
+            VDataTableFooter: {
+                VSelect: {density: 'compact'},
+            }
+        }
     },
 });
-
 
 
 createInertiaApp({
@@ -70,8 +73,8 @@ createInertiaApp({
             `./Pages/${name}.vue`,
             import.meta.glob("./Pages/**/*.vue")
         ),
-    setup({ el, App, props, plugin }) {
-        createApp({ render: () => h(App, props) })
+    setup({el, App, props, plugin}) {
+        createApp({render: () => h(App, props)})
             .use(plugin)
             .use(vuetify)
             .mount(el);

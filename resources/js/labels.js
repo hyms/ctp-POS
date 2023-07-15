@@ -21,7 +21,7 @@ export default {
     },
     payment: {
         date: "Fecha",
-        Ref: "Codigo",
+        Ref: "Codigo Pago",
         montant: "A Pagar",
         amount: "Monto Pagado",
         change: "Cambio",
@@ -30,7 +30,7 @@ export default {
         notes: "Notas de Pago",
     },
     sale: {
-        Ref: "Codigo",
+        Ref: "Codigo Venta",
         client_id: "Cliente",
         warehouse_id: "Agencia",
         discount: "Descuento",

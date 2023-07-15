@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Mail\Payment_Sale;
@@ -29,69 +30,35 @@ class PaymentSalesController extends Controller
     {
 //        $this->authorizeForUser($request->user('api'), 'Reports_payments_Sales', PaymentSale::class);
 
-        // How many items do you want to display.
-//        $perPage = $request->limit;
-//        $pageStart = Request::get('page', 1);
-//         Start displaying items from this number;
-//        $offSet = ($pageStart * $perPage) - $perPage;
-//        $order = $request->SortField;
-//        $dir = $request->SortType;
-//        $helpers = new helpers();
 //        $role = Auth::user()->roles()->first();
 //        $view_records = Role::findOrFail($role->id)->inRole('record_view');
-        // Filter fields With Params to retriever
-//        $param = array(0 => 'like', 1 => '=', 2 => 'like');
-//        $columns = array(0 => 'Ref', 1 => 'sale_id', 2 => 'Reglement');
+
         $data = collect();
-        if($request->collect()->count()==0){
+        $filter = collect($request->get('filter'));
+        if ($request->collect()->count() == 0) {
             $request['from'] = Carbon::now()->subMonth(5);
             $request['to'] = Carbon::now();
         }
         // Check If User Has Permission View  All Records
-        $Payments = PaymentSale::with('sale.client')
-            ->where('deleted_at', '=', null)
-            ->whereBetween('date', array($request->from, $request->to))
+        $Payments = PaymentSale::with('sale', 'sale.client')
+            ->where('deleted_at', '=', null);
 //            ->where(function ($query) use ($view_records) {
 //                if (!$view_records) {
 //                    return $query->where('user_id', '=', Auth::user()->id);
 //                }
 //            })
-            // Multiple Filter
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('client_id'), function ($query) use ($request) {
-                    return $query->whereHas('sale.client', function ($q) use ($request) {
-                        $q->where('id', '=', $request->client_id);
-                    });
-                });
-            });
-//        $Filtred = $helpers->filter($Payments, $columns, $param, $request)
-//            // Search With Multiple Param
-//            ->where(function ($query) use ($request) {
-//                return $query->when($request->filled('search'), function ($query) use ($request) {
-//                    return $query->where('Ref', 'LIKE', "%{$request->search}%")
-//                        ->orWhere('date', 'LIKE', "%{$request->search}%")
-//                        ->orWhere('Reglement', 'LIKE', "%{$request->search}%")
-//                        ->orWhere(function ($query) use ($request) {
-//                            return $query->whereHas('sale', function ($q) use ($request) {
-//                                $q->where('Ref', 'LIKE', "%{$request->search}%");
-//                            });
-//                        })
-//                        ->orWhere(function ($query) use ($request) {
-//                            return $query->whereHas('sale.client', function ($q) use ($request) {
-//                                $q->where('name', 'LIKE', "%{$request->search}%");
-//                            });
-//                        });
-//                });
-//            });
 
-//        $totalRows = $Filtred->count();
-//        if ($perPage == "-1") {
-//            $perPage = $totalRows;
-//        }
-//        $Payments = $Filtred->offset($offSet)
-//            ->limit($perPage)
-//            ->orderBy($order, $dir)
-//            ->get();
+        $Payments = helpers::getFilter($filter,
+            $Payments,
+            collect([
+                collect(['type' => 'date', 'key' => 'date', 'filter' => 'startDate', 'filter2' => 'endDate']),
+                collect(['type' => 'string', 'key' => 'Reglement', 'filter' => 'Reg']),
+                collect(['type' => 'string', 'key' => 'Ref', 'filter' => 'Ref']),
+                collect(['type' => 'rel_string', 'key' => 'sale', 'key2' => 'Ref', 'filter' => 'sale']),
+                collect(['type' => 'rel', 'key' => 'sale', 'key2' => 'client_id', 'filter' => 'client']),
+            ])
+        );
+
         $Payments = $Payments
             ->get();
 
@@ -99,8 +66,8 @@ class PaymentSalesController extends Controller
 
             $item['date'] = $Payment->date;
             $item['Ref'] = $Payment->Ref;
-            $item['Ref_Sale'] = $Payment['sale']->Ref;
-            $item['client_name'] = $Payment['sale']['client']?->company_name;
+            $item['Ref_Sale'] = $Payment['sale']?->Ref;
+            $item['client_name'] = $Payment['sale']?->client?->company_name;
             $item['Reglement'] = $Payment->Reglement;
             $item['montant'] = $Payment->montant;
             // $item['montant'] = number_format($Payment->montant, 2, '.', '');
@@ -108,10 +75,10 @@ class PaymentSalesController extends Controller
         }
 
         $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
-        $sales = Sale::whereIn('id',$Payments->pluck('sale_id'))->get(['Ref', 'id']);
+        $sales = Sale::whereIn('id', $Payments->pluck('sale_id'))->get(['Ref', 'id']);
 
-        return Inertia::render('Reports/payments/payments_sales',[
-//            'totalRows' => $totalRows,
+        Inertia::share('titlePage', 'Pagos de Ventas');
+        return Inertia::render('Reports/payments/payments_sales', [
             'payments' => $data,
             'sales' => $sales,
             'clients' => $clients,

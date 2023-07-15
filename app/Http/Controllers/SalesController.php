@@ -477,7 +477,7 @@ class SalesController extends Controller
 //        $this->authorizeForUser($request->user('api'), 'view', Sale::class);
 //        $role = Auth::user()->roles()->first();
 //        $view_records = Role::findOrFail($role->id)->inRole('record_view');
-        $sale_data = Sale::with('details.product.unitSale')
+        $sale_data = Sale::with(['details.product.unitSale','client'])
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
 
@@ -499,8 +499,8 @@ class SalesController extends Controller
         $sale_details['shipping'] = $sale_data->shipping;
         $sale_details['tax_rate'] = $sale_data->tax_rate;
         $sale_details['TaxNet'] = $sale_data->TaxNet;
-        $sale_details['client_name'] = $sale_data->client->name;
-        $sale_details['client_company_name'] = $sale_data->client->company_name;
+        $sale_details['client_name'] = $sale_data->client?->name;
+        $sale_details['client_company_name'] = $sale_data->client?->company_name;
         $sale_details['client_phone'] = $sale_data->client->phone;
         $sale_details['client_adr'] = $sale_data->client->adresse;
         $sale_details['client_email'] = $sale_data->client->email;
@@ -590,7 +590,7 @@ class SalesController extends Controller
         $helpers = new helpers();
         $details = collect();
 
-        $sale = Sale::with(['details.product.unitSale','warehouse'])
+        $sale = Sale::with(['details.product.unitSale','warehouse','client'])
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
 
@@ -709,12 +709,12 @@ class SalesController extends Controller
 
         $details = collect();
         $helpers = new helpers();
-        $sale_data = Sale::with('details.product.unitSale')
+        $sale_data = Sale::with(['details.product.unitSale','client'])
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
 
-        $sale['client_name'] = $sale_data['client']->name;
-        $sale['client_company_name'] = $sale_data['client']->company_name;
+        $sale['client_name'] = $sale_data['client']?->name;
+        $sale['client_company_name'] = $sale_data['client']?->company_name;
         $sale['client_phone'] = $sale_data['client']->phone;
         $sale['client_adr'] = $sale_data['client']->adresse;
         $sale['client_email'] = $sale_data['client']->email;

@@ -9,6 +9,7 @@ use App\Models\UserWarehouse;
 use App\Models\Warehouse;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -122,5 +123,53 @@ class helpers
             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
         }
         return $warehouses;
+    }
+
+    public static function getFilter(\Illuminate\Support\Collection $filter, $Model, \Illuminate\Support\Collection $filters)
+    {
+        if ($filter->count() > 0) {
+            $filterData = false;
+            foreach ($filters as $data) {
+                switch ($data->get('type')) {
+                    case 'date':
+                        if (!empty($filter->get($data->get('filter'))) && $filter->get($data->get('filter2'))) {
+                            $Model = $Model->whereBetween($data->get('key'), [Carbon::parse($filter->get($data->get('filter'))), Carbon::parse($filter->get($data->get('filter2')))]);
+                        }
+                        break;
+                    case 'string':
+                        if (!empty($filter->get($data->get('filter')))) {
+                            $Model = $Model->where($data->get('key'), 'like', "%{$filter->get($data->get('filter'))}%");
+                        }
+                        break;
+                    case 'rel':
+                        if (!empty($filter->get($data->get('filter')))) {
+                            $Model = $Model->whereHas($data->get('key'), function (Builder $query) use ($data, $filter) {
+                                $query->where($data->get('key2'), '=', $filter->get($data->get('filter')));
+                            });
+                        }
+                        break;
+                    case 'rel_string':
+                        if (!empty($filter->get($data->get('filter')))) {
+                            $Model = $Model->whereHas($data->get('key'), function (Builder $query) use ($data, $filter) {
+                                $query->where($data->get('key2'), 'like', "%{$filter->get($data->get('filter'))}%");
+                            });
+                        }
+                        break;
+                    default:
+                        if (!empty($filter->get($data->get('filter')))) {
+                            $Model = $Model->where($data->get('key'), '=', $filter->get($data->get('filter')));
+                        }
+                        break;
+                }
+                $filterData = true;
+            }
+
+            if (!$filterData) {
+                $Model = $Model->limit(1000);
+            }
+        } else {
+            $Model = $Model->limit(500);
+        }
+        return $Model;
     }
 }
