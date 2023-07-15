@@ -119,7 +119,7 @@ function Payments_Sales() {
       </v-col>
       <v-spacer></v-spacer>
       <v-col cols="auto" class="text-right">
-        <v-btn color="info" variant="tonal" class="mr-2 my-1" size="small">{{labels.sale.GrandTotal}}: <strong>{{sumCount(payments)}}</strong></v-btn>
+        <v-chip color="info" variant="tonal" class="mr-2 my-1 rounded text-uppercase">{{labels.sale.GrandTotal}}: <span class="font-weight-black">{{sumCount(payments)}}</span></v-chip>
         <v-menu v-model="menu" :close-on-content-click="false" location="bottom">
           <template v-slot:activator="{ props }">
             <v-btn
