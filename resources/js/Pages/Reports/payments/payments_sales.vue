@@ -1,12 +1,10 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import {ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
 import {router} from "@inertiajs/vue3";
 import helper from "@/helpers";
 import labels from "@/labels";
-import moment from 'moment'
 
 const props = defineProps({
   payments: Object,
@@ -14,7 +12,6 @@ const props = defineProps({
   clients: Object,
 })
 const loading = ref(false);
-const today_mode = ref(true);
 const menu = ref(false);
 const search = ref("");
 const clientFilter = ref([]);
@@ -54,25 +51,6 @@ function sumCount(rowObj) {
   return sum;
 }
 
-//------ Reset Filter
-function Reset_Filter() {
-  search.value = "";
-  form.value.client = "";
-  form.value.Ref = "";
-  form.value.sale = "";
-  form.value.Reg = "";
-  // Payments_Sales(this.serverParams.page);
-}
-
-function get_data_loaded() {
-  if (today_mode.value) {
-    let today = new Date()
-
-    form.value.startDate = today.getFullYear();
-    form.value.endDate = new Date().toJSON().slice(0, 10);
-  }
-}
-
 function querySelections(v) {
   clientFilter.value = props.clients.filter((e) => {
     return (
@@ -84,20 +62,19 @@ function querySelections(v) {
 //-------------------------------- Get All Payments Sales ---------------------\\
 function Payments_Sales() {
   // Start the progress bar.
-  // get_data_loaded();
 
   router.get("/payment_sale",
       {filter: form.value},
       {
         preserveState: true,
         onStart: page => {
-          loading.value=true;
+          loading.value = true;
         },
         onSuccess: page => {
-          menu.value=false;
+          menu.value = false;
         },
         onFinish: visit => {
-          loading.value=false;
+          loading.value = false;
         },
       }
   )
@@ -119,7 +96,8 @@ function Payments_Sales() {
       </v-col>
       <v-spacer></v-spacer>
       <v-col cols="auto" class="text-right">
-        <v-chip color="info" variant="tonal" class="mr-2 my-1 rounded text-uppercase">{{labels.sale.GrandTotal}}: <span class="font-weight-black">{{sumCount(payments)}}</span></v-chip>
+        <v-chip color="info" variant="tonal" class="mr-2 my-1 rounded text-uppercase">{{ labels.sale.GrandTotal }}:
+          <span class="font-weight-black">{{ sumCount(payments) }}</span></v-chip>
         <v-menu v-model="menu" :close-on-content-click="false" location="bottom">
           <template v-slot:activator="{ props }">
             <v-btn

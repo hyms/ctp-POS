@@ -35,10 +35,10 @@ class PaymentSalesController extends Controller
 
         $data = collect();
         $filter = collect($request->get('filter'));
-        if ($request->collect()->count() == 0) {
-            $request['from'] = Carbon::now()->subMonth(5);
-            $request['to'] = Carbon::now();
-        }
+//        if ($request->collect()->count() == 0) {
+//            $request['from'] = Carbon::now()->subMonth(5);
+//            $request['to'] = Carbon::now();
+//        }
         // Check If User Has Permission View  All Records
         $Payments = PaymentSale::with('sale', 'sale.client')
             ->where('deleted_at', '=', null);
@@ -59,7 +59,7 @@ class PaymentSalesController extends Controller
             ])
         );
 
-        $Payments = $Payments
+        $Payments = $Payments->orderByDesc('date')
             ->get();
 
         foreach ($Payments as $Payment) {
@@ -74,7 +74,7 @@ class PaymentSalesController extends Controller
             $data->add($item);
         }
 
-        $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
+        $clients = Client::where('deleted_at', '=', null)->get(['id', 'company_name as name']);
         $sales = Sale::whereIn('id', $Payments->pluck('sale_id'))->get(['Ref', 'id']);
 
         Inertia::share('titlePage', 'Pagos de Ventas');

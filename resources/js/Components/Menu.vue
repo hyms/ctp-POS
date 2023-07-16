@@ -118,6 +118,10 @@ const menuItems = ref([
         label: "Pagos de Ventas",
         url: "/payment_sale",
         role: "admin",
+      },{
+        label: "Reporte de Ventas",
+        url: "/report/sales",
+        role: "admin",
       },
     ],
   },

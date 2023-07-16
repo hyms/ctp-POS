@@ -1,517 +1,291 @@
-<script>
-// import NProgress from "nprogress";
-// import jsPDF from "jspdf";
-// import "jspdf-autotable";
-// import DateRangePicker from 'vue2-daterange-picker'
-// //you need to import the CSS manually
-// import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
-// import moment from 'moment'
-//
-// export default {
-//   metaInfo: {
-//     title: "Report Sales"
-//   },
-// components: { DateRangePicker },
-//   data() {
-//     return {
-//      startDate: "",
-//      endDate: "",
-//      dateRange: {
-//        startDate: "",
-//        endDate: ""
-//      },
-//       locale:{
-//           //separator between the two ranges apply
-//           Label: "Apply",
-//           cancelLabel: "Cancel",
-//           weekLabel: "W",
-//           customRangeLabel: "Custom Range",
-//           daysOfWeek: moment.weekdaysMin(),
-//           //array of days - see moment documenations for details
-//           monthNames: moment.monthsShort(), //array of month names - see moment documenations for details
-//           firstDay: 1 //ISO first day of week - see moment documenations for details
-//         },
-//       isLoading: true,
-//       serverParams: {
-//         sort: {
-//           field: "id",
-//           type: "desc"
-//         },
-//         page: 1,
-//         perPage: 10
-//       },
-//       limit: "10",
-//       search: "",
-//       totalRows: "",
-//       Filter_Client: "",
-//       Filter_warehouse: "",
-//       Filter_Ref: "",
-//       Filter_status: "",
-//       Filter_Payment: "",
-//       customers: [],
-//       warehouses: [],
-//       rows: [{
-//           statut: 'Total',
-//
-//           children: [
-//
-//           ],
-//       },],
-//       sales: [],
-//       today_mode: true,
-//       to: "",
-//       from: "",
-//     };
-//   },
-//
-//   computed: {
-//     columns() {
-//       return [
-//         {
-//           label: this.$t("date"),
-//           field: "date",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Reference"),
-//           field: "Ref",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Customer"),
-//           field: "client_name",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("warehouse"),
-//           field: "warehouse_name",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Status"),
-//           field: "statut",
-//           html: true,
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Total"),
-//           field: "GrandTotal",
-//           type: "decimal",
-//           headerField: this.sumCount,
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Paid"),
-//           field: "paid_amount",
-//           type: "decimal",
-//           headerField: this.sumCount2,
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Due"),
-//           field: "due",
-//           type: "decimal",
-//           headerField: this.sumCount3,
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("PaymentStatus"),
-//           field: "payment_status",
-//           html: true,
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         }
-//       ];
-//     }
-//   },
-//
-//   methods: {
-//
-//     sumCount(rowObj) {
-//
-//     	let sum = 0;
-//       for (let i = 0; i < rowObj.children.length; i++) {
-//         sum += rowObj.children[i].GrandTotal;
-//       }
-//       return sum;
-//     },
-//     sumCount2(rowObj) {
-//
-//     	let sum = 0;
-//       for (let i = 0; i < rowObj.children.length; i++) {
-//         sum += rowObj.children[i].paid_amount;
-//       }
-//       return sum;
-//     },
-//     sumCount3(rowObj) {
-//
-//     	let sum = 0;
-//       for (let i = 0; i < rowObj.children.length; i++) {
-//         sum += rowObj.children[i].due;
-//       }
-//       return sum;
-//     },
-//
-//     //---- update Params Table
-//     updateParams(newProps) {
-//       this.serverParams = Object.assign({}, this.serverParams, newProps);
-//     },
-//
-//     //---- Event Page Change
-//     onPageChange({ currentPage }) {
-//       if (this.serverParams.page !== currentPage) {
-//         this.updateParams({ page: currentPage });
-//         this.Get_Sales(currentPage);
-//       }
-//     },
-//
-//     //---- Event Per Page Change
-//     onPerPageChange({ currentPerPage }) {
-//       if (this.limit !== currentPerPage) {
-//         this.limit = currentPerPage;
-//         this.updateParams({ page: 1, perPage: currentPerPage });
-//         this.Get_Sales(1);
-//       }
-//     },
-//
-//     //---- Event on Sort Change
-//
-//     onSortChange(params) {
-//       let field = "";
-//       if (params[0].field == "client_name") {
-//         field = "client_id";
-//       } else {
-//         field = params[0].field;
-//       }
-//       this.updateParams({
-//         sort: {
-//           type: params[0].type,
-//           field: field
-//         }
-//       });
-//       this.Get_Sales(this.serverParams.page);
-//     },
-//
-//     //---- Event on Search
-//     onSearch(value) {
-//       this.search = value.searchTerm;
-//       this.Get_Sales(this.serverParams.page);
-//     },
-//
-//     //------ Reset Filter
-//     Reset_Filter() {
-//       this.search = "";
-//       this.Filter_Client = "";
-//       this.Filter_status = "";
-//       this.Filter_Payment = "";
-//       this.Filter_Ref = "";
-//       this.Filter_warehouse = "";
-//       this.Get_Sales(this.serverParams.page);
-//     },
-//
-//     //------------------------------Formetted Numbers -------------------------\\
-//     formatNumber(number, dec) {
-//       const value = (typeof number === "string"
-//         ? number
-//         : number.toString()
-//       ).split(".");
-//       if (dec <= 0) return value[0];
-//       let formated = value[1] || "";
-//       if (formated.length > dec)
-//         return `${value[0]}.${formated.substr(0, dec)}`;
-//       while (formated.length < dec) formated += "0";
-//       return `${value[0]}.${formated}`;
-//     },
-//
-//     //----------------------------------- Sales PDF ------------------------------\\
-//     Sales_PDF() {
-//       var self = this;
-//
-//       let pdf = new jsPDF("p", "pt");
-//       let columns = [
-//         { title: "Ref", dataKey: "Ref" },
-//         { title: "Client", dataKey: "client_name" },
-//         { title: "Warehouse", dataKey: "warehouse_name" },
-//         { title: "Status", dataKey: "statut" },
-//         { title: "Total", dataKey: "GrandTotal" },
-//         { title: "Paid", dataKey: "paid_amount" },
-//         { title: "Due", dataKey: "due" },
-//         { title: "Status Payment", dataKey: "payment_status" }
-//       ];
-//       pdf.autoTable(columns, self.sales);
-//       pdf.text("Sales report", 40, 25);
-//       pdf.save("Sales_report.pdf");
-//     },
-//
-//     //---------------------------------------- Set To Strings-------------------------\\
-//     setToStrings() {
-//       // Simply replaces null values with strings=''
-//       if (this.Filter_Client === null) {
-//         this.Filter_Client = "";
-//       }else if (this.Filter_warehouse === null) {
-//         this.Filter_warehouse = "";
-//       }
-//     },
-//
-//      //----------------------------- Submit Date Picker -------------------\\
-//     Submit_filter_dateRange() {
-//       var self = this;
-//       self.startDate =  self.dateRange.startDate.toJSON().slice(0, 10);
-//       self.endDate = self.dateRange.endDate.toJSON().slice(0, 10);
-//       self.Get_Sales(1);
-//     },
-//
-//
-//     get_data_loaded() {
-//       var self = this;
-//       if (self.today_mode) {
-//         let today = new Date()
-//
-//         self.startDate = today.getFullYear();
-//         self.endDate = new Date().toJSON().slice(0, 10);
-//
-//         self.dateRange.startDate = today.getFullYear();
-//         self.dateRange.endDate = new Date().toJSON().slice(0, 10);
-//
-//       }
-//     },
-//
-//     //----------------------------------------- Get all Sales ------------------------------\\
-//     Get_Sales(page) {
-//       // Start the progress bar.
-//       NProgress.start();
-//       NProgress.set(0.1);
-//       this.setToStrings();
-//       this.get_data_loaded();
-//       axios
-//         .get(
-//           "/report/sales?page=" +
-//             page +
-//             "&Ref=" +
-//             this.Filter_Ref +
-//             "&client_id=" +
-//             this.Filter_Client +
-//             "&warehouse_id=" +
-//             this.Filter_warehouse +
-//             "&statut=" +
-//             this.Filter_status +
-//             "&payment_statut=" +
-//             this.Filter_Payment +
-//             "&SortField=" +
-//             this.serverParams.sort.field +
-//             "&SortType=" +
-//             this.serverParams.sort.type +
-//             "&search=" +
-//             this.search +
-//             "&limit=" +
-//             this.limit+
-//             "&to=" +
-//             this.endDate +
-//             "&from=" +
-//             this.startDate
-//         )
-//         .then(response => {
-//           this.sales = response.data.sales;
-//           this.customers = response.data.customers;
-//           this.warehouses = response.data.warehouses;
-//           this.totalRows = response.data.totalRows;
-//           this.rows[0].children = this.sales;
-//
-//           // Complete the animation of theprogress bar.
-//           NProgress.done();
-//           this.isLoading = false;
-//           this.today_mode = false;
-//         })
-//         .catch(response => {
-//           // Complete the animation of theprogress bar.
-//           NProgress.done();
-//           setTimeout(() => {
-//             this.isLoading = false;
-//             this.today_mode = false;
-//           }, 500);
-//         });
-//     }
-//   },
-//   //----------------------------- Created function-------------------\\
-//   created() {
-//     this.Get_Sales(1);
-//   }
-// };
+<script setup>
+import {ref} from "vue";
+import Layout from "@/Layouts/Authenticated.vue";
+import ExportBtn from "@/Components/ExportBtn.vue";
+import {router} from "@inertiajs/vue3";
+import helper from "@/helpers";
+import labels from "@/labels";
+
+const props = defineProps({
+  customers: Object,
+  warehouses: Object,
+  sales: Object,
+})
+const loading = ref(false);
+const menu = ref(false);
+const search = ref("");
+const clientFilter = ref([]);
+const form = ref({
+  startDate: "",
+  endDate: "",
+  client: "",
+  warehouse: "",
+  Ref: "",
+  status: "",
+  Payment: "",
+});
+
+const fields = ref([
+  {title: "Fecha", key: "date"},
+  {title: "Codigo", key: "Ref"},
+  {title: "Cliente", key: "client_name"},
+  {title: "Agencia", key: "warehouse_name"},
+  {title: "Estado", key: "statut"},
+  {title: "Total", key: "GrandTotal"},
+  {title: "Pagado", key: "paid_amount"},
+  {title: "Deuda", key: "due"},
+  {title: "Estado de pago", key: "payment_status"},
+]);
+const jsonFields = ref({
+  "Fecha": "date",
+  "Codigo": "Ref",
+  "Cliente": "client_name",
+  "Agencia": "warehouse_name",
+  "Estado": "statut",
+  "Total": "GrandTotal",
+  "Pagado": "paid_amount",
+  "Deuda": "due",
+  "Estado de pago": "payment_status",
+});
+
+function sumCount(rowObj) {
+
+  let sum = 0;
+  for (let i = 0; i < rowObj.length; i++) {
+    sum += rowObj[i].GrandTotal;
+  }
+  return sum;
+}
+
+function sumCount2(rowObj) {
+  let sum = 0;
+  for (let i = 0; i < rowObj.length; i++) {
+    sum += rowObj[i].paid_amount;
+  }
+  return sum;
+
+}
+
+function sumCount3(rowObj) {
+  let sum = 0;
+  for (let i = 0; i < rowObj.length; i++) {
+    sum += rowObj[i].due;
+  }
+  return sum;
+
+}
+
+function querySelections(v) {
+  clientFilter.value = props.customers.filter((e) => {
+    return (
+        (e.name || "").toLowerCase().indexOf((v || "").toLowerCase()) > -1
+    );
+  });
+}
+
+//----------------------------------------- Get all Sales ------------------------------\\
+function Get_Sales(page) {
+  router.get("/report/sales",
+      {filter: form.value},
+      {
+        preserveState: true,
+        onStart: page => {
+          loading.value = true;
+        },
+        onSuccess: page => {
+          menu.value = false;
+        },
+        onFinish: visit => {
+          loading.value = false;
+        },
+      }
+  )
+}
 </script>
 <template>
-<!--  <div class="main-content">-->
-<!--    <breadcumb :page="$t('SalesReport')" :folder="$t('Reports')"/>-->
+  <layout>
+    <v-row align="center" class="mb-3">
+      <v-col cols="12" sm="6">
+        <v-text-field
+            v-model="search"
+            prepend-icon="mdi-magnify"
+            hide-details
+            :label="labels.search"
+            single-line
+            variant="underlined"
+        ></v-text-field>
+      </v-col>
+      <v-spacer></v-spacer>
+      <v-col cols="auto" class="text-right">
+        <v-menu v-model="menu" :close-on-content-click="false" location="bottom">
+          <template v-slot:activator="{ props }">
+            <v-btn
+                color="primary"
+                variant="outlined"
+                size="small"
+                elevation="1"
+                class="mr-2 my-1"
+                v-bind="props"
+                append-icon="mdi-magnify"
+            >
+              {{ labels.filters }}
+            </v-btn>
+          </template>
 
-<!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
-<!--      <b-col md="12" class="text-center" v-if="!isLoading">-->
-<!--        <date-range-picker -->
-<!--          v-model="dateRange" -->
-<!--          :startDate="startDate" -->
-<!--          :endDate="endDate" -->
-<!--           @update="Submit_filter_dateRange"-->
-<!--          :locale-data="locale" > -->
+          <v-card max-width="500">
+            <v-form @submit.prevent="Get_Sales">
+              <v-card-text>
+                <v-row>
+                  <v-col cols="12" sm="6">
+                    <v-text-field
+                        v-model="form.startDate"
+                        variant="outlined"
+                        clearable
+                        hide-details="auto"
+                        type="date"
+                        :label="labels.start_date"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6">
+                    <v-text-field
+                        v-model="form.endDate"
+                        variant="outlined"
+                        clearable
+                        hide-details="auto"
+                        type="date"
+                        :label="labels.end_date"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6">
+                    <v-text-field
+                        v-model="form.Ref"
+                        variant="outlined"
+                        clearable
+                        hide-details="auto"
+                        type="text"
+                        :label="labels.payment.Ref"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6">
+                    <v-text-field
+                        v-model="form.sale"
+                        variant="outlined"
+                        clearable
+                        hide-details="auto"
+                        type="text"
+                        :label="labels.sale.Ref"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6">
+                    <v-autocomplete
+                        v-model="form.client"
+                        @update:search="querySelections"
+                        item-title="name"
+                        item-value="id"
+                        variant="outlined"
+                        clearable
+                        hide-details="auto"
+                        :items="clientFilter"
+                        :label="labels.sale.client_id"
+                    ></v-autocomplete>
+                  </v-col>
+                  <v-col cols="12" sm="6">
+                    <v-select
+                        v-model="form.warehouse"
+                        :items="warehouses"
+                        :label="labels.sale.warehouse_id"
+                        item-value="id"
+                        item-title="name"
+                        variant="outlined"
+                        hide-details="auto"
+                        clearable
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="12" sm="6">
+                    <v-select
+                        v-model="form.status"
+                        :items="helper.statutSale()"
+                        :label="labels.sale.statut"
+                        variant="outlined"
+                        hide-details="auto"
+                        clearable
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="12" sm="6">
+                    <v-select
+                        v-model="form.Payment"
+                        :items="helper.statusPayment()"
+                        :label="labels.sale.payment_status"
+                        variant="outlined"
+                        hide-details="auto"
+                        clearable
+                    ></v-select>
+                  </v-col>
 
-<!--          <template v-slot:input="picker" style="min-width: 350px;">-->
-<!--              {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}-->
-<!--          </template>        -->
-<!--        </date-range-picker>-->
-<!--      </b-col>-->
+                </v-row>
+              </v-card-text>
+              <v-divider></v-divider>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                    variant="text"
+                    size="small"
+                    color="error"
+                    @click="menu = false"
+                >
+                  {{ labels.cancel }}
+                </v-btn>
+                <v-btn
+                    type="submit"
+                    variant="tonal"
+                    size="small"
+                    color="primary"
+                    @click="Get_Sales"
+                >
+                  {{ labels.search }}
+                </v-btn>
+              </v-card-actions>
+            </v-form>
+          </v-card>
+        </v-menu>
+        <ExportBtn
+            :data="sales"
+            :fields="jsonFields"
+            name-file="Ventas"
+        ></ExportBtn>
+      </v-col>
+    </v-row>
 
-<!--    <b-card class="wrapper" v-if="!isLoading">-->
-<!--      <vue-good-table-->
-<!--        mode="remote"-->
-<!--        :columns="columns"-->
-<!--        :totalRows="totalRows"-->
-<!--        :rows="rows"-->
-<!--        :group-options="{-->
-<!--          enabled: true,-->
-<!--          headerPosition: 'bottom',-->
-<!--        }"-->
-<!--        @on-page-change="onPageChange"-->
-<!--        @on-per-page-change="onPerPageChange"-->
-<!--        @on-sort-change="onSortChange"-->
-<!--        @on-search="onSearch"-->
-<!--        :search-options="{-->
-<!--        placeholder: $t('Search_this_table'),-->
-<!--        enabled: true,-->
-<!--      }"-->
-<!--        :pagination-options="{-->
-<!--        enabled: true,-->
-<!--        mode: 'records',-->
-<!--        nextLabel: 'next',-->
-<!--        prevLabel: 'prev',-->
-<!--      }"-->
-<!--        :styleClass="'mt-5 order-table vgt-table'"-->
-<!--      >-->
-<!--        <div slot="table-actions" class="mt-2 mb-3">-->
-<!--          <b-button variant="outline-info ripple m-1" size="sm" v-b-toggle.sidebar-right>-->
-<!--            <i class="i-Filter-2"></i>-->
-<!--            {{ $t("Filter") }}-->
-<!--          </b-button>-->
-<!--          <b-button @click="Sales_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--            <i class="i-File-Copy"></i> PDF-->
-<!--          </b-button>-->
-<!--           <vue-excel-xlsx-->
-<!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
-<!--              :data="sales"-->
-<!--              :columns="columns"-->
-<!--              :file-name="'sales_report'"-->
-<!--              :file-type="'xlsx'"-->
-<!--              :sheet-name="'sales_report'"-->
-<!--              >-->
-<!--              <i class="i-File-Excel"></i> EXCEL-->
-<!--          </vue-excel-xlsx>-->
-<!--        </div>-->
+  <v-card>
+    <v-data-table
+        :headers="fields"
+        :items="sales"
+        :search="search"
+        hover
+        density="compact"
+        :no-data-text="labels.no_data_table"
+        :loading="loading"
+    >
+      <template v-slot:item.Reglement="{ item }">
+        {{ helper.getReglamentPayment(item.raw.Reglement)[0].title }}
+      </template>
+      <template v-slot:item.statut="{ item }">
+        <v-chip
+            :color="helper.statutSaleColor(item.raw.statut)"
+            variant="tonal"
+            size="x-small"
+        >{{helper.statutSale(item.raw.statut)}}</v-chip>
+      </template>
+      <template v-slot:item.payment_status="{ item }">
+        <v-chip
+            :color="helper.statusPaymentColor(item.raw.payment_status)"
+            variant="tonal"
+            size="x-small"
+        >{{helper.statusPayment(item.raw.payment_status)}}</v-chip>
+      </template>
 
-<!--        <template slot="table-row" slot-scope="props">-->
-<!--          <div v-if="props.column.field == 'statut'">-->
-<!--            <span-->
-<!--              v-if="props.row.statut == 'completed'"-->
-<!--              class="badge badge-outline-success"-->
-<!--            >{{$t('complete')}}</span>-->
-<!--            <span-->
-<!--              v-else-if="props.row.statut == 'pending'"-->
-<!--              class="badge badge-outline-info"-->
-<!--            >{{$t('Pending')}}</span>-->
-<!--            <span v-else class="badge badge-outline-warning">{{$t('Ordered')}}</span>-->
-<!--          </div>-->
+    </v-data-table>
+  </v-card>
+  </layout>
 
-<!--          <div v-else-if="props.column.field == 'payment_status'">-->
-<!--            <span-->
-<!--              v-if="props.row.payment_status == 'paid'"-->
-<!--              class="badge badge-outline-success"-->
-<!--            >{{$t('Paid')}}</span>-->
-<!--            <span-->
-<!--              v-else-if="props.row.payment_status == 'partial'"-->
-<!--              class="badge badge-outline-primary"-->
-<!--            >{{$t('partial')}}</span>-->
-<!--            <span v-else class="badge badge-outline-warning">{{$t('Unpaid')}}</span>-->
-<!--          </div>-->
-<!--        </template>-->
-<!--      </vue-good-table>-->
-<!--    </b-card>-->
-
-<!--    &lt;!&ndash; Sidebar Filter &ndash;&gt;-->
-<!--    <b-sidebar id="sidebar-right" :title="$t('Filter')" bg-variant="white" right shadow>-->
-<!--      <div class="px-3 py-2">-->
-<!--        <b-row>-->
-<!--          &lt;!&ndash; Reference &ndash;&gt;-->
-<!--          <b-col md="12">-->
-<!--            <b-form-group :label="$t('Reference')">-->
-<!--              <b-form-input label="Reference" :placeholder="$t('Reference')" v-model="Filter_Ref"></b-form-input>-->
-<!--            </b-form-group>-->
-<!--          </b-col>-->
-
-<!--          &lt;!&ndash; Customer  &ndash;&gt;-->
-<!--          <b-col md="12">-->
-<!--            <b-form-group :label="$t('Customer')">-->
-<!--              <v-select-->
-<!--                :reduce="label => label.value"-->
-<!--                :placeholder="$t('Choose_Customer')"-->
-<!--                v-model="Filter_Client"-->
-<!--                :options="customers.map(customers => ({label: customers.name, value: customers.id}))"-->
-<!--              />-->
-<!--            </b-form-group>-->
-<!--          </b-col>-->
-
-<!--           &lt;!&ndash; warehouse &ndash;&gt;-->
-<!--          <b-col md="12">-->
-<!--            <b-form-group :label="$t('warehouse')">-->
-<!--              <v-select-->
-<!--                v-model="Filter_warehouse"-->
-<!--                :reduce="label => label.value"-->
-<!--                :placeholder="$t('Choose_Warehouse')"-->
-<!--                :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
-<!--              />-->
-<!--            </b-form-group>-->
-<!--          </b-col>-->
-
-<!--          &lt;!&ndash; Status  &ndash;&gt;-->
-<!--          <b-col md="12">-->
-<!--            <b-form-group :label="$t('Status')">-->
-<!--              <select v-model="Filter_status" type="text" class="form-control">-->
-<!--                <option value selected>All</option>-->
-<!--                <option value="completed">Completed</option>-->
-<!--                <option value="pending">Pending</option>-->
-<!--                <option value="ordered">Ordered</option>-->
-<!--              </select>-->
-<!--            </b-form-group>-->
-<!--          </b-col>-->
-
-<!--          &lt;!&ndash; Payment Status  &ndash;&gt;-->
-<!--          <b-col md="12">-->
-<!--            <b-form-group :label="$t('PaymentStatus')">-->
-<!--              <select v-model="Filter_Payment" type="text" class="form-control">-->
-<!--                <option value selected>All</option>-->
-<!--                <option value="paid">Paid</option>-->
-<!--                <option value="partial">partial</option>-->
-<!--                <option value="unpaid">UnPaid</option>-->
-<!--              </select>-->
-<!--            </b-form-group>-->
-<!--          </b-col>-->
-
-<!--          <b-col md="6" sm="12">-->
-<!--            <b-button @click="Get_Sales(serverParams.page)" variant="primary ripple m-1" size="sm" block>-->
-<!--              <i class="i-Filter-2"></i>-->
-<!--              {{ $t("Filter") }}-->
-<!--            </b-button>-->
-<!--          </b-col>-->
-<!--          <b-col md="6" sm="12">-->
-<!--            <b-button @click="Reset_Filter()" variant="danger ripple m-1" size="sm" block>-->
-<!--              <i class="i-Power-2"></i>-->
-<!--              {{ $t("Reset") }}-->
-<!--            </b-button>-->
-<!--          </b-col>-->
-<!--        </b-row>-->
-<!--      </div>-->
-<!--    </b-sidebar>-->
-<!--  </div>-->
 </template>

@@ -59,7 +59,7 @@ class ReportController extends Controller
             ->orderBy('id', 'desc')
             ->take(5)
             ->get();
-
+        $data = collect();
         foreach ($Sales as $Sale) {
 
             $item['Ref'] = $Sale['Ref'];
@@ -70,7 +70,7 @@ class ReportController extends Controller
             $item['due'] = $Sale['GrandTotal'] - $Sale['paid_amount'];
             $item['payment_status'] = $Sale['payment_statut'];
 
-            $data[] = $item;
+            $data->add($item);
         }
 
         return response()->json($data);
@@ -94,7 +94,7 @@ class ReportController extends Controller
         $data = array();
 
         $clients = Client::where('deleted_at', '=', null)
-        // Search With Multiple Param
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('name', 'LIKE', "%{$request->search}%")
@@ -104,7 +104,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $clients->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $clients = $clients->offset($offSet)
@@ -221,15 +221,15 @@ class ReportController extends Controller
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $sales = Sale::where('deleted_at', '=', null)->with('client','warehouse')
+        $sales = Sale::where('deleted_at', '=', null)->with('client', 'warehouse')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             })
             ->where('client_id', $request->id)
-             // Search With Multiple Param
-             ->where(function ($query) use ($request) {
+            // Search With Multiple Param
+            ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
                         ->orWhere('statut', 'LIKE', "%{$request->search}%")
@@ -248,7 +248,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $sales->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $sales = $sales->offset($offSet)
@@ -269,7 +269,7 @@ class ReportController extends Controller
             $item['due'] = $sale->GrandTotal - $sale->paid_amount;
             $item['payment_status'] = $sale->payment_statut;
             $item['shipping_status'] = $sale->shipping_status;
-            
+
             $data[] = $item;
         }
         return response()->json([
@@ -303,8 +303,8 @@ class ReportController extends Controller
             ->where('payment_sales.deleted_at', '=', null)
             ->join('sales', 'payment_sales.sale_id', '=', 'sales.id')
             ->where('sales.client_id', $request->id)
-             // Search With Multiple Param
-             ->where(function ($query) use ($request) {
+            // Search With Multiple Param
+            ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('payment_sales.Ref', 'LIKE', "%{$request->search}%")
                         ->orWhere('payment_sales.date', 'LIKE', "%{$request->search}%")
@@ -317,7 +317,7 @@ class ReportController extends Controller
             );
 
         $totalRows = $payments->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $payments = $payments->offset($offSet)
@@ -347,7 +347,7 @@ class ReportController extends Controller
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
         $data = array();
-        
+
         $Quotations = Quotation::with('client', 'warehouse')
             ->where('deleted_at', '=', null)
             ->where('client_id', $request->id)
@@ -375,7 +375,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $Quotations->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $Quotations = $Quotations->offset($offSet)
@@ -419,15 +419,15 @@ class ReportController extends Controller
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $SaleReturn = SaleReturn::where('deleted_at', '=', null)->with('sale','client','warehouse')
+        $SaleReturn = SaleReturn::where('deleted_at', '=', null)->with('sale', 'client', 'warehouse')
             ->where('client_id', $request->id)
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             })
-             // Search With Multiple Param
-             ->where(function ($query) use ($request) {
+            // Search With Multiple Param
+            ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
                         ->orWhere('statut', 'LIKE', "%{$request->search}%")
@@ -451,7 +451,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $SaleReturn->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $SaleReturn = $SaleReturn->offset($offSet)
@@ -464,8 +464,8 @@ class ReportController extends Controller
             $item['Ref'] = $Sale_Return->Ref;
             $item['statut'] = $Sale_Return->statut;
             $item['client_name'] = $Sale_Return['client']->name;
-            $item['sale_ref'] = $Sale_Return['sale']?$Sale_Return['sale']->Ref:'---';
-            $item['sale_id'] = $Sale_Return['sale']?$Sale_Return['sale']->id:NULL;
+            $item['sale_ref'] = $Sale_Return['sale'] ? $Sale_Return['sale']->Ref : '---';
+            $item['sale_id'] = $Sale_Return['sale'] ? $Sale_Return['sale']->id : NULL;
             $item['warehouse_name'] = $Sale_Return['warehouse']->name;
             $item['GrandTotal'] = $Sale_Return->GrandTotal;
             $item['paid_amount'] = $Sale_Return->paid_amount;
@@ -482,50 +482,49 @@ class ReportController extends Controller
     }
 
 
+    //------------- Show Report Purchases ----------\\
 
-        //------------- Show Report Purchases ----------\\
+    public function Report_Purchases(request $request)
+    {
+        $this->authorizeForUser($request->user('api'), 'ReportPurchases', Purchase::class);
+        // How many items do you want to display.
+        $perPage = $request->limit;
+        $pageStart = \Request::get('page', 1);
+        // Start displaying items from this number;
+        $offSet = ($pageStart * $perPage) - $perPage;
+        $order = $request->SortField;
+        $dir = $request->SortType;
+        $helpers = new helpers();
+        // Filter fields With Params to retrieve
+        $param = array(
+            0 => 'like',
+            1 => 'like',
+            2 => '=',
+            3 => 'like',
+            4 => '=',
+        );
+        $columns = array(
+            0 => 'Ref',
+            1 => 'statut',
+            2 => 'provider_id',
+            3 => 'payment_statut',
+            4 => 'warehouse_id',
+        );
+        $data = array();
+        $total = 0;
 
-        public function Report_Purchases(request $request)
-        {
-            $this->authorizeForUser($request->user('api'), 'ReportPurchases', Purchase::class);
-            // How many items do you want to display.
-            $perPage = $request->limit;
-            $pageStart = \Request::get('page', 1);
-            // Start displaying items from this number;
-            $offSet = ($pageStart * $perPage) - $perPage;
-            $order = $request->SortField;
-            $dir = $request->SortType;
-            $helpers = new helpers();
-            // Filter fields With Params to retrieve
-            $param = array(
-                0 => 'like',
-                1 => 'like',
-                2 => '=',
-                3 => 'like',
-                4 => '=',
-            );
-            $columns = array(
-                0 => 'Ref',
-                1 => 'statut',
-                2 => 'provider_id',
-                3 => 'payment_statut',
-                4 => 'warehouse_id',
-            );
-            $data = array();
-            $total = 0;
-    
-            $Purchases = Purchase::select('purchases.*')
-                ->with('facture', 'provider', 'warehouse')
-                ->join('providers', 'purchases.provider_id', '=', 'providers.id')
-                ->where('purchases.deleted_at', '=', null)
-                ->whereBetween('purchases.date', array($request->from, $request->to));
-                
-            //  Check If User Has Permission Show All Records
-            $Purchases = $helpers->Show_Records($Purchases);
-            //Multiple Filter
-            $Filtred = $helpers->filter($Purchases, $columns, $param, $request)
-             // Search With Multiple Param
-             ->where(function ($query) use ($request) {
+        $Purchases = Purchase::select('purchases.*')
+            ->with('facture', 'provider', 'warehouse')
+            ->join('providers', 'purchases.provider_id', '=', 'providers.id')
+            ->where('purchases.deleted_at', '=', null)
+            ->whereBetween('purchases.date', array($request->from, $request->to));
+
+        //  Check If User Has Permission Show All Records
+        $Purchases = $helpers->Show_Records($Purchases);
+        //Multiple Filter
+        $Filtred = $helpers->filter($Purchases, $columns, $param, $request)
+            // Search With Multiple Param
+            ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
                         ->orWhere('statut', 'LIKE', "%{$request->search}%")
@@ -543,171 +542,120 @@ class ReportController extends Controller
                         });
                 });
             });
-    
-            $totalRows = $Filtred->count();
-            if($perPage == "-1"){
-                $perPage = $totalRows;
-            }
-            $Purchases = $Filtred->offset($offSet)
-                ->limit($perPage)
-                ->orderBy('purchases.' . $order, $dir)
-                ->get();
-    
-            foreach ($Purchases as $Purchase) {
-    
-                $item['id'] = $Purchase->id;
-                $item['date'] = $Purchase->date;
-                $item['Ref'] = $Purchase->Ref;
-                $item['warehouse_name'] = $Purchase['warehouse']->name;
-                $item['discount'] = $Purchase->discount;
-                $item['shipping'] = $Purchase->shipping;
-                $item['statut'] = $Purchase->statut;
-                $item['provider_name'] = $Purchase['provider']->name;
-                $item['provider_email'] = $Purchase['provider']->email;
-                $item['provider_tele'] = $Purchase['provider']->phone;
-                $item['provider_code'] = $Purchase['provider']->code;
-                $item['provider_adr'] = $Purchase['provider']->adresse;
-                $item['GrandTotal'] = $Purchase['GrandTotal'];
-                $item['paid_amount'] = $Purchase['paid_amount'];
-                $item['due'] = $Purchase['GrandTotal'] - $Purchase['paid_amount'];
-                $item['payment_status'] = $Purchase['payment_statut'];
-    
-                $data[] = $item;
-            }
-    
-            $suppliers = provider::where('deleted_at', '=', null)->get(['id', 'name']);
-    
-             //get warehouses assigned to user
-             $user_auth = auth()->user();
-             if($user_auth->is_all_warehouses){
-                 $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-             }else{
-                 $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-                 $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-             } 
-    
-            return response()->json([
-                'totalRows' => $totalRows,
-                'purchases' => $data,
-                'suppliers' => $suppliers,
-                'warehouses' => $warehouses,
-            ]);
+
+        $totalRows = $Filtred->count();
+        if ($perPage == "-1") {
+            $perPage = $totalRows;
         }
-    
-        //------------- Show Report SALES -----------\\
-    
-        public function Report_Sales(request $request)
-        {
+        $Purchases = $Filtred->offset($offSet)
+            ->limit($perPage)
+            ->orderBy('purchases.' . $order, $dir)
+            ->get();
+
+        foreach ($Purchases as $Purchase) {
+
+            $item['id'] = $Purchase->id;
+            $item['date'] = $Purchase->date;
+            $item['Ref'] = $Purchase->Ref;
+            $item['warehouse_name'] = $Purchase['warehouse']->name;
+            $item['discount'] = $Purchase->discount;
+            $item['shipping'] = $Purchase->shipping;
+            $item['statut'] = $Purchase->statut;
+            $item['provider_name'] = $Purchase['provider']->name;
+            $item['provider_email'] = $Purchase['provider']->email;
+            $item['provider_tele'] = $Purchase['provider']->phone;
+            $item['provider_code'] = $Purchase['provider']->code;
+            $item['provider_adr'] = $Purchase['provider']->adresse;
+            $item['GrandTotal'] = $Purchase['GrandTotal'];
+            $item['paid_amount'] = $Purchase['paid_amount'];
+            $item['due'] = $Purchase['GrandTotal'] - $Purchase['paid_amount'];
+            $item['payment_status'] = $Purchase['payment_statut'];
+
+            $data[] = $item;
+        }
+
+        $suppliers = provider::where('deleted_at', '=', null)->get(['id', 'name']);
+
+        //get warehouses assigned to user
+        $user_auth = auth()->user();
+        if ($user_auth->is_all_warehouses) {
+            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
+        } else {
+            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
+            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
+        }
+
+        return response()->json([
+            'totalRows' => $totalRows,
+            'purchases' => $data,
+            'suppliers' => $suppliers,
+            'warehouses' => $warehouses,
+        ]);
+    }
+
+    //------------- Show Report SALES -----------\\
+
+    public function Report_Sales(request $request)
+    {
 //            $this->authorizeForUser($request->user('api'), 'Reports_sales', Sale::class);
-            // How many items do you want to display.
-//            $perPage = $request->limit;
-//            $pageStart = \Request::get('page', 1);
-            // Start displaying items from this number;
-//            $offSet = ($pageStart * $perPage) - $perPage;
-//            $order = $request->SortField;
-//            $dir = $request->SortType;
-            $helpers = new helpers();
-            // Filter fields With Params to retrieve
-    
-//            $param = array(
-//                0 => 'like',
-//                1 => 'like',
-//                2 => '=',
-//                3 => 'like',
-//                4 => '=',
-//            );
-//            $columns = array(
-//                0 => 'Ref',
-//                1 => 'statut',
-//                2 => 'client_id',
-//                3 => 'payment_statut',
-//                4 => 'warehouse_id',
-//            );
-            
-            $data = collect();
-    
-            $Sales = Sale::select('sales.*')
-                ->with('facture', 'client', 'warehouse')
-                ->join('clients', 'sales.client_id', '=', 'clients.id')
-                ->where('sales.deleted_at', '=', null)
-                ->whereBetween('sales.date', array($request->from, $request->to));
-    
-            //  Check If User Has Permission Show All Records
-//            $Sales = $helpers->Show_Records($Sales);
-            //Multiple Filter
-//            $Filtred = $helpers->filter($Sales, $columns, $param, $request)
-//           // Search With Multiple Param
-//            ->where(function ($query) use ($request) {
-//                return $query->when($request->filled('search'), function ($query) use ($request) {
-//                    return $query->where('Ref', 'LIKE', "%{$request->search}%")
-//                        ->orWhere('statut', 'LIKE', "%{$request->search}%")
-//                        ->orWhere('GrandTotal', $request->search)
-//                        ->orWhere('payment_statut', 'like', "%{$request->search}%")
-//                        ->orWhere('shipping_status', 'like', "%{$request->search}%")
-//                        ->orWhere(function ($query) use ($request) {
-//                            return $query->whereHas('client', function ($q) use ($request) {
-//                                $q->where('name', 'LIKE', "%{$request->search}%");
-//                            });
-//                        })
-//                        ->orWhere(function ($query) use ($request) {
-//                            return $query->whereHas('warehouse', function ($q) use ($request) {
-//                                $q->where('name', 'LIKE', "%{$request->search}%");
-//                            });
-//                        });
-//                });
-//            });
-    
-//            $totalRows = $Filtred->count();
-//            if($perPage == "-1"){
-//                $perPage = $totalRows;
-//            }
-//            $Sales = $Filtred->offset($offSet)
-//                ->limit($perPage)
-//                ->orderBy('sales.' . $order, $dir)
-//                ->get();
-            $Sales = $Sales->get();
-            foreach ($Sales as $Sale) {
-                $item['id'] = $Sale['id'];
-                $item['date'] = $Sale['date'];
-                $item['Ref'] = $Sale['Ref'];
-                $item['statut'] = $Sale['statut'];
-                $item['discount'] = $Sale['discount'];
-                $item['shipping'] = $Sale['shipping'];
-                $item['warehouse_name'] = $Sale['warehouse']['name'];
-                $item['client_name'] = $Sale['client']['name'];
-                $item['client_email'] = $Sale['client']['email'];
-                $item['client_tele'] = $Sale['client']['phone'];
-                $item['client_code'] = $Sale['client']['code'];
-                $item['client_adr'] = $Sale['client']['adresse'];
-                $item['GrandTotal'] = $Sale['GrandTotal'];
-                $item['paid_amount'] = $Sale['paid_amount'];
-                $item['due'] = $Sale['GrandTotal'] - $Sale['paid_amount'];
-                $item['payment_status'] = $Sale['payment_statut'];
-    
-                $data->add($item);
-            }
-    
-            $customers = client::where('deleted_at', '=', null)->get(['id', 'name']);
-    
-             //get warehouses assigned to user
-           $user_auth = auth()->user();
-           if($user_auth->is_all_warehouses){
-               $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-           }else{
-               $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-               $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-           }
-    
-//            return response()->json(
-            return Inertia::render('Reports/payments/payments_sales',
-                [
-//                    'totalRows' => $totalRows,
-                    'sales' => $data,
-                    'customers' => $customers, 
-                    'warehouses' => $warehouses
-                ]
-            );
+
+        $data = collect();
+        $filter = collect($request->get('filter'));
+
+        $Sales = Sale::select('sales.*')
+            ->with('facture', 'client', 'warehouse')
+            ->join('clients', 'sales.client_id', '=', 'clients.id')
+            ->where('sales.deleted_at', '=', null);
+//                ->whereBetween('sales.date', array($request->from, $request->to));
+
+        $Sales = helpers::getFilter($filter,
+            $Sales,
+            collect([
+                collect(['type' => 'date', 'key' => 'date', 'filter' => 'startDate', 'filter2' => 'endDate']),
+                collect(['type' => 'string', 'key' => 'Ref', 'filter' => 'Ref']),
+                collect(['type' => 'string', 'key' => 'statut', 'filter' => 'status']),
+                collect(['type' => 'string', 'key' => 'payment_statut', 'filter' => 'Payment']),
+                collect(['type' => '', 'key' => 'sales.warehouse_id', 'filter' => 'warehouse']),
+                collect(['type' => '', 'key' => 'sales.client_id', 'filter' => 'client']),
+            ])
+        );
+        $Sales = $Sales->orderByDesc('date')->get();
+        foreach ($Sales as $Sale) {
+            $item['id'] = $Sale['id'];
+            $item['date'] = $Sale['date'];
+            $item['Ref'] = $Sale['Ref'];
+            $item['statut'] = $Sale['statut'];
+            $item['discount'] = $Sale['discount'];
+            $item['shipping'] = $Sale['shipping'];
+            $item['warehouse_name'] = $Sale['warehouse']['name'];
+            $item['client_name'] = $Sale['client']?->company_name;
+            $item['client_email'] = $Sale['client']?->email;
+            $item['client_tele'] = $Sale['client']?->phone;
+            $item['client_code'] = $Sale['client']?->code;
+            $item['client_adr'] = $Sale['client']?->adresse;
+            $item['GrandTotal'] = $Sale['GrandTotal'];
+            $item['paid_amount'] = $Sale['paid_amount'];
+            $item['due'] = $Sale['GrandTotal'] - $Sale['paid_amount'];
+            $item['payment_status'] = $Sale['payment_statut'];
+
+            $data->add($item);
         }
+
+        $customers = Client::where('deleted_at', '=', null)->get(['id', 'company_name as name']);
+
+        //get warehouses assigned to user
+        $user_auth = auth()->user();
+        $warehouses = helpers::getWarehouses($user_auth);
+
+        Inertia::share('titlePage', 'Pagos de Ventas');
+        return Inertia::render('Reports/sales_report',
+            [
+                'sales' => $data,
+                'customers' => $customers,
+                'warehouses' => $warehouses
+            ]
+        );
+    }
 
     //----------------- Providers Report -----------------------\\
 
@@ -725,7 +673,7 @@ class ReportController extends Controller
         $data = array();
 
         $providers = Provider::where('deleted_at', '=', null)
-        // Search With Multiple Param
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('name', 'LIKE', "%{$request->search}%")
@@ -735,7 +683,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $providers->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $providers = $providers->offset($offSet)
@@ -762,9 +710,9 @@ class ReportController extends Controller
             $item['due'] = $item['total_amount'] - $item['total_paid'];
 
             $item['total_amount_return'] = DB::table('purchase_returns')
-            ->where('deleted_at', '=', null)
-            ->where('provider_id', $provider->id)
-            ->sum('GrandTotal');
+                ->where('deleted_at', '=', null)
+                ->where('provider_id', $provider->id)
+                ->sum('GrandTotal');
 
             $item['total_paid_return'] = DB::table('purchase_returns')
                 ->where('deleted_at', '=', null)
@@ -805,15 +753,15 @@ class ReportController extends Controller
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $purchases = Purchase::where('deleted_at', '=', null)
-            ->with('provider','warehouse')
+            ->with('provider', 'warehouse')
             ->where('provider_id', $request->id)
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             })
-             // Search With Multiple Param
-             ->where(function ($query) use ($request) {
+            // Search With Multiple Param
+            ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
                         ->orWhere('statut', 'LIKE', "%{$request->search}%")
@@ -832,7 +780,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $purchases->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $purchases = $purchases->offset($offSet)
@@ -887,8 +835,8 @@ class ReportController extends Controller
             ->where('payment_purchases.deleted_at', '=', null)
             ->join('purchases', 'payment_purchases.purchase_id', '=', 'purchases.id')
             ->where('purchases.provider_id', $request->id)
-             // Search With Multiple Param
-             ->where(function ($query) use ($request) {
+            // Search With Multiple Param
+            ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('payment_purchases.Ref', 'LIKE', "%{$request->search}%")
                         ->orWhere('payment_purchases.date', 'LIKE', "%{$request->search}%")
@@ -901,7 +849,7 @@ class ReportController extends Controller
             );
 
         $totalRows = $payments->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $payments = $payments->offset($offSet)
@@ -933,7 +881,7 @@ class ReportController extends Controller
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $PurchaseReturn = PurchaseReturn::where('deleted_at', '=', null)
-            ->with('purchase','provider','warehouse')
+            ->with('purchase', 'provider', 'warehouse')
             ->where('provider_id', $request->id)
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
@@ -965,7 +913,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $PurchaseReturn->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $PurchaseReturn = $PurchaseReturn->offset($offSet)
@@ -977,8 +925,8 @@ class ReportController extends Controller
             $item['id'] = $Purchase_Return->id;
             $item['Ref'] = $Purchase_Return->Ref;
             $item['statut'] = $Purchase_Return->statut;
-            $item['purchase_ref'] = $Purchase_Return['purchase']?$Purchase_Return['purchase']->Ref:'---';
-            $item['purchase_id'] = $Purchase_Return['purchase']?$Purchase_Return['purchase']->id:NULL;
+            $item['purchase_ref'] = $Purchase_Return['purchase'] ? $Purchase_Return['purchase']->Ref : '---';
+            $item['purchase_id'] = $Purchase_Return['purchase'] ? $Purchase_Return['purchase']->id : NULL;
             $item['provider_name'] = $Purchase_Return['provider']->name;
             $item['warehouse_name'] = $Purchase_Return['warehouse']->name;
             $item['GrandTotal'] = $Purchase_Return->GrandTotal;
@@ -1058,9 +1006,9 @@ class ReportController extends Controller
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
-        if($user_auth->is_all_warehouses){
+        if ($user_auth->is_all_warehouses) {
             $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        }else{
+        } else {
             $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
         }
@@ -1088,7 +1036,7 @@ class ReportController extends Controller
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $sales = Sale::where('deleted_at', '=', null)->with('client','warehouse')
+        $sales = Sale::where('deleted_at', '=', null)->with('client', 'warehouse')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->where('user_id', '=', Auth::user()->id);
@@ -1099,7 +1047,7 @@ class ReportController extends Controller
                     return $query->where('warehouse_id', $request->warehouse_id);
                 });
             })
-        // Search With Multiple Param
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
@@ -1115,7 +1063,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $sales->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $sales = $sales->offset($offSet)
@@ -1162,7 +1110,7 @@ class ReportController extends Controller
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $Quotations = Quotation::where('deleted_at', '=', null)
-            ->with('client','warehouse')
+            ->with('client', 'warehouse')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->where('user_id', '=', Auth::user()->id);
@@ -1173,7 +1121,7 @@ class ReportController extends Controller
                     return $query->where('warehouse_id', $request->warehouse_id);
                 });
             })
-        //Search With Multiple Param
+            //Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
@@ -1187,7 +1135,7 @@ class ReportController extends Controller
                 });
             });
         $totalRows = $Quotations->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $Quotations = $Quotations->offset($offSet)
@@ -1231,7 +1179,7 @@ class ReportController extends Controller
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $SaleReturn = SaleReturn::where('deleted_at', '=', null)
-            ->with('sale','client','warehouse')
+            ->with('sale', 'client', 'warehouse')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->where('user_id', '=', Auth::user()->id);
@@ -1242,14 +1190,13 @@ class ReportController extends Controller
                     return $query->where('warehouse_id', $request->warehouse_id);
                 });
             })
-        //Search With Multiple Param
+            //Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
                         ->orWhere('statut', 'LIKE', "%{$request->search}%")
                         ->orWhere('GrandTotal', $request->search)
                         ->orWhere('payment_statut', 'like', "$request->search")
-
                         ->orWhere(function ($query) use ($request) {
                             return $query->whereHas('sale', function ($q) use ($request) {
                                 $q->where('Ref', 'LIKE', "%{$request->search}%");
@@ -1264,7 +1211,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $SaleReturn->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $SaleReturn = $SaleReturn->offset($offSet)
@@ -1278,8 +1225,8 @@ class ReportController extends Controller
             $item['Ref'] = $Sale_Return->Ref;
             $item['statut'] = $Sale_Return->statut;
             $item['client_name'] = $Sale_Return['client']->name;
-            $item['sale_ref'] = $Sale_Return['sale']?$Sale_Return['sale']->Ref:'---';
-            $item['sale_id'] = $Sale_Return['sale']?$Sale_Return['sale']->id:NULL;
+            $item['sale_ref'] = $Sale_Return['sale'] ? $Sale_Return['sale']->Ref : '---';
+            $item['sale_id'] = $Sale_Return['sale'] ? $Sale_Return['sale']->id : NULL;
             $item['GrandTotal'] = $Sale_Return->GrandTotal;
             $item['paid_amount'] = $Sale_Return->paid_amount;
             $item['due'] = $Sale_Return->GrandTotal - $Sale_Return->paid_amount;
@@ -1312,7 +1259,7 @@ class ReportController extends Controller
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $PurchaseReturn = PurchaseReturn::where('deleted_at', '=', null)
-            ->with('purchase','provider','warehouse')
+            ->with('purchase', 'provider', 'warehouse')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->where('user_id', '=', Auth::user()->id);
@@ -1328,7 +1275,7 @@ class ReportController extends Controller
                     return $query->where('warehouse_id', $request->warehouse_id);
                 });
             })
-        //Search With Multiple Param
+            //Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
@@ -1344,7 +1291,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $PurchaseReturn->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $PurchaseReturn = $PurchaseReturn->offset($offSet)
@@ -1356,8 +1303,8 @@ class ReportController extends Controller
             $item['id'] = $Purchase_Return->id;
             $item['Ref'] = $Purchase_Return->Ref;
             $item['statut'] = $Purchase_Return->statut;
-            $item['purchase_ref'] = $Purchase_Return['purchase']?$Purchase_Return['purchase']->Ref:'---';
-            $item['purchase_id'] = $Purchase_Return['purchase']?$Purchase_Return['purchase']->id:NULL;
+            $item['purchase_ref'] = $Purchase_Return['purchase'] ? $Purchase_Return['purchase']->Ref : '---';
+            $item['purchase_id'] = $Purchase_Return['purchase'] ? $Purchase_Return['purchase']->id : NULL;
             $item['warehouse_name'] = $Purchase_Return['warehouse']->name;
             $item['provider_name'] = $Purchase_Return['provider']->name;
             $item['GrandTotal'] = $Purchase_Return->GrandTotal;
@@ -1392,7 +1339,7 @@ class ReportController extends Controller
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $Expenses = Expense::where('deleted_at', '=', null)
-            ->with('expense_category','warehouse')
+            ->with('expense_category', 'warehouse')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->where('user_id', '=', Auth::user()->id);
@@ -1403,7 +1350,7 @@ class ReportController extends Controller
                     return $query->where('warehouse_id', $request->warehouse_id);
                 });
             })
-        //Search With Multiple Param
+            //Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
@@ -1418,7 +1365,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $Expenses->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $Expenses = $Expenses->offset($offSet)
@@ -1483,9 +1430,9 @@ class ReportController extends Controller
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
-        if($user_auth->is_all_warehouses){
+        if ($user_auth->is_all_warehouses) {
             $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        }else{
+        } else {
             $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
         }
@@ -1581,9 +1528,9 @@ class ReportController extends Controller
                 }
             })
             ->get(DB::raw('SUM(GrandTotal)  As sum'))
-            ->first()->sum; 
-     
-    
+            ->first()->sum;
+
+
         $item['purchases_return'] = PurchaseReturn::where('deleted_at', '=', null)
             ->whereBetween('date', array($request->from, $request->to))
             ->where(function ($query) use ($view_records) {
@@ -1595,33 +1542,33 @@ class ReportController extends Controller
             ->first()->sum;
 
 
-            //calcule COGS and average cost
-            $cogs_average_data = $this->CalculeCogsAndAverageCost($request);
-        
-            $cogs = $cogs_average_data['total_cogs_products'];
-            $total_average_cost = $cogs_average_data['total_average_cost'];
+        //calcule COGS and average cost
+        $cogs_average_data = $this->CalculeCogsAndAverageCost($request);
+
+        $cogs = $cogs_average_data['total_cogs_products'];
+        $total_average_cost = $cogs_average_data['total_average_cost'];
 
 
-            $item['product_cost_fifo'] = $cogs;
-            $item['total_average_cost'] = $total_average_cost;
- 
-            $item['profit_fifo'] = $item['sales']['sum'] - $cogs;
-            $item['profit_average_cost'] = $item['sales']['sum'] - $total_average_cost;
- 
+        $item['product_cost_fifo'] = $cogs;
+        $item['total_average_cost'] = $total_average_cost;
 
-            $item['payment_received'] = $item['paiement_sales']['sum'] + $item['PaymentPurchaseReturns']['sum'];
-            $item['payment_sent'] = $item['paiement_purchases']['sum'] + $item['PaymentSaleReturns']['sum'] + $item['expenses']['sum'];
-            $item['paiement_net'] = $item['payment_received'] - $item['payment_sent'];
-            $item['total_revenue'] =  $item['sales']['sum'] -  $item['return_sales'];
-            
+        $item['profit_fifo'] = $item['sales']['sum'] - $cogs;
+        $item['profit_average_cost'] = $item['sales']['sum'] - $total_average_cost;
+
+
+        $item['payment_received'] = $item['paiement_sales']['sum'] + $item['PaymentPurchaseReturns']['sum'];
+        $item['payment_sent'] = $item['paiement_purchases']['sum'] + $item['PaymentSaleReturns']['sum'] + $item['expenses']['sum'];
+        $item['paiement_net'] = $item['payment_received'] - $item['payment_sent'];
+        $item['total_revenue'] = $item['sales']['sum'] - $item['return_sales'];
+
         return response()->json(['data' => $item]);
-        
+
     }
 
     // Calculating the cost of goods sold (COGS)
     public function CalculeCogsAndAverageCost(request $request)
     {
-        
+
         // Initialize variable to store total COGS averageCost and for all products
         $total_cogs_products = 0;
         $total_average_cost = 0;
@@ -1635,109 +1582,107 @@ class ReportController extends Controller
             $totalCogs = 0;
             $average_cost = 0;
 
-             // Get the total cost and quantity for all adjustments of the product
-             $adjustments = AdjustmentDetail::join('adjustments', 'adjustments.id', '=', 'adjustment_details.adjustment_id')
-             ->where('adjustments.date', '<=' , $request->to)
-             ->where('product_id', $productId['product_id'])->get();
-     
-             $adjustment_quantity = 0;
-             foreach ($adjustments as $adjustment) {
-                 if($adjustment->type == 'add'){
-                     $adjustment_quantity += $adjustment->quantity;
-                 }else{
-                     $adjustment_quantity -= $adjustment->quantity;
-                 }
-             }
+            // Get the total cost and quantity for all adjustments of the product
+            $adjustments = AdjustmentDetail::join('adjustments', 'adjustments.id', '=', 'adjustment_details.adjustment_id')
+                ->where('adjustments.date', '<=', $request->to)
+                ->where('product_id', $productId['product_id'])->get();
+
+            $adjustment_quantity = 0;
+            foreach ($adjustments as $adjustment) {
+                if ($adjustment->type == 'add') {
+                    $adjustment_quantity += $adjustment->quantity;
+                } else {
+                    $adjustment_quantity -= $adjustment->quantity;
+                }
+            }
 
             // Get total quantity sold before start date
             $totalQuantitySold = SaleDetail::where('product_id', $productId['product_id'])->where('date', '<', $request->from)->sum('quantity');
 
             // Get purchase details for current product, ordered by date in ascending date
             $purchases = PurchaseDetail::where('product_id', $productId['product_id'])
-            ->join('purchases', 'purchases.id', '=', 'purchase_details.purchase_id')
-            ->orderBy('purchases.date', 'asc')
-            ->select('purchase_details.quantity as quantity','purchase_details.cost as cost')
-            ->get();
-            
-            if(count($purchases) > 0){
+                ->join('purchases', 'purchases.id', '=', 'purchase_details.purchase_id')
+                ->orderBy('purchases.date', 'asc')
+                ->select('purchase_details.quantity as quantity', 'purchase_details.cost as cost')
+                ->get();
+
+            if (count($purchases) > 0) {
                 $purchases_to_array = $purchases->toArray();
-                $purchases_sum_qty = array_sum(array_column($purchases_to_array,'quantity'));
-            }else{
+                $purchases_sum_qty = array_sum(array_column($purchases_to_array, 'quantity'));
+            } else {
                 $purchases_sum_qty = 0;
             }
-            
+
             // Get sale details for current product between start and end date, ordered by date in ascending order
             $sales = SaleDetail::where('product_id', $productId['product_id'])
-            ->whereBetween('date', array($request->from, $request->to))
-            ->orderBy('date', 'asc')
-            ->get();
+                ->whereBetween('date', array($request->from, $request->to))
+                ->orderBy('date', 'asc')
+                ->get();
 
             $sales_to_array = $sales->toArray();
-            $sales_sum_qty = array_sum(array_column($sales_to_array,'quantity'));
-            
+            $sales_sum_qty = array_sum(array_column($sales_to_array, 'quantity'));
+
             $total_sum_sales = $totalQuantitySold + $sales_sum_qty;
 
 
             //calcule average Cost
-            $average_cost = $this->averageCost($productId['product_id'] ,$request);
+            $average_cost = $this->averageCost($productId['product_id'], $request);
 
-            if($total_sum_sales > $purchases_sum_qty){
+            if ($total_sum_sales > $purchases_sum_qty) {
                 // Handle adjustments only case
                 // $product = Product::find($productId['product_id']);
                 // $product_cost = $product->cost;
                 $totalCogs += $sales_sum_qty * $average_cost;
                 $total_average_cost += $sales_sum_qty * $average_cost;
-                
-            }else{
+
+            } else {
 
                 foreach ($sales as $sale) {
-                    
+
                     $saleQuantity = $sale->quantity;
                     $total_average_cost += $average_cost * $sale->quantity;
 
                     while ($saleQuantity > 0) {
                         $purchase = $purchases->first();
-                       
-                        if ($purchase->quantity > 0) { 
-                            $totalQuantitySold += $saleQuantity; 
+
+                        if ($purchase->quantity > 0) {
+                            $totalQuantitySold += $saleQuantity;
 
                             if ($purchase->quantity >= $totalQuantitySold) {
                                 $totalCogs += $saleQuantity * $purchase->cost;
                                 $purchase->quantity -= $totalQuantitySold;
                                 $saleQuantity = 0;
-                                $totalQuantitySold =  0;
-                                
-                                if($purchase->quantity == 0){
+                                $totalQuantitySold = 0;
+
+                                if ($purchase->quantity == 0) {
                                     $purchase->quantity = 0;
                                     $saleQuantity = 0;
                                     $totalQuantitySold = 0;
                                     $purchases->shift();
                                 }
-                            
+
                             } else {
 
-                                if($purchase->quantity >= ($totalQuantitySold - $saleQuantity)) {
+                                if ($purchase->quantity >= ($totalQuantitySold - $saleQuantity)) {
                                     $rest = $purchase->quantity - ($totalQuantitySold - $saleQuantity);
-                                    if($rest <= $saleQuantity){
+                                    if ($rest <= $saleQuantity) {
                                         $saleQuantity -= $rest;
                                         $totalCogs += $rest * $purchase->cost;
-                                        $totalQuantitySold =  0;
+                                        $totalQuantitySold = 0;
                                         $purchase->quantity = 0;
                                         $purchases->shift();
 
-                                    }
-                                   
-                                    else{
-                                        $totalQuantitySold -=  $saleQuantity;
+                                    } else {
+                                        $totalQuantitySold -= $saleQuantity;
                                         $purchase->quantity = $purchase->quantity - $totalQuantitySold;
-                                        $totalCogs+= $purchase->quantity * $purchase->cost;
+                                        $totalCogs += $purchase->quantity * $purchase->cost;
                                         $saleQuantity -= $purchase->quantity;
                                         $purchase->quantity = 0;
                                         $purchases->shift();
                                     }
-                            
-                                }else{
-                                    $totalQuantitySold -=  $saleQuantity;
+
+                                } else {
+                                    $totalQuantitySold -= $saleQuantity;
                                     $totalQuantitySold -= $purchase->quantity;
                                     $purchase->quantity = 0;
                                     $purchases->shift();
@@ -1747,9 +1692,9 @@ class ReportController extends Controller
                             $purchases->shift();
                         }
 
-                        
+
                     }
-                
+
                 }
             }
             $total_cogs_products += $totalCogs;
@@ -1758,15 +1703,15 @@ class ReportController extends Controller
 
         return [
             'total_cogs_products' => $total_cogs_products,
-            'total_average_cost'  => $total_average_cost
+            'total_average_cost' => $total_average_cost
         ];
 
 
     }
-    
+
 
     // Calculate the average cost of a product.
-    public function averageCost($product_id , request $request)
+    public function averageCost($product_id, request $request)
     {
         // Get the cost of the product from the products table
         $product = Product::find($product_id);
@@ -1774,12 +1719,12 @@ class ReportController extends Controller
 
         // Get the total cost and quantity for all purchases of the product
         $purchases = PurchaseDetail::with('purchase')
-        ->where(function ($query) use ($request) {
+            ->where(function ($query) use ($request) {
                 return $query->whereHas('purchase', function ($q) use ($request) {
-                    $q->where('date', '<=' , $request->to);
+                    $q->where('date', '<=', $request->to);
                 });
 
-        })->where('product_id', $product_id)->get();
+            })->where('product_id', $product_id)->get();
 
         $purchase_cost = 0;
         $purchase_quantity = 0;
@@ -1790,21 +1735,21 @@ class ReportController extends Controller
 
         // Get the total cost and quantity for all adjustments of the product
         $adjustments = AdjustmentDetail::with('adjustment')
-        ->where(function ($query) use ($request) {
-            return $query->whereHas('adjustment', function ($q) use ($request) {
-                $q->where('date', '<=' , $request->to);
-            });
+            ->where(function ($query) use ($request) {
+                return $query->whereHas('adjustment', function ($q) use ($request) {
+                    $q->where('date', '<=', $request->to);
+                });
 
-        })
-        ->where('product_id', $product_id)->get();
+            })
+            ->where('product_id', $product_id)->get();
 
         $adjustment_cost = 0;
         $adjustment_quantity = 0;
         foreach ($adjustments as $adjustment) {
-            if($adjustment->type == 'add'){
+            if ($adjustment->type == 'add') {
                 $adjustment_cost += $adjustment->quantity * $product_cost;
                 $adjustment_quantity += $adjustment->quantity;
-            }else{
+            } else {
                 $adjustment_cost -= $adjustment->quantity * $product_cost;
                 $adjustment_quantity -= $adjustment->quantity;
             }
@@ -1819,11 +1764,11 @@ class ReportController extends Controller
     }
 
 
-     //-------------------- report_top_products -------------\\
+    //-------------------- report_top_products -------------\\
 
-     public function report_top_products(request $request)
-     {
- 
+    public function report_top_products(request $request)
+    {
+
         $this->authorizeForUser($request->user('api'), 'Top_products', Product::class);
 
         $Role = Auth::user()->roles()->first();
@@ -1835,37 +1780,37 @@ class ReportController extends Controller
         $offSet = ($pageStart * $perPage) - $perPage;
 
         $products_data = SaleDetail::join('sales', 'sale_details.sale_id', '=', 'sales.id')
-        ->join('products', 'sale_details.product_id', '=', 'products.id')
-        ->where(function ($query) use ($view_records) {
-            if (!$view_records) {
-                return $query->where('sales.user_id', '=', Auth::user()->id);
-            }
-        })
-        ->whereBetween('sale_details.date', array($request->from, $request->to))
-        ->where(function ($query) use ($request) {
-            return $query->when($request->filled('search'), function ($query) use ($request) {
-                    return $query->where('products.name','LIKE', "%{$request->search}%")
-                    ->orWhere('products.code', 'LIKE', "%{$request->search}%");
-            });
-        })
-        ->select(
-            DB::raw('products.name as name'),
-            DB::raw('products.code as code'),
-            DB::raw('count(*) as total_sales'),
-            DB::raw('sum(total) as total'),
-        )
-        ->groupBy('products.name');
+            ->join('products', 'sale_details.product_id', '=', 'products.id')
+            ->where(function ($query) use ($view_records) {
+                if (!$view_records) {
+                    return $query->where('sales.user_id', '=', Auth::user()->id);
+                }
+            })
+            ->whereBetween('sale_details.date', array($request->from, $request->to))
+            ->where(function ($query) use ($request) {
+                return $query->when($request->filled('search'), function ($query) use ($request) {
+                    return $query->where('products.name', 'LIKE', "%{$request->search}%")
+                        ->orWhere('products.code', 'LIKE', "%{$request->search}%");
+                });
+            })
+            ->select(
+                DB::raw('products.name as name'),
+                DB::raw('products.code as code'),
+                DB::raw('count(*) as total_sales'),
+                DB::raw('sum(total) as total'),
+            )
+            ->groupBy('products.name');
 
         $totalRows = $products_data->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
-        
-        
+
+
         $products = $products_data->offset($offSet)
-        ->limit($perPage)
-        ->orderBy('total_sales', 'desc')
-        ->get();
+            ->limit($perPage)
+            ->orderBy('total_sales', 'desc')
+            ->get();
 
 
         return response()->json([
@@ -1873,7 +1818,7 @@ class ReportController extends Controller
             'totalRows' => $totalRows,
         ]);
 
-     }
+    }
 
 
     //-------------------- report_top_customers -------------\\
@@ -1892,37 +1837,35 @@ class ReportController extends Controller
         $offSet = ($pageStart * $perPage) - $perPage;
 
         $customers_count = Sale::where('sales.deleted_at', '=', null)
-        ->where(function ($query) use ($view_records) {
-            if (!$view_records) {
-                return $query->where('sales.user_id', '=', Auth::user()->id);
-            }
-        })
-
-        ->join('clients', 'sales.client_id', '=', 'clients.id')
-        ->select(DB::raw('clients.name'), DB::raw("count(*) as total_sales"))
-        ->groupBy('clients.name')->get();
+            ->where(function ($query) use ($view_records) {
+                if (!$view_records) {
+                    return $query->where('sales.user_id', '=', Auth::user()->id);
+                }
+            })
+            ->join('clients', 'sales.client_id', '=', 'clients.id')
+            ->select(DB::raw('clients.name'), DB::raw("count(*) as total_sales"))
+            ->groupBy('clients.name')->get();
 
         $totalRows = $customers_count->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
 
         $customers_data = Sale::where('sales.deleted_at', '=', null)
-        ->where(function ($query) use ($view_records) {
-            if (!$view_records) {
-                return $query->where('sales.user_id', '=', Auth::user()->id);
-            }
-        })
-
-        ->join('clients', 'sales.client_id', '=', 'clients.id')
-        ->select(
-            DB::raw('clients.name as name'), 
-            DB::raw('clients.phone as phone'), 
-            DB::raw('clients.email as email'), 
-            DB::raw("count(*) as total_sales"),
-            DB::raw('sum(GrandTotal) as total'),
-        )
-        ->groupBy('clients.name');
+            ->where(function ($query) use ($view_records) {
+                if (!$view_records) {
+                    return $query->where('sales.user_id', '=', Auth::user()->id);
+                }
+            })
+            ->join('clients', 'sales.client_id', '=', 'clients.id')
+            ->select(
+                DB::raw('clients.name as name'),
+                DB::raw('clients.phone as phone'),
+                DB::raw('clients.email as email'),
+                DB::raw("count(*) as total_sales"),
+                DB::raw('sum(GrandTotal) as total'),
+            )
+            ->groupBy('clients.name');
 
         $customers = $customers_data->offset($offSet)
             ->limit($perPage)
@@ -1937,87 +1880,87 @@ class ReportController extends Controller
     }
 
 
-     //----------------- Users Report -----------------------\\
+    //----------------- Users Report -----------------------\\
 
-     public function users_Report(request $request)
-     {
- 
-         $this->authorizeForUser($request->user('api'), 'users_report', User::class);
- 
-         // How many items do you want to display.
-         $perPage = $request->limit;
-         $pageStart = \Request::get('page', 1);
-         // Start displaying items from this number;
-         $offSet = ($pageStart * $perPage) - $perPage;
-         $order = $request->SortField;
-         $dir = $request->SortType;
-         $data = array();
- 
-         $users = User::where(function ($query) use ($request) {
+    public function users_Report(request $request)
+    {
+
+        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
+
+        // How many items do you want to display.
+        $perPage = $request->limit;
+        $pageStart = \Request::get('page', 1);
+        // Start displaying items from this number;
+        $offSet = ($pageStart * $perPage) - $perPage;
+        $order = $request->SortField;
+        $dir = $request->SortType;
+        $data = array();
+
+        $users = User::where(function ($query) use ($request) {
             return $query->when($request->filled('search'), function ($query) use ($request) {
                 return $query->where('username', 'LIKE', "%{$request->search}%");
-                });
             });
- 
-         $totalRows = $users->count();
-         if($perPage == "-1"){
-             $perPage = $totalRows;
-         }
-         $users = $users->offset($offSet)
-             ->limit($perPage)
-             ->orderBy($order, $dir)
-             ->get();
- 
-         foreach ($users as $user) {
+        });
+
+        $totalRows = $users->count();
+        if ($perPage == "-1") {
+            $perPage = $totalRows;
+        }
+        $users = $users->offset($offSet)
+            ->limit($perPage)
+            ->orderBy($order, $dir)
+            ->get();
+
+        foreach ($users as $user) {
             $item['total_sales'] = DB::table('sales')
-                 ->where('deleted_at', '=', null)
-                 ->where('user_id', $user->id)
-                 ->count();
+                ->where('deleted_at', '=', null)
+                ->where('user_id', $user->id)
+                ->count();
 
             $item['total_purchases'] = DB::table('purchases')
-                 ->where('deleted_at', '=', null)
-                 ->where('user_id', $user->id)
-                 ->count();
+                ->where('deleted_at', '=', null)
+                ->where('user_id', $user->id)
+                ->count();
 
             $item['total_quotations'] = DB::table('quotations')
-                 ->where('deleted_at', '=', null)
-                 ->where('user_id', $user->id)
-                 ->count();
+                ->where('deleted_at', '=', null)
+                ->where('user_id', $user->id)
+                ->count();
 
             $item['total_return_sales'] = DB::table('sale_returns')
-                 ->where('deleted_at', '=', null)
-                 ->where('user_id', $user->id)
-                 ->count();
+                ->where('deleted_at', '=', null)
+                ->where('user_id', $user->id)
+                ->count();
 
             $item['total_return_purchases'] = DB::table('purchase_returns')
-                 ->where('deleted_at', '=', null)
-                 ->where('user_id', $user->id)
-                 ->count();
+                ->where('deleted_at', '=', null)
+                ->where('user_id', $user->id)
+                ->count();
 
             $item['total_transfers'] = DB::table('transfers')
-                 ->where('deleted_at', '=', null)
-                 ->where('user_id', $user->id)
-                 ->count();
+                ->where('deleted_at', '=', null)
+                ->where('user_id', $user->id)
+                ->count();
 
             $item['total_adjustments'] = DB::table('adjustments')
-                 ->where('deleted_at', '=', null)
-                 ->where('user_id', $user->id)
-                 ->count();
- 
-             $item['id'] = $user->id;
-             $item['username'] = $user->username;
-             $data[] = $item;
-         }
- 
-         return response()->json([
-             'report' => $data,
-             'totalRows' => $totalRows,
-         ]);
- 
-     }
+                ->where('deleted_at', '=', null)
+                ->where('user_id', $user->id)
+                ->count();
+
+            $item['id'] = $user->id;
+            $item['username'] = $user->username;
+            $data[] = $item;
+        }
+
+        return response()->json([
+            'report' => $data,
+            'totalRows' => $totalRows,
+        ]);
+
+    }
 
 
-      //-------------------- Get Sales By user -------------\\
+    //-------------------- Get Sales By user -------------\\
 
     public function get_sales_by_user(request $request)
     {
@@ -2032,15 +1975,15 @@ class ReportController extends Controller
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $sales = Sale::where('deleted_at', '=', null)->with('user','client','warehouse')
+        $sales = Sale::where('deleted_at', '=', null)->with('user', 'client', 'warehouse')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             })
             ->where('user_id', $request->id)
-             // Search With Multiple Param
-             ->where(function ($query) use ($request) {
+            // Search With Multiple Param
+            ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
                         ->orWhere('statut', 'LIKE', "%{$request->search}%")
@@ -2059,7 +2002,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $sales->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $sales = $sales->offset($offSet)
@@ -2091,31 +2034,31 @@ class ReportController extends Controller
 
     }
 
-     //-------------------- Get Quotations By user -------------\\
+    //-------------------- Get Quotations By user -------------\\
 
-     public function get_quotations_by_user(request $request)
-     {
- 
+    public function get_quotations_by_user(request $request)
+    {
+
         $this->authorizeForUser($request->user('api'), 'users_report', User::class);
-         // How many items do you want to display.
-         $perPage = $request->limit;
-         $pageStart = \Request::get('page', 1);
-         // Start displaying items from this number;
-         $offSet = ($pageStart * $perPage) - $perPage;
- 
-         $Role = Auth::user()->roles()->first();
-         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
-         $data = array();
+        // How many items do you want to display.
+        $perPage = $request->limit;
+        $pageStart = \Request::get('page', 1);
+        // Start displaying items from this number;
+        $offSet = ($pageStart * $perPage) - $perPage;
 
-         $Quotations = Quotation::with('client', 'warehouse','user')
+        $Role = Auth::user()->roles()->first();
+        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+        $data = array();
+
+        $Quotations = Quotation::with('client', 'warehouse', 'user')
             ->where('deleted_at', '=', null)
-             ->where('user_id', $request->id)
-             ->where(function ($query) use ($ShowRecord) {
-                 if (!$ShowRecord) {
-                     return $query->where('user_id', '=', Auth::user()->id);
-                 }
-             })
-              //Search With Multiple Param
+            ->where('user_id', $request->id)
+            ->where(function ($query) use ($ShowRecord) {
+                if (!$ShowRecord) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })
+            //Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
@@ -2133,36 +2076,36 @@ class ReportController extends Controller
                 });
             });
 
-         $totalRows = $Quotations->count();
-         if($perPage == "-1"){
-             $perPage = $totalRows;
-         }
-         $Quotations = $Quotations->offset($offSet)
-             ->limit($perPage)
-             ->orderBy('id', 'desc')
-             ->get();
+        $totalRows = $Quotations->count();
+        if ($perPage == "-1") {
+            $perPage = $totalRows;
+        }
+        $Quotations = $Quotations->offset($offSet)
+            ->limit($perPage)
+            ->orderBy('id', 'desc')
+            ->get();
 
-            foreach ($Quotations as $Quotation) {
+        foreach ($Quotations as $Quotation) {
 
-                $item['id'] = $Quotation->id;
-                $item['date'] = $Quotation->date;
-                $item['Ref'] = $Quotation->Ref;
-                $item['statut'] = $Quotation->statut;
-                $item['username'] = $Quotation['user']->username;
-                $item['warehouse_name'] = $Quotation['warehouse']->name;
-                $item['client_name'] = $Quotation['client']->name;
-                $item['GrandTotal'] = $Quotation->GrandTotal;
+            $item['id'] = $Quotation->id;
+            $item['date'] = $Quotation->date;
+            $item['Ref'] = $Quotation->Ref;
+            $item['statut'] = $Quotation->statut;
+            $item['username'] = $Quotation['user']->username;
+            $item['warehouse_name'] = $Quotation['warehouse']->name;
+            $item['client_name'] = $Quotation['client']->name;
+            $item['GrandTotal'] = $Quotation->GrandTotal;
 
-                $data[] = $item;
-            }
- 
-         return response()->json([
-             'quotations' => $data,
-             'totalRows' => $totalRows,
-         ]);
-     }
+            $data[] = $item;
+        }
 
-      //-------------------- Get Purchases By user -------------\\
+        return response()->json([
+            'quotations' => $data,
+            'totalRows' => $totalRows,
+        ]);
+    }
+
+    //-------------------- Get Purchases By user -------------\\
 
     public function get_purchases_by_user(request $request)
     {
@@ -2179,7 +2122,7 @@ class ReportController extends Controller
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $purchases = Purchase::where('deleted_at', '=', null)
-            ->with('user','provider','warehouse')
+            ->with('user', 'provider', 'warehouse')
             ->where('user_id', $request->id)
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
@@ -2206,7 +2149,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $purchases->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $purchases = $purchases->offset($offSet)
@@ -2236,31 +2179,31 @@ class ReportController extends Controller
 
     }
 
-     //-------------------- Get sale Returns By user -------------\\
+    //-------------------- Get sale Returns By user -------------\\
 
-     public function get_sales_return_by_user(request $request)
-     {
- 
+    public function get_sales_return_by_user(request $request)
+    {
+
         $this->authorizeForUser($request->user('api'), 'users_report', User::class);
-         // How many items do you want to display.
-         $perPage = $request->limit;
-         $pageStart = \Request::get('page', 1);
-         // Start displaying items from this number;
-         $offSet = ($pageStart * $perPage) - $perPage;
-         $data = array();
- 
-         //  Check If User Has Permission Show All Records
-         $Role = Auth::user()->roles()->first();
-         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
- 
-         $SaleReturn = SaleReturn::where('deleted_at', '=', null)->with('user','client','warehouse')
-             ->where('user_id', $request->id)
-             ->where(function ($query) use ($ShowRecord) {
-                 if (!$ShowRecord) {
-                     return $query->where('user_id', '=', Auth::user()->id);
-                 }
-             })
-             // Search With Multiple Param
+        // How many items do you want to display.
+        $perPage = $request->limit;
+        $pageStart = \Request::get('page', 1);
+        // Start displaying items from this number;
+        $offSet = ($pageStart * $perPage) - $perPage;
+        $data = array();
+
+        //  Check If User Has Permission Show All Records
+        $Role = Auth::user()->roles()->first();
+        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+
+        $SaleReturn = SaleReturn::where('deleted_at', '=', null)->with('user', 'client', 'warehouse')
+            ->where('user_id', $request->id)
+            ->where(function ($query) use ($ShowRecord) {
+                if (!$ShowRecord) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
@@ -2278,36 +2221,36 @@ class ReportController extends Controller
                         });
                 });
             });
- 
-         $totalRows = $SaleReturn->count();
-         if($perPage == "-1"){
-             $perPage = $totalRows;
-         }
-         $SaleReturn = $SaleReturn->offset($offSet)
-             ->limit($perPage)
-             ->orderBy('id', 'desc')
-             ->get();
- 
-         foreach ($SaleReturn as $Sale_Return) {
-             $item['Ref'] = $Sale_Return->Ref;
-             $item['return_sale_id'] = $Sale_Return->id;
-             $item['statut'] = $Sale_Return->statut;
-             $item['username'] = $Sale_Return['user']->username;
-             $item['client_name'] = $Sale_Return['client']->name;
-             $item['warehouse_name'] = $Sale_Return['warehouse']->name;
-             $item['GrandTotal'] = $Sale_Return->GrandTotal;
-             $item['paid_amount'] = $Sale_Return->paid_amount;
-             $item['due'] = $Sale_Return->GrandTotal - $Sale_Return->paid_amount;
-             $item['payment_status'] = $Sale_Return->payment_statut;
- 
-             $data[] = $item;
-         }
- 
-         return response()->json([
-             'totalRows' => $totalRows,
-             'sales_return' => $data,
-         ]);
-     }
+
+        $totalRows = $SaleReturn->count();
+        if ($perPage == "-1") {
+            $perPage = $totalRows;
+        }
+        $SaleReturn = $SaleReturn->offset($offSet)
+            ->limit($perPage)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        foreach ($SaleReturn as $Sale_Return) {
+            $item['Ref'] = $Sale_Return->Ref;
+            $item['return_sale_id'] = $Sale_Return->id;
+            $item['statut'] = $Sale_Return->statut;
+            $item['username'] = $Sale_Return['user']->username;
+            $item['client_name'] = $Sale_Return['client']->name;
+            $item['warehouse_name'] = $Sale_Return['warehouse']->name;
+            $item['GrandTotal'] = $Sale_Return->GrandTotal;
+            $item['paid_amount'] = $Sale_Return->paid_amount;
+            $item['due'] = $Sale_Return->GrandTotal - $Sale_Return->paid_amount;
+            $item['payment_status'] = $Sale_Return->payment_statut;
+
+            $data[] = $item;
+        }
+
+        return response()->json([
+            'totalRows' => $totalRows,
+            'sales_return' => $data,
+        ]);
+    }
 
     //-------------------- Get purchase Returns By user -------------\\
 
@@ -2327,15 +2270,15 @@ class ReportController extends Controller
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $PurchaseReturn = PurchaseReturn::where('deleted_at', '=', null)
-            ->with('user','provider','warehouse')
+            ->with('user', 'provider', 'warehouse')
             ->where('user_id', $request->id)
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             })
-             // Search With Multiple Param
-             ->where(function ($query) use ($request) {
+            // Search With Multiple Param
+            ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
                         ->orWhere('statut', 'LIKE', "%{$request->search}%")
@@ -2354,7 +2297,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $PurchaseReturn->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $PurchaseReturn = $PurchaseReturn->offset($offSet)
@@ -2384,32 +2327,32 @@ class ReportController extends Controller
 
     }
 
-     //-------------------- Get transfers By user -------------\\
+    //-------------------- Get transfers By user -------------\\
 
-     public function get_transfer_by_user(request $request)
-     {
- 
-         $this->authorizeForUser($request->user('api'), 'users_report', User::class);
- 
-         // How many items do you want to display.
-         $perPage = $request->limit;
-         $pageStart = \Request::get('page', 1);
-         // Start displaying items from this number;
-         $offSet = ($pageStart * $perPage) - $perPage;
-         $data = array();
- 
-         $Role = Auth::user()->roles()->first();
-         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
- 
-         $transfers = Transfer::with('from_warehouse', 'to_warehouse')
-             ->with('user')
-             ->where('user_id', $request->id)
-             ->where(function ($query) use ($ShowRecord) {
-                 if (!$ShowRecord) {
-                     return $query->where('user_id', '=', Auth::user()->id);
-                 }
-             })
-             // Search With Multiple Param
+    public function get_transfer_by_user(request $request)
+    {
+
+        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
+
+        // How many items do you want to display.
+        $perPage = $request->limit;
+        $pageStart = \Request::get('page', 1);
+        // Start displaying items from this number;
+        $offSet = ($pageStart * $perPage) - $perPage;
+        $data = array();
+
+        $Role = Auth::user()->roles()->first();
+        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+
+        $transfers = Transfer::with('from_warehouse', 'to_warehouse')
+            ->with('user')
+            ->where('user_id', $request->id)
+            ->where(function ($query) use ($ShowRecord) {
+                if (!$ShowRecord) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
@@ -2426,35 +2369,35 @@ class ReportController extends Controller
                         });
                 });
             });
- 
-         $totalRows = $transfers->count();
-         if($perPage == "-1"){
-             $perPage = $totalRows;
-         }
-         $transfers = $transfers->offset($offSet)
-             ->limit($perPage)
-             ->orderBy('id', 'desc')
-             ->get();
- 
-        foreach ($transfers as $transfer) {
-                $item['id'] = $transfer->id;
-                $item['date'] = $transfer->date;
-                $item['Ref'] = $transfer->Ref;
-                $item['username'] = $transfer['user']->username;
-                $item['from_warehouse'] = $transfer['from_warehouse']->name;
-                $item['to_warehouse'] = $transfer['to_warehouse']->name;
-                $item['GrandTotal'] = $transfer->GrandTotal;
-                $item['items'] = $transfer->items;
-                $item['statut'] = $transfer->statut;
 
-                $data[] = $item;
+        $totalRows = $transfers->count();
+        if ($perPage == "-1") {
+            $perPage = $totalRows;
         }
-         return response()->json([
-             'totalRows' => $totalRows,
-             'transfers' => $data,
-         ]);
- 
-     }
+        $transfers = $transfers->offset($offSet)
+            ->limit($perPage)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        foreach ($transfers as $transfer) {
+            $item['id'] = $transfer->id;
+            $item['date'] = $transfer->date;
+            $item['Ref'] = $transfer->Ref;
+            $item['username'] = $transfer['user']->username;
+            $item['from_warehouse'] = $transfer['from_warehouse']->name;
+            $item['to_warehouse'] = $transfer['to_warehouse']->name;
+            $item['GrandTotal'] = $transfer->GrandTotal;
+            $item['items'] = $transfer->items;
+            $item['statut'] = $transfer->statut;
+
+            $data[] = $item;
+        }
+        return response()->json([
+            'totalRows' => $totalRows,
+            'transfers' => $data,
+        ]);
+
+    }
 
     //-------------------- Get adjustment By user -------------\\
 
@@ -2494,7 +2437,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $Adjustments->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $Adjustments = $Adjustments->offset($offSet)
@@ -2536,34 +2479,34 @@ class ReportController extends Controller
         $dir = $request->SortType;
         $data = array();
 
-        
+
         //get warehouses assigned to user
         $user_auth = auth()->user();
-        if($user_auth->is_all_warehouses){
+        if ($user_auth->is_all_warehouses) {
             $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
             $warehouses_id = Warehouse::where('deleted_at', '=', null)->pluck('id')->toArray();
-        }else{
+        } else {
             $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
         }
 
         $products_data = Product::with('unit', 'category', 'brand')
-        ->where('deleted_at', '=', null)
-        // Search With Multiple Param
-        ->where(function ($query) use ($request) {
-            return $query->when($request->filled('search'), function ($query) use ($request) {
-                return $query->where('products.name', 'LIKE', "%{$request->search}%")
-                    ->orWhere('products.code', 'LIKE', "%{$request->search}%")
-                    ->orWhere(function ($query) use ($request) {
-                        return $query->whereHas('category', function ($q) use ($request) {
-                            $q->where('name', 'LIKE', "%{$request->search}%");
+            ->where('deleted_at', '=', null)
+            // Search With Multiple Param
+            ->where(function ($query) use ($request) {
+                return $query->when($request->filled('search'), function ($query) use ($request) {
+                    return $query->where('products.name', 'LIKE', "%{$request->search}%")
+                        ->orWhere('products.code', 'LIKE', "%{$request->search}%")
+                        ->orWhere(function ($query) use ($request) {
+                            return $query->whereHas('category', function ($q) use ($request) {
+                                $q->where('name', 'LIKE', "%{$request->search}%");
+                            });
                         });
-                    });
+                });
             });
-        });
 
         $totalRows = $products_data->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $products = $products_data->offset($offSet)
@@ -2577,20 +2520,20 @@ class ReportController extends Controller
             $item['name'] = $product->name;
             $item['category'] = $product['category']->name;
             $item['price'] = $product->price;
-            
+
             $product_warehouse_data = product_warehouse::where('product_id', $product->id)
                 ->where('deleted_at', '=', null)
                 ->whereIn('warehouse_id', $warehouses_id)
                 ->where(function ($query) use ($request) {
                     return $query->when($request->filled('warehouse_id'), function ($query) use ($request) {
-                            return $query->where('warehouse_id', $request->warehouse_id);
+                        return $query->where('warehouse_id', $request->warehouse_id);
                     });
                 })
                 ->get();
             $total_qty = 0;
             foreach ($product_warehouse_data as $product_warehouse) {
                 $total_qty += $product_warehouse->qte;
-                $item['quantity'] = $total_qty .' '.$product['unit']->ShortName;
+                $item['quantity'] = $total_qty . ' ' . $product['unit']->ShortName;
             }
 
             $data[] = $item;
@@ -2620,7 +2563,7 @@ class ReportController extends Controller
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $sale_details_data = SaleDetail::with('product','sale','sale.client','sale.warehouse')
+        $sale_details_data = SaleDetail::with('product', 'sale', 'sale.client', 'sale.warehouse')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->whereHas('sale', function ($q) use ($request) {
@@ -2629,14 +2572,14 @@ class ReportController extends Controller
                 }
             })
             ->where('product_id', $request->id)
-             // Search With Multiple Param
-             ->where(function ($query) use ($request) {
+            // Search With Multiple Param
+            ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where(function ($query) use ($request) {
-                            return $query->whereHas('sale.client', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        })
+                        return $query->whereHas('sale.client', function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%{$request->search}%");
+                        });
+                    })
                         ->orWhere(function ($query) use ($request) {
                             return $query->whereHas('sale.warehouse', function ($q) use ($request) {
                                 $q->where('name', 'LIKE', "%{$request->search}%");
@@ -2656,7 +2599,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $sale_details_data->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $sale_details = $sale_details_data->offset($offSet)
@@ -2668,22 +2611,22 @@ class ReportController extends Controller
         foreach ($sale_details as $detail) {
 
             //check if detail has sale_unit_id Or Null
-            if($detail->sale_unit_id !== null){
+            if ($detail->sale_unit_id !== null) {
                 $unit = Unit::where('id', $detail->sale_unit_id)->first();
-            }else{
+            } else {
                 $product_unit_sale_id = Product::with('unitSale')
-                ->where('id', $detail->product_id)
-                ->first();
+                    ->where('id', $detail->product_id)
+                    ->first();
                 $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
             }
 
-            if($detail->product_variant_id){
+            if ($detail->product_variant_id) {
                 $productsVariants = ProductVariant::where('product_id', $detail->product_id)
-                ->where('id', $detail->product_variant_id)->first();
+                    ->where('id', $detail->product_variant_id)->first();
 
                 $product_name = $productsVariants->name . '-' . $detail['product']['name'];
 
-            }else{
+            } else {
                 $product_name = $detail['product']['name'];
             }
 
@@ -2692,7 +2635,7 @@ class ReportController extends Controller
             $item['sale_id'] = $detail['sale']->id;
             $item['client_name'] = $detail['sale']['client']->name;
             $item['warehouse_name'] = $detail['sale']['warehouse']->name;
-            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;
+            $item['quantity'] = $detail->quantity . ' ' . $unit->ShortName;
             $item['total'] = $detail->total;
             $item['product_name'] = $product_name;
             $item['unit_sale'] = $unit->ShortName;
@@ -2721,7 +2664,7 @@ class ReportController extends Controller
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $quotation_details_data = QuotationDetail::with('product','quotation','quotation.client','quotation.warehouse')
+        $quotation_details_data = QuotationDetail::with('product', 'quotation', 'quotation.client', 'quotation.warehouse')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->whereHas('quotation', function ($q) use ($request) {
@@ -2734,10 +2677,10 @@ class ReportController extends Controller
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where(function ($query) use ($request) {
-                            return $query->whereHas('quotation.client', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        })
+                        return $query->whereHas('quotation.client', function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%{$request->search}%");
+                        });
+                    })
                         ->orWhere(function ($query) use ($request) {
                             return $query->whereHas('quotation.warehouse', function ($q) use ($request) {
                                 $q->where('name', 'LIKE', "%{$request->search}%");
@@ -2757,7 +2700,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $quotation_details_data->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $quotation_details = $quotation_details_data->offset($offSet)
@@ -2769,22 +2712,22 @@ class ReportController extends Controller
         foreach ($quotation_details as $detail) {
 
             //check if detail has sale_unit_id Or Null
-            if($detail->sale_unit_id !== null){
-            $unit = Unit::where('id', $detail->sale_unit_id)->first();
-        }else{
-            $product_unit_sale_id = Product::with('unitSale')
-            ->where('id', $detail->product_id)
-            ->first();
-            $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
-        }
+            if ($detail->sale_unit_id !== null) {
+                $unit = Unit::where('id', $detail->sale_unit_id)->first();
+            } else {
+                $product_unit_sale_id = Product::with('unitSale')
+                    ->where('id', $detail->product_id)
+                    ->first();
+                $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
+            }
 
-            if($detail->product_variant_id){
+            if ($detail->product_variant_id) {
                 $productsVariants = ProductVariant::where('product_id', $detail->product_id)
-                ->where('id', $detail->product_variant_id)->first();
+                    ->where('id', $detail->product_variant_id)->first();
 
                 $product_name = $productsVariants->name . '-' . $detail['product']['name'];
 
-            }else{
+            } else {
                 $product_name = $detail['product']['name'];
             }
 
@@ -2793,7 +2736,7 @@ class ReportController extends Controller
             $item['quotation_id'] = $detail['quotation']->id;
             $item['client_name'] = $detail['quotation']['client']->name;
             $item['warehouse_name'] = $detail['quotation']['warehouse']->name;
-            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;
+            $item['quantity'] = $detail->quantity . ' ' . $unit->ShortName;
             $item['total'] = $detail->total;
             $item['product_name'] = $product_name;
             $item['unit_sale'] = $unit->ShortName;
@@ -2822,7 +2765,7 @@ class ReportController extends Controller
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $purchase_details_data = PurchaseDetail::with('product','purchase','purchase.provider','purchase.warehouse')
+        $purchase_details_data = PurchaseDetail::with('product', 'purchase', 'purchase.provider', 'purchase.warehouse')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->whereHas('purchase', function ($q) use ($request) {
@@ -2835,10 +2778,10 @@ class ReportController extends Controller
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where(function ($query) use ($request) {
-                            return $query->whereHas('purchase.provider', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        })
+                        return $query->whereHas('purchase.provider', function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%{$request->search}%");
+                        });
+                    })
                         ->orWhere(function ($query) use ($request) {
                             return $query->whereHas('purchase.warehouse', function ($q) use ($request) {
                                 $q->where('name', 'LIKE', "%{$request->search}%");
@@ -2858,7 +2801,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $purchase_details_data->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $purchase_details = $purchase_details_data->offset($offSet)
@@ -2870,22 +2813,22 @@ class ReportController extends Controller
         foreach ($purchase_details as $detail) {
 
             //-------check if detail has purchase_unit_id Or Null
-            if($detail->purchase_unit_id !== null){
-            $unit = Unit::where('id', $detail->purchase_unit_id)->first();
-        }else{
-            $product_unit_purchase_id = Product::with('unitPurchase')
-            ->where('id', $detail->product_id)
-            ->first();
-            $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
-        }
+            if ($detail->purchase_unit_id !== null) {
+                $unit = Unit::where('id', $detail->purchase_unit_id)->first();
+            } else {
+                $product_unit_purchase_id = Product::with('unitPurchase')
+                    ->where('id', $detail->product_id)
+                    ->first();
+                $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
+            }
 
-            if($detail->product_variant_id){
+            if ($detail->product_variant_id) {
                 $productsVariants = ProductVariant::where('product_id', $detail->product_id)
-                ->where('id', $detail->product_variant_id)->first();
+                    ->where('id', $detail->product_variant_id)->first();
 
                 $product_name = $productsVariants->name . '-' . $detail['product']['name'];
 
-            }else{
+            } else {
                 $product_name = $detail['product']['name'];
             }
 
@@ -2894,7 +2837,7 @@ class ReportController extends Controller
             $item['purchase_id'] = $detail['purchase']->id;
             $item['provider_name'] = $detail['purchase']['provider']->name;
             $item['warehouse_name'] = $detail['purchase']['warehouse']->name;
-            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;
+            $item['quantity'] = $detail->quantity . ' ' . $unit->ShortName;
             $item['total'] = $detail->total;
             $item['product_name'] = $product_name;
             $item['unit_purchase'] = $unit->ShortName;
@@ -2923,7 +2866,7 @@ class ReportController extends Controller
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $purchase_return_details_data = PurchaseReturnDetails::with('product','PurchaseReturn','PurchaseReturn.provider','PurchaseReturn.warehouse')
+        $purchase_return_details_data = PurchaseReturnDetails::with('product', 'PurchaseReturn', 'PurchaseReturn.provider', 'PurchaseReturn.warehouse')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->whereHas('PurchaseReturn', function ($q) use ($request) {
@@ -2936,10 +2879,10 @@ class ReportController extends Controller
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where(function ($query) use ($request) {
-                            return $query->whereHas('PurchaseReturn.provider', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        })
+                        return $query->whereHas('PurchaseReturn.provider', function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%{$request->search}%");
+                        });
+                    })
                         ->orWhere(function ($query) use ($request) {
                             return $query->whereHas('PurchaseReturn.warehouse', function ($q) use ($request) {
                                 $q->where('name', 'LIKE', "%{$request->search}%");
@@ -2958,35 +2901,35 @@ class ReportController extends Controller
                 });
             });
 
-                $totalRows = $purchase_return_details_data->count();
-                if($perPage == "-1"){
-                    $perPage = $totalRows;
-                }
-                $purchase_return_details = $purchase_return_details_data->offset($offSet)
-                    ->limit($perPage)
-                    ->orderBy('id', 'desc')
-                    ->get();
+        $totalRows = $purchase_return_details_data->count();
+        if ($perPage == "-1") {
+            $perPage = $totalRows;
+        }
+        $purchase_return_details = $purchase_return_details_data->offset($offSet)
+            ->limit($perPage)
+            ->orderBy('id', 'desc')
+            ->get();
 
-                $data = [];
-                foreach ($purchase_return_details as $detail) {
+        $data = [];
+        foreach ($purchase_return_details as $detail) {
 
-                    //-------check if detail has purchase_unit_id Or Null
-                if($detail->purchase_unit_id !== null){
+            //-------check if detail has purchase_unit_id Or Null
+            if ($detail->purchase_unit_id !== null) {
                 $unit = Unit::where('id', $detail->purchase_unit_id)->first();
-            }else{
+            } else {
                 $product_unit_purchase_id = Product::with('unitPurchase')
-                ->where('id', $detail->product_id)
-                ->first();
+                    ->where('id', $detail->product_id)
+                    ->first();
                 $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
             }
 
-            if($detail->product_variant_id){
+            if ($detail->product_variant_id) {
                 $productsVariants = ProductVariant::where('product_id', $detail->product_id)
-                ->where('id', $detail->product_variant_id)->first();
+                    ->where('id', $detail->product_variant_id)->first();
 
                 $product_name = $productsVariants->name . '-' . $detail['product']['name'];
 
-            }else{
+            } else {
                 $product_name = $detail['product']['name'];
             }
 
@@ -2995,8 +2938,8 @@ class ReportController extends Controller
             $item['return_purchase_id'] = $detail['PurchaseReturn']->id;
             $item['provider_name'] = $detail['PurchaseReturn']['provider']->name;
             $item['warehouse_name'] = $detail['PurchaseReturn']['warehouse']->name;
-            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;
-                    $item['total'] = $detail->total;
+            $item['quantity'] = $detail->quantity . ' ' . $unit->ShortName;
+            $item['total'] = $detail->total;
             $item['product_name'] = $product_name;
             $item['unit_purchase'] = $unit->ShortName;
 
@@ -3024,7 +2967,7 @@ class ReportController extends Controller
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $Sale_Return_details_data = SaleReturnDetails::with('product','SaleReturn','SaleReturn.client','SaleReturn.warehouse')
+        $Sale_Return_details_data = SaleReturnDetails::with('product', 'SaleReturn', 'SaleReturn.client', 'SaleReturn.warehouse')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->whereHas('SaleReturn', function ($q) use ($request) {
@@ -3037,10 +2980,10 @@ class ReportController extends Controller
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where(function ($query) use ($request) {
-                            return $query->whereHas('SaleReturn.client', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        })
+                        return $query->whereHas('SaleReturn.client', function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%{$request->search}%");
+                        });
+                    })
                         ->orWhere(function ($query) use ($request) {
                             return $query->whereHas('SaleReturn.warehouse', function ($q) use ($request) {
                                 $q->where('name', 'LIKE', "%{$request->search}%");
@@ -3060,7 +3003,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $Sale_Return_details_data->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $Sale_Return_details = $Sale_Return_details_data->offset($offSet)
@@ -3072,22 +3015,22 @@ class ReportController extends Controller
         foreach ($Sale_Return_details as $detail) {
 
             //check if detail has sale_unit_id Or Null
-            if($detail->sale_unit_id !== null){
-            $unit = Unit::where('id', $detail->sale_unit_id)->first();
-        }else{
-            $product_unit_sale_id = Product::with('unitSale')
-            ->where('id', $detail->product_id)
-            ->first();
-            $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
-        }
+            if ($detail->sale_unit_id !== null) {
+                $unit = Unit::where('id', $detail->sale_unit_id)->first();
+            } else {
+                $product_unit_sale_id = Product::with('unitSale')
+                    ->where('id', $detail->product_id)
+                    ->first();
+                $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
+            }
 
-            if($detail->product_variant_id){
+            if ($detail->product_variant_id) {
                 $productsVariants = ProductVariant::where('product_id', $detail->product_id)
-                ->where('id', $detail->product_variant_id)->first();
+                    ->where('id', $detail->product_variant_id)->first();
 
                 $product_name = $productsVariants->name . '-' . $detail['product']['name'];
 
-            }else{
+            } else {
                 $product_name = $detail['product']['name'];
             }
 
@@ -3096,7 +3039,7 @@ class ReportController extends Controller
             $item['return_sale_id'] = $detail['SaleReturn']->id;
             $item['client_name'] = $detail['SaleReturn']['client']->name;
             $item['warehouse_name'] = $detail['SaleReturn']['warehouse']->name;
-            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;
+            $item['quantity'] = $detail->quantity . ' ' . $unit->ShortName;
             $item['total'] = $detail->total;
             $item['product_name'] = $product_name;
             $item['unit_sale'] = $unit->ShortName;
@@ -3125,7 +3068,7 @@ class ReportController extends Controller
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $transfer_details_data = TransferDetail::with('product','transfer','transfer.from_warehouse','transfer.to_warehouse')
+        $transfer_details_data = TransferDetail::with('product', 'transfer', 'transfer.from_warehouse', 'transfer.to_warehouse')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->whereHas('transfer', function ($q) use ($request) {
@@ -3138,10 +3081,10 @@ class ReportController extends Controller
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where(function ($query) use ($request) {
-                            return $query->whereHas('transfer.from_warehouse', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        })
+                        return $query->whereHas('transfer.from_warehouse', function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%{$request->search}%");
+                        });
+                    })
                         ->orWhere(function ($query) use ($request) {
                             return $query->whereHas('transfer.to_warehouse', function ($q) use ($request) {
                                 $q->where('name', 'LIKE', "%{$request->search}%");
@@ -3161,7 +3104,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $transfer_details_data->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $transfer_details = $transfer_details_data->offset($offSet)
@@ -3172,13 +3115,13 @@ class ReportController extends Controller
         $data = [];
         foreach ($transfer_details as $detail) {
 
-            if($detail->product_variant_id){
+            if ($detail->product_variant_id) {
                 $productsVariants = ProductVariant::where('product_id', $detail->product_id)
-                ->where('id', $detail->product_variant_id)->first();
+                    ->where('id', $detail->product_variant_id)->first();
 
                 $product_name = $productsVariants->name . '-' . $detail['product']['name'];
 
-            }else{
+            } else {
                 $product_name = $detail['product']['name'];
             }
 
@@ -3212,7 +3155,7 @@ class ReportController extends Controller
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $adjustment_details_data = AdjustmentDetail::with('product','adjustment','adjustment.warehouse')
+        $adjustment_details_data = AdjustmentDetail::with('product', 'adjustment', 'adjustment.warehouse')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->whereHas('adjustment', function ($q) use ($request) {
@@ -3221,14 +3164,14 @@ class ReportController extends Controller
                 }
             })
             ->where('product_id', $request->id)
-                // Search With Multiple Param
-                ->where(function ($query) use ($request) {
+            // Search With Multiple Param
+            ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where(function ($query) use ($request) {
-                            return $query->whereHas('adjustment.warehouse', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        })
+                        return $query->whereHas('adjustment.warehouse', function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%{$request->search}%");
+                        });
+                    })
                         ->orWhere(function ($query) use ($request) {
                             return $query->whereHas('adjustment', function ($q) use ($request) {
                                 $q->where('Ref', 'LIKE', "%{$request->search}%");
@@ -3243,7 +3186,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $adjustment_details_data->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $adjustment_details = $adjustment_details_data->offset($offSet)
@@ -3254,13 +3197,13 @@ class ReportController extends Controller
         $data = [];
         foreach ($adjustment_details as $detail) {
 
-            if($detail->product_variant_id){
+            if ($detail->product_variant_id) {
                 $productsVariants = ProductVariant::where('product_id', $detail->product_id)
-                ->where('id', $detail->product_variant_id)->first();
+                    ->where('id', $detail->product_variant_id)->first();
 
                 $product_name = $productsVariants->name . '-' . $detail['product']['name'];
 
-            }else{
+            } else {
                 $product_name = $detail['product']['name'];
             }
 
@@ -3289,22 +3232,22 @@ class ReportController extends Controller
         $client = Client::where('deleted_at', '=', null)->findOrFail($id);
 
         $Sales = Sale::where('deleted_at', '=', null)
-        ->where([
-            ['payment_statut', '!=', 'paid'],
-            ['client_id', $id]
-        ])->get();
+            ->where([
+                ['payment_statut', '!=', 'paid'],
+                ['client_id', $id]
+            ])->get();
 
         $sales_details = [];
 
         foreach ($Sales as $Sale) {
-            
+
             $item_sale['date'] = $Sale['date'];
             $item_sale['Ref'] = $Sale['Ref'];
             $item_sale['GrandTotal'] = number_format($Sale['GrandTotal'], 2, '.', '');
             $item_sale['paid_amount'] = number_format($Sale['paid_amount'], 2, '.', '');
             $item_sale['due'] = number_format($item_sale['GrandTotal'] - $item_sale['paid_amount'], 2, '.', '');
             $item_sale['payment_status'] = $Sale['payment_statut'];
-            
+
             $sales_details[] = $item_sale;
         }
 
@@ -3314,9 +3257,9 @@ class ReportController extends Controller
         $data['total_sales'] = DB::table('sales')->where('deleted_at', '=', null)->where('client_id', $id)->count();
 
         $data['total_amount'] = DB::table('sales')
-                ->where('deleted_at', '=', null)
-                ->where('client_id', $client->id)
-                ->sum('GrandTotal');
+            ->where('deleted_at', '=', null)
+            ->where('client_id', $client->id)
+            ->sum('GrandTotal');
 
         $data['total_paid'] = DB::table('sales')
             ->where('deleted_at', '=', null)
@@ -3336,7 +3279,7 @@ class ReportController extends Controller
             ->sum('paid_amount');
 
         $data['return_Due'] = $data['total_amount_return'] - $data['total_paid_return'];
-     
+
         $symbol = $helpers->Get_Currency();
         $settings = Setting::where('deleted_at', '=', null)->first();
 
@@ -3351,38 +3294,38 @@ class ReportController extends Controller
 
     }
 
-     //------------- download_report_provider_pdf -----------\\
+    //------------- download_report_provider_pdf -----------\\
 
-     public function download_report_provider_pdf(Request $request, $id)
-     {
- 
+    public function download_report_provider_pdf(Request $request, $id)
+    {
+
         $this->authorizeForUser($request->user('api'), 'Reports_suppliers', Provider::class);
- 
-         $helpers = new helpers();
-         $provider = Provider::where('deleted_at', '=', null)->findOrFail($id);
- 
-         $purchases = Purchase::where('deleted_at', '=', null)
-         ->where('payment_statut', '!=', 'paid')
-         ->where('provider_id', $id)
-         ->get();
 
-         $purchases_details = [];
- 
-         foreach ($purchases as $purchase) {
-             
-             $item_purchase['date'] = $purchase['date'];
-             $item_purchase['Ref'] = $purchase['Ref'];
-             $item_purchase['GrandTotal'] = number_format($purchase['GrandTotal'], 2, '.', '');
-             $item_purchase['paid_amount'] = number_format($purchase['paid_amount'], 2, '.', '');
-             $item_purchase['due'] = number_format($item_purchase['GrandTotal'] - $item_purchase['paid_amount'], 2, '.', '');
-             $item_purchase['payment_status'] = $purchase['payment_statut'];
-             
-             $purchases_details[] = $item_purchase;
-         }
- 
-         $data['provider_name'] = $provider->name;
-         $data['phone'] = $provider->phone;
- 
+        $helpers = new helpers();
+        $provider = Provider::where('deleted_at', '=', null)->findOrFail($id);
+
+        $purchases = Purchase::where('deleted_at', '=', null)
+            ->where('payment_statut', '!=', 'paid')
+            ->where('provider_id', $id)
+            ->get();
+
+        $purchases_details = [];
+
+        foreach ($purchases as $purchase) {
+
+            $item_purchase['date'] = $purchase['date'];
+            $item_purchase['Ref'] = $purchase['Ref'];
+            $item_purchase['GrandTotal'] = number_format($purchase['GrandTotal'], 2, '.', '');
+            $item_purchase['paid_amount'] = number_format($purchase['paid_amount'], 2, '.', '');
+            $item_purchase['due'] = number_format($item_purchase['GrandTotal'] - $item_purchase['paid_amount'], 2, '.', '');
+            $item_purchase['payment_status'] = $purchase['payment_statut'];
+
+            $purchases_details[] = $item_purchase;
+        }
+
+        $data['provider_name'] = $provider->name;
+        $data['phone'] = $provider->phone;
+
         $data['total_purchase'] = DB::table('purchases')->where('deleted_at', '=', null)->where('provider_id', $id)->count();
 
         $data['total_amount'] = DB::table('purchases')->where('deleted_at', '=', null)->where('provider_id', $id)
@@ -3406,20 +3349,20 @@ class ReportController extends Controller
             ->sum('paid_amount');
 
         $data['return_Due'] = $data['total_amount_return'] - $data['total_paid_return'];
-      
-         $symbol = $helpers->Get_Currency();
-         $settings = Setting::where('deleted_at', '=', null)->first();
- 
-         $pdf = PDF::loadView('pdf.report_provider_pdf', [
-             'symbol' => $symbol,
-             'provider' => $data,
-             'purchases' => $purchases_details,
-             'setting' => $settings,
-         ]);
- 
-         return $pdf->download('report_provider.pdf');
- 
-     }
+
+        $symbol = $helpers->Get_Currency();
+        $settings = Setting::where('deleted_at', '=', null)->first();
+
+        $pdf = PDF::loadView('pdf.report_provider_pdf', [
+            'symbol' => $symbol,
+            'provider' => $data,
+            'purchases' => $purchases_details,
+            'setting' => $settings,
+        ]);
+
+        return $pdf->download('report_provider.pdf');
+
+    }
 
 
     //-------------------- product_report -------------\\
@@ -3438,40 +3381,39 @@ class ReportController extends Controller
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
-        if($user_auth->is_all_warehouses){
+        if ($user_auth->is_all_warehouses) {
             $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
             $array_warehouses_id = Warehouse::where('deleted_at', '=', null)->pluck('id')->toArray();
-        }else{
+        } else {
             $array_warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $array_warehouses_id)->get(['id', 'name']);
         }
 
-    
-        $products_data = Product::select('id', 'name','code', 'is_variant','unit_id')
-    
-        ->where(function ($query) use ($request) {
-            return $query->when($request->filled('search'), function ($query) use ($request) {
-                return $query->where('name','LIKE', "%{$request->search}%")
-                    ->orWhere('code', 'LIKE', "%{$request->search}%");
+
+        $products_data = Product::select('id', 'name', 'code', 'is_variant', 'unit_id')
+            ->where(function ($query) use ($request) {
+                return $query->when($request->filled('search'), function ($query) use ($request) {
+                    return $query->where('name', 'LIKE', "%{$request->search}%")
+                        ->orWhere('code', 'LIKE', "%{$request->search}%");
                 });
-        });
-        
+            });
+
         $totalRows = $products_data->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
-    
-                
+
+
         $products = $products_data->offset($offSet)
-        ->limit($perPage)
-        ->get();
+            ->limit($perPage)
+            ->get();
 
 
         $product_details = [];
         $total_sales = 0;
         foreach ($products as $product) {
 
-            if($product->is_variant) {
+            if ($product->is_variant) {
                 $variant_id_all = ProductVariant::where('product_id', $product->id)->pluck('id');
 
                 foreach ($variant_id_all as $key => $variant_id) {
@@ -3482,32 +3424,81 @@ class ReportController extends Controller
                     $nestedData['code'] = $product->code;
 
                     $nestedData['sold_amount'] = SaleDetail::with('sale')->where([
-                            ['product_id', $product->id],
-                            ['product_variant_id', $variant_id]
-                        ])->where(function ($query) use ($view_records) {
-                            if (!$view_records) {
-                                return $query->whereHas('sale', function ($q) use ($request) {
-                                    $q->where('user_id', '=', Auth::user()->id);
-                                });
+                        ['product_id', $product->id],
+                        ['product_variant_id', $variant_id]
+                    ])->where(function ($query) use ($view_records) {
+                        if (!$view_records) {
+                            return $query->whereHas('sale', function ($q) use ($request) {
+                                $q->where('user_id', '=', Auth::user()->id);
+                            });
 
-                            }
-                        })
+                        }
+                    })
                         ->where(function ($query) use ($request, $array_warehouses_id) {
                             if ($request->warehouse_id) {
                                 return $query->whereHas('sale', function ($q) use ($request, $array_warehouses_id) {
                                     $q->where('warehouse_id', $request->warehouse_id);
                                 });
-                            }else{
+                            } else {
                                 return $query->whereHas('sale', function ($q) use ($request, $array_warehouses_id) {
                                     $q->whereIn('warehouse_id', $array_warehouses_id);
                                 });
 
                             }
                         })
-                    ->whereBetween('date', array($request->from, $request->to))
-                    ->sum('total');
+                        ->whereBetween('date', array($request->from, $request->to))
+                        ->sum('total');
 
                     $lims_product_sale_data = SaleDetail::select('sale_unit_id', 'quantity')->with('sale')
+                        ->where(function ($query) use ($view_records) {
+                            if (!$view_records) {
+                                return $query->whereHas('sale', function ($q) use ($request) {
+                                    $q->where('user_id', '=', Auth::user()->id);
+                                });
+
+                            }
+                        })->where([
+                            ['product_id', $product->id],
+                            ['product_variant_id', $variant_id]
+                        ])
+                        ->where(function ($query) use ($request, $array_warehouses_id) {
+                            if ($request->warehouse_id) {
+                                return $query->whereHas('sale', function ($q) use ($request, $array_warehouses_id) {
+                                    $q->where('warehouse_id', $request->warehouse_id);
+                                });
+                            } else {
+                                return $query->whereHas('sale', function ($q) use ($request, $array_warehouses_id) {
+                                    $q->whereIn('warehouse_id', $array_warehouses_id);
+                                });
+
+                            }
+                        })
+                        ->whereBetween('date', array($request->from, $request->to))->get();
+
+                    $sold_qty = 0;
+                    if (count($lims_product_sale_data)) {
+                        foreach ($lims_product_sale_data as $product_sale) {
+                            $unit = Unit::find($product_sale->sale_unit_id);
+                            if ($unit->operator == '*') {
+                                $sold_qty += $product_sale->quantity * $unit->operator_value;
+                            } elseif ($unit->operator == '/') {
+                                $sold_qty += $product_sale->quantity / $unit->operator_value;
+                            }
+                        }
+                    }
+                    $unit_shortname = Unit::where('id', $product->unit_id)->first();
+                    $nestedData['sold_qty'] = $sold_qty . ' ' . $unit_shortname->ShortName;
+
+                    $product_details[] = $nestedData;
+
+                }
+
+            } else {
+                $nestedData['id'] = $product->id;
+                $nestedData['name'] = $product->name;
+                $nestedData['code'] = $product->code;
+
+                $nestedData['sold_amount'] = SaleDetail::with('sale')->where('product_id', $product->id)
                     ->where(function ($query) use ($view_records) {
                         if (!$view_records) {
                             return $query->whereHas('sale', function ($q) use ($request) {
@@ -3515,71 +3506,21 @@ class ReportController extends Controller
                             });
 
                         }
-                    })->where([
-                        ['product_id', $product->id],
-                        ['product_variant_id', $variant_id]
-                    ])
+                    })
                     ->where(function ($query) use ($request, $array_warehouses_id) {
                         if ($request->warehouse_id) {
                             return $query->whereHas('sale', function ($q) use ($request, $array_warehouses_id) {
                                 $q->where('warehouse_id', $request->warehouse_id);
                             });
-                        }else{
+                        } else {
                             return $query->whereHas('sale', function ($q) use ($request, $array_warehouses_id) {
                                 $q->whereIn('warehouse_id', $array_warehouses_id);
                             });
 
                         }
                     })
-                ->whereBetween('date', array($request->from, $request->to))->get();
-
-                    $sold_qty = 0;
-                    if(count($lims_product_sale_data)) {
-                        foreach ($lims_product_sale_data as $product_sale) {
-                            $unit =  Unit::find($product_sale->sale_unit_id);
-                            if($unit->operator == '*'){
-                                $sold_qty += $product_sale->quantity * $unit->operator_value;
-                            }
-                            elseif($unit->operator == '/'){
-                                $sold_qty += $product_sale->quantity / $unit->operator_value;
-                            }
-                        }
-                    }
-                    $unit_shortname = Unit::where('id', $product->unit_id)->first();
-                    $nestedData['sold_qty'] = $sold_qty .' '. $unit_shortname->ShortName;
-
-                    $product_details[] = $nestedData;
-                    
-                }
-
-            }else {
-                $nestedData['id'] = $product->id;
-                $nestedData['name'] = $product->name;
-                $nestedData['code'] = $product->code;
-
-                $nestedData['sold_amount'] = SaleDetail::with('sale')->where('product_id', $product->id)
-                ->where(function ($query) use ($view_records) {
-                    if (!$view_records) {
-                        return $query->whereHas('sale', function ($q) use ($request) {
-                            $q->where('user_id', '=', Auth::user()->id);
-                        });
-
-                    }
-                })
-                ->where(function ($query) use ($request, $array_warehouses_id) {
-                    if ($request->warehouse_id) {
-                        return $query->whereHas('sale', function ($q) use ($request, $array_warehouses_id) {
-                            $q->where('warehouse_id', $request->warehouse_id);
-                        });
-                    }else{
-                        return $query->whereHas('sale', function ($q) use ($request, $array_warehouses_id) {
-                            $q->whereIn('warehouse_id', $array_warehouses_id);
-                        });
-
-                    }
-                })
-                ->whereBetween('date', array($request->from, $request->to))
-                ->sum('total');
+                    ->whereBetween('date', array($request->from, $request->to))
+                    ->sum('total');
 
                 $lims_product_sale_data = SaleDetail::select('sale_unit_id', 'quantity')->with('sale')->where('product_id', $product->id)
                     ->where(function ($query) use ($view_records) {
@@ -3595,50 +3536,47 @@ class ReportController extends Controller
                             return $query->whereHas('sale', function ($q) use ($request, $array_warehouses_id) {
                                 $q->where('warehouse_id', $request->warehouse_id);
                             });
-                        }else{
+                        } else {
                             return $query->whereHas('sale', function ($q) use ($request, $array_warehouses_id) {
                                 $q->whereIn('warehouse_id', $array_warehouses_id);
                             });
 
                         }
                     })
-                ->whereBetween('date', array($request->from, $request->to))
-                ->get();
+                    ->whereBetween('date', array($request->from, $request->to))
+                    ->get();
 
                 $sold_qty = 0;
-                if(count($lims_product_sale_data)) {
+                if (count($lims_product_sale_data)) {
                     foreach ($lims_product_sale_data as $product_sale) {
-                        $unit =  Unit::find($product_sale->sale_unit_id);
+                        $unit = Unit::find($product_sale->sale_unit_id);
 
-                        if($unit->operator == '*'){
+                        if ($unit->operator == '*') {
                             $sold_qty += $product_sale->quantity * $unit->operator_value;
-                        }
-                        elseif($unit->operator == '/'){
+                        } elseif ($unit->operator == '/') {
                             $sold_qty += $product_sale->quantity / $unit->operator_value;
                         }
-                    
+
                     }
                 }
-            
+
                 $unit_shortname = Unit::where('id', $product->unit_id)->first();
-                
-                $nestedData['sold_qty'] = $sold_qty .' '. $unit_shortname->ShortName;
+
+                $nestedData['sold_qty'] = $sold_qty . ' ' . $unit_shortname->ShortName;
 
                 $product_details[] = $nestedData;
             }
 
-            
 
         }
 
-    
 
         return response()->json([
             'products' => $product_details,
             'totalRows' => $totalRows,
             'warehouses' => $warehouses,
         ]);
-    
+
     }
 
 
@@ -3657,7 +3595,7 @@ class ReportController extends Controller
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $sale_details_data = SaleDetail::with('product','sale','sale.client','sale.warehouse','sale.user')
+        $sale_details_data = SaleDetail::with('product', 'sale', 'sale.client', 'sale.warehouse', 'sale.user')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->whereHas('sale', function ($q) use ($request) {
@@ -3668,8 +3606,8 @@ class ReportController extends Controller
             ->whereBetween('date', array($request->from, $request->to))
             ->where('product_id', $request->id)
 
-             //Filters
-             ->where(function ($query) use ($request) {
+            //Filters
+            ->where(function ($query) use ($request) {
                 return $query->when($request->filled('Ref'), function ($query) use ($request) {
                     return $query->where(function ($query) use ($request) {
                         return $query->whereHas('sale', function ($q) use ($request) {
@@ -3678,7 +3616,6 @@ class ReportController extends Controller
                     });
                 });
             })
-
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('client_id'), function ($query) use ($request) {
                     return $query->where(function ($query) use ($request) {
@@ -3688,7 +3625,6 @@ class ReportController extends Controller
                     });
                 });
             })
-
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('warehouse_id'), function ($query) use ($request) {
                     return $query->where(function ($query) use ($request) {
@@ -3698,7 +3634,6 @@ class ReportController extends Controller
                     });
                 });
             })
-
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('user_id'), function ($query) use ($request) {
                     return $query->where(function ($query) use ($request) {
@@ -3710,13 +3645,13 @@ class ReportController extends Controller
             })
 
             //search
-             ->where(function ($query) use ($request) {
+            ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where(function ($query) use ($request) {
-                            return $query->whereHas('sale.client', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        })
+                        return $query->whereHas('sale.client', function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%{$request->search}%");
+                        });
+                    })
                         ->orWhere(function ($query) use ($request) {
                             return $query->whereHas('sale.warehouse', function ($q) use ($request) {
                                 $q->where('name', 'LIKE', "%{$request->search}%");
@@ -3736,7 +3671,7 @@ class ReportController extends Controller
             });
 
         $totalRows = $sale_details_data->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $sale_details = $sale_details_data->offset($offSet)
@@ -3748,23 +3683,23 @@ class ReportController extends Controller
         foreach ($sale_details as $detail) {
 
             //check if detail has sale_unit_id Or Null
-            if($detail->sale_unit_id !== null){
+            if ($detail->sale_unit_id !== null) {
                 $unit = Unit::where('id', $detail->sale_unit_id)->first();
-            }else{
+            } else {
                 $product_unit_sale_id = Product::with('unitSale')
-                ->where('id', $detail->product_id)
-                ->first();
+                    ->where('id', $detail->product_id)
+                    ->first();
                 $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
             }
 
 
-            if($detail->product_variant_id){
+            if ($detail->product_variant_id) {
                 $productsVariants = ProductVariant::where('product_id', $detail->product_id)
-                ->where('id', $detail->product_variant_id)->first();
+                    ->where('id', $detail->product_variant_id)->first();
 
                 $product_name = $productsVariants->name . '-' . $detail['product']['name'];
 
-            }else{
+            } else {
                 $product_name = $detail['product']['name'];
             }
 
@@ -3773,7 +3708,7 @@ class ReportController extends Controller
             $item['sale_id'] = $detail['sale']->id;
             $item['client_name'] = $detail['sale']['client']->name;
             $item['warehouse_name'] = $detail['sale']['warehouse']->name;
-            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;
+            $item['quantity'] = $detail->quantity . ' ' . $unit->ShortName;
             $item['total'] = $detail->total;
             $item['product_name'] = $product_name;
             $item['unit_sale'] = $unit->ShortName;
@@ -3786,9 +3721,9 @@ class ReportController extends Controller
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
-        if($user_auth->is_all_warehouses){
+        if ($user_auth->is_all_warehouses) {
             $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        }else{
+        } else {
             $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
         }
@@ -3808,31 +3743,31 @@ class ReportController extends Controller
 
     public function product_sales_report(request $request)
     {
- 
-         $this->authorizeForUser($request->user('api'), 'product_sales_report', Sale::class);
-         $role = Auth::user()->roles()->first();
-         $view_records = Role::findOrFail($role->id)->inRole('record_view');
-         // How many items do you want to display.
-         $perPage = $request->limit;
- 
-         $pageStart = \Request::get('page', 1);
-         // Start displaying items from this number;
-         $offSet = ($pageStart * $perPage) - $perPage;
-         $order = $request->SortField;
-         $dir = $request->SortType;
-         $helpers = new helpers();
-         // Filter fields With Params to retrieve
-         $param = array(
-             0 => '=',
-             1 => '=',
-         );
-         $columns = array(
-             0 => 'client_id',
-             1 => 'warehouse_id',
-         );
-         $data = array();
 
-         $sale_details_data = SaleDetail::with('product','sale','sale.client','sale.warehouse')
+        $this->authorizeForUser($request->user('api'), 'product_sales_report', Sale::class);
+        $role = Auth::user()->roles()->first();
+        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+        // How many items do you want to display.
+        $perPage = $request->limit;
+
+        $pageStart = \Request::get('page', 1);
+        // Start displaying items from this number;
+        $offSet = ($pageStart * $perPage) - $perPage;
+        $order = $request->SortField;
+        $dir = $request->SortType;
+        $helpers = new helpers();
+        // Filter fields With Params to retrieve
+        $param = array(
+            0 => '=',
+            1 => '=',
+        );
+        $columns = array(
+            0 => 'client_id',
+            1 => 'warehouse_id',
+        );
+        $data = array();
+
+        $sale_details_data = SaleDetail::with('product', 'sale', 'sale.client', 'sale.warehouse')
             ->where(function ($query) use ($view_records) {
                 if (!$view_records) {
                     return $query->whereHas('sale', function ($q) use ($request) {
@@ -3840,110 +3775,108 @@ class ReportController extends Controller
                     });
                 }
             })
-         ->whereBetween('date', array($request->from, $request->to));
+            ->whereBetween('date', array($request->from, $request->to));
 
-         // Filter
-         $sale_details_Filtred = $sale_details_data->where(function ($query) use ($request) {
-             return $query->when($request->filled('client_id'), function ($query) use ($request) {
-                 return $query->whereHas('sale.client', function ($q) use ($request) {
-                     $q->where('client_id', '=', $request->client_id);
-                 });
-             });
-         })
-        
-         ->where(function ($query) use ($request) {
-             return $query->when($request->filled('warehouse_id'), function ($query) use ($request) {
-                 return $query->whereHas('sale.warehouse', function ($q) use ($request) {
-                     $q->where('warehouse_id', '=', $request->warehouse_id);
-                 });
-             });
-         })
+        // Filter
+        $sale_details_Filtred = $sale_details_data->where(function ($query) use ($request) {
+            return $query->when($request->filled('client_id'), function ($query) use ($request) {
+                return $query->whereHas('sale.client', function ($q) use ($request) {
+                    $q->where('client_id', '=', $request->client_id);
+                });
+            });
+        })
+            ->where(function ($query) use ($request) {
+                return $query->when($request->filled('warehouse_id'), function ($query) use ($request) {
+                    return $query->whereHas('sale.warehouse', function ($q) use ($request) {
+                        $q->where('warehouse_id', '=', $request->warehouse_id);
+                    });
+                });
+            })
 
-        // Search With Multiple Param
-        ->where(function ($query) use ($request) {
-            return $query->when($request->filled('search'), function ($query) use ($request) {
-                return $query->where(function ($query) use ($request) {
+            // Search With Multiple Param
+            ->where(function ($query) use ($request) {
+                return $query->when($request->filled('search'), function ($query) use ($request) {
+                    return $query->where(function ($query) use ($request) {
                         return $query->whereHas('sale.client', function ($q) use ($request) {
                             $q->where('username', 'LIKE', "%{$request->search}%");
                         });
                     })
-                    ->orWhere(function ($query) use ($request) {
-                        return $query->whereHas('sale.warehouse', function ($q) use ($request) {
-                            $q->where('name', 'LIKE', "%{$request->search}%");
+                        ->orWhere(function ($query) use ($request) {
+                            return $query->whereHas('sale.warehouse', function ($q) use ($request) {
+                                $q->where('name', 'LIKE', "%{$request->search}%");
+                            });
+                        })
+                        ->orWhere(function ($query) use ($request) {
+                            return $query->whereHas('sale', function ($q) use ($request) {
+                                $q->where('Ref', 'LIKE', "%{$request->search}%");
+                            });
+                        })
+                        ->orWhere(function ($query) use ($request) {
+                            return $query->whereHas('product', function ($q) use ($request) {
+                                $q->where('name', 'LIKE', "%{$request->search}%");
+                            });
                         });
-                    })
-                    ->orWhere(function ($query) use ($request) {
-                        return $query->whereHas('sale', function ($q) use ($request) {
-                            $q->where('Ref', 'LIKE', "%{$request->search}%");
-                        });
-                    })
-                    ->orWhere(function ($query) use ($request) {
-                        return $query->whereHas('product', function ($q) use ($request) {
-                            $q->where('name', 'LIKE', "%{$request->search}%");
-                        });
-                    });
+                });
             });
-        });
 
 
+        $totalRows = $sale_details_Filtred->count();
+        if ($perPage == "-1") {
+            $perPage = $totalRows;
+        }
 
-         $totalRows = $sale_details_Filtred->count();
-         if($perPage == "-1"){
-             $perPage = $totalRows;
-         }
+        $sale_details = $sale_details_Filtred
+            ->offset($offSet)
+            ->limit($perPage)
+            ->orderBy($order, $dir)
+            ->get();
 
-         $sale_details = $sale_details_Filtred
-         ->offset($offSet)
-         ->limit($perPage)
-         ->orderBy($order, $dir)
-         ->get();
+        foreach ($sale_details as $detail) {
 
-         foreach ($sale_details as $detail) {
+            //check if detail has sale_unit_id Or Null
+            if ($detail->sale_unit_id !== null) {
+                $unit = Unit::where('id', $detail->sale_unit_id)->first();
+            } else {
+                $product_unit_sale_id = Product::with('unitSale')
+                    ->where('id', $detail->product_id)
+                    ->first();
+                $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
+            }
 
-             //check if detail has sale_unit_id Or Null
-             if($detail->sale_unit_id !== null){
-                 $unit = Unit::where('id', $detail->sale_unit_id)->first();
-             }else{
-                 $product_unit_sale_id = Product::with('unitSale')
-                 ->where('id', $detail->product_id)
-                 ->first();
-                 $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
-             }
- 
- 
-             if($detail->product_variant_id){
-                 $productsVariants = ProductVariant::where('product_id', $detail->product_id)
-                 ->where('id', $detail->product_variant_id)->first();
- 
-                 $product_name = $productsVariants->name . '-' . $detail['product']['name'];
- 
-             }else{
-                 $product_name = $detail['product']['name'];
-             }
- 
-             $item['date'] = $detail->date;
-             $item['Ref'] = $detail['sale']->Ref;
-             $item['client_name'] = $detail['sale']['client']->name;
-             $item['warehouse_name'] = $detail['sale']['warehouse']->name;
-             $item['quantity'] = $detail->quantity;
-             $item['total'] = $detail->total;
-             $item['product_name'] = $product_name;
-             $item['unit_sale'] = $unit->ShortName;
- 
-             $data[] = $item;
-         }
+
+            if ($detail->product_variant_id) {
+                $productsVariants = ProductVariant::where('product_id', $detail->product_id)
+                    ->where('id', $detail->product_variant_id)->first();
+
+                $product_name = $productsVariants->name . '-' . $detail['product']['name'];
+
+            } else {
+                $product_name = $detail['product']['name'];
+            }
+
+            $item['date'] = $detail->date;
+            $item['Ref'] = $detail['sale']->Ref;
+            $item['client_name'] = $detail['sale']['client']->name;
+            $item['warehouse_name'] = $detail['sale']['warehouse']->name;
+            $item['quantity'] = $detail->quantity;
+            $item['total'] = $detail->total;
+            $item['product_name'] = $product_name;
+            $item['unit_sale'] = $unit->ShortName;
+
+            $data[] = $item;
+        }
 
 
         //get warehouses assigned to user
-       $user_auth = auth()->user();
-       if($user_auth->is_all_warehouses){
-           $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-       }else{
-           $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-           $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-       }
+        $user_auth = auth()->user();
+        if ($user_auth->is_all_warehouses) {
+            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
+        } else {
+            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
+            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
+        }
 
-       $customers = client::where('deleted_at', '=', null)->get(['id', 'name']);
+        $customers = client::where('deleted_at', '=', null)->get(['id', 'name']);
 
         return response()->json([
             'totalRows' => $totalRows,
@@ -3959,31 +3892,31 @@ class ReportController extends Controller
 
     public function product_purchases_report(request $request)
     {
- 
-         $this->authorizeForUser($request->user('api'), 'product_purchases_report', Purchase::class);
-         $role = Auth::user()->roles()->first();
-         $view_records = Role::findOrFail($role->id)->inRole('record_view');
-         // How many items do you want to display.
-         $perPage = $request->limit;
- 
-         $pageStart = \Request::get('page', 1);
-         // Start displaying items from this number;
-         $offSet = ($pageStart * $perPage) - $perPage;
-         $order = $request->SortField;
-         $dir = $request->SortType;
-         $helpers = new helpers();
-         // Filter fields With Params to retrieve
-         $param = array(
-             0 => '=',
-             1 => '=',
-         );
-         $columns = array(
-             0 => 'provider_id',
-             1 => 'warehouse_id',
-         );
-         $data = array();
 
-         $purchase_details_data = PurchaseDetail::with('product','purchase','purchase.provider','purchase.warehouse')
+        $this->authorizeForUser($request->user('api'), 'product_purchases_report', Purchase::class);
+        $role = Auth::user()->roles()->first();
+        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+        // How many items do you want to display.
+        $perPage = $request->limit;
+
+        $pageStart = \Request::get('page', 1);
+        // Start displaying items from this number;
+        $offSet = ($pageStart * $perPage) - $perPage;
+        $order = $request->SortField;
+        $dir = $request->SortType;
+        $helpers = new helpers();
+        // Filter fields With Params to retrieve
+        $param = array(
+            0 => '=',
+            1 => '=',
+        );
+        $columns = array(
+            0 => 'provider_id',
+            1 => 'warehouse_id',
+        );
+        $data = array();
+
+        $purchase_details_data = PurchaseDetail::with('product', 'purchase', 'purchase.provider', 'purchase.warehouse')
             ->where(function ($query) use ($view_records) {
                 if (!$view_records) {
                     return $query->whereHas('purchase', function ($q) use ($request) {
@@ -3991,7 +3924,6 @@ class ReportController extends Controller
                     });
                 }
             })
-
             ->where(function ($query) use ($request) {
                 return $query->whereHas('purchase', function ($q) use ($request) {
                     $q->whereBetween('date', array($request->from, $request->to));
@@ -4006,98 +3938,96 @@ class ReportController extends Controller
                 });
             });
         })
-        
-        ->where(function ($query) use ($request) {
-            return $query->when($request->filled('warehouse_id'), function ($query) use ($request) {
-                return $query->whereHas('purchase.warehouse', function ($q) use ($request) {
-                    $q->where('warehouse_id', '=', $request->warehouse_id);
-                });
-            });
-        })
-
-        // Search With Multiple Param
             ->where(function ($query) use ($request) {
-            return $query->when($request->filled('search'), function ($query) use ($request) {
-                return $query->where(function ($query) use ($request) {
+                return $query->when($request->filled('warehouse_id'), function ($query) use ($request) {
+                    return $query->whereHas('purchase.warehouse', function ($q) use ($request) {
+                        $q->where('warehouse_id', '=', $request->warehouse_id);
+                    });
+                });
+            })
+
+            // Search With Multiple Param
+            ->where(function ($query) use ($request) {
+                return $query->when($request->filled('search'), function ($query) use ($request) {
+                    return $query->where(function ($query) use ($request) {
                         return $query->whereHas('purchase.provider', function ($q) use ($request) {
                             $q->where('name', 'LIKE', "%{$request->search}%");
                         });
                     })
-                    ->orWhere(function ($query) use ($request) {
-                        return $query->whereHas('purchase', function ($q) use ($request) {
-                            $q->where('Ref', 'LIKE', "%{$request->search}%");
+                        ->orWhere(function ($query) use ($request) {
+                            return $query->whereHas('purchase', function ($q) use ($request) {
+                                $q->where('Ref', 'LIKE', "%{$request->search}%");
+                            });
+                        })
+                        ->orWhere(function ($query) use ($request) {
+                            return $query->whereHas('product', function ($q) use ($request) {
+                                $q->where('name', 'LIKE', "%{$request->search}%");
+                            });
+                        })
+                        ->orWhere(function ($query) use ($request) {
+                            return $query->whereHas('purchase.warehouse', function ($q) use ($request) {
+                                $q->where('name', 'LIKE', "%{$request->search}%");
+                            });
                         });
-                    })
-                    ->orWhere(function ($query) use ($request) {
-                        return $query->whereHas('product', function ($q) use ($request) {
-                            $q->where('name', 'LIKE', "%{$request->search}%");
-                        });
-                    })
-                    ->orWhere(function ($query) use ($request) {
-                        return $query->whereHas('purchase.warehouse', function ($q) use ($request) {
-                            $q->where('name', 'LIKE', "%{$request->search}%");
-                        });
-                    });
+                });
             });
-        });
 
 
+        $totalRows = $purchase_details_Filtred->count();
+        if ($perPage == "-1") {
+            $perPage = $totalRows;
+        }
 
-         $totalRows = $purchase_details_Filtred->count();
-         if($perPage == "-1"){
-             $perPage = $totalRows;
-         }
+        $purchase_details = $purchase_details_Filtred
+            ->offset($offSet)
+            ->limit($perPage)
+            ->orderBy($order, $dir)
+            ->get();
 
-         $purchase_details = $purchase_details_Filtred
-         ->offset($offSet)
-         ->limit($perPage)
-         ->orderBy($order, $dir)
-         ->get();
-
-         foreach ($purchase_details as $detail) {
+        foreach ($purchase_details as $detail) {
 
             //-------check if detail has purchase_unit_id Or Null
-            if($detail->purchase_unit_id !== null){
-               $unit = Unit::where('id', $detail->purchase_unit_id)->first();
-           }else{
-               $product_unit_purchase_id = Product::with('unitPurchase')
-               ->where('id', $detail->product_id)
-               ->first();
-               $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
-           }
-  
-              if($detail->product_variant_id){
-                  $productsVariants = ProductVariant::where('product_id', $detail->product_id)
-                  ->where('id', $detail->product_variant_id)->first();
-  
-                  $product_name = $productsVariants->name . '-' . $detail['product']['name'];
-  
-              }else{
-                  $product_name = $detail['product']['name'];
-              }
-  
-              $item['date'] = $detail['purchase']->date;
-              $item['Ref'] = $detail['purchase']->Ref;
-              $item['provider_name'] = $detail['purchase']['provider']->name;
-              $item['warehouse_name'] = $detail['purchase']['warehouse']->name;
-              $item['quantity'] = $detail->quantity;
-              $item['total'] = $detail->total;
-              $item['product_name'] = $product_name;
-              $item['unit_purchase'] = $unit->ShortName;
+            if ($detail->purchase_unit_id !== null) {
+                $unit = Unit::where('id', $detail->purchase_unit_id)->first();
+            } else {
+                $product_unit_purchase_id = Product::with('unitPurchase')
+                    ->where('id', $detail->product_id)
+                    ->first();
+                $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
+            }
 
-              $data[] = $item;
-          }
+            if ($detail->product_variant_id) {
+                $productsVariants = ProductVariant::where('product_id', $detail->product_id)
+                    ->where('id', $detail->product_variant_id)->first();
+
+                $product_name = $productsVariants->name . '-' . $detail['product']['name'];
+
+            } else {
+                $product_name = $detail['product']['name'];
+            }
+
+            $item['date'] = $detail['purchase']->date;
+            $item['Ref'] = $detail['purchase']->Ref;
+            $item['provider_name'] = $detail['purchase']['provider']->name;
+            $item['warehouse_name'] = $detail['purchase']['warehouse']->name;
+            $item['quantity'] = $detail->quantity;
+            $item['total'] = $detail->total;
+            $item['product_name'] = $product_name;
+            $item['unit_purchase'] = $unit->ShortName;
+
+            $data[] = $item;
+        }
 
         //get warehouses assigned to user
-       $user_auth = auth()->user();
-       if($user_auth->is_all_warehouses){
-           $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-       }else{
-           $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-           $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-       }
+        $user_auth = auth()->user();
+        if ($user_auth->is_all_warehouses) {
+            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
+        } else {
+            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
+            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
+        }
 
-       $suppliers = Provider::where('deleted_at', '=', null)->get(['id', 'name']);
+        $suppliers = Provider::where('deleted_at', '=', null)->get(['id', 'name']);
 
         return response()->json([
             'totalRows' => $totalRows,
