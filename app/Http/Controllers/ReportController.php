@@ -84,32 +84,11 @@ class ReportController extends Controller
 
 //        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
 
-        // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
-        // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-        $order = $request->SortField;
-        $dir = $request->SortType;
-        $data = array();
+        $data = collect();
 
-        $clients = Client::where('deleted_at', '=', null)
-            // Search With Multiple Param
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('search'), function ($query) use ($request) {
-                    return $query->where('name', 'LIKE', "%{$request->search}%")
-                        ->orWhere('code', 'LIKE', "%{$request->search}%")
-                        ->orWhere('phone', 'LIKE', "%{$request->search}%");
-                });
-            });
+        $clients = Client::where('deleted_at', '=', null);
 
-        $totalRows = $clients->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $clients = $clients->offset($offSet)
-            ->limit($perPage)
-            ->orderBy($order, $dir)
+        $clients = $clients->orderByDesc('id')
             ->get();
 
         foreach ($clients as $client) {
@@ -142,17 +121,17 @@ class ReportController extends Controller
 
             $item['return_Due'] = $item['total_amount_return'] - $item['total_paid_return'];
 
-            $item['name'] = $client->name;
+            $item['name'] = $client->company_name;
             $item['phone'] = $client->phone;
             $item['code'] = $client->code;
             $item['id'] = $client->id;
 
-            $data[] = $item;
+            $data->add($item);
         }
 
-        return response()->json([
+        Inertia::share('titlePage', 'Pagos de Clientes');
+        return Inertia::render('Reports/customers_report', [
             'report' => $data,
-            'totalRows' => $totalRows,
         ]);
 
     }
@@ -162,7 +141,7 @@ class ReportController extends Controller
     public function Client_Report_detail(request $request, $id)
     {
 
-        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
+//        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
 
         $client = Client::where('deleted_at', '=', null)->findOrFail($id);
 
@@ -178,7 +157,11 @@ class ReportController extends Controller
 
         $data['due'] = $data['total_amount'] - $data['total_paid'];
 
-        return response()->json(['report' => $data]);
+        Inertia::share('titlePage', 'Detalle de Cliente');
+        return Inertia::render('Reports/detail_Customer_Report', [
+            'report' => $data,
+            'client_id' => $id,
+        ]);
     }
 
     //----------------- Provider Report By ID-----------------------\\
@@ -211,58 +194,49 @@ class ReportController extends Controller
     public function Sales_Client(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
-        // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
-        // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
+//        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
 
-        $Role = Auth::user()->roles()->first();
-        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+//        $Role = Auth::user()->roles()->first();
+//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $sales = Sale::where('deleted_at', '=', null)->with('client', 'warehouse')
-            ->where(function ($query) use ($ShowRecord) {
-                if (!$ShowRecord) {
-                    return $query->where('user_id', '=', Auth::user()->id);
-                }
-            })
-            ->where('client_id', $request->id)
+//            ->where(function ($query) use ($ShowRecord) {
+//                if (!$ShowRecord) {
+//                    return $query->where('user_id', '=', Auth::user()->id);
+//                }
+//            })
+            ->where('client_id', $request->get('id'));
             // Search With Multiple Param
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('search'), function ($query) use ($request) {
-                    return $query->where('Ref', 'LIKE', "%{$request->search}%")
-                        ->orWhere('statut', 'LIKE', "%{$request->search}%")
-                        ->orWhere('payment_statut', 'like', "%{$request->search}%")
-                        ->orWhere(function ($query) use ($request) {
-                            return $query->whereHas('warehouse', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        })
-                        ->orWhere(function ($query) use ($request) {
-                            return $query->whereHas('client', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        });
-                });
-            });
+//            ->where(function ($query) use ($request) {
+//                return $query->when($request->filled('search'), function ($query) use ($request) {
+//                    return $query->where('Ref', 'LIKE', "%{$request->search}%")
+//                        ->orWhere('statut', 'LIKE', "%{$request->search}%")
+//                        ->orWhere('payment_statut', 'like', "%{$request->search}%")
+//                        ->orWhere(function ($query) use ($request) {
+//                            return $query->whereHas('warehouse', function ($q) use ($request) {
+//                                $q->where('name', 'LIKE', "%{$request->search}%");
+//                            });
+//                        })
+//                        ->orWhere(function ($query) use ($request) {
+//                            return $query->whereHas('client', function ($q) use ($request) {
+//                                $q->where('name', 'LIKE', "%{$request->search}%");
+//                            });
+//                        });
+//                });
+//            });
 
-        $totalRows = $sales->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $sales = $sales->offset($offSet)
-            ->limit($perPage)
-            ->orderBy('id', 'desc')
+
+        $sales = $sales
+            ->orderByDesc('id')
             ->get();
 
-        $data = [];
+        $data = collect();
         foreach ($sales as $sale) {
             $item['id'] = $sale->id;
             $item['date'] = $sale->date;
             $item['Ref'] = $sale->Ref;
-            $item['warehouse_name'] = $sale['warehouse']->name;
-            $item['client_name'] = $sale['client']->name;
+            $item['warehouse_name'] = $sale['warehouse']?->name;
+            $item['client_name'] = $sale['client']?->company_name;
             $item['statut'] = $sale->statut;
             $item['GrandTotal'] = $sale->GrandTotal;
             $item['paid_amount'] = $sale->paid_amount;
@@ -270,10 +244,9 @@ class ReportController extends Controller
             $item['payment_status'] = $sale->payment_statut;
             $item['shipping_status'] = $sale->shipping_status;
 
-            $data[] = $item;
+            $data->add($item);
         }
         return response()->json([
-            'totalRows' => $totalRows,
             'sales' => $data,
         ]);
 
@@ -284,50 +257,38 @@ class ReportController extends Controller
     public function Payments_Client(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
-        // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
-        // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-
-        $Role = Auth::user()->roles()->first();
-        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+//        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
+//        $Role = Auth::user()->roles()->first();
+//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $payments = DB::table('payment_sales')
-            ->where(function ($query) use ($ShowRecord) {
-                if (!$ShowRecord) {
-                    return $query->where('payment_sales.user_id', '=', Auth::user()->id);
-                }
-            })
+//            ->where(function ($query) use ($ShowRecord) {
+//                if (!$ShowRecord) {
+//                    return $query->where('payment_sales.user_id', '=', Auth::user()->id);
+//                }
+//            })
             ->where('payment_sales.deleted_at', '=', null)
             ->join('sales', 'payment_sales.sale_id', '=', 'sales.id')
             ->where('sales.client_id', $request->id)
             // Search With Multiple Param
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('search'), function ($query) use ($request) {
-                    return $query->where('payment_sales.Ref', 'LIKE', "%{$request->search}%")
-                        ->orWhere('payment_sales.date', 'LIKE', "%{$request->search}%")
-                        ->orWhere('payment_sales.Reglement', 'LIKE', "%{$request->search}%");
-                });
-            })
+//            ->where(function ($query) use ($request) {
+//                return $query->when($request->filled('search'), function ($query) use ($request) {
+//                    return $query->where('payment_sales.Ref', 'LIKE', "%{$request->search}%")
+//                        ->orWhere('payment_sales.date', 'LIKE', "%{$request->search}%")
+//                        ->orWhere('payment_sales.Reglement', 'LIKE', "%{$request->search}%");
+//                });
+//            })
             ->select(
                 'payment_sales.date', 'payment_sales.Ref AS Ref', 'sales.Ref AS Sale_Ref',
                 'payment_sales.Reglement', 'payment_sales.montant'
             );
 
-        $totalRows = $payments->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $payments = $payments->offset($offSet)
-            ->limit($perPage)
+        $payments = $payments
             ->orderBy('payment_sales.id', 'desc')
             ->get();
 
         return response()->json([
             'payments' => $payments,
-            'totalRows' => $totalRows,
         ]);
 
     }

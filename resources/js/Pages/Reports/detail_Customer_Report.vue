@@ -1,480 +1,123 @@
-<script>
-// import { mapActions, mapGetters } from "vuex";
-// import jsPDF from "jspdf";
-// import "jspdf-autotable";
-//
-// export default {
-//   data() {
-//     return {
-//       totalRows_quotations: "",
-//       totalRows_sales: "",
-//       totalRows_returns: "",
-//       totalRows_payments: "",
-//       limit_quotations: "10",
-//       limit_returns: "10",
-//       limit_sales: "10",
-//       limit_payments: "10",
-//       sales_page: 1,
-//       quotations_page: 1,
-//       Return_sale_page: 1,
-//       Payment_sale_page: 1,
-//       isLoading: true,
-//       payments: [],
-//       sales: [],
-//       quotations: [],
-//       returns_customer: [],
-//
-//       search_sales:"",
-//       search_payments:"",
-//       search_quotations:"",
-//       search_return_sales:"",
-//
-//       client: {
-//         id: "",
-//         name: "",
-//         total_sales: 0,
-//         total_amount: 0,
-//         total_paid: 0,
-//         due: 0
-//       }
-//     };
-//   },
-//
-//   computed: {
-//     ...mapGetters(["currentUser"]),
-//     columns_quotations() {
-//       return [
-//         {
-//           label: this.$t("date"),
-//           field: "date",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("Reference"),
-//           field: "Ref",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("Customer"),
-//           field: "client_name",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("warehouse"),
-//           field: "warehouse_name",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Total"),
-//           field: "GrandTotal",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("Status"),
-//           field: "statut",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           html: true,
-//           sortable: false
-//         }
-//       ];
-//     },
-//     columns_sales() {
-//       return [
-//         {
-//           label: this.$t("Reference"),
-//           field: "Ref",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//
-//         {
-//           label: this.$t("Customer"),
-//           field: "client_name",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("warehouse"),
-//           field: "warehouse_name",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Total"),
-//           field: "GrandTotal",
-//           type: "decimal",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("Paid"),
-//           field: "paid_amount",
-//           type: "decimal",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("Due"),
-//           field: "due",
-//           type: "decimal",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//          {
-//           label: this.$t("Status"),
-//           field: "statut",
-//           html: true,
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("PaymentStatus"),
-//           field: "payment_status",
-//           html: true,
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("Shipping_status"),
-//           field: "shipping_status",
-//           html: true,
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//       ];
-//     },
-//     columns_returns() {
-//       return [
-//         {
-//           label: this.$t("Reference"),
-//           field: "Ref",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("Customer"),
-//           field: "client_name",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("Sale_Ref"),
-//           field: "sale_ref",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("warehouse"),
-//           field: "warehouse_name",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//
-//         {
-//           label: this.$t("Total"),
-//           field: "GrandTotal",
-//           type: "decimal",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("Paid"),
-//           field: "paid_amount",
-//           type: "decimal",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("Due"),
-//           field: "due",
-//           type: "decimal",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//          {
-//           label: this.$t("Status"),
-//           field: "statut",
-//           html: true,
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("PaymentStatus"),
-//           field: "payment_status",
-//           html: true,
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         }
-//       ];
-//     },
-//     columns_payments() {
-//       return [
-//         {
-//           label: this.$t("date"),
-//           field: "date",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("Reference"),
-//           field: "Ref",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//
-//         {
-//           label: this.$t("Sale"),
-//           field: "Sale_Ref",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("ModePaiement"),
-//           field: "Reglement",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("Amount"),
-//           field: "montant",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           type: "decimal",
-//           sortable: false
-//         }
-//       ];
-//     }
-//   },
-//
-//   methods: {
-//
-//      //----------------------------------- Sales PDF ------------------------------\\
-//     Sales_PDF() {
-//       var self = this;
-//       let pdf = new jsPDF("p", "pt");
-//       let columns = [
-//         { title: "Ref", dataKey: "Ref" },
-//         { title: "Client", dataKey: "client_name" },
-//         { title: "Warehouse", dataKey: "warehouse_name" },
-//         { title: "Status", dataKey: "statut" },
-//         { title: "Total", dataKey: "GrandTotal" },
-//         { title: "Paid", dataKey: "paid_amount" },
-//         { title: "Due", dataKey: "due" },
-//         { title: "Status Payment", dataKey: "payment_status" },
-//         { title: "Shipping Status", dataKey: "shipping_status" }
-//       ];
-//       pdf.autoTable(columns, self.sales);
-//       pdf.text("Sale List", 40, 25);
-//       pdf.save("Sale_List.pdf");
-//     },
-//
-//       //------------------------------------- Quotations PDF -------------------------\\
-//     Quotation_PDF() {
-//       var self = this;
-//
-//       let pdf = new jsPDF("p", "pt");
-//       let columns = [
-//         { title: "Date", dataKey: "date" },
-//         { title: "Ref", dataKey: "Ref" },
-//         { title: "Client", dataKey: "client_name" },
-//         { title: "Warehouse", dataKey: "warehouse_name" },
-//         { title: "Status", dataKey: "statut" },
-//         { title: "Total", dataKey: "GrandTotal" }
-//       ];
-//       pdf.autoTable(columns, self.quotations);
-//       pdf.text("Quotation List", 40, 25);
-//       pdf.save("Quotation_List.pdf");
-//     },
-//
-//      //----------------------------------------- Sales Return PDF -----------------------\\
-//     Sale_Return_PDF() {
-//       var self = this;
-//
-//       let pdf = new jsPDF("p", "pt");
-//       let columns = [
-//         { title: "Ref", dataKey: "Ref" },
-//         { title: "Client", dataKey: "client_name" },
-//         { title: "sale_ref", dataKey: "sale_ref" },
-//         { title: "Warehouse", dataKey: "warehouse_name" },
-//         { title: "Total", dataKey: "GrandTotal" },
-//         { title: "Paid", dataKey: "paid_amount" },
-//         { title: "Due", dataKey: "due" },
-//         { title: "Status", dataKey: "statut" },
-//         { title: "Status Payment", dataKey: "payment_status" }
-//       ];
-//       pdf.autoTable(columns, self.returns_customer);
-//       pdf.text("Sales Return List", 40, 25);
-//       pdf.save("Sales Return.pdf");
-//     },
-//
-//        //----------------------------------- Sales PDF ------------------------------\\
-//     Payments_PDF() {
-//       var self = this;
-//       let pdf = new jsPDF("p", "pt");
-//       let columns = [
-//         { title: "Date", dataKey: "date" },
-//         { title: "Ref", dataKey: "Ref" },
-//         { title: "Sale", dataKey: "Sale_Ref" },
-//         { title: "Reglement", dataKey: "Reglement" },
-//         { title: "Amount", dataKey: "montant" },
-//       ];
-//       pdf.autoTable(columns, self.payments);
-//       pdf.text("Payments List", 40, 25);
-//       pdf.save("Payments_List.pdf");
-//     },
-//
-//     //------------------------------Formetted Numbers -------------------------\\
-//     formatNumber(number, dec) {
-//       const value = (typeof number === "string"
-//         ? number
-//         : number.toString()
-//       ).split(".");
-//       if (dec <= 0) return value[0];
-//       let formated = value[1] || "";
-//       if (formated.length > dec)
-//         return `${value[0]}.${formated.substr(0, dec)}`;
-//       while (formated.length < dec) formated += "0";
-//       return `${value[0]}.${formated}`;
-//     },
-//
-//     //------------------------------ Show Reports -------------------------\\
-//     Get_Reports() {
-//       let id = this.$route.params.id;
-//       axios
-//         .get(`report/client/${id}`)
-//         .then(response => {
-//           this.client = response.data.report;
-//         })
-//         .catch(response => {});
-//     },
-//
-//     //--------------------------- Event Page Change -------------\\
-//     PageChangeSales({ currentPage }) {
-//       if (this.sales_page !== currentPage) {
-//         this.Get_Sales(currentPage);
-//       }
-//     },
-//
-//     //--------------------------- Limit Page Sales -------------\\
-//     onPerPageChangeSales({ currentPerPage }) {
-//       if (this.limit_sales !== currentPerPage) {
-//         this.limit_sales = currentPerPage;
-//         this.Get_Sales(1);
-//       }
-//     },
-//
-//     onSearch_sales(value) {
-//       this.search_sales = value.searchTerm;
-//       this.Get_Sales(1);
-//     },
-//
-//     //--------------------------- Get sales By Customer -------------\\
-//     Get_Sales(page) {
-//       axios
-//         .get(
-//           "/report/client_sales?page=" +
-//             page +
-//             "&limit=" +
-//             this.limit_sales +
-//             "&search=" +
-//             this.search_sales +
-//             "&id=" +
-//             this.$route.params.id
-//         )
-//         .then(response => {
-//           this.sales = response.data.sales;
-//           this.totalRows_sales = response.data.totalRows;
-//         })
-//         .catch(response => {});
-//     },
-//
-//     //--------------------------- Event Page Change -------------\\
-//     PageChangePayments({ currentPage }) {
-//       if (this.Payment_sale_page !== currentPage) {
-//         this.Get_Payments(currentPage);
-//       }
-//     },
-//
-//     //--------------------------- Limit Page Payments -------------\\
-//     onPerPageChangePayments({ currentPerPage }) {
-//       if (this.limit_payments !== currentPerPage) {
-//         this.limit_payments = currentPerPage;
-//         this.Get_Payments(1);
-//       }
-//     },
-//
-//      onSearch_payments(value) {
-//       this.search_payments = value.searchTerm;
-//       this.Get_Payments(1);
-//     },
-//
-//     //--------------------------- Get Payments By Customer -------------\\
-//     Get_Payments(page) {
-//       axios
-//         .get(
-//           "report/client_payments?page=" +
-//             page +
-//             "&limit=" +
-//             this.limit_payments +
-//             "&search=" +
-//             this.search_payments +
-//             "&id=" +
-//             this.$route.params.id
-//         )
-//         .then(response => {
-//           this.payments = response.data.payments;
-//           this.totalRows_payments = response.data.totalRows;
-//         })
-//         .catch(response => {});
-//     },
-//
-//     //--------------------------- Event Page Change -------------\\
-//     PageChangeQuotation({ currentPage }) {
-//       if (this.quotations_page !== currentPage) {
-//         this.Get_Quotations(currentPage);
-//       }
-//     },
-//
-//     //--------------------------- Limit Page Quotations -------------\\
-//     onPerPageChangeQuotation({ currentPerPage }) {
-//       if (this.limit_quotations !== currentPerPage) {
-//         this.limit_quotations = currentPerPage;
-//         this.Get_Quotations(1);
-//       }
-//     },
-//
-//      onSearch_quotations(value) {
-//       this.search_quotations = value.searchTerm;
-//       this.Get_Quotations(1);
-//     },
+<script setup>
+import {computed, onMounted, ref} from "vue";
+import Layout from "@/Layouts/Authenticated.vue";
+import ExportBtn from "@/Components/ExportBtn.vue";
+import {router, usePage} from "@inertiajs/vue3";
+import helper from "@/helpers";
+import labels from "@/labels";
+
+const props = defineProps({
+  report: Object,
+  client_id: Number,
+})
+const currency = computed(() => usePage().props.currency);
+
+const loading = ref(false);
+const tab = ref(null);
+const search_sales = ref("");
+const search_payments = ref("");
+const search_quotations = ref("");
+const search_return_sales = ref("");
+const totalRows_quotations = ref("");
+const totalRows_sales = ref("");
+const totalRows_returns = ref("");
+const totalRows_payments = ref("");
+const payments = ref([]);
+const sales = ref([]);
+const quotations = ref([]);
+const returns_customer = ref([]);
+const client = ref({
+  id: "",
+  name: "",
+  total_sales: 0,
+  total_amount: 0,
+  total_paid: 0,
+  due: 0
+});
+const fields_quotations = ref([
+  {title: "Fecha", key: "date"},
+  {title: "Codigo", key: "Ref"},
+  {title: "Cliente", key: "client_name"},
+  {title: "Agencia", key: "warehouse_name"},
+  {title: "Total", key: "GrandTotal"},
+  {title: "Estado", key: "statut"},
+]);
+const fields_sales = ref([
+  {title: "Codigo", key: "Ref"},
+  {title: "Cliente", key: "client_name"},
+  {title: "Agencia", key: "warehouse_name"},
+  {title: "Total", key: "GrandTotal"},
+  {title: "Pagado", key: "paid_amount"},
+  {title: "Deuda", key: "due"},
+  {title: "Estado", key: "statut"},
+  {title: "Estado de Pago", key: "payment_status"},
+// {title: "Estado de Envio", key: "shipping_status"},
+]);
+const fields_sales_export = ref({
+  "Codigo": "Ref",
+  "Cliente": "client_name",
+  "Agencia": "warehouse_name",
+  "Total": "GrandTotal",
+  "Pagado": "paid_amount",
+  "Deuda": "due",
+  "Estado": "statut",
+  "Estado de Pago": "payment_status",
+// "Estado de Envio": "shipping_status",
+});
+const fields_returns = ref([
+  {title: "Codigo", key: "Ref"},
+  {title: "Cliente", key: "client_name"},
+  {title: "Codigo de Venta", key: "sale_ref"},
+  {title: "Agencia", key: "warehouse_name"},
+  {title: "Total", key: "GrandTotal"},
+  {title: "Monto de Pago", key: "paid_amount"},
+  {title: "Deuda", key: "due"},
+  {title: "Estado", key: "statut"},
+  {title: "Estado de Pago", key: "payment_status"},
+]);
+const fields_payments = ref([
+  {title: "Fecha", key: "date"},
+  {title: "Codigo", key: "Ref"},
+  {title: "Codigo de Venta", key: "Sale_Ref"},
+  {title: "Tipo de Pago", key: "Reglement"},
+  {title: "Monto de Pago", key: "montant"},
+]);
+const fields_payments_export = ref({
+  "Fecha": "date",
+  "Codigo": "Ref",
+  "Codigo de Venta": "Sale_Ref",
+  "Tipo de Pago": "Reglement",
+  "Monto de Pago": "montant",
+});
+
+//--------------------------- Get sales By Customer -------------\\
+function Get_Sales() {
+  loading.value = true;
+  axios.get("/report/client_sales", {params: {'id': props.client_id}})
+      .then(response => {
+        sales.value = response.data.sales;
+      })
+      .catch(response => {
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+}
+
+//--------------------------- Get Payments By Customer -------------\\
+function Get_Payments() {
+  loading.value = true;
+  axios.get("/report/client_payments", {params: {'id': props.client_id}})
+      .then(response => {
+        payments.value = response.data.payments;
+      })
+      .catch(response => {
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+}
+
 //
 //     //--------------------------- Get Quotations By Customer -------------\\
 //     Get_Quotations(page) {
@@ -501,26 +144,6 @@
 //         });
 //     },
 //
-//     //--------------------------- Event Page Change -------------\\
-//     PageChangeReturn({ currentPage }) {
-//       if (this.Return_sale_page !== currentPage) {
-//         this.Get_Returns(currentPage);
-//       }
-//     },
-//
-//     //--------------------------- Limit Page Returns -------------\\
-//     onPerPageChangeReturn({ currentPerPage }) {
-//       if (this.limit_returns !== currentPerPage) {
-//         this.limit_returns = currentPerPage;
-//         this.Get_Returns(1);
-//       }
-//     },
-//
-//      onSearch_return_sales(value) {
-//       this.search_return_sales = value.searchTerm;
-//       this.Get_Returns(1);
-//     },
-//
 //     //--------------------------- Get Returns By Customer -------------\\
 //     Get_Returns(page) {
 //       axios
@@ -542,301 +165,380 @@
 //     }
 //   }, //end Methods
 //
-//   //----------------------------- Created function------------------- \\
-//
-//   created: function() {
-//     this.Get_Reports();
-//     this.Get_Sales(1);
-//     this.Get_Payments(1);
-//     this.Get_Quotations(1);
-//     this.Get_Returns(1);
-//   }
-// };
+const tabVal = computed({
+  get() {
+    switch (tab.value) {
+      case 'sales':
+        Get_Sales();
+        break;
+      case 'payments':
+        Get_Payments();
+        break;
+        // case 'quotations':
+        //   Get_Quotations();
+        // break;
+        // case 'returns':
+        //   Get_Returns();
+        // break;
+    }
+    return tab.value;
+  },
+  set(val) {
+    tab.value = val;
+  }
+});
 </script>
 <template>
-<!--  <div class="main-content">-->
-<!--    <breadcumb :page="$t('CustomersReport')" :folder="$t('Reports')"/>-->
-<!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+  <layout>
+    <v-row align="center" class="mb-3">
+      <v-col md="3" sm="6" cols="12">
+        <v-card class="mb-30 text-center">
+          <v-card-text>
+            <v-row align="center" no-gutters>
+              <v-col cols="6" class="text-right">
+                <v-icon
+                    color="primary"
+                    icon="mdi-cart-outline"
+                    size="68"
+                ></v-icon>
+              </v-col>
+              <v-col
+                  class="text-h6"
+                  cols="6"
+              >
+                <p class="text-disabled mt-2 mb-0">Ventas</p>
+                <p class="text-primary text-24 line-height-1 mb-2">{{ report.total_sales }}</p>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col md="3" sm="6" cols="12">
+        <v-card class="mb-30 text-center">
+          <v-card-text>
+            <v-row align="center" no-gutters>
+              <v-col cols="6" class="text-right">
+                <v-icon
+                    color="primary"
+                    icon="mdi-hand-coin-outline"
+                    size="68"
+                ></v-icon>
+              </v-col>
+              <v-col
+                  class="text-h6"
+                  cols="6"
+              >
+                <p class="text-disabled mt-2 mb-0">Monto Total</p>
+                <p class="text-primary text-24 line-height-1 mb-2">
+                  {{ currency }} {{ helper.formatNumber((report.total_amount), 2) }}</p>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col md="3" sm="6" cols="12">
+        <v-card class="mb-30 text-center">
+          <v-card-text>
+            <v-row align="center" no-gutters>
+              <v-col cols="6" class="text-right">
+                <v-icon
+                    color="primary"
+                    icon="mdi-cash-multiple"
+                    size="68"
+                ></v-icon>
+              </v-col>
+              <v-col
+                  class="text-h6"
+                  cols="6"
+              >
+                <p class="text-disabled mt-2 mb-0">Total Pagado</p>
+                <p class="text-primary text-24 line-height-1 mb-2">
+                  {{ currency }} {{ helper.formatNumber((report.total_paid), 2) }}</p>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col md="3" sm="6" cols="12">
+        <v-card class="mb-30 text-center">
+          <v-card-text>
+            <v-row align="center" no-gutters>
+              <v-col cols="6" class="text-right">
+                <v-icon
+                    color="primary"
+                    icon="mdi-cash-clock"
+                    size="68"
+                ></v-icon>
+              </v-col>
+              <v-col
+                  class="text-h6"
+                  cols="6"
+              >
+                <p class="text-disabled mt-2 mb-0">Deuda</p>
+                <p class="text-primary text-24 line-height-1 mb-2">
+                  {{ currency }} {{ helper.formatNumber((report.due), 2) }}</p>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-card>
+      <v-tabs v-model="tabVal" color="primary">
+        <v-tab value="sales">Ventas</v-tab>
+        <!--        <v-tab value="quotations">Citas</v-tab>-->
+        <!--        <v-tab value="returns">Devoluciones</v-tab>-->
+        <v-tab value="payments">Pagos de Ventas</v-tab>
+      </v-tabs>
+      <v-card-text>
+        <v-window v-model="tabVal">
+          <v-window-item value="sales">
+            <v-row align="center" class="mb-1">
+              <v-col cols="12" sm="6">
+                <v-text-field
+                    v-model="search_sales"
+                    prepend-icon="mdi-magnify"
+                    hide-details
+                    :label="labels.search"
+                    single-line
+                    variant="underlined"
+                ></v-text-field>
+              </v-col>
+              <v-spacer></v-spacer>
+              <v-col cols="auto" class="text-right">
+                <ExportBtn
+                    :data="sales"
+                    :fields="fields_sales_export"
+                    name-file="Ventas"
+                ></ExportBtn>
+              </v-col>
+            </v-row>
+            <v-data-table
+                :headers="fields_sales"
+                :items="sales"
+                :search="search_sales"
+                hover
+                density="compact"
+                :no-data-text="labels.no_data_table"
+                :loading="loading"
+            >
+              <template v-slot:item.statut="{ item }">
+                <v-chip
+                    :color="helper.statutSaleColor(item.raw.statut)"
+                    variant="tonal"
+                    size="x-small"
+                >{{helper.statutSale(item.raw.statut)}}</v-chip>
+              </template>
+              <template v-slot:item.payment_status="{ item }">
+                <v-chip
+                    :color="helper.statusPaymentColor(item.raw.payment_status)"
+                    variant="tonal"
+                    size="x-small"
+                >{{helper.statusPayment(item.raw.payment_status)}}</v-chip>
+              </template>
+              <template v-slot:item.Ref="{ item }">
+                <v-btn
+                    variant="tonal"
+                    size="x-small"
+                    color="default"
+                    :text="item.raw.Ref"
+                    @click="router.visit('/sales/detail/'+item.raw.id)"
+                ></v-btn>
+              </template>
 
-<!--    <b-row v-if="!isLoading">-->
-<!--      &lt;!&ndash; ICON BG &ndash;&gt;-->
+            </v-data-table>
+          </v-window-item>
+          <v-window-item value="payments">
+            <v-row align="center" class="mb-1">
+              <v-col cols="12" sm="6">
+                <v-text-field
+                    v-model="search_payments"
+                    prepend-icon="mdi-magnify"
+                    hide-details
+                    :label="labels.search"
+                    single-line
+                    variant="underlined"
+                ></v-text-field>
+              </v-col>
+              <v-spacer></v-spacer>
+              <v-col cols="auto" class="text-right">
+                <ExportBtn
+                    :data="payments"
+                    :fields="fields_payments_export"
+                    name-file="Pagos"
+                ></ExportBtn>
+              </v-col>
+            </v-row>
+            <v-data-table
+                :headers="fields_payments"
+                :items="payments"
+                :search="search_payments"
+                hover
+                density="compact"
+                :no-data-text="labels.no_data_table"
+                :loading="loading"
+            >
+            </v-data-table>
+          </v-window-item>
+        </v-window>
+      </v-card-text>
+    </v-card>
+  </layout>
 
-<!--      <b-col lg="3" md="6" sm="12">-->
-<!--        <b-card class="card-icon-bg card-icon-bg-primary o-hidden mb-30 text-center">-->
-<!--          <i class="i-Full-Cart"></i>-->
-<!--          <div class="content">-->
-<!--            <p class="text-muted mt-2 mb-0">{{$t('Sales')}}</p>-->
-<!--            <p class="text-primary text-24 line-height-1 mb-2">{{client.total_sales}}</p>-->
-<!--          </div>-->
-<!--        </b-card>-->
-<!--      </b-col>-->
-<!--      <b-col lg="3" md="6" sm="12">-->
-<!--        <b-card class="card-icon-bg card-icon-bg-primary o-hidden mb-30 text-center">-->
-<!--          <i class="i-Financial"></i>-->
-<!--          <div class="content">-->
-<!--            <p class="text-muted mt-2 mb-0">{{$t('TotalAmount')}}</p>-->
-<!--            <p-->
-<!--              class="text-primary text-24 line-height-1 mb-2"-->
-<!--            >{{currentUser.currency}} {{formatNumber((client.total_amount),2)}}</p>-->
-<!--          </div>-->
-<!--        </b-card>-->
-<!--      </b-col>-->
-<!--      <b-col lg="3" md="6" sm="12">-->
-<!--        <b-card class="card-icon-bg card-icon-bg-primary o-hidden mb-30 text-center">-->
-<!--          <i class="i-Money-2"></i>-->
-<!--          <div class="content">-->
-<!--            <p class="text-muted mt-2 mb-0">{{$t('TotalPaid')}}</p>-->
-<!--            <p-->
-<!--              class="text-primary text-24 line-height-1 mb-2"-->
-<!--            >{{currentUser.currency}} {{formatNumber((client.total_paid),2)}}</p>-->
-<!--          </div>-->
-<!--        </b-card>-->
-<!--      </b-col>-->
-<!--      <b-col lg="3" md="6" sm="12">-->
-<!--        <b-card class="card-icon-bg card-icon-bg-primary o-hidden mb-30 text-center">-->
-<!--          <i class="i-Money-Bag"></i>-->
-<!--          <div class="content">-->
-<!--            <p class="text-muted mt-2 mb-0">{{$t('Due')}}</p>-->
-<!--            <p-->
-<!--              class="text-primary text-24 line-height-1 mb-2"-->
-<!--            >{{currentUser.currency}} {{formatNumber((client.due),2)}}</p>-->
-<!--          </div>-->
-<!--        </b-card>-->
-<!--      </b-col>-->
-<!--    </b-row>-->
+  <!--                </div>-->
+  <!--                   <div v-else-if="props.column.field == 'Ref'">-->
+  <!--                    <router-link-->
+  <!--                      :to="'/app/sales/detail/'+props.row.id"-->
+  <!--                    >-->
+  <!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
+  <!--                    </router-link>-->
+  <!--                  </div>-->
+  <!--                </template>-->
+  <!--              </vue-good-table>-->
+  <!--            </b-tab>-->
 
-<!--    <b-row v-if="!isLoading">-->
-<!--      <b-col md="12">-->
-<!--        <b-card class="card mb-30" header-bg-variant="transparent ">-->
-<!--          <b-tabs active-nav-item-class="nav nav-tabs" content-class="mt-3">-->
-<!--           -->
-<!--            &lt;!&ndash; Sales Table &ndash;&gt;-->
-<!--            <b-tab :title="$t('Sales')">-->
-<!--              <vue-good-table-->
-<!--                mode="remote"-->
-<!--                :columns="columns_sales"-->
-<!--                :totalRows="totalRows_sales"-->
-<!--                :rows="sales"-->
-<!--                @on-page-change="PageChangeSales"-->
-<!--                @on-per-page-change="onPerPageChangeSales"-->
-<!--                @on-search="onSearch_sales"-->
-<!--                :search-options="{-->
-<!--                  placeholder: $t('Search_this_table'),-->
-<!--                  enabled: true,-->
-<!--                }"-->
-<!--                :pagination-options="{-->
-<!--                  enabled: true,-->
-<!--                  mode: 'records',-->
-<!--                  nextLabel: 'next',-->
-<!--                  prevLabel: 'prev',-->
-<!--                }"-->
-<!--                styleClass="tableOne table-hover vgt-table"-->
-<!--              >-->
-<!--              <div slot="table-actions" class="mt-2 mb-3">-->
-<!--                <b-button @click="Sales_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--                  <i class="i-File-Copy"></i> PDF-->
-<!--                </b-button>-->
-<!--              </div>-->
-<!--                <template slot="table-row" slot-scope="props">-->
-<!--                  <div v-if="props.column.field == 'statut'">-->
-<!--                    <span-->
-<!--                      v-if="props.row.statut == 'completed'"-->
-<!--                      class="badge badge-outline-success"-->
-<!--                    >{{$t('complete')}}</span>-->
-<!--                    <span-->
-<!--                      v-else-if="props.row.statut == 'pending'"-->
-<!--                      class="badge badge-outline-info"-->
-<!--                    >{{$t('Pending')}}</span>-->
-<!--                    <span v-else class="badge badge-outline-warning">{{$t('Ordered')}}</span>-->
-<!--                  </div>-->
-<!--                  <div v-else-if="props.column.field == 'payment_status'">-->
-<!--                    <span-->
-<!--                      v-if="props.row.payment_status == 'paid'"-->
-<!--                      class="badge badge-outline-success"-->
-<!--                    >{{$t('Paid')}}</span>-->
-<!--                    <span-->
-<!--                      v-else-if="props.row.payment_status == 'partial'"-->
-<!--                      class="badge badge-outline-primary"-->
-<!--                    >{{$t('partial')}}</span>-->
-<!--                    <span v-else class="badge badge-outline-warning">{{$t('Unpaid')}}</span>-->
-<!--                  </div>-->
-<!--                  <div v-else-if="props.column.field == 'shipping_status'">-->
-<!--                  <span-->
-<!--                    v-if="props.row.shipping_status == 'ordered'"-->
-<!--                    class="badge badge-outline-warning"-->
-<!--                  >{{$t('Ordered')}}</span>-->
+  <!--             &lt;!&ndash; Quotations Table &ndash;&gt;-->
+  <!--            <b-tab :title="$t('Quotations')">-->
+  <!--              <vue-good-table-->
+  <!--                mode="remote"-->
+  <!--                :columns="columns_quotations"-->
+  <!--                :totalRows="totalRows_quotations"-->
+  <!--                :rows="quotations"-->
+  <!--                @on-page-change="PageChangeQuotation"-->
+  <!--                @on-per-page-change="onPerPageChangeQuotation"-->
+  <!--                @on-search="onSearch_quotations"-->
+  <!--                :search-options="{-->
+  <!--                  placeholder: $t('Search_this_table'),-->
+  <!--                  enabled: true,-->
+  <!--                }"-->
+  <!--                :pagination-options="{-->
+  <!--                  enabled: true,-->
+  <!--                  mode: 'records',-->
+  <!--                  nextLabel: 'next',-->
+  <!--                  prevLabel: 'prev',-->
+  <!--                }"-->
+  <!--                styleClass="tableOne table-hover vgt-table"-->
+  <!--              >-->
+  <!--              <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--                <b-button @click="Quotation_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--                  <i class="i-File-Copy"></i> PDF-->
+  <!--                </b-button>-->
+  <!--              </div>-->
+  <!--                <template slot="table-row" slot-scope="props">-->
+  <!--                  <div v-if="props.column.field == 'statut'">-->
+  <!--                    <span-->
+  <!--                      v-if="props.row.statut == 'sent'"-->
+  <!--                      class="badge badge-outline-success"-->
+  <!--                    >{{$t('Sent')}}</span>-->
+  <!--                    <span v-else class="badge badge-outline-info">{{$t('Pending')}}</span>-->
+  <!--                  </div>-->
+  <!--                    <div v-else-if="props.column.field == 'Ref'">-->
+  <!--                    <router-link-->
+  <!--                      :to="'/app/quotations/detail/'+props.row.id"-->
+  <!--                    >-->
+  <!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
+  <!--                    </router-link>-->
+  <!--                  </div>-->
+  <!--                </template>-->
+  <!--              </vue-good-table>-->
+  <!--            </b-tab>-->
 
-<!--                  <span-->
-<!--                    v-else-if="props.row.shipping_status == 'packed'"-->
-<!--                    class="badge badge-outline-info"-->
-<!--                  >{{$t('Packed')}}</span>-->
+  <!--            &lt;!&ndash; Returns Table &ndash;&gt;-->
+  <!--            <b-tab :title="$t('Returns')">-->
+  <!--              <vue-good-table-->
+  <!--                mode="remote"-->
+  <!--                :columns="columns_returns"-->
+  <!--                :totalRows="totalRows_returns"-->
+  <!--                :rows="returns_customer"-->
+  <!--                @on-page-change="PageChangeReturn"-->
+  <!--                @on-per-page-change="onPerPageChangeReturn"-->
+  <!--                @on-search="onSearch_return_sales"-->
+  <!--                :search-options="{-->
+  <!--                  placeholder: $t('Search_this_table'),-->
+  <!--                  enabled: true,-->
+  <!--                }"-->
+  <!--                :pagination-options="{-->
+  <!--                  enabled: true,-->
+  <!--                  mode: 'records',-->
+  <!--                  nextLabel: 'next',-->
+  <!--                  prevLabel: 'prev',-->
+  <!--                }"-->
+  <!--                styleClass="tableOne table-hover vgt-table"-->
+  <!--              >-->
+  <!--              <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--                <b-button @click="Sale_Return_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--                  <i class="i-File-Copy"></i> PDF-->
+  <!--                </b-button>-->
+  <!--              </div>-->
+  <!--                <template slot="table-row" slot-scope="props">-->
+  <!--                  <div v-if="props.column.field == 'statut'">-->
+  <!--                    <span-->
+  <!--                      v-if="props.row.statut == 'received'"-->
+  <!--                      class="badge badge-outline-success"-->
+  <!--                    >{{$t('Received')}}</span>-->
+  <!--                    <span v-else class="badge badge-outline-info">{{$t('Pending')}}</span>-->
+  <!--                  </div>-->
 
-<!--                  <span-->
-<!--                    v-else-if="props.row.shipping_status == 'shipped'"-->
-<!--                    class="badge badge-outline-secondary"-->
-<!--                  >{{$t('Shipped')}}</span>-->
+  <!--                  <div v-else-if="props.column.field == 'payment_status'">-->
+  <!--                    <span-->
+  <!--                      v-if="props.row.payment_status == 'paid'"-->
+  <!--                      class="badge badge-outline-success"-->
+  <!--                    >{{$t('Paid')}}</span>-->
+  <!--                    <span-->
+  <!--                      v-else-if="props.row.payment_status == 'partial'"-->
+  <!--                      class="badge badge-outline-primary"-->
+  <!--                    >{{$t('partial')}}</span>-->
+  <!--                    <span v-else class="badge badge-outline-warning">{{$t('Unpaid')}}</span>-->
+  <!--                  </div>-->
+  <!--                  <div v-else-if="props.column.field == 'Ref'">-->
+  <!--                    <router-link-->
+  <!--                      :to="'/app/sale_return/detail/'+props.row.id"-->
+  <!--                    >-->
+  <!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
+  <!--                    </router-link>-->
+  <!--                  </div>-->
+  <!--                  <div v-else-if="props.column.field == 'sale_ref' && props.row.sale_id">-->
+  <!--                    <router-link-->
+  <!--                      :to="'/app/sales/detail/'+props.row.sale_id"-->
+  <!--                    >-->
+  <!--                      <span class="ul-btn__text ml-1">{{props.row.sale_ref}}</span>-->
+  <!--                    </router-link>-->
+  <!--                  </div>-->
+  <!--                </template>-->
+  <!--              </vue-good-table>-->
+  <!--            </b-tab>-->
 
-<!--                  <span-->
-<!--                    v-else-if="props.row.shipping_status == 'delivered'"-->
-<!--                    class="badge badge-outline-success"-->
-<!--                  >{{$t('Delivered')}}</span>-->
+  <!--            &lt;!&ndash; Payments Table &ndash;&gt;-->
+  <!--            <b-tab :title="$t('SalesInvoice')">-->
+  <!--              <vue-good-table-->
+  <!--                mode="remote"-->
+  <!--                :columns="columns_payments"-->
+  <!--                :totalRows="totalRows_payments"-->
+  <!--                :rows="payments"-->
+  <!--                @on-page-change="PageChangePayments"-->
+  <!--                @on-per-page-change="onPerPageChangePayments"-->
+  <!--                @on-search="onSearch_payments"-->
+  <!--                :search-options="{-->
+  <!--                  placeholder: $t('Search_this_table'),-->
+  <!--                  enabled: true,-->
+  <!--                }"-->
+  <!--                :pagination-options="{-->
+  <!--                  enabled: true,-->
+  <!--                  mode: 'records',-->
+  <!--                  nextLabel: 'next',-->
+  <!--                  prevLabel: 'prev',-->
+  <!--                }"-->
+  <!--                styleClass="tableOne table-hover vgt-table"-->
+  <!--              >-->
+  <!--               <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--                <b-button @click="Payments_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--                  <i class="i-File-Copy"></i> PDF-->
+  <!--                </b-button>-->
+  <!--              </div>-->
+  <!--              </vue-good-table>-->
+  <!--            </b-tab>-->
+  <!--          </b-tabs>-->
+  <!--        </v-card>-->
+  <!--      </v-col>-->
 
-<!--                  <span v-else-if="props.row.shipping_status == 'cancelled'" class="badge badge-outline-danger">{{$t('Cancelled')}}</span>-->
-<!--                </div>-->
-<!--                   <div v-else-if="props.column.field == 'Ref'">-->
-<!--                    <router-link-->
-<!--                      :to="'/app/sales/detail/'+props.row.id"-->
-<!--                    >-->
-<!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
-<!--                    </router-link>-->
-<!--                  </div>-->
-<!--                </template>-->
-<!--              </vue-good-table>-->
-<!--            </b-tab>-->
-
-<!--             &lt;!&ndash; Quotations Table &ndash;&gt;-->
-<!--            <b-tab :title="$t('Quotations')">-->
-<!--              <vue-good-table-->
-<!--                mode="remote"-->
-<!--                :columns="columns_quotations"-->
-<!--                :totalRows="totalRows_quotations"-->
-<!--                :rows="quotations"-->
-<!--                @on-page-change="PageChangeQuotation"-->
-<!--                @on-per-page-change="onPerPageChangeQuotation"-->
-<!--                @on-search="onSearch_quotations"-->
-<!--                :search-options="{-->
-<!--                  placeholder: $t('Search_this_table'),-->
-<!--                  enabled: true,-->
-<!--                }"-->
-<!--                :pagination-options="{-->
-<!--                  enabled: true,-->
-<!--                  mode: 'records',-->
-<!--                  nextLabel: 'next',-->
-<!--                  prevLabel: 'prev',-->
-<!--                }"-->
-<!--                styleClass="tableOne table-hover vgt-table"-->
-<!--              >-->
-<!--              <div slot="table-actions" class="mt-2 mb-3">-->
-<!--                <b-button @click="Quotation_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--                  <i class="i-File-Copy"></i> PDF-->
-<!--                </b-button>-->
-<!--              </div>-->
-<!--                <template slot="table-row" slot-scope="props">-->
-<!--                  <div v-if="props.column.field == 'statut'">-->
-<!--                    <span-->
-<!--                      v-if="props.row.statut == 'sent'"-->
-<!--                      class="badge badge-outline-success"-->
-<!--                    >{{$t('Sent')}}</span>-->
-<!--                    <span v-else class="badge badge-outline-info">{{$t('Pending')}}</span>-->
-<!--                  </div>-->
-<!--                    <div v-else-if="props.column.field == 'Ref'">-->
-<!--                    <router-link-->
-<!--                      :to="'/app/quotations/detail/'+props.row.id"-->
-<!--                    >-->
-<!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
-<!--                    </router-link>-->
-<!--                  </div>-->
-<!--                </template>-->
-<!--              </vue-good-table>-->
-<!--            </b-tab>-->
-
-<!--            &lt;!&ndash; Returns Table &ndash;&gt;-->
-<!--            <b-tab :title="$t('Returns')">-->
-<!--              <vue-good-table-->
-<!--                mode="remote"-->
-<!--                :columns="columns_returns"-->
-<!--                :totalRows="totalRows_returns"-->
-<!--                :rows="returns_customer"-->
-<!--                @on-page-change="PageChangeReturn"-->
-<!--                @on-per-page-change="onPerPageChangeReturn"-->
-<!--                @on-search="onSearch_return_sales"-->
-<!--                :search-options="{-->
-<!--                  placeholder: $t('Search_this_table'),-->
-<!--                  enabled: true,-->
-<!--                }"-->
-<!--                :pagination-options="{-->
-<!--                  enabled: true,-->
-<!--                  mode: 'records',-->
-<!--                  nextLabel: 'next',-->
-<!--                  prevLabel: 'prev',-->
-<!--                }"-->
-<!--                styleClass="tableOne table-hover vgt-table"-->
-<!--              >-->
-<!--              <div slot="table-actions" class="mt-2 mb-3">-->
-<!--                <b-button @click="Sale_Return_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--                  <i class="i-File-Copy"></i> PDF-->
-<!--                </b-button>-->
-<!--              </div>-->
-<!--                <template slot="table-row" slot-scope="props">-->
-<!--                  <div v-if="props.column.field == 'statut'">-->
-<!--                    <span-->
-<!--                      v-if="props.row.statut == 'received'"-->
-<!--                      class="badge badge-outline-success"-->
-<!--                    >{{$t('Received')}}</span>-->
-<!--                    <span v-else class="badge badge-outline-info">{{$t('Pending')}}</span>-->
-<!--                  </div>-->
-
-<!--                  <div v-else-if="props.column.field == 'payment_status'">-->
-<!--                    <span-->
-<!--                      v-if="props.row.payment_status == 'paid'"-->
-<!--                      class="badge badge-outline-success"-->
-<!--                    >{{$t('Paid')}}</span>-->
-<!--                    <span-->
-<!--                      v-else-if="props.row.payment_status == 'partial'"-->
-<!--                      class="badge badge-outline-primary"-->
-<!--                    >{{$t('partial')}}</span>-->
-<!--                    <span v-else class="badge badge-outline-warning">{{$t('Unpaid')}}</span>-->
-<!--                  </div>-->
-<!--                  <div v-else-if="props.column.field == 'Ref'">-->
-<!--                    <router-link-->
-<!--                      :to="'/app/sale_return/detail/'+props.row.id"-->
-<!--                    >-->
-<!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
-<!--                    </router-link>-->
-<!--                  </div>-->
-<!--                  <div v-else-if="props.column.field == 'sale_ref' && props.row.sale_id">-->
-<!--                    <router-link-->
-<!--                      :to="'/app/sales/detail/'+props.row.sale_id"-->
-<!--                    >-->
-<!--                      <span class="ul-btn__text ml-1">{{props.row.sale_ref}}</span>-->
-<!--                    </router-link>-->
-<!--                  </div>-->
-<!--                </template>-->
-<!--              </vue-good-table>-->
-<!--            </b-tab>-->
-
-<!--            &lt;!&ndash; Payments Table &ndash;&gt;-->
-<!--            <b-tab :title="$t('SalesInvoice')">-->
-<!--              <vue-good-table-->
-<!--                mode="remote"-->
-<!--                :columns="columns_payments"-->
-<!--                :totalRows="totalRows_payments"-->
-<!--                :rows="payments"-->
-<!--                @on-page-change="PageChangePayments"-->
-<!--                @on-per-page-change="onPerPageChangePayments"-->
-<!--                @on-search="onSearch_payments"-->
-<!--                :search-options="{-->
-<!--                  placeholder: $t('Search_this_table'),-->
-<!--                  enabled: true,-->
-<!--                }"-->
-<!--                :pagination-options="{-->
-<!--                  enabled: true,-->
-<!--                  mode: 'records',-->
-<!--                  nextLabel: 'next',-->
-<!--                  prevLabel: 'prev',-->
-<!--                }"-->
-<!--                styleClass="tableOne table-hover vgt-table"-->
-<!--              >-->
-<!--               <div slot="table-actions" class="mt-2 mb-3">-->
-<!--                <b-button @click="Payments_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--                  <i class="i-File-Copy"></i> PDF-->
-<!--                </b-button>-->
-<!--              </div>-->
-<!--              </vue-good-table>-->
-<!--            </b-tab>-->
-<!--          </b-tabs>-->
-<!--        </b-card>-->
-<!--      </b-col>-->
-<!--    </b-row>-->
-<!--  </div>-->
 </template>

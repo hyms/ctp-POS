@@ -122,6 +122,10 @@ const menuItems = ref([
         label: "Reporte de Ventas",
         url: "/report/sales",
         role: "admin",
+      },{
+        label: "Reporte de Clientes",
+        url: "/report/client",
+        role: "admin",
       },
     ],
   },
