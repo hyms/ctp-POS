@@ -55,14 +55,10 @@ const vuetify = createVuetify({
     defaults: {
         VCard: {density: 'compact'},
         VTable: {density: 'compact'},
-        VTextField: {density: 'compact'},
-        VSelect: {density: 'compact'},
-        VAutocomplete: {density: 'compact'},
-        VDataTable: {
-            VDataTableFooter: {
-                VSelect: {density: 'compact'},
-            }
-        }
+        VTextField: {density: 'compact',variant:'outlined'},
+        VSelect: {density: 'compact',variant:'outlined'},
+        VAutocomplete: {density: 'compact',variant:'outlined'},
+        VDataTable: {density: 'compact'},
     },
 });
 

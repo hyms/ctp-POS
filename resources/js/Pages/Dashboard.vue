@@ -7,12 +7,6 @@ import {router, usePage} from "@inertiajs/vue3";
 import VChart from 'vue-echarts'
 
 import {use} from "echarts/core";
-// import ECharts modules manually to reduce bundle size
-// import "echarts/lib/chart/pie";
-// import "echarts/lib/chart/bar";
-// import "echarts/lib/chart/line";
-// import "echarts/lib/component/tooltip";
-// import "echarts/lib/component/legend";
 import {CanvasRenderer} from "echarts/renderers";
 import {BarChart, PieChart, LineChart} from 'echarts/charts'
 import {LegendComponent, TooltipComponent, GridComponent} from 'echarts/components'
@@ -365,8 +359,6 @@ function getPermission(role) {
             :label="labels.filter_by_warehouse"
             item-title="name"
             item-value="id"
-            variant="outlined"
-            density="comfortable"
             hide-details="auto"
             clearable
         ></v-select>
@@ -374,7 +366,7 @@ function getPermission(role) {
     </v-row>
     <v-row v-if="getPermission('admin')">
       <v-col md="8" cols="12">
-        <v-card density="comfortable" :loading="loading">
+        <v-card :loading="loading">
           <v-card-title>
             {{ labels.this_week_sales_purchases }}
           </v-card-title>
@@ -386,7 +378,7 @@ function getPermission(role) {
         </v-card>
       </v-col>
       <v-col md="4" cols="12">
-        <v-card density="comfortable" :loading="loading">
+        <v-card :loading="loading">
           <v-card-title>
             {{ labels.top_customers }} ({{CurrentMonth}})
           </v-card-title>
@@ -402,14 +394,13 @@ function getPermission(role) {
     <v-row v-if="getPermission('admin')">
       <!-- Stock Alert -->
       <v-col cols="12" md="8">
-        <v-card density="comfortable" :loading="loading">
+        <v-card :loading="loading">
           <v-card-title>
             {{ labels.stock_alert }}
           </v-card-title>
           <v-data-table :headers="columns_stock"
                         :items="stock_alerts"
                         hover
-                        density="compact"
                         :no-data-text="labels.no_data_table">
             <template v-slot:item.stock_alert="{ item }">
               <v-chip
@@ -424,14 +415,13 @@ function getPermission(role) {
       </v-col>
 
       <v-col cols="12" md="4">
-        <v-card density="comfortable" :loading="loading">
+        <v-card :loading="loading">
           <v-card-title>
             {{labels.top_selling_products}} ({{CurrentMonth}})
           </v-card-title>
           <v-data-table :headers="columns_products"
                         :items="products"
                         hover
-                        density="compact"
                         :no-data-text="labels.no_data_table">
           </v-data-table>
         </v-card>
@@ -447,7 +437,6 @@ function getPermission(role) {
           <v-data-table :headers="columns_sales"
                         :items="sales"
                         hover
-                        density="compact"
                         :no-data-text="labels.no_data_table">
             <template v-slot:item.statut="{ item }">
               <v-chip

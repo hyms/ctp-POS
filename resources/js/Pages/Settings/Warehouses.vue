@@ -24,11 +24,11 @@ const dialogDelete = ref(false);
 const editmode = ref(false);
 
 const fields = ref([
-  {title: "Nombre", key: "name"},
-  {title: "Tefono", key: "mobile"},
-  {title: "Ciudad", key: "city"},
-  {title: "Correo", key: "email"},
-  {title: "Acciones", key: "actions"},
+  {title: labels.warehouse.name, key: "name"},
+  {title: labels.warehouse.mobile, key: "mobile"},
+  {title: labels.warehouse.city, key: "city"},
+  {title: labels.warehouse.email, key: "email"},
+  {title: labels.actions, key: "actions"},
 ]);
 
 //form
@@ -217,11 +217,11 @@ function onCloseDelete() {
         @update:modelValue="dialog === false ? reset_Form() : dialog"
     >
       <v-card>
-        <v-form ref="form">
+        <v-form ref="form" @submit.prevent="onSave">
           <v-toolbar
               border
               density="compact"
-              :title="(editmode ? 'Modificar' : 'Nuevo') + ' Almacen'"
+              :title="(editmode ? 'Modificar' : 'Nuevo') + ' Agencia'"
           >
           </v-toolbar>
 

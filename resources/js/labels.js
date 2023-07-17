@@ -114,6 +114,7 @@ export default {
     total_sale_due: "Total deuda",
     filter_by_warehouse: "Filtrar por agencia",
     choose_warehouse: "Elija una agencia",
+    actions: "Acciones",
     // this_week_sales_purchases:"Ventas y compras de la semana",
     this_week_sales_purchases: "Ventas de la semana",
     top_selling_products: "Productos más vendidos",

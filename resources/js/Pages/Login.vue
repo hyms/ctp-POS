@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from "vue";
+import {ref} from "vue";
 import Layout from "@/Layouts/Guest.vue";
-import { router } from "@inertiajs/vue3";
+import {router} from "@inertiajs/vue3";
+import helpers from "@/helpers";
 
 defineProps({
     canResetPassword: Boolean,
@@ -9,9 +10,9 @@ defineProps({
 });
 
 const form = ref({
-    username: "",
-    password: "",
-    remember: false,
+    username: '',
+    password: '',
+    remember: false
 });
 const processing = ref(false);
 const alert = ref(false);
@@ -38,58 +39,60 @@ function submit() {
             <div class="auth-inner">
                 <v-card class="auth-card" :elevation="5">
                     <!-- title -->
-                    <v-card-title> Bienvenido a xCTP </v-card-title>
+                    <v-card-title> Bienvenido a xCTP</v-card-title>
                     <v-card-subtitle>
                         Por favor ingresa tu usuario y contraseña
                     </v-card-subtitle>
                     <!-- login form -->
-                    <v-card-text>
-                        <v-alert
-                            closable
-                            class="mb-4"
-                            v-if="Object.keys(errors).length > 0"
-                            v-model="alert"
-                            type="error"
-                        >
-                            <ul class="text-sm">
-                                <li v-for="(error, key) in errors" :key="key">
-                                    {{ error }}
-                                </li>
-                            </ul>
-                        </v-alert>
-                        <form @submit.prevent="submit">
+                    <form @submit.prevent="submit">
+                        <v-card-text>
+                            <v-alert
+                                closable
+                                class="mb-4"
+                                v-if="Object.keys(errors).length > 0"
+                                v-model="alert"
+                                type="error"
+                            >
+                                <ul class="text-sm">
+                                    <li v-for="(error, key) in errors" :key="key">
+                                        {{ error }}
+                                    </li>
+                                </ul>
+                            </v-alert>
+
                             <div>
                                 <v-text-field
                                     label="Usuario"
-                                    density="compact"
-                                    variant="outlined"
+                                    color="primary"
                                     v-model="form.username"
                                     type="text"
                                     hide-details="auto"
+                                    :rules="helpers.required"
                                 ></v-text-field>
                             </div>
                             <div class="mt-3">
                                 <v-text-field
                                     label="Contraseña"
                                     v-model="form.password"
-                                    density="compact"
-                                    variant="outlined"
+                                    color="primary"
                                     type="password"
                                     hide-details="auto"
+                                    :rules="helpers.required"
                                 ></v-text-field>
                             </div>
 
-                            <div
-                                class="d-flex align-center justify-space-between flex-wrap"
-                            >
+                            <div class="d-flex align-center justify-space-between flex-wrap">
                                 <v-checkbox
                                     label="Remember Me"
                                     hide-details
                                     class="me-3 mt-1"
+                                    color="primary"
                                 >
                                 </v-checkbox>
                             </div>
 
+                        </v-card-text>
+                        <v-card-actions>
                             <v-btn
                                 class="mt-6"
                                 block
@@ -103,8 +106,8 @@ function submit() {
                                     <span>Ingresando...</span>
                                 </template>
                             </v-btn>
-                        </form>
-                    </v-card-text>
+                        </v-card-actions>
+                    </form>
                 </v-card>
             </div>
         </div>
@@ -114,7 +117,7 @@ function submit() {
 <style lang="scss">
 .auth-wrapper {
     display: flex;
-    //min-height: calc(var(--vh, 1vh) * 100);
+    min-height: calc(var(--vh, 1vh) * 100);
     width: 100%;
     flex-basis: 100%;
     align-items: center;
