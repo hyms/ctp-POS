@@ -9,7 +9,7 @@ const user = computed(() => usePage().props.user);
 </script>
 
 <template>
-  <v-btn color="secondary" variant="outlined" prepend-icon="mdi-account">
+  <v-btn color="secondary" variant="flat" prepend-icon="mdi-account" class="elevation-2">
     {{ $page.props.user.firstname + " " + $page.props.user.lastname }}
 
     <v-menu activator="parent">

@@ -118,11 +118,11 @@ const menuItems = ref([
         label: "Pagos de Ventas",
         url: "/payment_sale",
         role: "admin",
-      },{
+      }, {
         label: "Reporte de Ventas",
         url: "/report/sales",
         role: "admin",
-      },{
+      }, {
         label: "Reporte de Clientes",
         url: "/report/client",
         role: "admin",
@@ -241,10 +241,8 @@ onMounted(() => {
           >
             <template v-slot:activator="{ props }">
               <v-list-item v-bind="props">
-                <v-list-item-title>
-                                    <span class="text-capitalize">{{
-                                        link.label
-                                      }}</span>
+                <v-list-item-title class="text-capitalize">
+                  {{ link.label }}
                 </v-list-item-title>
               </v-list-item>
             </template>
@@ -256,10 +254,8 @@ onMounted(() => {
                     :active="$page.url === subLink.url"
                     :value="subLink.label"
                 >
-                  <v-list-item-title>
-                                        <span class="text-capitalize">{{
-                                            subLink.label
-                                          }}</span>
+                  <v-list-item-title class="text-capitalize">
+                    {{ subLink.label }}
                   </v-list-item-title>
                 </v-list-item>
               </template>
@@ -274,10 +270,8 @@ onMounted(() => {
               :key="key"
               :value="link.label"
           >
-            <v-list-item-title>
-                            <span class="text-capitalize">{{
-                                link.label
-                              }}</span>
+            <v-list-item-title class="text-capitalize">
+              {{ link.label }}
             </v-list-item-title>
           </v-list-item>
         </template>
@@ -293,7 +287,7 @@ onMounted(() => {
 
     <v-spacer></v-spacer>
     <full_screen></full_screen>
-    <v-btn color="primary" variant="outlined" prepend-icon="mdi-cart" class="mr-3"
+    <v-btn color="primary" variant="flat" prepend-icon="mdi-cart" class="mr-3 elevation-2"
            @click="helpers.linkVisit('/pos', )">
       POS
     </v-btn>
