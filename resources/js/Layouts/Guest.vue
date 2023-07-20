@@ -1,11 +1,9 @@
 <template>
-    <v-layout>
-        <v-main>
-            <v-container>
-                <slot/>
-            </v-container>
-        </v-main>
-    </v-layout>
+  <v-layout full-height>
+    <v-main>
+        <slot/>
+    </v-main>
+  </v-layout>
 </template>
 
 

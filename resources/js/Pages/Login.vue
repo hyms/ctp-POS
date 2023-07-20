@@ -94,12 +94,12 @@ function submit() {
                         </v-card-text>
                         <v-card-actions>
                             <v-btn
-                                class="mt-6"
                                 block
                                 color="primary"
                                 type="submit"
                                 :loading="processing"
                                 :disabled="processing"
+                                variant="flat"
                             >
                                 Ingresar
                                 <template v-slot:loader>
@@ -115,12 +115,17 @@ function submit() {
 </template>
 
 <style lang="scss">
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; /* make scrollbar transparent */
+}
 .auth-wrapper {
     display: flex;
     min-height: calc(var(--vh, 1vh) * 100);
     width: 100%;
     flex-basis: 100%;
     align-items: center;
+
     // common style for both v1 and v2
     a {
         text-decoration: unset;
