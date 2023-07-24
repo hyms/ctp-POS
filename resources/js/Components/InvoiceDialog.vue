@@ -122,6 +122,9 @@ const props = defineProps({
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
+        <v-btn prepend-icon="mdi-printer" @click="helper.print_pdf('invoice-POS',invoice_pos.sale.ref)" color="primary" variant="outlined">
+          Imprimir PDF
+        </v-btn>
         <v-btn prepend-icon="mdi-printer" @click="helper.print_pos('invoice-POS')" color="primary" variant="outlined">
           Imprimir
         </v-btn>

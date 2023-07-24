@@ -281,6 +281,7 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
     Route::get('pos/get_products_pos', [PosController::class, 'GetProductsByParametre']);
     Route::get('pos/', [PosController::class, 'GetELementPos']);
     //------------------------------------------------------------------\\
+    Route::get('pdf', [\App\Http\Controllers\PDFController::class, 'printHtml']);
 
     //------------------------------- Permission Groups user -----------\\
 //    Route::resource('roles', 'PermissionsController');

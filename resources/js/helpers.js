@@ -48,7 +48,16 @@ const print_pos = (element_id) => {
     setTimeout(() => {
         a.print();
     }, 1000);
-}
+};
+const print_pdf = (element_id,title) => {
+    event.preventDefault();
+    let divContents = document.getElementById(element_id).innerHTML;
+    let url = "/pdf?body="+divContents;
+    let win = window.open(url, '_blank');
+    win.focus();
+
+    // router.post('/pdf',{'title':title,'body':divContents});
+};
 //------------------------------Get Month -------------------------\\
 const GetMonth = () => {
     let months = [
@@ -196,6 +205,7 @@ export default {
         return reglaments;
     },
     print_pos,
+    print_pdf,
     toggleFullScreen,
     linkVisit,
     GetMonth,

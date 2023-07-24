@@ -35,10 +35,13 @@ class PaymentSalesController extends Controller
 
         $data = collect();
         $filter = collect($request->get('filter'));
-//        if ($request->collect()->count() == 0) {
-//            $request['from'] = Carbon::now()->subMonth(5);
-//            $request['to'] = Carbon::now();
-//        }
+        if (empty($filter->get('startDate'))) {
+            $filter['startDate'] = Carbon::now()->startOfDay();
+        }
+        if (empty($filter->get('endDate'))) {
+            $filter['endDate'] = Carbon::parse($filter['startDate'])->endOfDay();
+        }
+
         // Check If User Has Permission View  All Records
         $Payments = PaymentSale::with('sale', 'sale.client')
             ->where('deleted_at', '=', null);

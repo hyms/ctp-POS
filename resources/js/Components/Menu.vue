@@ -42,7 +42,7 @@ const menuItems = ref([
   {
     label: "Ajustes de Stock",
     url: "",
-    role: "venta",
+    role: "vendor",
     icon: "",
     subItems: [
       {
@@ -53,14 +53,14 @@ const menuItems = ref([
       {
         label: "Listar Ajustes",
         url: "/adjustments/list",
-        role: "admin",
+        role: "vendor",
       },
     ],
   },
   {
     label: "Productos",
     url: "",
-    role: "venta",
+    role: "vendor",
     icon: "",
     subItems: [
       {
@@ -71,7 +71,7 @@ const menuItems = ref([
       {
         label: "Listar Productos",
         url: "/products/list",
-        role: "admin",
+        role: "vendor",
       },
       {
         label: "Categorias",
@@ -88,18 +88,18 @@ const menuItems = ref([
   {
     label: "Gastos",
     url: "",
-    role: "venta",
+    role: "vendor",
     icon: "",
     subItems: [
       {
         label: "Añadir Gastos",
         url: "/expenses/create",
-        role: "admin",
+        role: "vendor",
       },
       {
         label: "Listar Gastos",
         url: "/expenses",
-        role: "admin",
+        role: "vendor",
       },
       {
         label: "Categorias de Gastos",
@@ -111,17 +111,17 @@ const menuItems = ref([
   {
     label: "Informes",
     url: "",
-    role: "admin",
+    role: "vendor",
     icon: "",
     subItems: [
       {
-        label: "Pagos de Ventas",
+        label: "Pagos de ventas",
         url: "/payment_sale",
-        role: "admin",
+        role: "vendor",
       }, {
-        label: "Reporte de Ventas",
+        label: "Reporte de ventas",
         url: "/report/sales",
-        role: "admin",
+        role: "vendor",
       }, {
         label: "Reporte de Clientes",
         url: "/report/client",
@@ -136,7 +136,7 @@ const menuItems = ref([
     icon: "",
     subItems: [
       {
-        label: "Tipos de venta",
+        label: "Tipos de ventas",
         url: "/sales_types",
         role: "admin",
       },
@@ -174,7 +174,6 @@ function linkVisit(url, type = "get") {
 }
 
 function getPermission(role) {
-  // console.log(user.value);
   for (const key in roles.value) {
     for (const [key, item] of Object.entries(roles.value)) {
       if (key === role) {

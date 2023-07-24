@@ -33,6 +33,7 @@ use App\Models\User;
 use App\Models\UserWarehouse;
 use App\Models\Warehouse;
 use App\utils\helpers;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -562,6 +563,12 @@ class ReportController extends Controller
 
         $data = collect();
         $filter = collect($request->get('filter'));
+        if (empty($filter->get('startDate'))) {
+            $filter['startDate'] = Carbon::now()->startOfDay();
+        }
+        if (empty($filter->get('endDate'))) {
+            $filter['endDate'] = Carbon::parse($filter['startDate'])->endOfDay();
+        }
 
         $Sales = Sale::select('sales.*')
             ->with('facture', 'client', 'warehouse')

@@ -1,8 +1,8 @@
 <script setup>
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import helper from "@/helpers";
 import labels from "@/labels";
 
@@ -11,6 +11,7 @@ const props = defineProps({
   warehouses: Object,
   sales: Object,
 })
+const currency = computed(() => usePage().props.currency);
 const loading = ref(false);
 const menu = ref(false);
 const search = ref("");
@@ -104,6 +105,32 @@ function Get_Sales(page) {
 </script>
 <template>
   <layout>
+    <v-row align="center" class="mb-3">
+      <v-col sm="4" cols="12">
+        <v-card class="mb-30 text-center">
+          <v-card-text class="text-center  text-h6">
+            <p class="text-disabled mt-2 mb-1">Total ({{currency}})</p>
+            <p class="text-primary text-24 line-height-1 mb-2">{{ sumCount(sales) }}</p>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col sm="4" cols="12">
+        <v-card class="mb-30 text-center  ">
+          <v-card-text class="text-center text-h6">
+            <p class="text-disabled mt-2 mb-1">Pagado ({{currency}})</p>
+            <p class="text-primary text-24 line-height-1 mb-2">{{ sumCount2(sales) }}</p>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col sm="4" cols="12">
+        <v-card class="mb-30 text-center">
+          <v-card-text class="text-center  text-h6">
+            <p class="text-disabled mt-2 mb-1">Deuda ({{currency}})</p>
+            <p class="text-primary text-24 line-height-1 mb-2">{{ sumCount3(sales) }}</p>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
     <v-row align="center" class="mb-3">
       <v-col cols="12" sm="6">
         <v-text-field
@@ -256,36 +283,38 @@ function Get_Sales(page) {
       </v-col>
     </v-row>
 
-  <v-card>
-    <v-data-table
-        :headers="fields"
-        :items="sales"
-        :search="search"
-        hover
-        density="compact"
-        :no-data-text="labels.no_data_table"
-        :loading="loading"
-    >
-      <template v-slot:item.Reglement="{ item }">
-        {{ helper.getReglamentPayment(item.raw.Reglement)[0].title }}
-      </template>
-      <template v-slot:item.statut="{ item }">
-        <v-chip
-            :color="helper.statutSaleColor(item.raw.statut)"
-            variant="tonal"
-            size="x-small"
-        >{{helper.statutSale(item.raw.statut)}}</v-chip>
-      </template>
-      <template v-slot:item.payment_status="{ item }">
-        <v-chip
-            :color="helper.statusPaymentColor(item.raw.payment_status)"
-            variant="tonal"
-            size="x-small"
-        >{{helper.statusPayment(item.raw.payment_status)}}</v-chip>
-      </template>
+    <v-card>
+      <v-data-table
+          :headers="fields"
+          :items="sales"
+          :search="search"
+          hover
+          density="compact"
+          :no-data-text="labels.no_data_table"
+          :loading="loading"
+      >
+        <template v-slot:item.Reglement="{ item }">
+          {{ helper.getReglamentPayment(item.raw.Reglement)[0].title }}
+        </template>
+        <template v-slot:item.statut="{ item }">
+          <v-chip
+              :color="helper.statutSaleColor(item.raw.statut)"
+              variant="tonal"
+              size="x-small"
+          >{{ helper.statutSale(item.raw.statut) }}
+          </v-chip>
+        </template>
+        <template v-slot:item.payment_status="{ item }">
+          <v-chip
+              :color="helper.statusPaymentColor(item.raw.payment_status)"
+              variant="tonal"
+              size="x-small"
+          >{{ helper.statusPayment(item.raw.payment_status) }}
+          </v-chip>
+        </template>
 
-    </v-data-table>
-  </v-card>
+      </v-data-table>
+    </v-card>
   </layout>
 
 </template>

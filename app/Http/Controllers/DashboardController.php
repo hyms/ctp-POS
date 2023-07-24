@@ -106,7 +106,7 @@ class DashboardController extends Controller
             ->groupBy(DB::raw("DATE_FORMAT(date,'%Y-%m-%d')"))
             ->orderBy('date', 'asc')
             ->get([
-                DB::raw(DB::raw("DATE_FORMAT(date,'%Y-%m-%d') as date")),
+                DB::raw("DATE_FORMAT(date,'%Y-%m-%d') as date"),
                 DB::raw('SUM(GrandTotal) AS count'),
             ])
             ->pluck('count', 'date');
@@ -114,11 +114,11 @@ class DashboardController extends Controller
         // Merge the two collections;
         $dates = $dates->merge($sales);
 
-        $data = [];
-        $days = [];
+        $data = collect();
+        $days = collect();
         foreach ($dates as $key => $value) {
-            $data[] = $value;
-            $days[] = $key;
+            $data->add($value);
+            $days->add($key);
         }
 
         return response()->json(['data' => $data, 'days' => $days]);
