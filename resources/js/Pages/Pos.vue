@@ -8,6 +8,7 @@ import Snackbar from "@/Components/snackbar.vue";
 import MenuUser from "@/Components/Menu_user.vue";
 import Full_screen from "@/Components/full_screen.vue";
 import InvoiceDialog from "@/Components/InvoiceDialog.vue";
+import select_client from "@/Components/select_client.vue";
 
 const currency = computed(() => usePage().props.currency);
 
@@ -29,7 +30,7 @@ const loading = ref(false);
 const snackbar = ref(false);
 const snackbarText = ref("");
 const snackbarColor = ref("info");
-const dialogCustomer = ref(false);
+// const dialogCustomer = ref(false);
 const dialogUpdateDetail = ref(false);
 const dialogAddPayment = ref(false);
 const dialogInvoice = ref(false);
@@ -44,7 +45,7 @@ const timer = ref(null);
 const searchProducts = ref('');
 const search_input = ref('');
 const product_filter = ref([]);
-const clientFilter = ref([]);
+// const clientFilter = ref([]);
 const GrandTotal = ref(0);
 const total = ref(0);
 const Ref = ref("");
@@ -87,17 +88,17 @@ const sale = ref({
   notes: '',
   sales_type_id:"",
 });
-const client = ref({
-  id: "",
-  name: "",
-  code: "",
-  email: "",
-  phone: "",
-  country: "",
-  tax_number: "",
-  city: "",
-  adresse: ""
-});
+// const client = ref({
+//   id: "",
+//   name: "",
+//   code: "",
+//   email: "",
+//   phone: "",
+//   country: "",
+//   tax_number: "",
+//   city: "",
+//   adresse: ""
+// });
 const category_id = ref("");
 const product = ref({
   id: "",
@@ -129,14 +130,14 @@ const product = ref({
 const sound = ref("/audio/Beep.wav");
 const audio = ref(new Audio("/audio/Beep.wav"))
 
-//---------- filter clients
-function querySelectionClient(v) {
-  clientFilter.value = props.clients.filter((e) => {
-    return (
-        (e.name || "").toLowerCase().indexOf((v || "").toLowerCase()) > -1
-    );
-  });
-}
+// //---------- filter clients
+// function querySelectionClient(v) {
+//   clientFilter.value = props.clients.filter((e) => {
+//     return (
+//         (e.name || "").toLowerCase().indexOf((v || "").toLowerCase()) > -1
+//     );
+//   });
+// }
 
 //--- Submit Validate Create Sale
 async function Submit_Pos() {
@@ -188,70 +189,70 @@ async function Submit_Payment() {
     }
   }
 }
-
-//------------- Submit Validation Create & Edit Customer
-async function Submit_Customer() {
-  snackbar.value = false;
-  const validate = await formCreateCustomer.value.validate();
-  if (!validate) {
-    snackbar.value = true;
-    snackbarColor.value = "error";
-    snackbarText.value = labels.no_fill_data;
-  } else {
-    Create_Client();
-  }
-}
-
-//---------------------------------------- Create new Customer -------------------------------\\
-function Create_Client() {
-  loading.value = true;
-  axios
-      .post("/clients", {
-        name: client.value.name,
-        email: client.value.email,
-        phone: client.value.phone,
-        tax_number: client.value.tax_number,
-        country: client.value.country,
-        city: client.value.city,
-        adresse: client.value.adresse
-      })
-      .then(response => {
-        snackbar.value = true;
-        snackbarColor.value = "success";
-        snackbarText.value = labels.success_message;
-        Get_Client_Without_Paginate();
-        dialogCustomer.value = false;
-      })
-      .catch(error => {
-        snackbar.value = true;
-        snackbarColor.value = "error";
-        snackbarText.value = labels.error_message;
-        console.log(error)
-      })
-      .finally(() => {
-        loading.value = false;
-      });
-}
-
-//------------------------------ New Model (create Customer) -------------------------------\\
-function New_Client() {
-  reset_Form_client();
-  dialogCustomer.value = true;
-}
-
-//-------------------------------- reset Form -------------------------------\\
-function reset_Form_client() {
-  client.value = {
-    id: "",
-    name: "",
-    email: "",
-    phone: "",
-    tax_number: "",
-    country: "",
-    city: "",
-    adresse: ""
-  };
-}
+//
+// //------------- Submit Validation Create & Edit Customer
+// async function Submit_Customer() {
+//   snackbar.value = false;
+//   const validate = await formCreateCustomer.value.validate();
+//   if (!validate) {
+//     snackbar.value = true;
+//     snackbarColor.value = "error";
+//     snackbarText.value = labels.no_fill_data;
+//   } else {
+//     Create_Client();
+//   }
+// }
+//
+// //---------------------------------------- Create new Customer -------------------------------\\
+// function Create_Client() {
+//   loading.value = true;
+//   axios
+//       .post("/clients", {
+//         name: client.value.name,
+//         email: client.value.email,
+//         phone: client.value.phone,
+//         tax_number: client.value.tax_number,
+//         country: client.value.country,
+//         city: client.value.city,
+//         adresse: client.value.adresse
+//       })
+//       .then(response => {
+//         snackbar.value = true;
+//         snackbarColor.value = "success";
+//         snackbarText.value = labels.success_message;
+//         Get_Client_Without_Paginate();
+//         dialogCustomer.value = false;
+//       })
+//       .catch(error => {
+//         snackbar.value = true;
+//         snackbarColor.value = "error";
+//         snackbarText.value = labels.error_message;
+//         console.log(error)
+//       })
+//       .finally(() => {
+//         loading.value = false;
+//       });
+// }
+//
+// //------------------------------ New Model (create Customer) -------------------------------\\
+// function New_Client() {
+//   reset_Form_client();
+//   dialogCustomer.value = true;
+// }
+//
+// //-------------------------------- reset Form -------------------------------\\
+// function reset_Form_client() {
+//   client.value = {
+//     id: "",
+//     name: "",
+//     email: "",
+//     phone: "",
+//     tax_number: "",
+//     country: "",
+//     city: "",
+//     adresse: ""
+//   };
+// }
 
 //------------------------------------ Get Clients Without Paginate -------------------------\\
 function Get_Client_Without_Paginate() {
@@ -843,24 +844,25 @@ function created() {
               <v-row>
                 <!-- Customer -->
                 <v-col cols="12">
-                  <v-autocomplete
-                      v-model="sale.client_id"
-                      @update:search="querySelectionClient"
-                      :items="clientFilter"
-                      :label="labels.sale.client_id"
-                      item-title="name"
-                      item-value="id"
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                      clearable
-                      :rules="helper.required"
-                  >
-                    <template v-slot:append>
-                      <v-btn color="primary" icon="mdi-account-plus" density="comfortable" class="rounded"
-                             @click="New_Client()"></v-btn>
-                    </template>
-                  </v-autocomplete>
+<!--                  <v-autocomplete-->
+<!--                      v-model="sale.client_id"-->
+<!--                      @update:search="querySelectionClient"-->
+<!--                      :items="clientFilter"-->
+<!--                      :label="labels.sale.client_id"-->
+<!--                      item-title="name"-->
+<!--                      item-value="id"-->
+<!--                      variant="outlined"-->
+<!--                      density="comfortable"-->
+<!--                      hide-details="auto"-->
+<!--                      clearable-->
+<!--                      :rules="helper.required"-->
+<!--                  >-->
+<!--                    <template v-slot:append>-->
+<!--                      <v-btn color="primary" icon="mdi-account-plus" density="comfortable" class="rounded"-->
+<!--                             @click="New_Client()"></v-btn>-->
+<!--                    </template>-->
+<!--                  </v-autocomplete>-->
+                  <select_client v-model="sale.client_id" :clients="props.clients"></select_client>
                 </v-col>
 
                 <!-- warehouse -->
