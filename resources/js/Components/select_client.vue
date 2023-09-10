@@ -1,25 +1,21 @@
 <script setup>
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import labels from "@/labels";
 import helper from "@/helpers";
+import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
-  defaultClient: {
-    value: {},
-    type: Object,
-  },
-  clients: Object,
-  enableForm: {
-    value: true,
-    type: Boolean,
-  },
+  // clients: Object,
+  enableForm: {type: Boolean, default: true},
   modelValue: Number,
   error: Object,
 })
 const emit = defineEmits(['update:modelValue'])
 const dialogCustomer = ref(false);
-const clientFilter = ref([]);
+const loading = ref(false);
 
+const clientFilter = ref([]);
+const clients = ref([]);
 const client = ref({
   id: "",
   name: "",
@@ -31,11 +27,15 @@ const client = ref({
   city: "",
   adresse: ""
 });
+const snackbar = ref(false);
+const snackbarColor = ref("");
+const snackbarText = ref("");
 
 function updateValue(value) {
   emit('update:modelValue', value)
 }
 
+const form = ref(null);
 //---------- filter clients
 function querySelectionClient(v) {
   clientFilter.value = props.clients.filter((e) => {
@@ -49,8 +49,9 @@ function querySelectionClient(v) {
 //------------- Submit Validation Create & Edit Customer
 async function Submit_Customer() {
   snackbar.value = false;
-  const validate = await formCreateCustomer.value.validate();
-  if (!validate) {
+  const validate = await form.value.validate();
+  console.log(validate);
+  if (!validate.valid) {
     snackbar.value = true;
     snackbarColor.value = "error";
     snackbarText.value = labels.no_fill_data;
@@ -62,21 +63,23 @@ async function Submit_Customer() {
 //---------------------------------------- Create new Customer -------------------------------\\
 function Create_Client() {
   loading.value = true;
+  snackbar.value = false;
   axios
       .post("/clients", {
         name: client.value.name,
+        company_name: client.value.company_name,
         email: client.value.email,
         phone: client.value.phone,
-        tax_number: client.value.tax_number,
+        nit_ci: client.value.nit_ci,
         country: client.value.country,
         city: client.value.city,
-        adresse: client.value.adresse
+        adresse: client.value.adresse,
       })
       .then(response => {
         snackbar.value = true;
         snackbarColor.value = "success";
         snackbarText.value = labels.success_message;
-        // Get_Client_Without_Paginate();
+        Get_Client_Without_Paginate();
         dialogCustomer.value = false;
       })
       .catch(error => {
@@ -101,6 +104,7 @@ function reset_Form_client() {
   client.value = {
     id: "",
     name: "",
+    company_name: "",
     email: "",
     phone: "",
     tax_number: "",
@@ -109,14 +113,164 @@ function reset_Form_client() {
     adresse: ""
   };
 }
+
+//------------------------------------ Get Clients Without Paginate -------------------------\\
+function Get_Client_Without_Paginate() {
+  loading.value = true;
+  axios
+      .get("/get_clients_without_paginate")
+      .then(({data}) => {
+        clients.value = data;
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+}
+
+onMounted(() => {
+  Get_Client_Without_Paginate();
+})
 </script>
 
 <template>
-<!--  v-on:input="updateValue($event.target.value)"-->
-  <!--      @update:search="querySelectionClient"-->
+  <snackbar
+      :snackbar="snackbar"
+      :snackbar-text="snackbarText"
+      :snackbar-color="snackbarColor"
+  ></snackbar>
+  <v-dialog v-model="dialogCustomer" width="800" v-if="props.enableForm">
+    <v-card>
+      <v-toolbar>
+        <v-toolbar-title>Añadir cliente</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon="mdi-close" size="small" density="comfortable" variant="tonal"
+               @click="dialogCustomer=false"></v-btn>
+      </v-toolbar>
+      <v-form @submit.prevent="Submit_Customer" ref="form">
+        <v-card-text>
+          <v-row>
+            <!-- Customer Name -->
+            <v-col cols="12" md="6">
+              <v-text-field
+                  :label="labels.client.name + ' *'"
+                  v-model="client.name"
+                  :placeholder="labels.client.name"
+                  :rules="helper.required"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details="auto"
+              >
+              </v-text-field>
+            </v-col>
+
+            <!-- Customer Company_name -->
+            <v-col cols="12" md="6">
+              <v-text-field
+                  :label="labels.client.company_name + ' *'"
+                  v-model="client.company_name"
+                  :placeholder="labels.client.company_name"
+                  :rules="helper.required"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details="auto"
+              >
+              </v-text-field>
+            </v-col>
+
+            <!-- Customer Email -->
+            <v-col cols="12" md="6">
+              <v-text-field
+                  :label="labels.client.email"
+                  v-model="client.email"
+                  :placeholder="labels.client.email"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details="auto"
+              >
+              </v-text-field>
+            </v-col>
+
+            <!-- Customer Phone -->
+            <v-col cols="12" md="6">
+              <v-text-field
+                  :label="labels.client.phone"
+                  v-model="client.phone"
+                  :placeholder="labels.client.phone"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details="auto"
+              >
+              </v-text-field>
+            </v-col>
+
+            <!-- Customer City -->
+            <v-col cols="12" md="6">
+              <v-text-field
+                  :label="labels.client.city"
+                  v-model="client.city"
+                  :placeholder="labels.client.city"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details="auto"
+              >
+              </v-text-field>
+            </v-col>
+
+            <!-- Customer Tax Number -->
+            <v-col cols="12" md="6">
+              <v-text-field
+                  :label="labels.client.nit_ci"
+                  v-model="client.nit_ci"
+                  :placeholder="labels.client.nit_ci"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details="auto"
+              ></v-text-field>
+            </v-col>
+
+            <!-- Customer Adress -->
+            <v-col md="12" sm="12">
+              <v-textarea
+                  rows="4"
+                  :label="labels.client.adresse"
+                  v-model="client.adresse"
+                  :placeholder="labels.client.adresse"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details="auto"
+              ></v-textarea>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+              size="small"
+              variant="outlined"
+              color="error"
+              class="ma-1"
+              @click="dialogCustomer=false"
+          >
+            {{ labels.cancel }}
+          </v-btn>
+          <v-btn
+              size="small"
+              color="primary"
+              variant="flat"
+              class="ma-1"
+              type="submit"
+              :loading="loading"
+              :disabled="loading"
+          >
+            {{ labels.submit }}
+          </v-btn>
+        </v-card-actions>
+      </v-form>
+    </v-card>
+  </v-dialog>
   <v-autocomplete
       :model-value="props.modelValue"
-      :items="props.clients"
+      :items="clients"
       :label="labels.sale.client_id"
       @update:modelValue="updateValue"
       item-title="name"
@@ -126,9 +280,10 @@ function reset_Form_client() {
       hide-details="auto"
       clearable
       :rules="helper.required"
-      :no-data-text="(props.clients.length==0)?labels.no_data_table:'Escriba el nombre del cliente'"
+      :loading="loading"
+      :no-data-text="labels.no_data_table"
   >
-    <template v-slot:append>
+    <template v-slot:append v-if="props.enableForm">
       <v-btn color="primary" icon="mdi-account-plus" density="comfortable" class="rounded"
              @click="New_Client()"></v-btn>
     </template>

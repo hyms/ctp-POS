@@ -8,7 +8,7 @@ import Snackbar from "@/Components/snackbar.vue";
 import MenuUser from "@/Components/Menu_user.vue";
 import Full_screen from "@/Components/full_screen.vue";
 import InvoiceDialog from "@/Components/InvoiceDialog.vue";
-import select_client from "@/Components/select_client.vue";
+import SelectClient from "@/Components/select_client.vue";
 
 const currency = computed(() => usePage().props.currency);
 
@@ -254,12 +254,12 @@ async function Submit_Payment() {
 //   };
 // }
 
-//------------------------------------ Get Clients Without Paginate -------------------------\\
-function Get_Client_Without_Paginate() {
-  axios
-      .get("/get_clients_without_paginate")
-      .then(({data}) => (client.values = data));
-}
+// //------------------------------------ Get Clients Without Paginate -------------------------\\
+// function Get_Client_Without_Paginate() {
+//   axios
+//       .get("/get_clients_without_paginate")
+//       .then(({data}) => (client.values = data));
+// }
 
 //---Validate State Fields
 function getValidationState({dirty, validated, valid = null}) {
@@ -862,7 +862,10 @@ function created() {
 <!--                             @click="New_Client()"></v-btn>-->
 <!--                    </template>-->
 <!--                  </v-autocomplete>-->
-                  <select_client v-model="sale.client_id" :clients="props.clients"></select_client>
+                  <SelectClient
+                      v-model="sale.client_id"
+                                :clients="props.clients"
+                  ></SelectClient>
                 </v-col>
 
                 <!-- warehouse -->
@@ -1492,109 +1495,6 @@ function created() {
           </v-card-text>
         </v-card>
       </v-dialog>
-
-      <!--        <validation-observer ref="Create_Customer">-->
-      <!--          <v-modal hide-footer size="lg" id="New_Customer" :title="$t('Add')">-->
-      <!--            <v-form @submit.prevent="Submit_Customer">-->
-      <!--              <v-row>-->
-      <!--                &lt;!&ndash; Customer Name &ndash;&gt;-->
-      <!--                <v-col md="6" sm="12">-->
-      <!--                  <validation-provider-->
-      <!--                      name="Name Customer"-->
-      <!--                      :rules="{ required: true}"-->
-      <!--                      v-slot="validationContext"-->
-      <!--                  >-->
-      <!--                    <v-form-group :label="$t('CustomerName') + ' ' + '*'">-->
-      <!--                      <v-form-input-->
-      <!--                          :state="getValidationState(validationContext)"-->
-      <!--                          aria-describedby="name-feedback"-->
-      <!--                          label="name"-->
-      <!--                          v-model="client.name"-->
-      <!--                          :placeholder="$t('CustomerName')"-->
-      <!--                      ></v-form-input>-->
-      <!--                      <v-form-invalid-feedback id="name-feedback">{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-      <!--                    </v-form-group>-->
-      <!--                  </validation-provider>-->
-      <!--                </v-col>-->
-
-      <!--                &lt;!&ndash; Customer Email &ndash;&gt;-->
-      <!--                <v-col md="6" sm="12">-->
-      <!--                  <v-form-group :label="$t('Email')">-->
-      <!--                    <v-form-input-->
-      <!--                        label="email"-->
-      <!--                        v-model="client.email"-->
-      <!--                        :placeholder="$t('Email')"-->
-      <!--                    ></v-form-input>-->
-      <!--                  </v-form-group>-->
-      <!--                </v-col>-->
-
-      <!--                &lt;!&ndash; Customer Phone &ndash;&gt;-->
-      <!--                <v-col md="6" sm="12">-->
-      <!--                  <v-form-group :label="$t('Phone')">-->
-      <!--                    <v-form-input-->
-      <!--                        label="Phone"-->
-      <!--                        v-model="client.phone"-->
-      <!--                        :placeholder="$t('Phone')"-->
-      <!--                    ></v-form-input>-->
-      <!--                  </v-form-group>-->
-      <!--                </v-col>-->
-
-      <!--                &lt;!&ndash; Customer Country &ndash;&gt;-->
-      <!--                <v-col md="6" sm="12">-->
-      <!--                  <v-form-group :label="$t('Country')">-->
-      <!--                    <v-form-input-->
-      <!--                        label="Country"-->
-      <!--                        v-model="client.country"-->
-      <!--                        :placeholder="$t('Country')"-->
-      <!--                    ></v-form-input>-->
-      <!--                  </v-form-group>-->
-      <!--                </v-col>-->
-
-      <!--                &lt;!&ndash; Customer City &ndash;&gt;-->
-      <!--                <v-col md="6" sm="12">-->
-      <!--                  <v-form-group :label="$t('City')">-->
-      <!--                    <v-form-input-->
-      <!--                        label="City"-->
-      <!--                        v-model="client.city"-->
-      <!--                        :placeholder="$t('City')"-->
-      <!--                    ></v-form-input>-->
-      <!--                  </v-form-group>-->
-      <!--                </v-col>-->
-
-      <!--                &lt;!&ndash; Customer Tax Number &ndash;&gt;-->
-      <!--                <v-col md="6" sm="12">-->
-      <!--                  <v-form-group :label="$t('Tax_Number')">-->
-      <!--                    <v-form-input-->
-      <!--                        label="Tax Number"-->
-      <!--                        v-model="client.tax_number"-->
-      <!--                        :placeholder="$t('Tax_Number')"-->
-      <!--                    ></v-form-input>-->
-      <!--                  </v-form-group>-->
-      <!--                </v-col>-->
-
-
-      <!--                &lt;!&ndash; Customer Adress &ndash;&gt;-->
-      <!--                <v-col md="12" sm="12">-->
-      <!--                  <v-form-group :label="$t('Adress')">-->
-      <!--                      <textarea-->
-      <!--                          label="Adress"-->
-      <!--                          class="form-control"-->
-      <!--                          rows="4"-->
-      <!--                          v-model="client.adresse"-->
-      <!--                          :placeholder="$t('Adress')"-->
-      <!--                      ></textarea>-->
-      <!--                  </v-form-group>-->
-      <!--                </v-col>-->
-
-      <!--                <v-col md="12" class="mt-3">-->
-      <!--                  <v-button variant="primary" type="submit">{{$t('submit')}}</v-button>-->
-      <!--                </v-col>-->
-      <!--              </v-row>-->
-      <!--            </v-form>-->
-      <!--          </v-modal>-->
-      <!--        </validation-observer>-->
-      <!--      </v-row>-->
-      <!--    </div>-->
     </v-row>
   </Layout>
 </template>

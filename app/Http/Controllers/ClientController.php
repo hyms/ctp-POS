@@ -154,6 +154,11 @@ class ClientController extends Controller
         } else {
             $code = 1;
         }
+        $exits = DB::table('clients')->where('code',$code)->exists();
+        while($exits){
+            $code = $code + 1;
+            $exits = DB::table('clients')->where('code',$code)->exists();
+        }
         return $code;
     }
 
