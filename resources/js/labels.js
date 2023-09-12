@@ -47,7 +47,7 @@ export default {
             sub_total: "SubTotal",
         },
         notes: "Notas de Venta",
-        statut: "Estado",
+        statut: "Estado de Trabajo",
         due: "Deuda",
         payment_status: "Estado de pago",
     },

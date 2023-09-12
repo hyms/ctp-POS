@@ -864,7 +864,6 @@ function created() {
 <!--                  </v-autocomplete>-->
                   <SelectClient
                       v-model="sale.client_id"
-                                :clients="props.clients"
                   ></SelectClient>
                 </v-col>
 
@@ -1370,7 +1369,7 @@ function created() {
                 <v-col sm="6" cols="12">
                   <v-row>
                     <!-- Received  Amount  -->
-                    <v-col cols="12">
+                    <v-col cols="12" v-if="false">
                       <v-text-field
                           @keyup="Verified_Received_Amount(payment.received_amount)"
                           :label="labels.payment.received_amount"
@@ -1379,6 +1378,7 @@ function created() {
                           variant="outlined"
                           density="comfortable"
                           hide-details="auto"
+
                       >
                       </v-text-field>
                     </v-col>

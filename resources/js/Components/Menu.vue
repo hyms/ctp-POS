@@ -288,7 +288,7 @@ onMounted(() => {
     <full_screen></full_screen>
     <v-btn color="primary" variant="flat" prepend-icon="mdi-cart" class="mr-3 elevation-2"
            @click="helpers.linkVisit('/pos', )">
-      POS
+      TIENDA
     </v-btn>
     <MenuUser></MenuUser>
   </v-app-bar>

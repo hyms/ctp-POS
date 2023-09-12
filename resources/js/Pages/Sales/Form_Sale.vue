@@ -4,6 +4,7 @@ import Layout from "@/Layouts/Authenticated.vue";
 import {router} from "@inertiajs/vue3";
 import helper from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
+import SelectClient from "@/Components/select_client.vue";
 
 const props = defineProps({
   clients: Object,
@@ -690,17 +691,11 @@ onMounted(() => {
             </v-col>
             <!-- Customer -->
             <v-col lg="4" md="4" cols="12">
-              <v-autocomplete
+              <SelectClient
                   v-model="saleForm.client_id"
-                  @update:search="querySelections"
-                  :items="clientFilter"
-                  :label="saleLabel.client_id"
-                  variant="outlined"
-                  density="comfortable"
-                  hide-details="auto"
-                  clearable
-                  :rules="helper.required"
-              ></v-autocomplete>
+                  :enableForm="false"
+              ></SelectClient>
+
             </v-col>
 
             <!-- warehouse -->
