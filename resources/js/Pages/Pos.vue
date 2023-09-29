@@ -1,5 +1,5 @@
 <script setup>
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import Layout from "@/Layouts/Pos.vue";
 import {router, usePage} from "@inertiajs/vue3";
 import helper from "@/helpers";
@@ -16,8 +16,8 @@ const props = defineProps({
   defaultWarehouse: Object,
   defaultClient: Object,
   sales_types: Object,
-  warehouses: Object,
-  categories: Object,
+  warehouses: Array,
+  categories: Array,
   error: Object,
 })
 
@@ -85,6 +85,7 @@ const sale = ref({
   TaxNet: 0,
   notes: '',
   sales_type_id:"",
+  statut:''
 });
 
 const category_id = ref("");
@@ -381,6 +382,7 @@ function CreatePOS() {
         shipping: sale.value.shipping ? sale.value.shipping : 0,
         sales_type: sale.value.sales_type_id,
         notes: sale.value.notes,
+        statut:sale.value.statut,
         details: details.value,
         GrandTotal: GrandTotal.value,
         payment: payment.value,
@@ -724,6 +726,13 @@ function created() {
   payment.value.Reglement = "cash";
   dialogAddPayment.value = true;
 }
+
+onMounted(()=>{
+  if (props.warehouses.length == 1) {
+    sale.value.warehouse_id = props.warehouses[0].id;
+    Get_Products_By_Warehouse(props.warehouses[0].id);
+  }
+});
 </script>
 <template>
   <Layout :loading="loading">
@@ -1322,7 +1331,7 @@ function created() {
                 </v-col>
 
                 <!-- Payment choice -->
-                <v-col cols="12" sm="6">
+                <v-col lg="4" md="4" cols="12">
                   <v-select
                       v-model="payment.Reglement"
                       :items="helper.reglamentPayment()"
@@ -1336,7 +1345,7 @@ function created() {
                   ></v-select>
                 </v-col>
                 <!-- Sales type  -->
-                <v-col cols="12" sm="6">
+                <v-col lg="4" md="4" cols="12">
                   <v-select
                       v-model="sale.sales_type_id"
                       variant="outlined"
@@ -1347,6 +1356,19 @@ function created() {
                       :rules="helper.required"
                       item-value="id"
                       item-title="name"
+                  ></v-select>
+                </v-col>
+
+                <!-- Status  -->
+                <v-col lg="4" md="4" cols="12">
+                  <v-select
+                      v-model="sale.statut"
+                      variant="outlined"
+                      density="compact"
+                      clearable
+                      hide-details="auto"
+                      :items="helper.statutSale()"
+                      :label="labels.sale.statut"
                   ></v-select>
                 </v-col>
 

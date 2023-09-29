@@ -56,8 +56,10 @@ class PosController extends Controller
             $order->shipping_status = "";
             $order->GrandTotal = $request->GrandTotal;
             $order->notes = $request->notes;
-            $order->statut = 'completed';
-            $order->payment_statut = 'unpaid';
+//            $order->statut = 'completed';
+            $order->statut = $request->statut;
+//            $order->payment_statut = 'unpaid';
+            $order->payment_statut = $request->payment_statut;
             $order->user_pos = Auth::user()->id;
             $order->user_id = Auth::user()->id;
 
@@ -94,7 +96,8 @@ class PosController extends Controller
                         ->where('product_id', $value['product_id'])
                         ->first();
                 }
-                if ($unit && $product_warehouse) {
+
+                if ($unit && $product_warehouse && $request['statut'] == "completed") {
                     if ($unit->operator == '/') {
                         $product_warehouse->qty -= $value['quantity'] / $unit->operator_value;
                     } else {
