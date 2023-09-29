@@ -350,7 +350,7 @@ function onCloseDelete() {
                   icon="mdi-pencil"
                   size="x-small"
                   variant="outlined"
-                  @click="Edit_Warehouse(item.raw)"
+                  @click="Edit_Warehouse(item)"
               >
               </v-btn>
               <v-btn
@@ -359,7 +359,7 @@ function onCloseDelete() {
                   icon="mdi-delete"
                   size="x-small"
                   variant="outlined"
-                  @click="Delete_Warehouse(item.raw)"
+                  @click="Delete_Warehouse(item)"
               >
               </v-btn>
             </template>

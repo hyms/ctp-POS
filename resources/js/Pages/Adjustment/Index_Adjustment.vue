@@ -262,7 +262,7 @@ function Remove_Adjustment() {
                 icon="mdi-eye"
                 size="x-small"
                 variant="outlined"
-                @click="showDetails(item.raw.id)"
+                @click="showDetails(item.id)"
             >
             </v-btn>
             <v-btn
@@ -271,9 +271,9 @@ function Remove_Adjustment() {
                 icon="mdi-pencil"
                 size="x-small"
                 variant="outlined"
-                :disabled="helper.enableDay(item.raw.updated_at)"
+                :disabled="helper.enableDay(item.updated_at)"
                 @click="
-                                router.visit('/adjustments/edit/' + item.raw.id)
+                                router.visit('/adjustments/edit/' + item.id)
                             "
             >
             </v-btn>
@@ -283,8 +283,8 @@ function Remove_Adjustment() {
                 icon="mdi-delete"
                 size="x-small"
                 variant="outlined"
-                :disabled="helper.enableDay(item.raw.updated_at)"
-                @click="Delete_Item(item.raw)"
+                :disabled="helper.enableDay(item.updated_at)"
+                @click="Delete_Item(item)"
             >
             </v-btn>
           </template>

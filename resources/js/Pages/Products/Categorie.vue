@@ -316,7 +316,7 @@ function Remove_Category() {
                 icon="mdi-pencil"
                 size="x-small"
                 variant="outlined"
-                @click="Edit_category(item.raw)"
+                @click="Edit_category(item)"
             >
             </v-btn>
             <v-btn
@@ -325,7 +325,7 @@ function Remove_Category() {
                 icon="mdi-delete"
                 size="x-small"
                 variant="outlined"
-                @click="Delete_Category(item.raw)"
+                @click="Delete_Category(item)"
             >
             </v-btn>
           </template>

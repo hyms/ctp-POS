@@ -407,7 +407,7 @@ function getPermission(role) {
                   color="error"
                   variant="tonal"
                   size="small"
-              >{{ item.raw.stock_alert }}
+              >{{ item.stock_alert }}
               </v-chip>
             </template>
           </v-data-table>
@@ -440,17 +440,17 @@ function getPermission(role) {
                         :no-data-text="labels.no_data_table">
             <template v-slot:item.statut="{ item }">
               <v-chip
-                  :color="helper.statutSaleColor(item.raw.statut)"
+                  :color="helper.statutSaleColor(item.statut)"
                   variant="tonal"
                   size="x-small"
-              >{{helper.statutSale(item.raw.statut)}}</v-chip>
+              >{{helper.statutSale(item.statut)}}</v-chip>
             </template>
             <template v-slot:item.payment_status="{ item }">
               <v-chip
-                  :color="helper.statusPaymentColor(item.raw.payment_status)"
+                  :color="helper.statusPaymentColor(item.payment_status)"
                   variant="tonal"
                   size="x-small"
-              >{{helper.statusPayment(item.raw.payment_status)}}</v-chip>
+              >{{helper.statusPayment(item.payment_status)}}</v-chip>
             </template>
           </v-data-table>
         </v-card>

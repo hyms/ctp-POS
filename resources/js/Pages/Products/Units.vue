@@ -406,7 +406,7 @@ function Remove_Unit() {
                 icon="mdi-pencil"
                 size="x-small"
                 variant="outlined"
-                @click="Edit_Unit(item.raw)"
+                @click="Edit_Unit(item)"
             >
             </v-btn>
             <v-btn
@@ -415,7 +415,7 @@ function Remove_Unit() {
                 icon="mdi-delete"
                 size="x-small"
                 variant="outlined"
-                @click="Delete_item(item.raw)"
+                @click="Delete_item(item)"
             >
             </v-btn>
           </template>

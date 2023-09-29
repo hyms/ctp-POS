@@ -223,7 +223,7 @@ function Remove_Product() {
                 size="x-small"
                 variant="outlined"
                 @click="
-                                router.visit('/products/detail/' + item.raw.id)
+                                router.visit('/products/detail/' + item.id)
                             "
             >
             </v-btn>
@@ -234,7 +234,7 @@ function Remove_Product() {
                 size="x-small"
                 variant="outlined"
                 @click="
-                                router.visit('/products/edit/' + item.raw.id)
+                                router.visit('/products/edit/' + item.id)
                             "
             >
             </v-btn>
@@ -244,7 +244,7 @@ function Remove_Product() {
                 icon="mdi-delete"
                 size="x-small"
                 variant="outlined"
-                @click="Delete_Item(item.raw)"
+                @click="Delete_Item(item)"
             >
             </v-btn>
           </template>

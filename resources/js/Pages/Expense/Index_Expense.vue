@@ -148,7 +148,7 @@ function Delete_Expense(id) {
                 icon="mdi-pencil"
                 size="x-small"
                 variant="outlined"
-                @click="router.visit('/expenses/edit/' + item.raw.id)"
+                @click="router.visit('/expenses/edit/' + item.id)"
             >
             </v-btn>
             <v-btn
@@ -157,7 +157,7 @@ function Delete_Expense(id) {
                 icon="mdi-delete"
                 size="x-small"
                 variant="outlined"
-                @click="Delete_Expense(item.raw.id)"
+                @click="Delete_Expense(item.id)"
             >
             </v-btn>
           </template>

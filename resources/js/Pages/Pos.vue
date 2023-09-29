@@ -15,7 +15,6 @@ const currency = computed(() => usePage().props.currency);
 const props = defineProps({
   defaultWarehouse: Object,
   defaultClient: Object,
-  clients: Object,
   sales_types: Object,
   warehouses: Object,
   categories: Object,
@@ -24,13 +23,12 @@ const props = defineProps({
 
 const form = ref(null);
 const formAddPayment = ref(null);
-const formCreateCustomer = ref(null);
 const formUpdateDetail = ref(null);
 const loading = ref(false);
 const snackbar = ref(false);
 const snackbarText = ref("");
 const snackbarColor = ref("info");
-// const dialogCustomer = ref(false);
+
 const dialogUpdateDetail = ref(false);
 const dialogAddPayment = ref(false);
 const dialogInvoice = ref(false);
@@ -88,17 +86,7 @@ const sale = ref({
   notes: '',
   sales_type_id:"",
 });
-// const client = ref({
-//   id: "",
-//   name: "",
-//   code: "",
-//   email: "",
-//   phone: "",
-//   country: "",
-//   tax_number: "",
-//   city: "",
-//   adresse: ""
-// });
+
 const category_id = ref("");
 const product = ref({
   id: "",
@@ -129,15 +117,6 @@ const product = ref({
 });
 const sound = ref("/audio/Beep.wav");
 const audio = ref(new Audio("/audio/Beep.wav"))
-
-// //---------- filter clients
-// function querySelectionClient(v) {
-//   clientFilter.value = props.clients.filter((e) => {
-//     return (
-//         (e.name || "").toLowerCase().indexOf((v || "").toLowerCase()) > -1
-//     );
-//   });
-// }
 
 //--- Submit Validate Create Sale
 async function Submit_Pos() {
@@ -189,77 +168,6 @@ async function Submit_Payment() {
     }
   }
 }
-//
-// //------------- Submit Validation Create & Edit Customer
-// async function Submit_Customer() {
-//   snackbar.value = false;
-//   const validate = await formCreateCustomer.value.validate();
-//   if (!validate) {
-//     snackbar.value = true;
-//     snackbarColor.value = "error";
-//     snackbarText.value = labels.no_fill_data;
-//   } else {
-//     Create_Client();
-//   }
-// }
-//
-// //---------------------------------------- Create new Customer -------------------------------\\
-// function Create_Client() {
-//   loading.value = true;
-//   axios
-//       .post("/clients", {
-//         name: client.value.name,
-//         email: client.value.email,
-//         phone: client.value.phone,
-//         tax_number: client.value.tax_number,
-//         country: client.value.country,
-//         city: client.value.city,
-//         adresse: client.value.adresse
-//       })
-//       .then(response => {
-//         snackbar.value = true;
-//         snackbarColor.value = "success";
-//         snackbarText.value = labels.success_message;
-//         Get_Client_Without_Paginate();
-//         dialogCustomer.value = false;
-//       })
-//       .catch(error => {
-//         snackbar.value = true;
-//         snackbarColor.value = "error";
-//         snackbarText.value = labels.error_message;
-//         console.log(error)
-//       })
-//       .finally(() => {
-//         loading.value = false;
-//       });
-// }
-//
-// //------------------------------ New Model (create Customer) -------------------------------\\
-// function New_Client() {
-//   reset_Form_client();
-//   dialogCustomer.value = true;
-// }
-//
-// //-------------------------------- reset Form -------------------------------\\
-// function reset_Form_client() {
-//   client.value = {
-//     id: "",
-//     name: "",
-//     email: "",
-//     phone: "",
-//     tax_number: "",
-//     country: "",
-//     city: "",
-//     adresse: ""
-//   };
-// }
-
-// //------------------------------------ Get Clients Without Paginate -------------------------\\
-// function Get_Client_Without_Paginate() {
-//   axios
-//       .get("/get_clients_without_paginate")
-//       .then(({data}) => (client.values = data));
-// }
 
 //---Validate State Fields
 function getValidationState({dirty, validated, valid = null}) {
@@ -844,24 +752,6 @@ function created() {
               <v-row>
                 <!-- Customer -->
                 <v-col cols="12">
-<!--                  <v-autocomplete-->
-<!--                      v-model="sale.client_id"-->
-<!--                      @update:search="querySelectionClient"-->
-<!--                      :items="clientFilter"-->
-<!--                      :label="labels.sale.client_id"-->
-<!--                      item-title="name"-->
-<!--                      item-value="id"-->
-<!--                      variant="outlined"-->
-<!--                      density="comfortable"-->
-<!--                      hide-details="auto"-->
-<!--                      clearable-->
-<!--                      :rules="helper.required"-->
-<!--                  >-->
-<!--                    <template v-slot:append>-->
-<!--                      <v-btn color="primary" icon="mdi-account-plus" density="comfortable" class="rounded"-->
-<!--                             @click="New_Client()"></v-btn>-->
-<!--                    </template>-->
-<!--                  </v-autocomplete>-->
                   <SelectClient
                       v-model="sale.client_id"
                   ></SelectClient>

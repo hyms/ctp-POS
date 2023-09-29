@@ -310,7 +310,7 @@ function Remove_SalesType() {
                                 icon="mdi-pencil"
                                 size="x-small"
                                 variant="outlined"
-                                @click="Edit_SalesType(item.raw)"
+                                @click="Edit_SalesType(item)"
                             >
                             </v-btn>
                             <v-btn
@@ -319,7 +319,7 @@ function Remove_SalesType() {
                                 icon="mdi-delete"
                                 size="x-small"
                                 variant="outlined"
-                                @click="Delete_SalesType(item.raw)"
+                                @click="Delete_SalesType(item)"
                             >
                             </v-btn>
                         </template>

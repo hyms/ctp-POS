@@ -252,7 +252,7 @@ function Payments_Sales() {
           :loading="loading"
       >
         <template v-slot:item.Reglement="{ item }">
-          {{ helper.getReglamentPayment(item.raw.Reglement)[0].title }}
+          {{ helper.getReglamentPayment(itemsnackbarText.value.Reglement)[0].title }}
         </template>
 
       </v-data-table>

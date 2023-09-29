@@ -191,16 +191,12 @@ class UserController extends Controller
         DB::transaction(function () use ($id, $request) {
             $user = User::findOrFail($id);
             $current = $user->password;
-
-            if (!empty($request->NewPassword) || $request->NewPassword != "null") {
-                if ($request->NewPassword != $current) {
-                    $pass = Hash::make($request->NewPassword);
-                } else {
-                    $pass = $user->password;
+            $pass = $user->password;
+            if (!empty($request->NewPassword) && $request->NewPassword != "null") {
+                $password_new = Hash::make($request->NewPassword);
+                if ($password_new != $current) {
+                    $pass = $password_new;
                 }
-
-            } else {
-                $pass = $user->password;
             }
 
             User::whereId($id)->update([
@@ -239,16 +235,12 @@ class UserController extends Controller
         $id = Auth::user()->id;
         $user = User::findOrFail($id);
         $current = $user->password;
-
+        $pass = $user->password;
         if (!empty($request->NewPassword) && $request->NewPassword != 'undefined') {
-            if ($request->NewPassword != $current) {
-                $pass = Hash::make($request->NewPassword);
-            } else {
-                $pass = $user->password;
+            $password_new = Hash::make($request->NewPassword);
+            if ($password_new != $current) {
+                $pass = $password_new;
             }
-
-        } else {
-            $pass = $user->password;
         }
 
         User::whereId($id)->update([

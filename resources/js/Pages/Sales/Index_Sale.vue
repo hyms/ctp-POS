@@ -738,25 +738,25 @@ function Remove_Sale(id, sale_has_return) {
       >
         <template v-slot:item.statut="{ item }">
           <v-chip
-              :color="helper.statutSaleColor(item.raw.statut)"
+              :color="helper.statutSaleColor(item.statut)"
               variant="tonal"
               size="x-small"
-          >{{helper.statutSale(item.raw.statut)}}</v-chip>
+          >{{helper.statutSale(item.statut)}}</v-chip>
         </template>
         <template v-slot:item.payment_status="{ item }">
           <v-chip
-              :color="helper.statusPaymentColor(item.raw.payment_status)"
+              :color="helper.statusPaymentColor(item.payment_status)"
               variant="tonal"
               size="x-small"
-          >{{helper.statusPayment(item.raw.payment_status)}}</v-chip>
+          >{{helper.statusPayment(item.payment_status)}}</v-chip>
         </template>
         <template v-slot:item.Ref="{ item }">
           <v-btn
               variant="tonal"
               size="x-small"
               color="default"
-              :text="item.raw.Ref"
-              @click="router.visit('/sales/detail/'+item.raw.id)"
+              :text="item.Ref"
+              @click="router.visit('/sales/detail/'+item.id)"
           ></v-btn>
         </template>
         <template v-slot:item.actions="{ item }">
@@ -774,7 +774,7 @@ function Remove_Sale(id, sale_has_return) {
             </template>
             <v-list density="compact">
               <v-list-item
-                  @click="router.visit('/sales/detail/' + item.raw.id)"
+                  @click="router.visit('/sales/detail/' + item.id)"
                   prepend-icon="mdi-eye"
               >
                 <v-list-item-title>
@@ -782,7 +782,7 @@ function Remove_Sale(id, sale_has_return) {
                 </v-list-item-title>
               </v-list-item>
               <v-list-item
-                  @click="router.visit('/sales/edit/' + item.raw.id)"
+                  @click="router.visit('/sales/edit/' + item.id)"
                   prepend-icon="mdi-pen"
               >
                 <v-list-item-title>
@@ -790,7 +790,7 @@ function Remove_Sale(id, sale_has_return) {
                 </v-list-item-title>
               </v-list-item>
               <v-list-item
-                  @click="Show_Payments(item.raw.id, item.raw)"
+                  @click="Show_Payments(item.id, item)"
                   prepend-icon="mdi-basket"
               >
                 <v-list-item-title>
@@ -799,16 +799,16 @@ function Remove_Sale(id, sale_has_return) {
               </v-list-item>
               <!--                                  v-if="currentUserPermissions.includes('payment_sales_add')"-->
               <v-list-item
-                  @click="New_Payment(item.raw)"
+                  @click="New_Payment(item)"
                   prepend-icon="mdi-currency-usd"
-                  v-if="item.raw.payment_status!='paid'"
+                  v-if="item.payment_status!='paid'"
               >
                 <v-list-item-title>
                   Añadir Pago
                 </v-list-item-title>
               </v-list-item>
               <v-list-item
-                  @click="Invoice_POS(item.raw.id)"
+                  @click="Invoice_POS(item.id)"
                   prepend-icon="mdi-printer-pos-outline"
               >
                 <v-list-item-title>
@@ -821,7 +821,7 @@ function Remove_Sale(id, sale_has_return) {
               <!--                  {{$t('DownloadPdf')}}-->
               <!--                </v-dropdown-item>-->
               <v-list-item
-                  @click="Delete_Item(item.raw)"
+                  @click="Delete_Item(item)"
                   prepend-icon="mdi-delete"
               >
                 <v-list-item-title>

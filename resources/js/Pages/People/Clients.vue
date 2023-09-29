@@ -944,8 +944,8 @@ function Submit_Pay_due() {
               </template>
               <v-list density="compact">
                 <v-list-item
-                    v-if="item.raw.due > 0"
-                    @click="Pay_due(item.raw)"
+                    v-if="item.due > 0"
+                    @click="Pay_due(item)"
                     prepend-icon="mdi-currency-usd"
                 >
                   <v-list-item-title>
@@ -954,8 +954,8 @@ function Submit_Pay_due() {
                 </v-list-item>
 
                 <!--                                <v-list-item-->
-                <!--                                    v-if="item.raw.return_Due > 0"-->
-                <!--                                    @click="Pay_return_due(item.raw)"-->
+                <!--                                    v-if="item.return_Due > 0"-->
+                <!--                                    @click="Pay_return_due(item)"-->
                 <!--                                    prepend-icon="mdi-currency-usd"-->
 
                 <!--                                >-->
@@ -965,7 +965,7 @@ function Submit_Pay_due() {
                 <!--                                </v-list-item>-->
 
                 <v-list-item
-                    @click="showDetails(item.raw)"
+                    @click="showDetails(item)"
                     prepend-icon="mdi-eye"
                 >
                   <v-list-item-title>
@@ -974,7 +974,7 @@ function Submit_Pay_due() {
                 </v-list-item>
 
                 <v-list-item
-                    @click="Edit_Client(item.raw)"
+                    @click="Edit_Client(item)"
                     prepend-icon="mdi-pencil"
                 >
                   <v-list-item-title>
@@ -983,7 +983,7 @@ function Submit_Pay_due() {
                 </v-list-item>
 
                 <v-list-item
-                    @click="Delete_Client(item.raw)"
+                    @click="Delete_Client(item)"
                     prepend-icon="mdi-delete"
                 >
                   <v-list-item-title>

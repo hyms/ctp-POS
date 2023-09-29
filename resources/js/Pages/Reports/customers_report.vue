@@ -124,7 +124,7 @@ function sumCount4(rowObj) {
               icon="mdi-eye"
               size="x-small"
               variant="outlined"
-              @click="helper.linkVisit('/report/client/'+item.raw.id)"
+              @click="helper.linkVisit('/report/client/'+item.id)"
           >
           </v-btn>
         </template>

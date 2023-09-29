@@ -308,7 +308,7 @@ function Delete_Category(id) {
                 icon="mdi-pencil"
                 size="x-small"
                 variant="outlined"
-                @click="Edit_Category(item.raw)"
+                @click="Edit_Category(item)"
             >
             </v-btn>
             <v-btn
@@ -317,7 +317,7 @@ function Delete_Category(id) {
                 icon="mdi-delete"
                 size="x-small"
                 variant="outlined"
-                @click="Delete_CategoryExpense(item.raw)"
+                @click="Delete_CategoryExpense(item)"
             >
             </v-btn>
           </template>

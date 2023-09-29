@@ -5,16 +5,13 @@ import helper from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
-  // clients: Object,
   enableForm: {type: Boolean, default: true},
   modelValue: Number,
-  error: Object,
 })
 const emit = defineEmits(['update:modelValue'])
 const dialogCustomer = ref(false);
 const loading = ref(false);
 
-const clientFilter = ref([]);
 const clients = ref([]);
 const client = ref({
   id: "",
@@ -36,15 +33,6 @@ function updateValue(value) {
 }
 
 const form = ref(null);
-//---------- filter clients
-function querySelectionClient(v) {
-  clientFilter.value = props.clients.filter((e) => {
-    return (
-        (e.name || "").toLowerCase().indexOf((v || "").toLowerCase()) > -1
-    );
-  });
-}
-
 
 //------------- Submit Validation Create & Edit Customer
 async function Submit_Customer() {
@@ -278,7 +266,6 @@ onMounted(() => {
       variant="outlined"
       density="comfortable"
       hide-details="auto"
-      clearable
       :rules="helper.required"
       :loading="loading"
       :no-data-text="labels.no_data_table"

@@ -294,22 +294,22 @@ function Get_Sales(page) {
           :loading="loading"
       >
         <template v-slot:item.Reglement="{ item }">
-          {{ helper.getReglamentPayment(item.raw.Reglement)[0].title }}
+          {{ helper.getReglamentPayment(item.Reglement)[0].title }}
         </template>
         <template v-slot:item.statut="{ item }">
           <v-chip
-              :color="helper.statutSaleColor(item.raw.statut)"
+              :color="helper.statutSaleColor(item.statut)"
               variant="tonal"
               size="x-small"
-          >{{ helper.statutSale(item.raw.statut) }}
+          >{{ helper.statutSale(item.statut) }}
           </v-chip>
         </template>
         <template v-slot:item.payment_status="{ item }">
           <v-chip
-              :color="helper.statusPaymentColor(item.raw.payment_status)"
+              :color="helper.statusPaymentColor(item.payment_status)"
               variant="tonal"
               size="x-small"
-          >{{ helper.statusPayment(item.raw.payment_status) }}
+          >{{ helper.statusPayment(item.payment_status) }}
           </v-chip>
         </template>
 

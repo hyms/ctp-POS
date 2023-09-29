@@ -509,11 +509,11 @@ function onClose() {
         >
           <template v-slot:item.statut="{ item }">
             <v-switch
-                :model-value="!!item.raw.statut"
+                :model-value="!!item.statut"
                 color="primary"
                 density="compact"
                 hide-details
-                @change="isChecked(item.raw)"
+                @change="isChecked(item)"
             ></v-switch>
           </template>
           <template v-slot:item.actions="{ item }">
@@ -523,7 +523,7 @@ function onClose() {
                 icon="mdi-pencil"
                 size="x-small"
                 variant="outlined"
-                @click="Edit_User(item.raw)"
+                @click="Edit_User(item)"
             >
             </v-btn>
           </template>

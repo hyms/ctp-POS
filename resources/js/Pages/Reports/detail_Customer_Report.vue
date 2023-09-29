@@ -324,25 +324,25 @@ const tabVal = computed({
             >
               <template v-slot:item.statut="{ item }">
                 <v-chip
-                    :color="helper.statutSaleColor(item.raw.statut)"
+                    :color="helper.statutSaleColor(item.statut)"
                     variant="tonal"
                     size="x-small"
-                >{{helper.statutSale(item.raw.statut)}}</v-chip>
+                >{{helper.statutSale(item.statut)}}</v-chip>
               </template>
               <template v-slot:item.payment_status="{ item }">
                 <v-chip
-                    :color="helper.statusPaymentColor(item.raw.payment_status)"
+                    :color="helper.statusPaymentColor(item.payment_status)"
                     variant="tonal"
                     size="x-small"
-                >{{helper.statusPayment(item.raw.payment_status)}}</v-chip>
+                >{{helper.statusPayment(item.payment_status)}}</v-chip>
               </template>
               <template v-slot:item.Ref="{ item }">
                 <v-btn
                     variant="tonal"
                     size="x-small"
                     color="default"
-                    :text="item.raw.Ref"
-                    @click="router.visit('/sales/detail/'+item.raw.id)"
+                    :text="item.Ref"
+                    @click="router.visit('/sales/detail/'+item.id)"
                 ></v-btn>
               </template>
 
