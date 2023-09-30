@@ -177,12 +177,12 @@ class PosController extends Controller
             ->where(function ($query) use ($request) {
                 return $query->whereHas('product', function ($q) use ($request) {
                     $q->where('not_selling', '=', 0);
-                })
-                    ->where(function ($query) use ($request) {
-                        if ($request->stock == '1') {
-                            return $query->where('qty', '>', 0);
-                        }
-                    });
+                });
+//                    ->where(function ($query) use ($request) {
+//                        if ($request->stock == '1') {
+//                            return $query->where('qty', '>', 0);
+//                        }
+//                    });
             })
 
             // Filter
@@ -242,6 +242,7 @@ class PosController extends Controller
             $item['unitSale'] = $product_warehouse['product']['unitSale']->ShortName;
             $item['qte'] = $product_warehouse->qty;
 
+            $item['Net_price'] = $price;
             if ($product_warehouse['product']->TaxNet !== 0.0) {
 
                 //Exclusive
@@ -249,13 +250,7 @@ class PosController extends Controller
                     $tax_price = $price * $product_warehouse['product']->TaxNet / 100;
 
                     $item['Net_price'] = $price + $tax_price;
-
-                    // Inxclusive
-                } else {
-                    $item['Net_price'] = $price;
                 }
-            } else {
-                $item['Net_price'] = $price;
             }
 
             $data->add($item);

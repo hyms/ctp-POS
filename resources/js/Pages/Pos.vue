@@ -52,6 +52,7 @@ const payments = ref([]);
 const products = ref([]);
 const products_page = ref(0);
 const products_pos = ref([]);
+const products_pos_page = ref(1);
 const details = ref([]);
 const detail = ref({});
 const pos_settings = ref({});
@@ -179,7 +180,7 @@ function getValidationState({dirty, validated, valid = null}) {
 function Selected_Warehouse(value) {
   search_input.value = '';
   product_filter.value = [];
-  Get_Products_By_Warehouse(sale.value.warehouse_id);
+  // Get_Products_By_Warehouse(sale.value.warehouse_id);
   getProducts(1);
 }
 
@@ -708,7 +709,8 @@ function getProducts(page = 1) {
           "&stock=" + 1
       )
       .then(response => {
-        product.values = response.data.products;
+        products_pos.value = response.data.products;
+        // console.log(products_pos.value)
         // product.value_totalRows = response.data.totalRows;
         // product.value_paginatePerPage();
         // Complete the animation of theprogress bar.
@@ -1104,13 +1106,27 @@ onMounted(()=>{
 
       <!-- Card right Of Products -->
       <v-col lg="7" md="6" cols="12">
-        <v-card>
+        <v-card max-height="600" class="overflow-auto">
           <v-card-text>
             <v-row>
               <v-col md="6" cols="12">
                 <v-btn block color="info">
                   <i class="i-Two-Windows"></i>
                   {{ labels.list_category }}
+                  <v-menu activator="parent">
+                    <v-list>
+                      <v-list-item @click="getAllCategory">
+                        <v-list-item-title>Todas las Categorias</v-list-item-title>
+                      </v-list-item>
+                      <v-list-item
+                          v-for="(category, index) in categories"
+                          :key="index"
+                          @click="Products_by_Category(category.id)"
+                      >
+                        <v-list-item-title>{{ category.name }}</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
                 </v-btn>
               </v-col>
               <!--              <v-col md="6">-->
@@ -1120,12 +1136,14 @@ onMounted(()=>{
               <!--                </button>-->
               <!--              </v-col>-->
 
-
               <!-- Product -->
               <v-col cols="12" class="mt-2 mv-2">
                 <v-data-iterator
                     :items="products_pos"
                     :search="searchProducts"
+                    :page="products_pos_page"
+                    :items-per-page="products_pos.length"
+
                 >
                   <template v-slot:header>
                     <div class="mb-3">
@@ -1146,11 +1164,11 @@ onMounted(()=>{
                     <v-alert type="warning">{{ labels.no_data_products }}</v-alert>
                   </template>
 
-                  <template v-slot:default="props">
+                  <template v-slot:default="{items}">
                     <v-row>
                       <v-col
-                          v-for="item in props.items"
-                          :key="item.id"
+                          v-for="(item, i) in items"
+                          :key="i"
                           cols="12"
                           sm="6"
                           md="4"
