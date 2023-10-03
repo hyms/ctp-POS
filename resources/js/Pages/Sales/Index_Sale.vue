@@ -807,6 +807,15 @@ function Remove_Sale(id, sale_has_return) {
                   Añadir Pago
                 </v-list-item-title>
               </v-list-item>
+<!--              <v-list-item-->
+<!--                  @click="New_Payment(item)"-->
+<!--                  prepend-icon="mdi-hammer"-->
+<!--                  v-if="item.statut!='completed'"-->
+<!--              >-->
+<!--                <v-list-item-title>-->
+<!--                 Completar Trabajo-->
+<!--                </v-list-item-title>-->
+<!--              </v-list-item>-->
               <v-list-item
                   @click="Invoice_POS(item.id)"
                   prepend-icon="mdi-printer-pos-outline"
