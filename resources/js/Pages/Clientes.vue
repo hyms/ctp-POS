@@ -33,8 +33,12 @@ export default {
             fields:
                 [
                     {
+                        text: 'Codigo',
+                        value: 'code'
+                    },
+                    {
                         text: 'Nombre',
-                        value: 'nombreResponsable'
+                        value: 'nombre'
                     },
                     {
                         text: 'Correo',
@@ -61,15 +65,8 @@ export default {
                     state: null,
                     stateText: null
                 },
-                nombreNegocio: {
-                    label: 'nombreNegocio',
-                    value: "",
-                    type: "text",
-                    state: null,
-                    stateText: null
-                },
-                nombreResponsable: {
-                    label: 'nombreResponsable',
+                nombre: {
+                    label: 'nombre',
                     value: "",
                     type: "text",
                     state: null,
@@ -103,7 +100,7 @@ export default {
                     state: null,
                     stateText: null
                 },
-                codigo: {
+                code: {
                     label: 'codigo',
                     value: "",
                     type: "text",

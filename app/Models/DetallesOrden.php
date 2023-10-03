@@ -81,7 +81,7 @@ class DetallesOrden extends Model
     {
         $total = 0;
         foreach ($detalleOrden as $item) {
-            $totalParcial = $item['costo'] * $item['cantidad'];
+            $totalParcial = round($item['costo'],2) * $item['cantidad'];
             DB::table(self::$tables)
                 ->where('ordenTrabajo', $idOrden)
                 ->where('stock', $item['stock'])
@@ -91,6 +91,6 @@ class DetallesOrden extends Model
                 ]);
             $total += ($totalParcial);
         }
-        return $total;
+        return round($total,2);
     }
 }

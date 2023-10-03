@@ -17,11 +17,13 @@ class ClienteController extends Controller
     {
         $clientes = Cliente::all();
         $clientes->transform(function ($item, $key) {
-            $item['nombreSucursal']=$item->Sucursales?->nombre;
+            $item['nombreSucursal'] = $item->Sucursales?->nombre;
             return $item;
         });
         $sucursales = Sucursal::getAll();
-        $sucursales = $sucursales->map(function ($item,$key){ return ['value'=>$item->id,'text'=>$item->nombre];});
+        $sucursales = $sucursales->map(function ($item, $key) {
+            return ['value' => $item->id, 'text' => $item->nombre];
+        });
         Inertia::share('titlePage', 'Clientes');
         return Inertia::render('Clientes', [
             'clientes' => $clientes,
@@ -35,8 +37,9 @@ class ClienteController extends Controller
             $validator = Validator::make($request->all(), [
                 'sucursal' => 'required',
                 'nombreCompleto' => 'required',
-                'nombreResponsable' => 'required',
-                 'nitCi' => 'required'
+                'nombre' => 'required',
+                'nitCi' => 'required',
+                'code' => 'required|numeric|unique:App\Models\Cliente,code'
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -66,12 +69,13 @@ class ClienteController extends Controller
         return back()->withInput();
     }
 
-    public function buscar($id){
+    public function buscar($id)
+    {
         $clientes = DB::table(Cliente::$tables)
-            ->where('nombreResponsable','like',"%{$id}%")
+            ->where('nombre', 'like', "%{$id}%")
             ->whereNull('deleted_at')
-            ->select(['nombreResponsable','id','telefono'])
+            ->select(['nombre', 'id', 'telefono'])
             ->get();
-        return response()->json(["items"=>$clientes]);
+        return response()->json(["items" => $clientes]);
     }
 }

@@ -150,9 +150,11 @@ class OrdenesTrabajo extends Model
             ->update($orden);
         if ($realized) {
             $item = DB::table(self::$tables)->where('id', $orden['id'])->get()->first();
+            $detalle = 'pago de deuda de orden ';
+            $detalle .= (($item->tipoOrden == null) ? "#{$item->correlativo}" : $item->codigoServicio);
             $values = [
                 'codigo' => '',
-                'detalle' => 'pago de deuda de orden ' . (($item->tipoOrden == null) ? "#{$item->correlativo}" : $item->codigoServicio),
+                'detalle' => $detalle,
                 'nombre' => $item->responsable,
                 'ciNit' => '',
                 'codigoVenta' => $item->correlativo,

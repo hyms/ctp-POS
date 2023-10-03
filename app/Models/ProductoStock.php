@@ -150,13 +150,10 @@ class ProductoStock extends Model
                     $tmp = $tmp->get()->first();
                     $item->put('cantidad', $tmp->cantidad);
                     $item->put('precio', $tmp->precioUnidad);
-                    $item->put('estado', $tmp->enable);
                     $item->put('stockId', $tmp->id);
                 } else {
                     $item->put('cantidad', null);
                     $item->put('precio', null);
-                    $item->put('estado', null);
-                    $item->put('estado', null);
                     $item->put('stockId', null);
                 }
                 $stockItem->add($item);
@@ -210,7 +207,6 @@ class ProductoStock extends Model
         if (!empty($sucursal)) {
             $stock->where(self::$tables . '.sucursal', '=', $sucursal);
         }
-        $stock->where(self::$tables . '.enable', '=', true);
         if (!empty($id)) {
             $stock->where(self::$tables . '.id', '=', $id);
         }

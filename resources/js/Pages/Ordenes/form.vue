@@ -55,7 +55,7 @@
                                 cache-items
                                 hide-no-data
                                 hide-selected
-                                item-text="nombreResponsable"
+                                item-text="nombre"
                                 label="Nombre"
                                 return-object
                                 dense
@@ -210,12 +210,12 @@ export default {
             if (this.editedItem.cliente !== "") {
                 this.clients.push({
                     id: this.editedItem.cliente,
-                    nombreResponsable: this.editedItem.responsable,
+                    nombre: this.editedItem.responsable,
                     telefono: this.editedItem.telefono
                 })
                 this.client = {
                     id: this.editedItem.cliente,
-                    nombreResponsable: this.editedItem.responsable,
+                    nombre: this.editedItem.responsable,
                     telefono: this.editedItem.telefono
                 }
             }
@@ -279,7 +279,7 @@ export default {
         },
         //autoComplete
         selectSeachDemo(item) {
-            this.form.responsable.value = item?.nombreResponsable;
+            this.form.responsable.value = item?.nombre;
             this.form.telefono.value = item?.telefono;
             this.idClient = item?.id
         },

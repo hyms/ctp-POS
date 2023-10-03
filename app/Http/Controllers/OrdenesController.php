@@ -39,6 +39,15 @@ class OrdenesController extends Controller
             $tipoOrden = $item->tipoOrden;
             $tipoOrden =$tiposSelect->first(function ($value,$id) use ($tipoOrden) { return $value['value']==$tipoOrden;});
             $item->tipoOrdenView =$tipoOrden['text']??'';
+            $totalVenta = 0;
+            $totalPagado = 0;
+            if ($item->estado === 2 || $item->estado === 0) {
+                foreach ($item->detallesOrden as $detalle) {
+                    $totalVenta += $detalle->total;
+                }
+                $totalPagado = $item->montoVenta;
+            }
+            $item->montoDeuda = $totalVenta - $totalPagado;
             return $item;
         });
         $estados = OrdenesTrabajo::estadoCTP();
@@ -176,6 +185,7 @@ class OrdenesController extends Controller
             //armar orden
             $orden = array();
             $orden['id'] = $ordenPost['id'];
+            $ordenPost['montoVenta']=round($ordenPost['montoVenta'],2);
             $total = DetallesOrden::getTotal($orden['id'], $ordenPost['detallesOrden']);
             $orden['estado'] = (($ordenPost['montoVenta'] >= $total)) ? 0 : 2;
             $orden['montoVenta'] = $ordenPost['montoVenta'];
@@ -206,6 +216,7 @@ class OrdenesController extends Controller
             //armar orden
             $orden = array();
             $orden['id'] = $ordenPost['id'];
+            $ordenPost['montoVenta']=round($ordenPost['montoVenta'],2);
             $total = DetallesOrden::getTotal($orden['id'], $ordenPost['detallesOrden']);
             $saldo = $total - $ordenPost['montoVenta'];
             $orden['montoVenta'] = $ordenPost['montoVenta'] + $request['monto'];

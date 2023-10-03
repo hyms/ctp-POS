@@ -10,7 +10,7 @@
                             :base-path="basePath"
                             @close="close()"
                         />
-                        <v-dialog v-model="dialog" max-width="500px" persistent scrollable>
+                        <v-dialog v-model="dialog" max-width="500px" scrollable>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-btn
                                     color="primary"

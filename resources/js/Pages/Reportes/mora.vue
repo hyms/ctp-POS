@@ -57,7 +57,7 @@
                     <v-dialog id="cliente" v-model="dialogOrdenes" max-width="600">
                         <v-card>
                             <v-card-title class="text-h5">
-                                {{ 'Cliente: '+ item.nombreResponsable }}
+                                {{ 'Cliente: '+ item.nombre }}
                             </v-card-title>
                             <v-card-text>
                             <div class="table-responsive">
@@ -188,7 +188,7 @@
                                                         getCantidad(item)
                                                     }}
                                                 </template>
-                                                <template v-else-if="field==='nombreResponsable'"><v-btn @click="loadModal(item)" text color="primary">{{ item[field] }}</v-btn></template>
+                                                <template v-else-if="field==='nombre'"><v-btn @click="loadModal(item)" text color="primary">{{ item[field] }}</v-btn></template>
                                                 <template v-else>{{ item[field] }}</template>
                                             </td>
                                         </template>
@@ -210,7 +210,7 @@
                             <h5 class="mb-0">Resultados</h5>
                         </template>
                         <b-modal id="cliente"
-                                 :title="'Cliente: '+ item.nombreResponsable" size="lg">
+                                 :title="'Cliente: '+ item.nombre" size="lg">
                             <div class="table-responsive">
                                 <b-table
                                     striped
@@ -282,9 +282,9 @@
                                 <template #empty="scope">
                                     <p>No existen clientes</p>
                                 </template>
-                                <template v-slot:cell(nombreResponsable)="row">
+                                <template v-slot:cell(nombre)="row">
                                     <b-button variant="link" v-b-modal="'cliente'" @click="loadModal(row.item)">
-                                        {{ row.item.nombreResponsable }}
+                                        {{ row.item.nombre }}
                                     </b-button>
                                 </template>
                                 <template v-slot:cell(desde)="row">

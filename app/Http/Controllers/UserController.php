@@ -6,9 +6,12 @@ use App\Models\Sucursal;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -94,5 +97,55 @@ class UserController extends Controller
             return response()->json(["status" => -1,
                 'error' => $error,], 500);
         }
+    }
+
+    public function backup()
+    {
+        /*set_time_limit(300);
+        $tables = DB::select('SHOW TABLES');
+        $str = 'Tables_in_' . env('DB_DATABASE');
+
+        $sqlScript = "";
+        foreach ($tables as $table) {
+            // Prepare SQLscript for creating table structure
+            $row = DB::select("SHOW CREATE TABLE {$table->$str}");
+            $keyCreateTable = "Create Table";
+            $sqlScript .= "\n\n{$row[0]->$keyCreateTable};\n\n";
+
+            $result = DB::table($table->$str)->get();
+            foreach ($result as $row) {
+                $sqlScript .= "INSERT INTO {$table->$str} VALUES(";
+                $columnCount = count((array)$row);
+                $indexColumn = 0;
+                foreach ($row as $item) {
+
+                    $sqlScript = isset($item)
+                        ? $sqlScript . '"' . $item . '"'
+                        : $sqlScript . '""';
+                    if ($indexColumn < ($columnCount - 1)) {
+                        $sqlScript .= ',';
+                    }
+                    $indexColumn++;
+                }
+                $sqlScript .= ");\n";
+            }
+
+            $sqlScript .= "\n";
+        }
+
+        if (!empty($sqlScript)) {
+            // Save the SQL script to a backup file
+            $backup_file_name = public_path() . '/' . (env('DB_DATABASE')) . '_backup.sql';
+            //return $backup_file_name;
+            $fileHandler = fopen($backup_file_name, 'w+');
+            $number_of_lines = fwrite($fileHandler, $sqlScript);
+            fclose($fileHandler);
+        }*/
+        Artisan::call('backup:run --only-db');
+        $directory = env('APP_NAME', 'ctp-backup');
+        $file_path= Storage::disk('public')->files($directory);
+        $file_path = collect($file_path);
+        $file_path = $file_path->last();
+        return Storage::disk('public')->download($file_path,'respaldo.zip');
     }
 }

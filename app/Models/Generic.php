@@ -23,9 +23,6 @@ class Generic
     {
         $collection = DB::table($this->table);
 
-        if (isset($filters['enable'])) {
-            $collection = $collection->where('enable', $filters['enable']);
-        }
         if (isset($filters['sucursal'])) {
             $collection = $collection->where('sucursal', $filters['sucursal']);
         }

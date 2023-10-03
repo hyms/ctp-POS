@@ -307,7 +307,7 @@ class ReporteController extends Controller
                 $total += $totalCliente;
                 if ($totalCliente > 0) {
                     $clientes->add([
-                        'nombreResponsable' => $cliente->nombreResponsable,
+                        'nombre' => $cliente->nombre,
                         'ordenes' => $ordenes,
                         'fields' => [
                               [ 'text'=> 'Codigo', 'value'=> 'codigoServicio' ],
@@ -319,7 +319,7 @@ class ReporteController extends Controller
                     ]);
                 }
             }
-            $data = ['table' => $clientes->all(), 'fields' => ['nombreResponsable', 'mora', 'desde', 'hasta', 'cantidad']];
+            $data = ['table' => $clientes->all(), 'fields' => ['nombre', 'mora', 'desde', 'hasta', 'cantidad']];
         }
         Inertia::share('titlePage', 'Mora de Clientes');
         return Inertia::render('Reportes/mora',
@@ -483,7 +483,7 @@ class ReporteController extends Controller
         }
         $sucursales = Sucursal::getAll()->pluck('nombre', 'id');
         $productosAll = ProductoStock::getProducts(Auth::user()['sucursal']);
-        $clientes = Cliente::getAll($request['sucursal'])->pluck('nombreResponsable', 'id');
+        $clientes = Cliente::getAll($request['sucursal'])->pluck('nombre', 'id');
         $data = ['table' => $movimientos, 'fields' => $fields];
         return Inertia::render('Reportes/clientes',
             [
@@ -561,10 +561,12 @@ class ReporteController extends Controller
                     $totalDeudaOrden['reposicion'] += $item->totalDeuda ?? 0;
                     $totalPagadoOrden['reposicion'] += $item->totalPagado ?? 0;
                 }
+                $cliente = Cliente::where('id',$item->cliente)->first();
                 $totalesOrden[(string)$item->estado] += 1;
                 return [
                     'codigo' => $item->codigoServicio,
-                    'cliente' => $item->responsable,
+                    'code' => $cliente->code,
+                    'cliente' => $cliente->nombre,
                     'estado' => $item->estado,
                     'venta' => $item->montoVenta * 1,
                     'pagado' => $item->totalPagado * 1,
@@ -574,7 +576,8 @@ class ReporteController extends Controller
                 ];
             });
             $fields = [
-                ['value' => 'codigo', 'text' => 'Codigo'],
+                ['value' => 'codigo', 'text' => 'Codigo Orden'],
+                ['value' => 'code', 'text' => 'Codigo Cliente'],
                 ['value' => 'cliente', 'text' => 'Cliente'],
                 ['value' => 'estado', 'text' => 'Estado'],
                 ['value' => 'venta', 'text' => 'Venta (Bs)'],
@@ -594,7 +597,7 @@ class ReporteController extends Controller
                 'tipoOrdenes' => $estadoCTP,
                 'tipoProducto' => $tiposSelect,
                 'clientes' => Cliente::getAll()->map(function ($value) {
-                    return ['value' => (string)$value->id, 'text' => $value->nombreResponsable];
+                    return ['value' => (string)$value->id, 'text' => $value->nombre];
                 }),
                 'request' => $request->all(),
                 'data' => $data,
@@ -701,6 +704,10 @@ class ReporteController extends Controller
             return ['value' => (string)$item->id, 'text' => $item->nombre];
         });
 
+        $totales = collect([]);
+        $totalIngresos = collect([]);
+        $totalEgresos = collect([]);
+        $totalSinContar = collect([]);
         $validator = Validator::make($request->all(), [
             'sucursal' => 'required',
             'fechaI' => 'required',
@@ -718,35 +725,73 @@ class ReporteController extends Controller
                 $query->whereIn('stockDestino', $stocksId)
                     ->orWhereIn('stockOrigen', $stocksId);
             })->get();
-            $reporte = $movimientos->map(function ($value, $key) use ($productos, $stocks) {
+            $reporte = $movimientos->map(function ($value, $key) use ($productos, $stocks,$totalEgresos,$totalIngresos) {
                 $producto = $productos->first(function ($item) use ($value) {
                     return $item->id === $value->producto;
                 });
+                if (!isset($totalEgresos[$producto->formato])) {
+                    $totalEgresos[$producto->formato] = 0;
+                }
+                if (!isset($totalIngresos[$producto->formato])) {
+                    $totalIngresos[$producto->formato] = 0;
+                }
+                if (!isset($totalSinContar[$producto->formato])) {
+                    $totalSinContar[$producto->formato] = 0;
+                }
 
                 $tipoMovimiento = "-";
                 if (!empty($value->stockOrigen)) {
                     $tipoMovimiento = "Egreso";
+                    $totalEgresos[$producto->formato] += $value->cantidad;
                 }
                 if (!empty($value->stockDestino)) {
                     $tipoMovimiento = "Ingreso";
+                    $totalIngresos[$producto->formato] += $value->cantidad;
                 }
                 if(!empty($value->detalleOrden)) {
                     $detalles = DB::table(DetallesOrden::$tables)->where('id', $value->detalleOrden)->get()->first();
                     $orden = DB::table(OrdenesTrabajo::$tables)->where('id', $detalles->ordenTrabajo)->get()->first();
                     $value->observaciones.= " codigo:{$orden->codigoServicio}";
                 }
+
                 return [
                     'producto' => "{$producto->formato} ({$producto->dimension})",
                     'tipoMovimiento' => $tipoMovimiento,
                     'detalle' => $value->observaciones,
+                    'cantidad' => $value->cantidad,
                 ];
             });
+            $sucursal = Auth::user()['sucursal'];
+            $fechaI=Carbon::parse($request['fechaI']);
+            $fechaF=Carbon::parse($request['fechaF']);
+            $noConteo = DB::select("select do.*,productos.formato
+from detallesOrden as do
+left join movimientosStock ms on do.id = ms.detalleOrden and ms.created_at between '{$fechaI->startOfDay()->toDateTimeString()}' and '{$fechaF->endOfDay()->toDateTimeString()}'
+inner join stock on do.stock = stock.id
+inner join productos on stock.producto = productos.id
+where do.updated_at between '{$fechaI->startOfDay()->toDateTimeString()}' and '{$fechaF->endOfDay()->toDateTimeString()}'
+  and ms.detalleOrden is null
+and stock.sucursal={$sucursal}");
+            foreach ($noConteo as $item)
+            {
+                if (!isset($totalSinContar[$item->formato])) {
+                    $totalSinContar[$item->formato] = 0;
+                }
+                $totalSinContar[$item->formato]+=$item->cantidad;
+            }
+            $totales = [
+                'Egresos'=>$totalEgresos,
+                'Ingresos'=>$totalIngresos,
+                'NoConteo'=>$totalSinContar,
+                'fields'=>Producto::whereIn('id',$stocks->pluck('producto')->toArray())->get()->pluck('formato')->toArray(),
+            ];
             $fields = [
                 ['value' => 'producto', 'text' => 'Producto'],
                 ['value' => 'tipoMovimiento', 'text' => 'Tipo Movimiento'],
                 ['value' => 'detalle', 'text' => 'Detalle'],
+                ['value' => 'cantidad', 'text' => 'Cantidad'],
             ];
-            $data = ['table' => $reporte, 'fields' => $fields];
+            $data = ['table' => $reporte, 'fields' => $fields,'totales'=>$totales];
         }
 
         Inertia::share('titlePage', 'Reporte Movimiento de Inventario');
