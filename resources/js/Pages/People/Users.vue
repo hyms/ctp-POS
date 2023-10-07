@@ -1,7 +1,6 @@
 <script setup>
 import {ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
 
 import helper from "@/helpers";
@@ -260,12 +259,11 @@ function onClose() {
 </script>
 
 <template>
-  <Layout>
-    <Snackbar
-        :snackbar="snackbar"
-        :snackbar-color="snackbarColor"
-        :snackbar-text="snackbarText"
-    ></Snackbar>
+  <Layout
+      :snackbar-color="snackbarColor"
+      :snackbar-text="snackbarText"
+      :snackbar-view="snackbar"
+  >
     <v-dialog
         v-model="dialog"
         max-width="600px"
@@ -276,7 +274,6 @@ function onClose() {
         <v-form ref="form">
           <v-toolbar
               border
-              density="compact"
               :title="(editmode ? 'Modificar' : 'Nuevo') + ' Usuario'"
           >
           </v-toolbar>
@@ -289,8 +286,6 @@ function onClose() {
                     v-model="user.firstname"
                     :placeholder="labels.user.firstname"
                     :rules="helper.required.concat(helper.min(3)).concat(helper.max(30))"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -303,8 +298,6 @@ function onClose() {
                     v-model="user.lastname"
                     :placeholder="labels.user.lastname"
                     :rules="helper.required.concat(helper.min(3)).concat(helper.max(30))"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -317,8 +310,6 @@ function onClose() {
                     v-model="user.username"
                     :placeholder="labels.user.username"
                     :rules="helper.required.concat(helper.min(3)).concat(helper.max(30))"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -331,8 +322,6 @@ function onClose() {
                     v-model="user.phone"
                     :placeholder="labels.user.phone"
                     :rules="helper.required.concat(helper.number)"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -345,8 +334,6 @@ function onClose() {
                     v-model="user.email"
                     :placeholder="labels.user.email"
                     :rules="helper.required"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                     type="mail"
                 >
@@ -360,8 +347,6 @@ function onClose() {
                     v-model="user.password"
                     :placeholder="labels.user.password"
                     :rules="helper.required.concat(helper.min(6)).concat(helper.max(14))"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                     type="password"
                 >
@@ -377,8 +362,6 @@ function onClose() {
                     :label="labels.user.role"
                     item-title="title"
                     item-value="value"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 ></v-select>
               </v-col>
@@ -390,8 +373,6 @@ function onClose() {
                     v-model="user.NewPassword"
                     :placeholder="labels.user.NewPassword"
                     :rules="helper.min(6).concat(helper.max(14))"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                     type="password"
                 >
@@ -403,8 +384,6 @@ function onClose() {
                     v-model="user.ci"
                     :placeholder="labels.user.ci"
                     :rules="helper.number"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -421,7 +400,6 @@ function onClose() {
                     v-model="user.is_all_warehouses"
                     :model-value="!!user.is_all_warehouses"
                     :label="labels.user.is_all_warehouses"
-                    density="comfortable"
                     hide-details="auto"
                 ></v-checkbox>
                 <v-select
@@ -432,8 +410,6 @@ function onClose() {
                     item-value="value"
                     multiple
                     chips
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 ></v-select>
               </v-col>
@@ -442,7 +418,6 @@ function onClose() {
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
-                size="small"
                 variant="outlined"
                 color="error"
                 class="ma-1"
@@ -452,7 +427,6 @@ function onClose() {
             </v-btn>
             <v-btn
                 type="submit"
-                size="small"
                 color="primary"
                 variant="flat"
                 class="ma-1"
@@ -472,7 +446,6 @@ function onClose() {
         <v-text-field
             v-model="search"
             prepend-icon="mdi-magnify"
-            density="compact"
             hide-details
             label="Buscar"
             single-line
@@ -487,7 +460,6 @@ function onClose() {
             name-file="Usuarios"
         ></ExportBtn>
         <v-btn
-            size="small"
             color="primary"
             class="ma-1"
             prepend-icon="mdi-account-plus"
@@ -503,7 +475,6 @@ function onClose() {
             :search="search"
             hover
             class="elevation-2"
-            density="compact"
             :no-data-text="labels.no_data_table"
             :loading="loading"
         >
@@ -511,7 +482,6 @@ function onClose() {
             <v-switch
                 :model-value="!!item.statut"
                 color="primary"
-                density="compact"
                 hide-details
                 @change="isChecked(item)"
             ></v-switch>

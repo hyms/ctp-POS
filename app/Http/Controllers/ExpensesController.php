@@ -30,10 +30,12 @@ class ExpensesController extends Controller
 //        $view_records = Role::findOrFail($role->id)->inRole('record_view');
 
         $filter = collect($request->get('filter'));
-
+//get warehouses assigned to user
+        $warehouses = helpers::getWarehouses(auth()->user());
         // Check If User Has Permission View  All Records
         $Expenses = Expense::with('expense_category', 'warehouse')
-            ->where('deleted_at', '=', null);
+            ->where('deleted_at', '=', null)
+            ->whereIn('warehouse_id', $warehouses->pluck('id'));
 
         if ($filter->count() > 0) {
             $filterData = false;
@@ -75,8 +77,6 @@ class ExpensesController extends Controller
 
         $Expenses_category = ExpenseCategory::where('deleted_at', '=', null)->get(['id', 'name']);
 
-        //get warehouses assigned to user
-        $warehouses = helpers::getWarehouses(auth()->user());
 
         Inertia::share('titlePage', 'Gastos');
         return Inertia::render('Expense/Index_Expense', [

@@ -1,20 +1,26 @@
 <script setup>
 import Menu from "@/Components/Menu.vue";
-import moment from "moment";
-import {ref} from "vue";
+import Snackbar from "@/Components/snackbar.vue";
 
-const props = defineProps({loading: {type: Boolean, default: false}});
+import moment from "moment";
+
+const props = defineProps({
+  loading: {type: Boolean, default: false},
+  snackbarView: Boolean,
+  snackbarColor: String,
+  snackbarText: String,
+});
 </script>
 <template>
-  <v-dialog :model-value="loading" persistent width="auto">
-    <v-card color="surface">
-      <v-card-text>
-        <div class="text-center ma-1 pa-1">
-          <v-progress-circular color="primary" indeterminate :size="65" :width="6"></v-progress-circular>
-        </div>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+  <v-overlay
+      :model-value="loading"
+      class="align-center justify-center"
+  ></v-overlay>
+  <Snackbar
+      :snackbar-view="snackbarView"
+      :snackbar-color="snackbarColor"
+      :snackbar-text="snackbarText"
+  ></Snackbar>
   <v-layout full-height>
     <Menu></Menu>
 

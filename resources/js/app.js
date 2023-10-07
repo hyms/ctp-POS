@@ -53,12 +53,17 @@ const vuetify = createVuetify({
         },
     },
     defaults: {
+        VBtn: {size:'small'},
         VCard: {density: 'compact'},
         VTable: {density: 'compact'},
+        vDataTable: {density: 'compact'},
         VTextField: {density: 'compact',variant:'outlined'},
+        VCheckbox: {density: 'compact'},
         VSelect: {density: 'compact',variant:'outlined'},
         VAutocomplete: {density: 'compact',variant:'outlined'},
         VDataTable: {density: 'compact'},
+        VSwitch: {density: 'compact'},
+        VToolbar: {density: 'compact'},
     },
 });
 

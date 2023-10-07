@@ -132,7 +132,7 @@ onMounted(() => {
     >
     </snackbar>
 
-    <v-card>
+    <v-card :loading="loading">
       <v-toolbar height="10"></v-toolbar>
       <v-card-text>
         <v-form @submit.prevent="Submit_Expense" ref="form">

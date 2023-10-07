@@ -4,7 +4,6 @@ import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/ExportBtn.vue";
 import FilterForm from "./filter_form.vue";
-import helper from "@/helpers";
 import labels from "@/labels";
 import {router} from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
@@ -87,7 +86,7 @@ function Delete_Expense(id) {
 }
 </script>
 <template>
-  <layout :loading="loading">
+  <layout>
     <snackbar
         :snackbar="snackbar"
         :snackbar-text="snackbarText"
@@ -140,6 +139,7 @@ function Delete_Expense(id) {
             class="elevation-2"
             density="compact"
             :no-data-text="labels.no_data_table"
+            :loading="loading"
         >
           <template v-slot:item.actions="{ item }">
             <v-btn
