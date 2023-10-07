@@ -14,11 +14,10 @@ use App\Models\User;
 use App\Models\UserWarehouse;
 use App\utils\helpers;
 use Carbon\Carbon;
-use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class TransferController extends BaseController
+class TransferController extends Controller
 {
 
     //------------ Show All Transfers  -----------\\
@@ -31,7 +30,7 @@ class TransferController extends BaseController
 
         // How many items do you want to display.
         $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+        $pageStart = Request::get('page', 1);
         // Start displaying items from this number;
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;

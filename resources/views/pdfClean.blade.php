@@ -3,29 +3,23 @@
     <meta charset="utf-8"/>
     <style>
         @media print {
-
             .change {
                 font-size: 10px !important;
             }
-
             * {
                 font-size: 12px;
                 line-height: 18px;
             }
-
             body {
                 margin: 0.5cm;
                 margin-bottom: 1.6cm;
             }
-
             td, th {
                 padding: 1px 0;
             }
-
             #invoice-POS table tr {
                 border-bottom: 2px dotted #05070b;
             }
-
         }
 
         .pos_page {
@@ -103,22 +97,18 @@
             align-content: center;
         }
 
-
         @media (min-width: 1024px) {
             #pos .list-grid {
                 height: 100vh;
                 min-height: 100vh;
                 overflow: scroll;
             }
-
         }
-
         #pos .card.o-hidden {
             width: 19%;;
             max-width: 19%;;
             min-width: 130px;
         }
-
         #pos .input-customer {
             position: relative;
             display: flex;
@@ -126,114 +116,89 @@
             align-items: stretch;
             width: 100%;
         }
-
         #pos .card.o-hidden:hover {
             cursor: pointer;
             border: 1px solid;
         }
-
         * {
             font-size: 14px;
             font-family: 'Ubuntu', sans-serif;
             text-transform: capitalize;
 
         }
-
         td,
         th,
         tr,
         table {
             border-collapse: collapse;
         }
-
         tr {
             border-bottom: 2px dotted #05070b;
         }
-
         table {
             width: 100%;
         }
-
         tfoot tr th:first-child {
             text-align: left;
         }
-
         .total {
             font-weight: bold;
             font-size: 12px;
         }
-
-
         .change {
             font-size: 10px;
             margin-top: 25px;
         }
-
         .centered {
             text-align: center;
             align-content: center;
         }
-
         #invoice-POS {
             max-width: 400px;
             margin: 0px auto;
         }
-
-
         #top .logo {
             height: 100px;
             width: 100px;
             background-size: 100px 100px;
         }
-
         .info {
             margin-bottom: 20px;
         }
-
         .title {
             float: right;
         }
-
         .title p {
             text-align: right;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
         }
-
         #invoice-POS table tr {
             border-bottom: 2px dotted #05070b;
         }
-
         .tabletitle {
             font-size: .5em;
             background: #EEE;
         }
-
         #legalcopy {
             margin-top: 5mm;
         }
-
         #legalcopy p {
             text-align: center;
         }
-
         #bar {
             text-align: center;
         }
-
         .quantity {
             max-width: 95px;
             width: 95px;
         }
-
         .quantity input {
             text-align: center;
             border: none;
         }
-
         .quantity .form-control:focus {
             color: #374151;
             background-color: unset;
@@ -241,7 +206,6 @@
             outline: 0;
             box-shadow: unset;
         }
-
         .quantity span {
             padding: 8px;
         }

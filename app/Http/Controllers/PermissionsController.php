@@ -10,7 +10,7 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 
-class PermissionsController extends BaseController
+class PermissionsController extends Controller
 {
 
     //----------- GET ALL Roles --------------\\

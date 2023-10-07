@@ -32,7 +32,7 @@ use DB;
 use PDF;
 use ArPHP\I18N\Arabic;
 
-class PurchasesController extends BaseController
+class PurchasesController extends Controller
 {
 
     //------------- Show ALL Purchases ----------\\
