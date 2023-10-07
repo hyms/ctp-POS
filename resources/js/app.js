@@ -53,7 +53,6 @@ const vuetify = createVuetify({
         },
     },
     defaults: {
-        // VBtn: {density: 'compact'},
         VCard: {density: 'compact'},
         VTable: {density: 'compact'},
         VTextField: {density: 'compact',variant:'outlined'},

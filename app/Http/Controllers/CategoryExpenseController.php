@@ -86,9 +86,9 @@ class CategoryExpenseController extends Controller
     public function destroy(Request $request, $id)
     {
 //        $this->authorizeForUser($request->user('api'), 'delete', ExpenseCategory::class);
-        $role = Auth::user()->roles()->first();
+//        $role = Auth::user()->roles()->first();
 //        $view_records = Role::findOrFail($role->id)->inRole('record_view');
-        $ExpenseCategory = ExpenseCategory::findOrFail($id);
+        $ExpenseCategory = ExpenseCategory::find($id);
 
         // Check If User Has Permission view All Records
 //        if (!$view_records) {

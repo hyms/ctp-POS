@@ -151,11 +151,11 @@ function onCloseDelete() {
 }
 
 //--------------------------- Delete Category----------------\\
-function Delete_Category(id) {
+function Delete_Category() {
   loading.value = true;
   snackbar.value = false;
   axios
-      .delete("/expenses_category/" + id)
+      .delete("/expenses_category/" + category.value.id)
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
