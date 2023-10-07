@@ -198,12 +198,10 @@ function onCloseDelete() {
 </script>
 
 <template>
-  <Layout>
-    <snackbar
-        :snackbar="snackbar"
-        :snackbar-color="snackbarColor"
-        :snackbar-text="snackbarText"
-    ></snackbar>
+  <Layout
+      :snackbar-view="snackbar"
+      :snackbar-color="snackbarColor"
+      :snackbar-text="snackbarText">
     <delete-dialog
         :model="dialogDelete"
         :on-save="Remove_Warehouse"
@@ -220,7 +218,6 @@ function onCloseDelete() {
         <v-form ref="form" @submit.prevent="onSave">
           <v-toolbar
               border
-              density="compact"
               :title="(editmode ? 'Modificar' : 'Nuevo') + ' Agencia'"
           >
           </v-toolbar>
@@ -234,8 +231,6 @@ function onCloseDelete() {
                     v-model="warehouse.name"
                     :placeholder="labels.warehouse.name"
                     :rules="helper.required"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -247,8 +242,6 @@ function onCloseDelete() {
                     :label="labels.warehouse.mobile"
                     v-model="warehouse.mobile"
                     :placeholder="labels.warehouse.mobile"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -260,8 +253,6 @@ function onCloseDelete() {
                     :label="labels.warehouse.city"
                     v-model="warehouse.city"
                     :placeholder="labels.warehouse.city"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -273,8 +264,6 @@ function onCloseDelete() {
                     :label="labels.warehouse.email"
                     v-model="warehouse.email"
                     :placeholder="labels.warehouse.email"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -285,7 +274,6 @@ function onCloseDelete() {
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
-                size="small"
                 variant="outlined"
                 color="error"
                 class="ma-1"
@@ -295,7 +283,6 @@ function onCloseDelete() {
             </v-btn>
             <v-btn
                 type="submit"
-                size="small"
                 color="primary"
                 variant="elevated"
                 class="ma-1"
@@ -314,7 +301,6 @@ function onCloseDelete() {
         <v-text-field
             v-model="search"
             prepend-icon="mdi-magnify"
-            density="compact"
             hide-details
             :label="labels.search"
             single-line
@@ -323,7 +309,6 @@ function onCloseDelete() {
       </v-col>
       <v-col cols="12" sm="6" class="text-right">
         <v-btn
-            size="small"
             color="primary"
             class="ma-1"
             prepend-icon="mdi-account-plus"

@@ -6,6 +6,9 @@ import helper from "@/helpers";
 import labels from "@/labels";
 import {router} from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/DeleteDialog.vue";
+import DeleteBtn from "@/Components/DeleteBtn.vue";
+import ModifyBtn from "@/Components/ModifyBtn.vue";
+import NewBtn from "@/Components/NewBtn.vue";
 
 const props = defineProps({
     sales_types: Array,
@@ -142,6 +145,7 @@ function reset_Form() {
 
 //---------------------- delete modal  ------------------------------\\
 function Delete_SalesType(item) {
+  console.log(item)
     reset_Form();
     sales_type.value = item;
     dialogDelete.value = true;
@@ -182,12 +186,10 @@ function Remove_SalesType() {
 }
 </script>
 <template>
-    <Layout>
-        <snackbar
-            :snackbar="snackbar"
-            :snackbar-color="snackbarColor"
-            :snackbar-text="snackbarText"
-        ></snackbar>
+    <Layout
+        :snackbar-view="snackbar"
+        :snackbar-color="snackbarColor"
+        :snackbar-text="snackbarText">
         <delete-dialog
             :model="dialogDelete"
             :on-close="onCloseDelete"
@@ -202,10 +204,8 @@ function Remove_SalesType() {
         >
             <v-card>
                 <v-form ref="form" @submit.prevent="Submit_SalesType">
-
                     <v-toolbar
                         border
-                        density="compact"
                         :title="(editmode ? 'Modificar' : 'Nuevo') + ' Tipo de Venta'"
                     >
                     </v-toolbar>
@@ -219,8 +219,6 @@ function Remove_SalesType() {
                                     v-model="sales_type.code"
                                     :placeholder="labels.sales_type.code"
                                     :rules="helper.required"
-                                    variant="outlined"
-                                    density="comfortable"
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -233,8 +231,6 @@ function Remove_SalesType() {
                                     v-model="sales_type.name"
                                     :placeholder="labels.sales_type.name"
                                     :rules="helper.required"
-                                    variant="outlined"
-                                    density="comfortable"
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -244,7 +240,6 @@ function Remove_SalesType() {
                     <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn
-                            size="small"
                             variant="outlined"
                             color="error"
                             class="ma-1"
@@ -254,7 +249,6 @@ function Remove_SalesType() {
                         </v-btn>
                         <v-btn
                             type="submit"
-                            size="small"
                             color="primary"
                             variant="elevated"
                             class="ma-1"
@@ -281,15 +275,7 @@ function Remove_SalesType() {
                 ></v-text-field>
             </v-col>
             <v-col cols="12" sm="6" class="text-right">
-                <v-btn
-                    size="small"
-                    color="primary"
-                    class="ma-1"
-                    prepend-icon="mdi-account-plus"
-                    @click="New_SalesType"
-                >
-                    {{ labels.add }}
-                </v-btn>
+              <new-btn :label="labels.add" :on-click="New_SalesType"></new-btn>
             </v-col>
         </v-row>
         <v-row>
@@ -304,24 +290,8 @@ function Remove_SalesType() {
                         :loading="loading"
                     >
                         <template v-slot:item.actions="{ item }">
-                            <v-btn
-                                class="ma-1"
-                                color="primary"
-                                icon="mdi-pencil"
-                                size="x-small"
-                                variant="outlined"
-                                @click="Edit_SalesType(item)"
-                            >
-                            </v-btn>
-                            <v-btn
-                                class="ma-1"
-                                color="error"
-                                icon="mdi-delete"
-                                size="x-small"
-                                variant="outlined"
-                                @click="Delete_SalesType(item)"
-                            >
-                            </v-btn>
+                          <modify-btn :on-click="()=>{Edit_SalesType(item)}"></modify-btn>
+                          <delete-btn :on-click="()=>{Delete_SalesType(item)}"></delete-btn>
                         </template>
                     </v-data-table>
                 </v-card>
