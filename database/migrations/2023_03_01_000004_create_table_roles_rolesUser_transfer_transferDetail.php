@@ -12,35 +12,40 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('transfers', function(Blueprint $table)
-        {
+        Schema::create('transfers', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->id();
             $table->foreignId('user_id')->constrained('users');
-            $table->string('Ref');
+            $table->string('Ref', 192);
             $table->date('date');
-            $table->foreignId('from_warehouse_id')->nullable()->constrained('sucursales');
-            $table->foreignId('to_warehouse_id')->nullable()->constrained('sucursales');
-            $table->integer('items');
-            $table->decimal('tax_rate', 10, 0)->nullable()->default(0);
-            $table->decimal('discount', 10, 0)->nullable()->default(0);
-            $table->decimal('shipping', 10, 0)->nullable()->default(0);
-            $table->decimal('total', 10, 0)->default(0);
+            $table->foreignId('from_warehouse_id')->constrained('warehouses');
+            $table->foreignId('to_warehouse_id')->constrained('warehouses');
+            $table->float('items', 10, 0);
+            $table->float('tax_rate', 10, 0)->nullable()->default(0);
+            $table->float('TaxNet', 10, 0)->nullable()->default(0);
+            $table->float('discount', 10, 0)->nullable()->default(0);
+            $table->float('shipping', 10, 0)->nullable()->default(0);
+            $table->float('GrandTotal', 10, 0)->default(0);
             $table->string('statut', 192);
             $table->text('notes')->nullable();
             $table->timestamps(6);
             $table->softDeletes();
         });
-        Schema::create('transfer_details', function(Blueprint $table)
-        {
+        Schema::create('transfer_details', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->id();
             $table->foreignId('transfer_id')->constrained('transfers');
-            $table->foreignId('product_id')->constrained('productos');
-            $table->foreignId('product_type')->constrained('productoTipo');
-            $table->decimal('cost');
-            $table->integer('quantity');
-            $table->decimal('total');
+            $table->foreignId('product_id')->constrained('products');
+            $table->foreignId('product_variant_id')->nullable()->constrained('product_variants');
+            $table->foreignId('purchase_unit_id')->nullable()->constrained('units');
+
+            $table->float('cost', 10, 0);
+            $table->float('TaxNet', 10, 0)->nullable();
+            $table->string('tax_method', 192)->nullable()->default('1');
+            $table->float('discount', 10, 0)->nullable();
+            $table->string('discount_method', 192)->nullable()->default('1');
+            $table->float('quantity', 10, 0);
+            $table->float('total', 10, 0);
             $table->timestamps(6);
         });
         Schema::create('roles', function(Blueprint $table)
