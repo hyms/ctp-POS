@@ -9,9 +9,10 @@ import * as directives from "vuetify/directives";
 import * as labs from "vuetify/labs/components";
 import {es} from "vuetify/locale";
 import moment from "moment";
-
+import 'typeface-roboto/index.css';
 
 import "@/../css/main.scss";
+// import "@/../css/app.css";
 
 import {resolvePageComponent} from "laravel-vite-plugin/inertia-helpers";
 // import 'vuetify/dist/vuetify.min.css'
@@ -22,8 +23,9 @@ import {createInertiaApp} from "@inertiajs/vue3";
 
 const customLight = {
     colors: {
-        // background: "#f7f7f7",
-        surface: "#f7f7f7",
+        // background: "rgba(0, 0, 21, 0.2)",
+        // surface: "#f7f7f7",
+        surface: "rgba(245,245,245,0)",
         primary: "#3c858d",
         secondary: "#5e8592",
         error: "#e75f5f",

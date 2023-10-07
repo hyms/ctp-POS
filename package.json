@@ -17,6 +17,7 @@
         "jspdf-html2canvas": "^1.4.9",
         "moment": "^2.29.4",
         "print-js": "^1.6.0",
+        "typeface-roboto": "^1.1.13",
         "vue-echarts": "^6.5.4",
         "vue-html-to-paper": "^2.0.0",
         "vue-json-excel3": "^1.0.8",

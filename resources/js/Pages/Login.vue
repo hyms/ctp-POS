@@ -40,7 +40,7 @@ function submit() {
       <div class="auth-inner">
         <v-card class="auth-card" :elevation="5">
           <!-- title -->
-          <v-card-title> Bienvenido a xCTP</v-card-title>
+          <v-card-title class="text-2xl"> Bienvenido a xCTP</v-card-title>
           <v-card-subtitle>
             Por favor ingresa tu usuario y contraseña
           </v-card-subtitle>
