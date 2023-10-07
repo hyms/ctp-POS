@@ -53,7 +53,7 @@ class PDFController extends Controller
                 'isVenta' => $isVenta
             ];
 
-            $this->mpdf = new Mpdf();
+            $this->mpdf = new Mpdf(['tempDir' =>storage_path('app/tmp')]);
             $view = View::make('pdfOrden', $data);
             $html = $view->render();
             $this->mpdf->WriteHTML($html);
@@ -112,7 +112,7 @@ class PDFController extends Controller
                 'fechaOrden' => $mytime->format("d/m/Y H:i"),
             ];
 
-            $this->mpdf = new Mpdf();
+            $this->mpdf = new Mpdf(['tempDir' =>storage_path('app/tmp')]);
             $view = View::make('pdfRecibo', $data);
             $html = $view->render();
             $this->mpdf->WriteHTML($html);

@@ -10,8 +10,7 @@ import moment from 'moment'
 import * as momentLocale from 'moment/locale/es'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 // import 'vuetify/dist/vuetify.min.css'
-
-import {createInertiaApp} from '@inertiajs/inertia-vue';
+import { createInertiaApp } from '@inertiajs/inertia-vue'
 import {InertiaProgress} from '@inertiajs/progress';
 
 createInertiaApp({
@@ -20,7 +19,7 @@ createInertiaApp({
         Vue.use(plugin)
         Vue.use(vueMoment, {moment});
         Vue.use(Vuetify)
-        Vue.mixin({methods: {route}})
+        // Vue.mixin({methods: {route}})
         new Vue({
             render: h => h(App, props),
             vuetify: new Vuetify({

@@ -3,12 +3,22 @@
     <head>
         <meta charset="utf-8">
         <link rel="shortcut icon" href="/favicon.jpeg">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        @vite('resources/js/app.js')
+        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
+
+        @routes
         @inertiaHead
+        @vite(['resources/js/app.js'])
     </head>
-    <body>
+    <body class="font-sans antialiased">
         @inertia
+
+        @env ('local')
+            <script src="http://localhost:8080/js/bundle.js"></script>
+        @endenv
     </body>
 </html>
