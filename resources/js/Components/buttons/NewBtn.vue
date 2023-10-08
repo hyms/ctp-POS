@@ -8,7 +8,7 @@ const props = defineProps({
   <v-btn
       color="primary"
       class="ma-1"
-      prepend-icon="mdi-account-plus"
+      prepend-icon="mdi-plus"
       @click="onClick"
   >
     {{ label }}

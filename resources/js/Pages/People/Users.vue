@@ -1,7 +1,7 @@
 <script setup>
 import {ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import ExportBtn from "@/Components/ExportBtn.vue";
+import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 
 import helper from "@/helpers";
 import labels from "@/labels";

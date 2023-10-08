@@ -21,11 +21,12 @@ const menu = ref(false);
 
 onMounted(() => {
   form.value = props.filter_form;
-  if(form.value.category)
-    form.value.category=helpers.getObjectValue(form.value.category,props.categories)
-  if(form.value.warehouse)
-    form.value.warehouse=helpers.getObjectValue(form.value.warehouse,props.warehouses)
-
+  if(form.value.category) {
+    form.value.category = helpers.getObjectValue(form.value.category, props.categories)
+  }
+  if(form.value.warehouse) {
+    form.value.warehouse = helpers.getObjectValue(form.value.warehouse, props.warehouses)
+  }
 });
 
 function search() {
@@ -50,7 +51,6 @@ function search() {
       <v-btn
           color="primary"
           variant="outlined"
-          size="small"
           elevation="1"
           class="mr-2 my-1"
           v-bind="props"
@@ -67,8 +67,6 @@ function search() {
             <v-col cols="12" sm="6">
               <v-text-field
                   v-model="form.start_date"
-                  variant="outlined"
-                  density="compact"
                   clearable
                   hide-details="auto"
                   type="date"
@@ -78,8 +76,6 @@ function search() {
             <v-col cols="12" sm="6">
               <v-text-field
                   v-model="form.end_date"
-                  variant="outlined"
-                  density="compact"
                   clearable
                   hide-details="auto"
                   type="date"
@@ -89,8 +85,6 @@ function search() {
             <v-col cols="12" sm="6">
               <v-text-field
                   v-model="form.ref"
-                  variant="outlined"
-                  density="compact"
                   clearable
                   hide-details="auto"
                   type="text"
@@ -102,8 +96,6 @@ function search() {
                   v-model="form.category"
                   item-title="name"
                   item-value="id"
-                  variant="outlined"
-                  density="compact"
                   clearable
                   hide-details="auto"
                   :items="categories"
@@ -115,8 +107,6 @@ function search() {
                   v-model="form.warehouse"
                   item-title="name"
                   item-value="id"
-                  variant="outlined"
-                  density="compact"
                   clearable
                   hide-details="auto"
                   :items="warehouses"
@@ -129,7 +119,6 @@ function search() {
         <v-spacer></v-spacer>
         <v-btn
             variant="text"
-            size="small"
             color="error"
             @click="menu = false"
         >
@@ -137,7 +126,6 @@ function search() {
         </v-btn>
         <v-btn
             variant="tonal"
-            size="small"
             color="primary"
             @click="search"
         >

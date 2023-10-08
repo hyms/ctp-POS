@@ -55,16 +55,17 @@ const vuetify = createVuetify({
         },
     },
     defaults: {
-        VBtn: {size:'small'},
+        VBtn: {size: 'small'},
         VCard: {density: 'compact'},
         VTable: {density: 'compact'},
-        VTextField: {density: 'compact',variant:'outlined'},
-        VCheckbox: {density: 'compact'},
-        VSelect: {density: 'compact',variant:'outlined'},
-        VAutocomplete: {density: 'compact',variant:'outlined'},
+        VTextarea: {density: 'compact', variant: 'outlined', color: 'primary'},
+        VTextField: {density: 'compact', variant: 'outlined', color: 'primary'},
+        VCheckbox: {density: 'compact', color: 'primary'},
+        VSelect: {density: 'compact', variant: 'outlined', color: 'primary'},
+        VAutocomplete: {density: 'compact', variant: 'outlined', color: 'primary'},
         VDataTable: {density: 'compact'},
-        VSwitch: {density: 'compact'},
-        VToolbar: {density: 'compact'},
+        VSwitch: {density: 'compact', color: 'primary'},
+        VToolbar: {density: 'comfortable'},
     },
 });
 
@@ -83,6 +84,5 @@ createInertiaApp({
     },
     progress: {
         color: "#007b89",
-        showSpinner: true,
     },
 });

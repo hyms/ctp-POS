@@ -80,7 +80,22 @@ export default {
         amount: "Monto",
         ref:"Codigo"
     },
-
+    product:{
+        name: "Nombre",
+        code: "Codigo",
+        cost: "Precio Compra",
+        price: "Precio Venta",
+        category_id: "Categoria",
+        TaxNet: "Factura",
+        tax_method: "Metodo de Factura",
+        unit_id: "Unidad",
+        unit_sale_id: "Unidad de Venta",
+        unit_purchase_id: "Unidad de Compra",
+        stock_alert: "Alerta en Stock",
+        note: "Detalle",
+        is_variant: "El Producto tiene multiples variantes",
+        not_selling: "Este Producto no es para la venta",
+    },
     //no data
     no_fill_data: "Debe llenar correctamente los datos",
     no_add_product: "debe adicionar un producto",

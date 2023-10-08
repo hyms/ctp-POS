@@ -114,7 +114,6 @@ watch(
 );
 
 onMounted(() => {
-
   if (props.expense != null) {
     expenseForm.value = props.expense;
     editmode.value = true;
@@ -124,16 +123,13 @@ onMounted(() => {
 });
 </script>
 <template>
-  <Layout :loading="loading">
-    <snackbar
-        v-model="snackbar"
-        :snackbarColor="snackbarColor"
-        :snackbarText="snackbarText"
-    >
-    </snackbar>
+  <Layout :loading="loading"
+          v-model="snackbar"
+          :snackbarColor="snackbarColor"
+          :snackbarText="snackbarText">
 
     <v-card :loading="loading">
-      <v-toolbar height="10"></v-toolbar>
+      <v-toolbar height="15" ></v-toolbar>
       <v-card-text>
         <v-form @submit.prevent="Submit_Expense" ref="form">
           <v-row class="mt-3">
@@ -144,8 +140,6 @@ onMounted(() => {
                   v-model="expenseForm.date"
                   :placeholder="labels.expense.date"
                   :rules="helper.required"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
                   type="date"
               >
@@ -160,8 +154,6 @@ onMounted(() => {
                   :label="labels.expense.warehouse_id"
                   item-title="name"
                   item-value="id"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
                   clearable
                   :rules="helper.required"
@@ -176,8 +168,6 @@ onMounted(() => {
                   :label="labels.expense.category_id"
                   item-title="name"
                   item-value="id"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
                   clearable
                   :rules="helper.required"
@@ -191,8 +181,6 @@ onMounted(() => {
                   v-model="expenseForm.amount"
                   :placeholder="labels.expense.amount"
                   :rules="helper.required.concat(helper.numberWithDecimal)"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
               >
               </v-text-field>
@@ -206,8 +194,6 @@ onMounted(() => {
                   v-model="expenseForm.details"
                   :placeholder="labels.expense.details"
                   :rules="helper.required"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
               ></v-textarea>
             </v-col>

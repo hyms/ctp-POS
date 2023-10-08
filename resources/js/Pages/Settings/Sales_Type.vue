@@ -5,10 +5,10 @@ import Snackbar from "@/Components/snackbar.vue";
 import helper from "@/helpers";
 import labels from "@/labels";
 import {router} from "@inertiajs/vue3";
-import DeleteDialog from "@/Components/DeleteDialog.vue";
-import DeleteBtn from "@/Components/DeleteBtn.vue";
-import ModifyBtn from "@/Components/ModifyBtn.vue";
-import NewBtn from "@/Components/NewBtn.vue";
+import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
+import DeleteBtn from "@/Components/buttons/DeleteBtn.vue";
+import ModifyBtn from "@/Components/buttons/ModifyBtn.vue";
+import NewBtn from "@/Components/buttons/NewBtn.vue";
 
 const props = defineProps({
     sales_types: Array,

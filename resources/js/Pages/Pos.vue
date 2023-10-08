@@ -6,7 +6,7 @@ import helper from "@/helpers";
 import labels from "@/labels";
 import Snackbar from "@/Components/snackbar.vue";
 import MenuUser from "@/Components/Menu_user.vue";
-import Full_screen from "@/Components/full_screen.vue";
+import Full_screen from "@/Components/buttons/full_screen.vue";
 import InvoiceDialog from "@/Components/InvoiceDialog.vue";
 import SelectClient from "@/Components/select_client.vue";
 

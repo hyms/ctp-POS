@@ -5,7 +5,7 @@ import Snackbar from "@/Components/snackbar.vue";
 import helper from "@/helpers";
 import labels from "@/labels";
 import {router} from "@inertiajs/vue3";
-import DeleteDialog from "@/Components/DeleteDialog.vue";
+import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
 
 const props = defineProps({
   warehouses: Array,

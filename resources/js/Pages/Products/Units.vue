@@ -4,7 +4,8 @@ import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import helper from "@/helpers";
 import {router} from "@inertiajs/vue3";
-import DeleteDialog from "@/Components/DeleteDialog.vue";
+import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
+import NewBtn from "@/Components/buttons/NewBtn.vue";
 
 const props = defineProps({
   units: Array,
@@ -26,7 +27,7 @@ const show_operator = ref(false);
 const fields = ref([
   {title: "Nombre", key: "name"},
   {title: "Nombre corto", key: "ShortName"},
-  {title: "Unidad base", key: "base_unit"},
+  {title: "Unidad base", key: "base_unit_name"},
   {title: "Operador", key: "operator"},
   {title: "Valor de Operacion", key: "operator_value"},
   {title: "Acciones", key: "actions"},
@@ -222,12 +223,10 @@ function Remove_Unit() {
 }
 </script>
 <template>
-  <Layout>
-    <snackbar
-        :snackbar="snackbar"
-        :snackbar-color="snackbarColor"
-        :snackbar-text="snackbarText"
-    ></snackbar>
+  <Layout
+      :snackbar-view="snackbar"
+      :snackbar-color="snackbarColor"
+      :snackbar-text="snackbarText">
     <delete-dialog
         :model="dialogDelete"
         :on-save="Remove_Unit"
@@ -247,9 +246,8 @@ function Remove_Unit() {
             :title="(editmode ? 'Modificar' : 'Nueva') + ' Unidad'"
         >
         </v-toolbar>
-
+        <v-form ref="form">
         <v-card-text>
-          <v-form ref="form">
             <v-row>
               <!-- Name -->
               <v-col cols="12">
@@ -257,11 +255,7 @@ function Remove_Unit() {
                     :label="unitLabels.name + ' *'"
                     v-model="unit.name"
                     :placeholder="unitLabels.name"
-                    :rules="
-                                        helper.required.concat(helper.max(15))
-                                    "
-                    variant="outlined"
-                    density="comfortable"
+                    :rules="helper.required.concat(helper.max(15))"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -272,11 +266,7 @@ function Remove_Unit() {
                     :label="unitLabels.ShortName + ' *'"
                     v-model="unit.ShortName"
                     :placeholder="unitLabels.ShortName"
-                    :rules="
-                                        helper.required.concat(helper.max(15))
-                                    "
-                    variant="outlined"
-                    density="comfortable"
+                    :rules="helper.required.concat(helper.max(15))"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -290,8 +280,6 @@ function Remove_Unit() {
                     :label="unitLabels.base_unit"
                     item-title="title"
                     item-value="value"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                     clearable
                 ></v-select>
@@ -300,18 +288,10 @@ function Remove_Unit() {
               <v-col cols="12" v-if="show_operator">
                 <v-select
                     v-model="unit.operator"
-                    :items="[
-                                        {
-                                            title: 'Multiplicar (*)',
-                                            value: '*',
-                                        },
-                                        { title: 'Dividir (/)', value: '/' },
-                                    ]"
+                    :items="helper.getOperatorUnit()"
                     :label="unitLabels.operator"
                     item-title="title"
                     item-value="value"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 ></v-select>
               </v-col>
@@ -322,24 +302,16 @@ function Remove_Unit() {
                     :label="unitLabels.operator_value + ' *'"
                     v-model="unit.operator_value"
                     :placeholder="unitLabels.operator_value"
-                    :rules="
-                                        helper.required.concat(
-                                            helper.numberWithDecimal
-                                        )
-                                    "
-                    variant="outlined"
-                    density="comfortable"
+                    :rules="helper.required.concat(helper.numberWithDecimal)"
                     hide-details="auto"
                 >
                 </v-text-field>
               </v-col>
             </v-row>
-          </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
-              size="small"
               variant="outlined"
               color="error"
               class="ma-1"
@@ -348,7 +320,6 @@ function Remove_Unit() {
             Cancelar
           </v-btn>
           <v-btn
-              size="small"
               color="primary"
               variant="elevated"
               class="ma-1"
@@ -359,6 +330,7 @@ function Remove_Unit() {
             Guardar
           </v-btn>
         </v-card-actions>
+        </v-form>
       </v-card>
     </v-dialog>
 
@@ -367,7 +339,6 @@ function Remove_Unit() {
         <v-text-field
             v-model="search"
             prepend-icon="mdi-magnify"
-            density="compact"
             hide-details
             label="Buscar"
             single-line
@@ -375,15 +346,7 @@ function Remove_Unit() {
         ></v-text-field>
       </v-col>
       <v-col cols="12" sm="6" class="text-right">
-        <v-btn
-            size="small"
-            color="primary"
-            class="ma-1"
-            prepend-icon="mdi-account-plus"
-            @click="New_Unit"
-        >
-          Añadir
-        </v-btn>
+        <new-btn :on-click="New_Unit" label="Añadir"></new-btn>
       </v-col>
     </v-row>
     <v-row>
@@ -394,7 +357,6 @@ function Remove_Unit() {
             :search="search"
             hover
             class="elevation-2"
-            density="compact"
             no-data-text="No existen datos a mostrar"
             :loading="loading"
             loading-text="Cargando..."

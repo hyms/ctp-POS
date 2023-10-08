@@ -1,7 +1,6 @@
 <script setup>
 import {ref, onMounted, watch} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import Snackbar from "@/Components/snackbar.vue";
 import {router} from "@inertiajs/vue3";
 import helper from "@/helpers";
 
@@ -353,16 +352,13 @@ onMounted(() => {
 });
 </script>
 <template>
-  <Layout :loading="loading">
-    <snackbar
-        v-model="snackbar"
-        :snackbarColor="snackbarColor"
-        :snackbarText="snackbarText"
-    >
-    </snackbar>
+  <layout :loading="loading"
+          :snackbar-view="snackbar"
+          :snackbar-text="snackbarText"
+          :snackbar-color="snackbarColor">
     <v-form ref="form">
       <v-card>
-        <v-toolbar height="10"></v-toolbar>
+        <v-toolbar height="15"></v-toolbar>
         <v-card-text>
           <v-row>
             <!-- warehouse -->
@@ -374,8 +370,6 @@ onMounted(() => {
                   :label="adjustmentLabel.warehouse_id"
                   item-title="title"
                   item-value="value"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
                   clearable
                   :rules="helper.required"
@@ -388,8 +382,6 @@ onMounted(() => {
               <v-text-field
                   v-model="adjustmentForm.date"
                   :label="adjustmentLabel.date"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
                   type="date"
                   :rules="helper.required"
@@ -407,7 +399,6 @@ onMounted(() => {
                   :model-value="search_input"
                   item-title="name"
                   item-value="id"
-                  density="comfortable"
                   variant="solo-filled"
                   hide-no-data
                   hide-details
@@ -422,7 +413,6 @@ onMounted(() => {
               <v-table
                   hover
                   class="border rounded"
-                  density="comfortable"
               >
                 <thead>
                 <tr class="bg-secondary">
@@ -473,29 +463,18 @@ onMounted(() => {
                   </td>
                   <td>
                     <v-text-field
-                        variant="outlined"
-                        density="compact"
+                        class="my-1"
                         hide-details="auto"
                         :rules="helper.number"
                         v-model="detail.quantity"
-                        @keyup="
-                                                    Verified_Qty(
-                                                        detail,
-                                                        detail.detail_id
-                                                    )
-                                                "
+                        @keyup="Verified_Qty(detail,detail.detail_id)"
                         :min="0.0"
                         :max="detail.current"
                     >
                       <template v-slot:append>
                         <v-icon
                             color="secundary"
-                            @click="
-                                                            increment(
-                                                                detail,
-                                                                detail.detail_id
-                                                            )
-                                                        "
+                            @click="increment(detail,detail.detail_id)"
                         >
                           mdi-plus-box
                         </v-icon>
@@ -503,12 +482,7 @@ onMounted(() => {
                       <template v-slot:prepend>
                         <v-icon
                             color="secundary"
-                            @click="
-                                                            decrement(
-                                                                detail,
-                                                                detail.detail_id
-                                                            )
-                                                        "
+                            @click="decrement(detail,detail.detail_id)"
                         >
                           mdi-minus-box
                         </v-icon>
@@ -521,8 +495,6 @@ onMounted(() => {
                         :items="[ { title: 'Añadir', value: 'add' }, {title: 'Quitar',value: 'sub'} ]"
                         item-title="title"
                         item-value="value"
-                        variant="outlined"
-                        density="compact"
                         :hide-details="true"
                     ></v-select>
                   </td>
@@ -533,11 +505,7 @@ onMounted(() => {
                         icon="mdi-delete"
                         size="x-small"
                         variant="elevated"
-                        @click="
-                                                    Remove_Product(
-                                                        detail.detail_id
-                                                    )
-                                                "
+                        @click="Remove_Product(detail.detail_id)"
                     >
                     </v-btn>
                   </td>
@@ -551,8 +519,6 @@ onMounted(() => {
                   :label="adjustmentLabel.notes"
                   v-model="adjustmentForm.notes"
                   :placeholder="adjustmentLabel.notes"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
               ></v-textarea>
             </v-col>

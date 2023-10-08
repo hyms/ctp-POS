@@ -5,7 +5,7 @@ import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import printJS from "print-js";
 import helper from "@/helpers";
-import DeleteDialog from "@/Components/DeleteDialog.vue";
+import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
 import InvoiceDialog from "@/Components/InvoiceDialog.vue";
 
 const props = defineProps({

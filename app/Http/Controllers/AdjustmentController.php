@@ -29,10 +29,12 @@ class AdjustmentController extends Controller
 //        $this->authorizeForUser($request->user('api'), 'view', Adjustment::class);
 //        $role = Auth::user()->roles()->first();
 //        $view_records = Role::findOrFail($role->id)->inRole('record_view');
-
+//get warehouses assigned to user
+        $warehouses = $this->getWarehouses();
         // Check If User Has Permission View  All Records
         $Adjustments = Adjustment::with('warehouse')
             ->where('deleted_at', '=', null)
+            ->whereIn('warehouse_id',$warehouses->pluck('value'))
             ->where(function ($query) {
                 return $query->where('user_id', '=', Auth::user()->id);
             });
@@ -49,8 +51,7 @@ class AdjustmentController extends Controller
             $data->add($item);
         }
 
-        //get warehouses assigned to user
-        $warehouses = $this->getWarehouses();
+
         Inertia::share('titlePage', 'Ajustes en stock');
         return Inertia::render('Adjustment/Index_Adjustment', [
             'adjustments' => $data,
@@ -190,6 +191,7 @@ class AdjustmentController extends Controller
                 'warehouse_id' => $request['warehouse_id'],
                 'notes' => $request['notes'],
                 'date' => $request['date'],
+                'items' => $new_adjustment_details->count()
             ]);
 
         }, 10);
@@ -244,7 +246,7 @@ class AdjustmentController extends Controller
     public function getNumberOrder()
     {
         $last = DB::table('adjustments')->latest('id')->first();
-        return helpers::get_code($last?->Ref,"AJ");
+        return helpers::get_code($last?->Ref, "AJ");
     }
 
     //---------------- Show Form Create Adjustment ---------------\\
@@ -276,17 +278,13 @@ class AdjustmentController extends Controller
 //            // Check If User->id === Adjustment->id
 //            $this->authorizeForUser($request->user('api'), 'check_record', $Adjustment_data);
 //        }
-
+        $adjustment['warehouse_id'] = '';
         if ($Adjustment_data->warehouse_id) {
             if (Warehouse::where('id', $Adjustment_data->warehouse_id)
                 ->where('deleted_at', '=', null)
                 ->first()) {
                 $adjustment['warehouse_id'] = $Adjustment_data->warehouse_id;
-            } else {
-                $adjustment['warehouse_id'] = '';
             }
-        } else {
-            $adjustment['warehouse_id'] = '';
         }
 
         $adjustment['notes'] = $Adjustment_data->notes;

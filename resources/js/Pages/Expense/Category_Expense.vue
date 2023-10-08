@@ -5,7 +5,8 @@ import Snackbar from "@/Components/snackbar.vue";
 import helper from "@/helpers";
 import labels from "@/labels";
 import {router} from "@inertiajs/vue3";
-import DeleteDialog from "@/Components/DeleteDialog.vue";
+import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
+import NewBtn from "@/Components/buttons/NewBtn.vue";
 
 const props = defineProps({
   Expenses_category: Object,
@@ -180,12 +181,11 @@ function Delete_Category() {
 }
 </script>
 <template>
-  <Layout>
-    <snackbar
-        :snackbar="snackbar"
-        :snackbar-color="snackbarColor"
-        :snackbar-text="snackbarText"
-    ></snackbar>
+  <Layout
+      :snackbar-view="snackbar"
+      :snackbar-color="snackbarColor"
+      :snackbar-text="snackbarText"
+  >
     <delete-dialog
         :model="dialogDelete"
         :on-close="onCloseDelete"
@@ -216,8 +216,6 @@ function Delete_Category() {
                     v-model="category.name"
                     :placeholder="labels.category.name"
                     :rules="helper.required"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -230,8 +228,6 @@ function Delete_Category() {
                     v-model="category.description"
                     :placeholder="labels.category.description"
                     rows="4"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-textarea>
@@ -241,7 +237,6 @@ function Delete_Category() {
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
-                size="small"
                 variant="outlined"
                 color="error"
                 class="ma-1"
@@ -251,7 +246,6 @@ function Delete_Category() {
             </v-btn>
             <v-btn
                 type="submit"
-                size="small"
                 color="primary"
                 variant="elevated"
                 class="ma-1"
@@ -270,7 +264,6 @@ function Delete_Category() {
         <v-text-field
             v-model="search"
             prepend-icon="mdi-magnify"
-            density="compact"
             hide-details
             :label="labels.search"
             single-line
@@ -278,15 +271,7 @@ function Delete_Category() {
         ></v-text-field>
       </v-col>
       <v-col cols="12" sm="6" class="text-right">
-        <v-btn
-            size="small"
-            color="primary"
-            class="ma-1"
-            prepend-icon="mdi-account-plus"
-            @click="New_Category"
-        >
-          {{ labels.add }}
-        </v-btn>
+        <new-btn :on-click="New_Category" :label="labels.add"></new-btn>
       </v-col>
     </v-row>
     <v-row>
@@ -297,7 +282,6 @@ function Delete_Category() {
             :search="search"
             hover
             class="elevation-2"
-            density="compact"
             :no-data-text="labels.no_data_table"
             :loading="loading"
         >

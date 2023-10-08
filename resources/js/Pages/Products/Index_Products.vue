@@ -2,9 +2,9 @@
 import {ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
-import ExportBtn from "@/Components/ExportBtn.vue";
+import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import {router} from "@inertiajs/vue3";
-import DeleteDialog from "@/Components/DeleteDialog.vue";
+import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
 
 const props = defineProps({
   warehouses: Array,
@@ -153,12 +153,10 @@ function Remove_Product() {
 }
 </script>
 <template>
-  <layout :loading="loading">
-    <snackbar
-        :snackbar="snackbar"
-        :snackbar-text="snackbarText"
-        :snackbar-color="snackbarColor"
-    ></snackbar>
+  <layout :loading="loading"
+          :snackbar-view="snackbar"
+          :snackbar-text="snackbarText"
+          :snackbar-color="snackbarColor">
     <!-- Modal Remove Product -->
     <delete-dialog
         :model="dialogDelete"
@@ -170,7 +168,6 @@ function Remove_Product() {
         <v-text-field
             v-model="search"
             prepend-icon="mdi-magnify"
-            density="compact"
             hide-details
             label="Buscar"
             single-line
@@ -185,7 +182,7 @@ function Remove_Product() {
         ></ExportBtn>
         <!--                <v-btn-->
         <!--                    @click="Show_import_productos()"-->
-        <!--                    size="small"-->
+        <!--                    -->
         <!--                    class="ma-1"-->
         <!--                    color="info"-->
         <!--                    variant="elevated"-->
@@ -194,7 +191,6 @@ function Remove_Product() {
         <!--                    Importar-->
         <!--                </v-btn>-->
         <v-btn
-            size="small"
             color="primary"
             class="ma-1"
             prepend-icon="mdi-account-plus"
@@ -212,7 +208,6 @@ function Remove_Product() {
             :search="search"
             hover
             class="elevation-2"
-            density="compact"
             no-data-text="No existen datos a mostrar"
         >
           <template v-slot:item.actions="{ item }">
@@ -222,9 +217,7 @@ function Remove_Product() {
                 icon="mdi-eye"
                 size="x-small"
                 variant="outlined"
-                @click="
-                                router.visit('/products/detail/' + item.id)
-                            "
+                @click="router.visit('/products/detail/' + item.id)"
             >
             </v-btn>
             <v-btn
@@ -233,9 +226,7 @@ function Remove_Product() {
                 icon="mdi-pencil"
                 size="x-small"
                 variant="outlined"
-                @click="
-                                router.visit('/products/edit/' + item.id)
-                            "
+                @click="router.visit('/products/edit/' + item.id)"
             >
             </v-btn>
             <v-btn

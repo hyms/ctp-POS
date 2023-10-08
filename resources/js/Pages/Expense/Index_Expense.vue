@@ -1,12 +1,11 @@
 <script setup>
 import {ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import Snackbar from "@/Components/snackbar.vue";
-import ExportBtn from "@/Components/ExportBtn.vue";
+import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import FilterForm from "./filter_form.vue";
 import labels from "@/labels";
 import {router} from "@inertiajs/vue3";
-import DeleteDialog from "@/Components/DeleteDialog.vue";
+import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
 
 const props = defineProps({
   expenses: Object,
@@ -86,12 +85,11 @@ function Delete_Expense(id) {
 }
 </script>
 <template>
-  <layout>
-    <snackbar
-        :snackbar="snackbar"
-        :snackbar-text="snackbarText"
-        :snackbar-color="snackbarColor"
-    ></snackbar>
+  <layout
+      :snackbar-view="snackbar"
+      :snackbar-text="snackbarText"
+      :snackbar-color="snackbarColor"
+  >
     <!-- Modal Remove Expense -->
     <delete-dialog
         :model="dialogDelete"
@@ -103,7 +101,6 @@ function Delete_Expense(id) {
         <v-text-field
             v-model="search"
             prepend-icon="mdi-magnify"
-            density="compact"
             hide-details
             :label="labels.search"
             single-line
@@ -119,10 +116,9 @@ function Delete_Expense(id) {
             name-file="Gastos"
         ></ExportBtn>
         <v-btn
-            size="small"
             color="primary"
             class="ma-1"
-            prepend-icon="mdi-account-plus"
+            prepend-icon="mdi-plus"
             @click="router.visit('/expenses/create')"
         >
           {{ labels.add }}
@@ -137,7 +133,6 @@ function Delete_Expense(id) {
             :search="search"
             hover
             class="elevation-2"
-            density="compact"
             :no-data-text="labels.no_data_table"
             :loading="loading"
         >
@@ -165,68 +160,4 @@ function Delete_Expense(id) {
       </v-col>
     </v-row>
   </layout>
-
-  <!--    &lt;!&ndash; Multiple Filters &ndash;&gt;-->
-  <!--    <b-sidebar id="sidebar-right" :title="$t('Filter')" bg-variant="white" right shadow>-->
-  <!--      <div class="px-3 py-2">-->
-  <!--        <b-row>-->
-  <!--          &lt;!&ndash; date  &ndash;&gt;-->
-  <!--          <b-col md="12">-->
-  <!--            <b-form-group :label="$t('date')">-->
-  <!--              <b-form-input type="date" v-model="Filter_date"></b-form-input>-->
-  <!--            </b-form-group>-->
-  <!--          </b-col>-->
-
-  <!--          &lt;!&ndash; Reference  &ndash;&gt;-->
-  <!--          <b-col md="12">-->
-  <!--            <b-form-group :label="$t('Reference')">-->
-  <!--              <b-form-input label="Reference" :placeholder="$t('Reference')" v-model="Filter_Ref"></b-form-input>-->
-  <!--            </b-form-group>-->
-  <!--          </b-col>-->
-
-  <!--          &lt;!&ndash; warehouse  &ndash;&gt;-->
-  <!--          <b-col md="12">-->
-  <!--            <b-form-group :label="$t('warehouse')">-->
-  <!--              <v-select-->
-  <!--                :reduce="label => label.value"-->
-  <!--                :placeholder="$t('Choose_Warehouse')"-->
-  <!--                v-model="Filter_warehouse"-->
-  <!--                :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
-  <!--              />-->
-  <!--            </b-form-group>-->
-  <!--          </b-col>-->
-
-  <!--          &lt;!&ndash; Expense_Category  &ndash;&gt;-->
-  <!--          <b-col md="12">-->
-  <!--            <b-form-group :label="$t('Expense_Category')">-->
-  <!--              <v-select-->
-  <!--                :reduce="label => label.value"-->
-  <!--                :placeholder="$t('Choose_Category')"-->
-  <!--                v-model="Filter_category"-->
-  <!--                :options="expense_Category.map(expense_Category => ({label: expense_Category.name, value: expense_Category.id}))"-->
-  <!--              />-->
-  <!--            </b-form-group>-->
-  <!--          </b-col>-->
-
-  <!--          <b-col md="6" sm="12">-->
-  <!--            <b-button-->
-  <!--              @click="Get_Expenses(serverParams.page)"-->
-  <!--              variant="primary m-1"-->
-  <!--              size="sm"-->
-  <!--              block-->
-  <!--            >-->
-  <!--              <i class="i-Filter-2"></i>-->
-  <!--              {{ $t("Filter") }}-->
-  <!--            </b-button>-->
-  <!--          </b-col>-->
-  <!--          <b-col md="6" sm="12">-->
-  <!--            <b-button @click="Reset_Filter()" variant="danger m-1" size="sm" block>-->
-  <!--              <i class="i-Power-2"></i>-->
-  <!--              {{ $t("Reset") }}-->
-  <!--            </b-button>-->
-  <!--          </b-col>-->
-  <!--        </b-row>-->
-  <!--      </div>-->
-  <!--    </b-sidebar>-->
-  <!--  </div>-->
 </template>

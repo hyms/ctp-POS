@@ -2,11 +2,11 @@
 import {computed, ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
-import ExportBtn from "@/Components/ExportBtn.vue";
+import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import helper from "@/helpers";
 import labels from "@/labels";
 import {router, usePage} from "@inertiajs/vue3";
-import DeleteDialog from "@/Components/DeleteDialog.vue";
+import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
 
 const currency = computed(() => usePage().props.currency);
 

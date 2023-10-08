@@ -1,9 +1,8 @@
 <script setup>
 import {ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import Snackbar from "@/Components/snackbar.vue";
-import ExportBtn from "@/Components/ExportBtn.vue";
-import DeleteDialog from "@/Components/DeleteDialog.vue";
+import ExportBtn from "@/Components/buttons/ExportBtn.vue";
+import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
 import {router} from "@inertiajs/vue3";
 import helper from "@/helpers";
 
@@ -98,12 +97,10 @@ function Remove_Adjustment() {
 }
 </script>
 <template>
-  <layout :loading="loading">
-    <snackbar
-        :snackbar="snackbar"
-        :snackbar-text="snackbarText"
-        :snackbar-color="snackbarColor"
-    ></snackbar>
+  <layout :loading="loading"
+          :snackbar-view="snackbar"
+          :snackbar-text="snackbarText"
+          :snackbar-color="snackbarColor">
     <!-- Modal Remove Adjustment -->
     <delete-dialog
         :model="dialogDelete"
@@ -115,14 +112,13 @@ function Remove_Adjustment() {
       <v-card>
         <v-toolbar
             title="Detalle de Ajuste"
-            density="compact"
             border
         ></v-toolbar>
         <v-card-text>
           <v-row>
             <v-col cols="12" lg="5" md="12" sm="12">
               <v-card variant="outlined">
-                <v-table hover density="compact">
+                <v-table hover>
                   <tbody>
                   <!-- date -->
                   <tr>
@@ -155,7 +151,7 @@ function Remove_Adjustment() {
             </v-col>
             <v-col cols="12" lg="7" md="12" sm="12">
               <v-card variant="outlined">
-                <v-table hover density="compact">
+                <v-table hover>
                   <thead>
                   <tr>
                     <th>Producto</th>
@@ -180,11 +176,7 @@ function Remove_Adjustment() {
                     <td v-if="detail.type === 'add'">
                       Añadido
                     </td>
-                    <td
-                        v-else-if="
-                                                    detail.type === 'sub'
-                                                "
-                    >
+                    <td v-if="detail.type === 'sub'">
                       Quitado
                     </td>
                   </tr>
@@ -203,12 +195,11 @@ function Remove_Adjustment() {
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
-              small
               variant="elevated"
               color="primary"
               class="ma-1"
               @click="dialogDetail = false"
-          >Ok
+          >Aceptar
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -219,7 +210,6 @@ function Remove_Adjustment() {
         <v-text-field
             v-model="search"
             prepend-icon="mdi-magnify"
-            density="compact"
             hide-details
             label="Buscar"
             single-line
@@ -234,7 +224,6 @@ function Remove_Adjustment() {
             name-file="Productos"
         ></ExportBtn>
         <v-btn
-            size="small"
             color="primary"
             class="ma-1"
             prepend-icon="mdi-account-plus"
@@ -252,7 +241,6 @@ function Remove_Adjustment() {
             :search="search"
             hover
             class="elevation-2"
-            density="compact"
             no-data-text="No existen datos a mostrar"
         >
           <template v-slot:item.actions="{ item }">
@@ -272,9 +260,7 @@ function Remove_Adjustment() {
                 size="x-small"
                 variant="outlined"
                 :disabled="helper.enableDay(item.updated_at)"
-                @click="
-                                router.visit('/adjustments/edit/' + item.id)
-                            "
+                @click="router.visit('/adjustments/edit/' + item.id)"
             >
             </v-btn>
             <v-btn

@@ -4,7 +4,7 @@ import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import helper from "@/helpers";
 import {router} from "@inertiajs/vue3";
-import DeleteDialog from "@/Components/DeleteDialog.vue";
+import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
 
 const props = defineProps({
   categories: Array,
@@ -187,12 +187,10 @@ function Remove_Category() {
 }
 </script>
 <template>
-  <Layout>
-    <snackbar
-        :snackbar="snackbar"
-        :snackbar-color="snackbarColor"
-        :snackbar-text="snackbarText"
-    ></snackbar>
+  <Layout
+      :snackbar-view="snackbar"
+      :snackbar-color="snackbarColor"
+      :snackbar-text="snackbarText">
     <delete-dialog
         :model="dialogDelete"
         :on-save="Remove_Category"
@@ -212,9 +210,9 @@ function Remove_Category() {
             :title="(editmode ? 'Modificar' : 'Nueva') + ' Categoria'"
         >
         </v-toolbar>
+        <v-form ref="form">
+          <v-card-text>
 
-        <v-card-text>
-          <v-form ref="form">
             <v-row>
               <!-- Code category -->
               <v-col cols="12">
@@ -223,8 +221,6 @@ function Remove_Category() {
                     v-model="category.code"
                     :placeholder="categoryLabels.code"
                     :rules="helper.required"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -237,38 +233,35 @@ function Remove_Category() {
                     v-model="category.name"
                     :placeholder="categoryLabels.name"
                     :rules="helper.required"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
               </v-col>
             </v-row>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-              size="small"
-              variant="outlined"
-              color="error"
-              class="ma-1"
-              @click="onClose"
-          >
-            Cancelar
-          </v-btn>
-          <v-btn
-              size="small"
-              color="primary"
-              variant="elevated"
-              class="ma-1"
-              @click="Submit_Category"
-              :loading="loading"
-              :disabled="loading"
-          >
-            Guardar
-          </v-btn>
-        </v-card-actions>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+                variant="outlined"
+                color="error"
+                class="ma-1"
+                @click="onClose"
+            >
+              Cancelar
+            </v-btn>
+            <v-btn
+                color="primary"
+                variant="elevated"
+                class="ma-1"
+                @click="Submit_Category"
+                :loading="loading"
+                :disabled="loading"
+            >
+              Guardar
+            </v-btn>
+          </v-card-actions>
+        </v-form>
       </v-card>
     </v-dialog>
 
@@ -277,7 +270,6 @@ function Remove_Category() {
         <v-text-field
             v-model="search"
             prepend-icon="mdi-magnify"
-            density="compact"
             hide-details
             label="Buscar"
             single-line
@@ -286,10 +278,9 @@ function Remove_Category() {
       </v-col>
       <v-col cols="12" sm="6" class="text-right">
         <v-btn
-            size="small"
             color="primary"
             class="ma-1"
-            prepend-icon="mdi-account-plus"
+            prepend-icon="mdi-plus"
             @click="New_category"
         >
           Añadir
@@ -304,7 +295,6 @@ function Remove_Category() {
             :search="search"
             hover
             class="elevation-2"
-            density="compact"
             no-data-text="No existen datos a mostrar"
             :loading="loading"
             loading-text="Cargando..."

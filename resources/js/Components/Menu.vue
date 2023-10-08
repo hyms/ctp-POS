@@ -2,7 +2,7 @@
 import {router, usePage} from "@inertiajs/vue3";
 import {computed, onMounted, ref} from "vue";
 import MenuUser from "@/Components/Menu_user.vue";
-import Full_screen from "@/Components/full_screen.vue";
+import Full_screen from "@/Components/buttons/full_screen.vue";
 import helpers from "@/helpers";
 
 const isDrawerOpen = ref(null);
@@ -101,11 +101,7 @@ const menuItems = ref([
         url: "/expenses",
         role: "vendor",
       },
-      {
-        label: "Categorias de Gastos",
-        url: "/expenses_category",
-        role: "admin",
-      },
+
     ],
   },
   {
@@ -136,6 +132,11 @@ const menuItems = ref([
     icon: "",
     subItems: [
       {
+        label: "Categorias de Gastos",
+        url: "/expenses_category",
+        role: "admin",
+      },
+      {
         label: "Tipos de ventas",
         url: "/sales_types",
         role: "admin",
@@ -150,6 +151,7 @@ const menuItems = ref([
         url: "/users",
         role: "admin",
       },
+
       // {
       //     label: "respaldo",
       //     url: "/backup",

@@ -218,4 +218,10 @@ export default {
         return object;
     },
     newLine,
+    getOperatorUnit() {
+        return [
+            {title: 'Multiplicar (*)', value: '*',},
+            {title: 'Dividir (/)', value: '/'},
+        ];
+    }
 };
