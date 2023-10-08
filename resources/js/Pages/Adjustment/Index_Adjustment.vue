@@ -24,20 +24,21 @@ const fields = ref([
   {title: "Fecha", key: "date"},
   {title: "Codigo", key: "Ref"},
   {title: "Agencia", key: "warehouse_name"},
-  {title: "Cantidad", key: "items"},
+  {title: "Items", key: "items"},
   {title: "Acciones", key: "actions"},
 ]);
 const jsonFields = ref({
   Fecha: "date",
   Codigo: "Ref",
   Agencia: "warehouse_name",
-  Cantidad: "items",
+  Items: "items",
 });
 const details = ref([]);
 const adjustment = ref({});
 
 //---------------Get Details Adjustement ----------------------\\
 function showDetails(id) {
+  loading.value = true;
   dialogDetail.value = false;
   axios
       .get("/adjustments/detail/" + id)
@@ -48,7 +49,8 @@ function showDetails(id) {
       })
       .catch((response) => {
         dialogDetail.value = true;
-      });
+      })
+      .finally(()=>{loading.value = false;});
 }
 
 //-------------------------------- Reset Form -------------------------------\\

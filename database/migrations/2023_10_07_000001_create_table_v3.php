@@ -92,7 +92,27 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
+        Schema::table('transfers', function (Blueprint $table) {
+            $table->renameColumn('total','GrandTotal');
+        });
+        Schema::drop('transfer_details');
+        Schema::create('transfer_details', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
+            $table->id();
+            $table->foreignId('transfer_id')->constrained('transfers');
+            $table->foreignId('product_id')->constrained('products');
+            $table->foreignId('product_variant_id')->nullable()->constrained('product_variants');
+            $table->foreignId('purchase_unit_id')->nullable()->constrained('units');
 
+            $table->float('cost', 10, 0);
+            $table->float('TaxNet', 10, 0)->nullable();
+            $table->string('tax_method', 192)->nullable()->default('1');
+            $table->float('discount', 10, 0)->nullable();
+            $table->string('discount_method', 192)->nullable()->default('1');
+            $table->float('quantity', 10, 0);
+            $table->float('total', 10, 0);
+            $table->timestamps(6);
+        });
 
     }
 
@@ -103,7 +123,10 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::drop('sales_type');
-
+        Schema::drop('servers');
+        Schema::drop('payment_purchases');
+        Schema::drop('purchase_details');
+        Schema::drop('purchases');
+        Schema::drop('providers');
     }
 };

@@ -1,27 +1,33 @@
-import {ref} from "vue";
-
+const defaults = {
+    name: "Nombre",
+    phone: "Telefono",
+    email: "Correo",
+    code: "Codigo",
+    city: "Ciudad",
+    date: "Fecha",
+};
 export default {
     //forms
     client: {
-        name: "Nombre en Factura",
-        company_name: "Nombre de Empresa",
-        code: "Codigo",
-        email: "Correo",
-        phone: "Telefono",
-        city: "Ciudad",
+        name: defaults.name + " en Factura",
+        company_name: defaults.name + " de Empresa",
+        code: defaults.code,
+        email: defaults.email,
+        phone: defaults.phone,
+        city: defaults.city,
         adresse: "Direccion",
         nit_ci: "NIT/CI",
     },
     warehouse: {
-        name: "Nombre",
-        mobile: "Telefono",
-        email: "Correo",
+        name: defaults.name,
+        mobile: defaults.phone,
+        email: defaults.email,
         country: "Pais",
-        city: "Ciudad",
+        city: defaults.city,
     },
     payment: {
-        date: "Fecha",
-        Ref: "Codigo Pago",
+        date: defaults.date,
+        Ref: defaults.code + " de Pago",
         montant: "A Pagar",
         amount: "Monto Pagado",
         change: "Cambio",
@@ -30,7 +36,7 @@ export default {
         notes: "Notas de Pago",
     },
     sale: {
-        Ref: "Codigo Venta",
+        Ref: defaults.code + "de Venta",
         client_id: "Cliente",
         warehouse_id: "Agencia",
         discount: "Descuento",
@@ -52,37 +58,37 @@ export default {
         payment_status: "Estado de pago",
     },
     user: {
-        firstname: "Nombre",
+        firstname: defaults.name,
         lastname: "Apellido",
         username: "Usuario",
         password: "Contraseña",
         NewPassword: "Nueva Contraseña",
-        email: "Correo",
-        phone: "Telefono",
+        email: defaults.email,
+        phone: defaults.phone,
         ci: "CI",
         statut: "Estado",
         role: "Role",
         is_all_warehouses: "Todas las sucursales",
     },
     sales_type: {
-        name: "Nombre",
-        code: "Codigo",
+        name: defaults.name,
+        code: defaults.code,
     },
-    category:{
-        name: "Nombre",
+    category: {
+        name: defaults.name,
         description: "Descripcion",
     },
-    expense:{
-        date: "Fecha",
+    expense: {
+        date: defaults.date,
         warehouse_id: "Agencia",
         category_id: "Categoria",
         details: "Detalle",
         amount: "Monto",
-        ref:"Codigo"
+        ref: defaults.code + " de Gasto"
     },
-    product:{
-        name: "Nombre",
-        code: "Codigo",
+    product: {
+        name: defaults.name,
+        code: defaults.code,
         cost: "Precio Compra",
         price: "Precio Venta",
         category_id: "Categoria",
@@ -92,9 +98,26 @@ export default {
         unit_sale_id: "Unidad de Venta",
         unit_purchase_id: "Unidad de Compra",
         stock_alert: "Alerta en Stock",
-        note: "Detalle",
+        note: "Notas del producto",
         is_variant: "El Producto tiene multiples variantes",
         not_selling: "Este Producto no es para la venta",
+    },
+    transfer: {
+        date: defaults.date,
+        Ref: defaults.code + " de Transferencia",
+        from_warehouse: "de Agencia",
+        to_warehouse: "a Agencia",
+        items: "Items",
+        GrandTotal: "Total",
+        statut: "Estado",
+        notes: "Notas de tranferencia",
+    },
+    transfer_detail: {
+        product: "Producto",
+        code: defaults.code,
+        qty: "Cantidad",
+        sub_total: "SubTotal",
+        stock: "Stock",
     },
     //no data
     no_fill_data: "Debe llenar correctamente los datos",
@@ -130,6 +153,7 @@ export default {
     filter_by_warehouse: "Filtrar por agencia",
     choose_warehouse: "Elija una agencia",
     actions: "Acciones",
+    same_warehouse:"Agencias iguales",
     // this_week_sales_purchases:"Ventas y compras de la semana",
     this_week_sales_purchases: "Ventas de la semana",
     top_selling_products: "Productos más vendidos",
@@ -149,5 +173,5 @@ export default {
     start_date: "Fecha desde",
     end_date: "Fecha hasta",
     payment_mayor_due: "El pago no puede ser mayor a la deuda",
-    client_detail:"Detalle del Cliente",
+    client_detail: "Detalle del Cliente",
 }

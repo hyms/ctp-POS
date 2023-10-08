@@ -16,6 +16,7 @@ return new class extends Migration {
         {
             $table->foreignId('user_pos')->nullable()->constrained('users');
         });
+
     }
 
     /**
@@ -29,5 +30,8 @@ return new class extends Migration {
         {
             $table->dropConstrainedForeignId('user_pos');
         });
+//        Schema::table('transfers', function (Blueprint $table) {
+//            $table->renameColumn('GrandTotal','total');
+//        });
     }
 };

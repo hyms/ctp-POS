@@ -279,7 +279,6 @@ function Update_Adjustment() {
   if (verifiedForm()) {
     loading.value = true;
     snackbar.value = false;
-    console.log(props.adjustment);
     let id = props.adjustment.id;
     axios
         .put(`/adjustments/${id}`, {
@@ -317,15 +316,15 @@ function detail_order_id() {
 
 //---------------------------------Get Product Details ------------------------\\
 
-function Get_Product_Details(product_id) {
-  axios.get("/products/detail/" + product_id).then(({data}) => {
-    product.value.product_id = data.id;
-    product.value.name = data.name;
-    product.value.type = "add";
-    product.value.unit = data.unit;
-    add_product();
-  });
-}
+// function Get_Product_Details(product_id) {
+//   axios.get("/products/detail/" + product_id).then(({data}) => {
+//     product.value.product_id = data.id;
+//     product.value.name = data.name;
+//     product.value.type = "add";
+//     product.value.unit = data.unit;
+//     add_product();
+//   });
+// }
 
 watch(
     () => [props.adjustment],
@@ -410,10 +409,7 @@ onMounted(() => {
             </v-col>
             <!-- Products -->
             <v-col cols="12">
-              <v-table
-                  hover
-                  class="border rounded"
-              >
+              <v-table hover class="border rounded" >
                 <thead>
                 <tr class="bg-secondary">
                   <th class="text-white text-center">

@@ -10,6 +10,22 @@ const reglaments = [
     {title: "QR", value: "qr"},
     {title: "Otros", value: "other"},
 ];
+const salesStatus = [
+    {title: "Completado", value: "completed", color: "primary"},
+    {title: "Pendiente", value: "pending", color: "secondary"},
+    {title: "Ordenado", value: "ordered", color: "info"},
+];
+const paymentStatus = [
+    {title: "Pagado", value: "paid", color: "success"},
+    {title: "Deuda", value: "unpaid", color: "error"},
+    {title: "Parcial", value: "partial", color: "warning"},
+];
+const transferStatus = [
+    {title: "Completado", value: "completed", color: "success"},
+    {title: "Enviado", value: "sent", color: "warning"},
+    {title: "Pendiente", value: "pending", color: "error"},
+];
+
 const toggleFullScreen = () => {
     let doc = window.document;
     let docEl = doc.documentElement;
@@ -50,10 +66,10 @@ const print_pos = (element_id) => {
         a.print();
     }, 1000);
 };
-const print_pdf = (element_id,title) => {
+const print_pdf = (element_id, title) => {
     event.preventDefault();
     let divContents = document.getElementById(element_id).innerHTML;
-    let url = "/pdf?body="+divContents;
+    let url = "/pdf?body=" + divContents;
     let win = window.open(url, '_blank');
     win.focus();
 
@@ -84,8 +100,8 @@ const linkVisit = (url, type = "get") => {
         preserveState: true,
     });
 }
-const newLine = (value)=>{
-    return value.toString().replaceAll(' ',"<br>");
+const newLine = (value) => {
+    return value.toString().replaceAll(' ', "<br>");
 }
 export default {
     required: [(v) => !!v || "Requerido"],
@@ -157,43 +173,32 @@ export default {
     formatDate: (date) => {
         return moment(date).format("DD-MM-YYYY");
     },
-    statutSale: (value = null) => {
-        const statut = [
-            {title: "Completado", value: "completed"},
-            {title: "Pendiente", value: "pending"},
-            {title: "Ordenado", value: "ordered"},
-        ];
+    statutTransfer: (value = null) => {
         if (value == null) {
-            return statut;
+            return transferStatus;
         }
-        return statut.find(item => item.value == value).title
+        return transferStatus.find(item => item.value == value).title
+    },
+    statutTransferColor: (value) => {
+        return transferStatus.find(item => item.value == value).color;
+    },
+    statutSale: (value = null) => {
+        if (value == null) {
+            return salesStatus;
+        }
+        return salesStatus.find(item => item.value == value).title
     },
     statutSaleColor: (value) => {
-        const statut = [
-            {color: "primary", value: "completed"},
-            {color: "secondary", value: "pending"},
-            {color: "info", value: "ordered"},
-        ];
-        return statut.find(item => item.value == value).color;
+        return salesStatus.find(item => item.value == value).color;
     },
     statusPayment: (value = null) => {
-        const payment_statut = [
-            {title: "Pagado", value: "paid"},
-            {title: "Deuda", value: "unpaid"},
-            {title: "Parcial", value: "partial"},
-        ];
         if (value == null) {
-            return payment_statut;
+            return paymentStatus;
         }
-        return payment_statut.find(item => item.value == value).title
+        return paymentStatus.find(item => item.value == value).title
     },
     statusPaymentColor: (value) => {
-        const payment_statut = [
-            {color: "success", value: "paid"},
-            {color: "error", value: "unpaid"},
-            {color: "warning", value: "partial"},
-        ];
-        return payment_statut.find(item => item.value == value).color;
+        return paymentStatus.find(item => item.value == value).color;
     },
     getReglamentPayment: (v) => {
         let result = reglaments.filter((i) => i.value.toLowerCase() == v.toLowerCase());

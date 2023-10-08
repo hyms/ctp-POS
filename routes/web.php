@@ -181,7 +181,10 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
     //------------------------------------------------------------------\\
 
     //------------------------------- Transfers --------------------------\\
+    Route::get('transfer/{id}', [TransferController::class, 'show']);
     Route::get('transfers', [TransferController::class, 'index']);
+    Route::get('transfers/create', [TransferController::class, 'create']);
+    Route::get('transfers/edit/{id}', [TransferController::class, 'edit']);
     Route::post('transfers', [TransferController::class, 'store']);
     Route::put('transfers/{id}', [TransferController::class, 'update']);
     Route::delete('transfers/{id}', [TransferController::class, 'destroy']);

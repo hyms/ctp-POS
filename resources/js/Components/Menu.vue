@@ -40,6 +40,24 @@ const menuItems = ref([
     subItems: [],
   },
   {
+    label: "Transferencias de Stock",
+    url: "",
+    role: "vendor",
+    icon: "",
+    subItems: [
+      {
+        label: "Crear Transferencia",
+        url: "/transfers/create",
+        role: "admin",
+      },
+      {
+        label: "Listar Transferencias",
+        url: "/transfers/",
+        role: "vendor",
+      },
+    ],
+  },
+  {
     label: "Ajustes de Stock",
     url: "",
     role: "vendor",

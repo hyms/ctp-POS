@@ -98,7 +98,7 @@ class TransferController extends Controller
             $order->to_warehouse_id = $request->transfer['to_warehouse'];
             $order->items = sizeof($request['details']);
             $order->tax_rate = $request->transfer['tax_rate'] ?? 0;
-            $order->TaxNet = $request->transfer['TaxNet'] ?? 0;
+//            $order->TaxNet = $request->transfer['TaxNet'] ?? 0;
             $order->discount = $request->transfer['discount'] ?? 0;
             $order->shipping = $request->transfer['shipping'] ?? 0;
             $order->statut = $request->transfer['statut'];
@@ -125,9 +125,9 @@ class TransferController extends Controller
 
                         if ($unit && $product_warehouse_from) {
                             if ($unit->operator == '/') {
-                                $product_warehouse_from->qte -= $value['quantity'] / $unit->operator_value;
+                                $product_warehouse_from->qty -= $value['quantity'] / $unit->operator_value;
                             } else {
-                                $product_warehouse_from->qte -= $value['quantity'] * $unit->operator_value;
+                                $product_warehouse_from->qty -= $value['quantity'] * $unit->operator_value;
                             }
                             $product_warehouse_from->save();
                         }
@@ -141,9 +141,9 @@ class TransferController extends Controller
 
                         if ($unit && $product_warehouse_to) {
                             if ($unit->operator == '/') {
-                                $product_warehouse_to->qte += $value['quantity'] / $unit->operator_value;
+                                $product_warehouse_to->qty += $value['quantity'] / $unit->operator_value;
                             } else {
-                                $product_warehouse_to->qte += $value['quantity'] * $unit->operator_value;
+                                $product_warehouse_to->qty += $value['quantity'] * $unit->operator_value;
                             }
                             $product_warehouse_to->save();
                         }
@@ -157,9 +157,9 @@ class TransferController extends Controller
 
                         if ($unit && $product_warehouse_from) {
                             if ($unit->operator == '/') {
-                                $product_warehouse_from->qte -= $value['quantity'] / $unit->operator_value;
+                                $product_warehouse_from->qty -= $value['quantity'] / $unit->operator_value;
                             } else {
-                                $product_warehouse_from->qte -= $value['quantity'] * $unit->operator_value;
+                                $product_warehouse_from->qty -= $value['quantity'] * $unit->operator_value;
                             }
                             $product_warehouse_from->save();
                         }
@@ -171,9 +171,9 @@ class TransferController extends Controller
 
                         if ($unit && $product_warehouse_to) {
                             if ($unit->operator == '/') {
-                                $product_warehouse_to->qte += $value['quantity'] / $unit->operator_value;
+                                $product_warehouse_to->qty += $value['quantity'] / $unit->operator_value;
                             } else {
-                                $product_warehouse_to->qte += $value['quantity'] * $unit->operator_value;
+                                $product_warehouse_to->qty += $value['quantity'] * $unit->operator_value;
                             }
                             $product_warehouse_to->save();
                         }
@@ -198,9 +198,9 @@ class TransferController extends Controller
                     }
                     if ($unit && $product_warehouse_from) {
                         if ($unit->operator == '/') {
-                            $product_warehouse_from->qte -= $value['quantity'] / $unit->operator_value;
+                            $product_warehouse_from->qty -= $value['quantity'] / $unit->operator_value;
                         } else {
-                            $product_warehouse_from->qte -= $value['quantity'] * $unit->operator_value;
+                            $product_warehouse_from->qty -= $value['quantity'] * $unit->operator_value;
                         }
                         $product_warehouse_from->save();
                     }
@@ -278,9 +278,9 @@ class TransferController extends Controller
 
                             if ($unit && $warehouse_from_variant) {
                                 if ($unit->operator == '/') {
-                                    $warehouse_from_variant->qte += $value['quantity'] / $unit->operator_value;
+                                    $warehouse_from_variant->qty += $value['quantity'] / $unit->operator_value;
                                 } else {
-                                    $warehouse_from_variant->qte += $value['quantity'] * $unit->operator_value;
+                                    $warehouse_from_variant->qty += $value['quantity'] * $unit->operator_value;
                                 }
                                 $warehouse_from_variant->save();
                             }
@@ -293,9 +293,9 @@ class TransferController extends Controller
 
                             if ($unit && $warehouse_To_variant) {
                                 if ($unit->operator == '/') {
-                                    $warehouse_To_variant->qte -= $value['quantity'] / $unit->operator_value;
+                                    $warehouse_To_variant->qty -= $value['quantity'] / $unit->operator_value;
                                 } else {
-                                    $warehouse_To_variant->qte -= $value['quantity'] * $unit->operator_value;
+                                    $warehouse_To_variant->qty -= $value['quantity'] * $unit->operator_value;
                                 }
                                 $warehouse_To_variant->save();
                             }
@@ -307,9 +307,9 @@ class TransferController extends Controller
 
                             if ($unit && $warehouse_from) {
                                 if ($unit->operator == '/') {
-                                    $warehouse_from->qte += $value['quantity'] / $unit->operator_value;
+                                    $warehouse_from->qty += $value['quantity'] / $unit->operator_value;
                                 } else {
-                                    $warehouse_from->qte += $value['quantity'] * $unit->operator_value;
+                                    $warehouse_from->qty += $value['quantity'] * $unit->operator_value;
                                 }
                                 $warehouse_from->save();
                             }
@@ -320,9 +320,9 @@ class TransferController extends Controller
 
                             if ($unit && $warehouse_To) {
                                 if ($unit->operator == '/') {
-                                    $warehouse_To->qte -= $value['quantity'] / $unit->operator_value;
+                                    $warehouse_To->qty -= $value['quantity'] / $unit->operator_value;
                                 } else {
-                                    $warehouse_To->qte -= $value['quantity'] * $unit->operator_value;
+                                    $warehouse_To->qty -= $value['quantity'] * $unit->operator_value;
                                 }
                                 $warehouse_To->save();
                             }
@@ -339,9 +339,9 @@ class TransferController extends Controller
 
                             if ($unit && $Sent_variant_To) {
                                 if ($unit->operator == '/') {
-                                    $Sent_variant_To->qte += $value['quantity'] / $unit->operator_value;
+                                    $Sent_variant_To->qty += $value['quantity'] / $unit->operator_value;
                                 } else {
-                                    $Sent_variant_To->qte += $value['quantity'] * $unit->operator_value;
+                                    $Sent_variant_To->qty += $value['quantity'] * $unit->operator_value;
                                 }
                                 $Sent_variant_To->save();
                             }
@@ -352,9 +352,9 @@ class TransferController extends Controller
 
                             if ($unit && $Sent_variant_From) {
                                 if ($unit->operator == '/') {
-                                    $Sent_variant_From->qte += $value['quantity'] / $unit->operator_value;
+                                    $Sent_variant_From->qty += $value['quantity'] / $unit->operator_value;
                                 } else {
-                                    $Sent_variant_From->qte += $value['quantity'] * $unit->operator_value;
+                                    $Sent_variant_From->qty += $value['quantity'] * $unit->operator_value;
                                 }
                                 $Sent_variant_From->save();
                             }
@@ -372,7 +372,7 @@ class TransferController extends Controller
 
             // Update Data with New request
             foreach ($New_Details as $key => $product_detail) {
-
+                $product_detail = collect($product_detail);
                 if ($product_detail['no_unit'] !== 0) {
                     $unit = Unit::where('id', $product_detail['purchase_unit_id'])->first();
                     if ($Trans['statut'] == "completed") {
@@ -387,9 +387,9 @@ class TransferController extends Controller
 
                             if ($unit && $product_warehouse_from) {
                                 if ($unit->operator == '/') {
-                                    $product_warehouse_from->qte -= $product_detail['quantity'] / $unit->operator_value;
+                                    $product_warehouse_from->qty -= $product_detail['quantity'] / $unit->operator_value;
                                 } else {
-                                    $product_warehouse_from->qte -= $product_detail['quantity'] * $unit->operator_value;
+                                    $product_warehouse_from->qty -= $product_detail['quantity'] * $unit->operator_value;
                                 }
                                 $product_warehouse_from->save();
                             }
@@ -403,9 +403,9 @@ class TransferController extends Controller
 
                             if ($unit && $product_warehouse_to) {
                                 if ($unit->operator == '/') {
-                                    $product_warehouse_to->qte += $product_detail['quantity'] / $unit->operator_value;
+                                    $product_warehouse_to->qty += $product_detail['quantity'] / $unit->operator_value;
                                 } else {
-                                    $product_warehouse_to->qte += $product_detail['quantity'] * $unit->operator_value;
+                                    $product_warehouse_to->qty += $product_detail['quantity'] * $unit->operator_value;
                                 }
                                 $product_warehouse_to->save();
                             }
@@ -419,9 +419,9 @@ class TransferController extends Controller
 
                             if ($unit && $product_warehouse_from) {
                                 if ($unit->operator == '/') {
-                                    $product_warehouse_from->qte -= $product_detail['quantity'] / $unit->operator_value;
+                                    $product_warehouse_from->qty -= $product_detail['quantity'] / $unit->operator_value;
                                 } else {
-                                    $product_warehouse_from->qte -= $product_detail['quantity'] * $unit->operator_value;
+                                    $product_warehouse_from->qty -= $product_detail['quantity'] * $unit->operator_value;
                                 }
                                 $product_warehouse_from->save();
                             }
@@ -433,9 +433,9 @@ class TransferController extends Controller
 
                             if ($unit && $product_warehouse_to) {
                                 if ($unit->operator == '/') {
-                                    $product_warehouse_to->qte += $product_detail['quantity'] / $unit->operator_value;
+                                    $product_warehouse_to->qty += $product_detail['quantity'] / $unit->operator_value;
                                 } else {
-                                    $product_warehouse_to->qte += $product_detail['quantity'] * $unit->operator_value;
+                                    $product_warehouse_to->qty += $product_detail['quantity'] * $unit->operator_value;
                                 }
                                 $product_warehouse_to->save();
                             }
@@ -453,9 +453,9 @@ class TransferController extends Controller
 
                             if ($unit && $product_warehouse_from) {
                                 if ($unit->operator == '/') {
-                                    $product_warehouse_from->qte -= $product_detail['quantity'] / $unit->operator_value;
+                                    $product_warehouse_from->qty -= $product_detail['quantity'] / $unit->operator_value;
                                 } else {
-                                    $product_warehouse_from->qte -= $product_detail['quantity'] * $unit->operator_value;
+                                    $product_warehouse_from->qty -= $product_detail['quantity'] * $unit->operator_value;
                                 }
                                 $product_warehouse_from->save();
                             }
@@ -468,9 +468,9 @@ class TransferController extends Controller
 
                             if ($unit && $product_warehouse_from) {
                                 if ($unit->operator == '/') {
-                                    $product_warehouse_from->qte -= $product_detail['quantity'] / $unit->operator_value;
+                                    $product_warehouse_from->qty -= $product_detail['quantity'] / $unit->operator_value;
                                 } else {
-                                    $product_warehouse_from->qte -= $product_detail['quantity'] * $unit->operator_value;
+                                    $product_warehouse_from->qty -= $product_detail['quantity'] * $unit->operator_value;
                                 }
                                 $product_warehouse_from->save();
                             }
@@ -504,7 +504,7 @@ class TransferController extends Controller
                 'statut' => $Trans['statut'],
                 'items' => sizeof($request['details']),
                 'tax_rate' => $Trans['tax_rate'] ?? 0,
-                'TaxNet' => $Trans['TaxNet'] ?? 0,
+//                'TaxNet' => $Trans['TaxNet'] ?? 0,
                 'discount' => $Trans['discount'] ?? 0,
                 'shipping' => $Trans['shipping'] ?? 0,
                 'GrandTotal' => $request['GrandTotal'],
@@ -556,9 +556,9 @@ class TransferController extends Controller
 
                         if ($unit && $warehouse_from_variant) {
                             if ($unit->operator == '/') {
-                                $warehouse_from_variant->qte += $value['quantity'] / $unit->operator_value;
+                                $warehouse_from_variant->qty += $value['quantity'] / $unit->operator_value;
                             } else {
-                                $warehouse_from_variant->qte += $value['quantity'] * $unit->operator_value;
+                                $warehouse_from_variant->qty += $value['quantity'] * $unit->operator_value;
                             }
                             $warehouse_from_variant->save();
                         }
@@ -571,9 +571,9 @@ class TransferController extends Controller
 
                         if ($unit && $warehouse_To_variant) {
                             if ($unit->operator == '/') {
-                                $warehouse_To_variant->qte -= $value['quantity'] / $unit->operator_value;
+                                $warehouse_To_variant->qty -= $value['quantity'] / $unit->operator_value;
                             } else {
-                                $warehouse_To_variant->qte -= $value['quantity'] * $unit->operator_value;
+                                $warehouse_To_variant->qty -= $value['quantity'] * $unit->operator_value;
                             }
                             $warehouse_To_variant->save();
                         }
@@ -585,9 +585,9 @@ class TransferController extends Controller
 
                         if ($unit && $warehouse_from) {
                             if ($unit->operator == '/') {
-                                $warehouse_from->qte += $value['quantity'] / $unit->operator_value;
+                                $warehouse_from->qty += $value['quantity'] / $unit->operator_value;
                             } else {
-                                $warehouse_from->qte += $value['quantity'] * $unit->operator_value;
+                                $warehouse_from->qty += $value['quantity'] * $unit->operator_value;
                             }
                             $warehouse_from->save();
                         }
@@ -598,9 +598,9 @@ class TransferController extends Controller
 
                         if ($unit && $warehouse_To) {
                             if ($unit->operator == '/') {
-                                $warehouse_To->qte -= $value['quantity'] / $unit->operator_value;
+                                $warehouse_To->qty -= $value['quantity'] / $unit->operator_value;
                             } else {
-                                $warehouse_To->qte -= $value['quantity'] * $unit->operator_value;
+                                $warehouse_To->qty -= $value['quantity'] * $unit->operator_value;
                             }
                             $warehouse_To->save();
                         }
@@ -617,9 +617,9 @@ class TransferController extends Controller
 
                         if ($unit && $Sent_variant_To) {
                             if ($unit->operator == '/') {
-                                $Sent_variant_To->qte += $value['quantity'] / $unit->operator_value;
+                                $Sent_variant_To->qty += $value['quantity'] / $unit->operator_value;
                             } else {
-                                $Sent_variant_To->qte += $value['quantity'] * $unit->operator_value;
+                                $Sent_variant_To->qty += $value['quantity'] * $unit->operator_value;
                             }
                             $Sent_variant_To->save();
                         }
@@ -630,9 +630,9 @@ class TransferController extends Controller
 
                         if ($unit && $Sent_variant_From) {
                             if ($unit->operator == '/') {
-                                $Sent_variant_From->qte += $value['quantity'] / $unit->operator_value;
+                                $Sent_variant_From->qty += $value['quantity'] / $unit->operator_value;
                             } else {
-                                $Sent_variant_From->qte += $value['quantity'] * $unit->operator_value;
+                                $Sent_variant_From->qty += $value['quantity'] * $unit->operator_value;
                             }
                             $Sent_variant_From->save();
                         }
@@ -692,6 +692,7 @@ class TransferController extends Controller
             }
         }
 
+        $transfer['id'] = $Transfer_data->id;
         $transfer['statut'] = $Transfer_data->statut;
         $transfer['notes'] = $Transfer_data->notes;
         $transfer['date'] = $Transfer_data->date;
@@ -729,9 +730,9 @@ class TransferController extends Controller
                 $data['product_variant_id'] = $detail->product_variant_id;
 
                 if ($unit && $unit->operator == '/') {
-                    $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
+                    $data['stock'] = $item_product ? $item_product->qty * $unit->operator_value : 0;
                 } else if ($unit && $unit->operator == '*') {
-                    $data['stock'] = $item_product ? $item_product->qte / $unit->operator_value : 0;
+                    $data['stock'] = $item_product ? $item_product->qty / $unit->operator_value : 0;
                 } else {
                     $data['stock'] = 0;
                 }
@@ -747,9 +748,9 @@ class TransferController extends Controller
                 $data['code'] = $detail['product']['code'];
 
                 if ($unit && $unit->operator == '/') {
-                    $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
+                    $data['stock'] = $item_product ? $item_product->qty * $unit->operator_value : 0;
                 } else if ($unit && $unit->operator == '*') {
-                    $data['stock'] = $item_product ? $item_product->qte / $unit->operator_value : 0;
+                    $data['stock'] = $item_product ? $item_product->qty / $unit->operator_value : 0;
                 } else {
                     $data['stock'] = 0;
                 }
@@ -795,7 +796,7 @@ class TransferController extends Controller
 
 
         Inertia::share('titlePage', 'Editar Transferencia');
-        return Inertia::render('Transfers/edit_transfer', [
+        return Inertia::render('Transfers/Form_Transfer', [
             'details' => $details,
             'transfer' => $transfer,
             'warehouses' => $warehouses,
@@ -877,7 +878,7 @@ class TransferController extends Controller
         $warehouses = helpers::getWarehouses(auth()->user());
 
         Inertia::share('titlePage', 'Crear Transferencia');
-        return Inertia::render('Transfers/create_transfer', [
+        return Inertia::render('Transfers/Form_Transfer', [
             'warehouses' => $warehouses,
         ]);
     }

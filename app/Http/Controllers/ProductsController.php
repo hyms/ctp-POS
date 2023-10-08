@@ -532,6 +532,7 @@ class ProductsController extends Controller
         $data = collect();
         $item['id'] = $Product_data['id'];
         $item['name'] = $Product_data['name'];
+        $item['name'] = $Product_data['name'];
         $item['Type_barcode'] = $Product_data['Type_barcode'];
         $item['unit_id'] = $Product_data['unit']->id;
         $item['unit'] = $Product_data['unit']->ShortName;
