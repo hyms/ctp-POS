@@ -29,7 +29,7 @@ const props = defineProps({
               </p>
             </v-col>
           </div>
-          <v-table density="compact" hover>
+          <v-table hover>
             <tbody>
             <tr v-for="detail_invoice in invoice_pos.details">
               <td colspan="3">
@@ -43,7 +43,7 @@ const props = defineProps({
               </td>
             </tr>
 
-            <tr style="margin-top:10px" v-show="invoice_pos.pos_settings.show_discount">
+            <tr style="margin-top:10px" v-if="invoice_pos.pos_settings.show_discount">
               <td colspan="3" class="total">Impuesto</td>
               <td style="text-align:right;" class="total">{{ invoice_pos.symbol }}
                 {{ helper.formatNumber(invoice_pos.sale.taxe, 2) }}
@@ -52,7 +52,7 @@ const props = defineProps({
               </td>
             </tr>
 
-            <tr style="margin-top:10px" v-show="invoice_pos.pos_settings.show_discount">
+            <tr style="margin-top:10px" v-if="invoice_pos.pos_settings.show_discount">
               <td colspan="3" class="total">Descuento</td>
               <td style="text-align:right;" class="total">{{ invoice_pos.symbol }}
                 {{ helper.formatNumber(invoice_pos.sale.discount, 2) }}
@@ -66,7 +66,7 @@ const props = defineProps({
               </td>
             </tr>
 
-            <tr v-show="invoice_pos.sale.paid_amount < invoice_pos.sale.GrandTotal">
+            <tr v-if="invoice_pos.sale.paid_amount < invoice_pos.sale.GrandTotal">
               <td colspan="3" class="total">Pagado</td>
               <td
                   style="text-align:right;"
@@ -75,7 +75,7 @@ const props = defineProps({
               </td>
             </tr>
 
-            <tr v-show="invoice_pos.sale.paid_amount < invoice_pos.sale.GrandTotal">
+            <tr v-if="invoice_pos.sale.paid_amount < invoice_pos.sale.GrandTotal">
               <td colspan="3" class="total">Deuda</td>
               <td
                   style="text-align:right;"
@@ -86,39 +86,49 @@ const props = defineProps({
             </tr>
             </tbody>
           </v-table>
-          <v-table
-              class="change mt-3"
-              style=" font-size: 12px;"
-              v-show="invoice_pos.sale.paid_amount > 0"
-              density="compact"
-              hover
-          >
+          <table class="change mt-2" style=" font-size: 12px;">
             <thead>
-            <tr style="background: #eee; ">
-              <th style="text-align: left;" colspan="1">Pagado en:</th>
-              <th style="text-align: center;" colspan="2">Monto:</th>
-              <th style="text-align: right;" colspan="1">Saldo:</th>
-            </tr>
+            <tr class="total"><th>Notas</th></tr>
             </thead>
             <tbody>
-            <tr v-for="payment_pos in invoice_pos.payments">
-              <td style="text-align: left;" colspan="1">{{
-                  helper.getReglamentPayment(payment_pos.Reglement)[0].title
-                }}
-              </td>
-              <td
-                  style="text-align: center;"
-                  colspan="2"
-              >{{ helper.formatNumber(payment_pos.montant, 2) }}
-              </td>
-              <td
-                  style="text-align: right;"
-                  colspan="1"
-              >{{ helper.formatNumber(payment_pos.change, 2) }}
-              </td>
-            </tr>
+            <tr><td>
+              {{invoice_pos.sale.notes}}
+            </td></tr>
             </tbody>
-          </v-table>
+          </table>
+<!--          <v-table-->
+<!--              class="change mt-3"-->
+<!--              style=" font-size: 12px;"-->
+<!--              v-show="invoice_pos.sale.paid_amount > 0"-->
+<!--              density="compact"-->
+<!--              hover-->
+<!--          >-->
+<!--            <thead>-->
+<!--            <tr style="background: #eee; ">-->
+<!--              <th style="text-align: left;" colspan="1">Pagado en:</th>-->
+<!--              <th style="text-align: center;" colspan="2">Monto:</th>-->
+<!--              <th style="text-align: right;" colspan="1">Saldo:</th>-->
+<!--            </tr>-->
+<!--            </thead>-->
+<!--            <tbody>-->
+<!--            <tr v-for="payment_pos in invoice_pos.payments">-->
+<!--              <td style="text-align: left;" colspan="1">{{-->
+<!--                  helper.getReglamentPayment(payment_pos.Reglement)[0].title-->
+<!--                }}-->
+<!--              </td>-->
+<!--              <td-->
+<!--                  style="text-align: center;"-->
+<!--                  colspan="2"-->
+<!--              >{{ helper.formatNumber(payment_pos.montant, 2) }}-->
+<!--              </td>-->
+<!--              <td-->
+<!--                  style="text-align: right;"-->
+<!--                  colspan="1"-->
+<!--              >{{ helper.formatNumber(payment_pos.change, 2) }}-->
+<!--              </td>-->
+<!--            </tr>-->
+<!--            </tbody>-->
+<!--          </v-table>-->
         </div>
       </v-card-text>
       <v-card-actions>

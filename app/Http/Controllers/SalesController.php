@@ -606,6 +606,7 @@ class SalesController extends Controller
         $item['warehouse'] = $sale['warehouse']->name;
         $item['GrandTotal'] = number_format($sale->GrandTotal, 2, '.', '');
         $item['paid_amount'] = number_format($sale->paid_amount, 2, '.', '');
+        $item['notes'] = $sale['notes'];
 
         foreach ($sale['details'] as $detail) {
 
