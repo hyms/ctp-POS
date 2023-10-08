@@ -753,7 +753,7 @@ function Remove_Sale(id, sale_has_return) {
               >
               </v-btn>
             </template>
-            <v-list>
+            <v-list density="compact">
               <v-list-item
                   @click="router.visit('/sales/detail/' + item.id)"
                   prepend-icon="mdi-eye"

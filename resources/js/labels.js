@@ -46,7 +46,7 @@ export default {
             qty: "Cantidad",
             sub_total: "SubTotal",
         },
-        notes: "Notas de Venta",
+        notes: "Notas de Orden",
         statut: "Estado de Trabajo",
         due: "Deuda",
         payment_status: "Estado de pago",

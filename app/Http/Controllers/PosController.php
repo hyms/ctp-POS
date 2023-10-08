@@ -58,8 +58,8 @@ class PosController extends Controller
             $order->notes = $request->notes;
 //            $order->statut = 'completed';
             $order->statut = $request->statut;
-//            $order->payment_statut = 'unpaid';
-            $order->payment_statut = $request->payment_statut;
+            $order->payment_statut = 'unpaid';
+//            $order->payment_statut = $request->payment_statut;
             $order->user_pos = Auth::user()->id;
             $order->user_id = Auth::user()->id;
 
@@ -177,12 +177,12 @@ class PosController extends Controller
             ->where(function ($query) use ($request) {
                 return $query->whereHas('product', function ($q) use ($request) {
                     $q->where('not_selling', '=', 0);
-                });
-//                    ->where(function ($query) use ($request) {
-//                        if ($request->stock == '1') {
-//                            return $query->where('qty', '>', 0);
-//                        }
-//                    });
+                })
+                    ->where(function ($query) use ($request) {
+                        if ($request->stock == '1') {
+                            return $query->where('qty', '>', 0);
+                        }
+                    });
             })
 
             // Filter

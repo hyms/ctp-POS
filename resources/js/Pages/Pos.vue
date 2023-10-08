@@ -571,9 +571,9 @@ function Verified_paidAmount() {
   if (isNaN(payment.value.amount)) {
     payment.value.amount = 0;
   } else {
-    if (payment.value.amount > payment.value.received_amount) {
+    if (parseFloat(payment.value.amount) > parseFloat(payment.value.received_amount)) {
       payment.value.amount = 0;
-    } else if (payment.value.amount > GrandTotal.value) {
+    } else if (parseFloat(payment.value.amount) > parseFloat(GrandTotal.value)) {
       payment.value.amount = 0;
     }
   }
@@ -777,8 +777,6 @@ onMounted(() => {
                       :label="labels.sale.warehouse_id"
                       item-title="name"
                       item-value="id"
-                      variant="outlined"
-                      density="comfortable"
                       hide-details="auto"
                       clearable
                       :rules="helper.required"
@@ -809,13 +807,12 @@ onMounted(() => {
                           <span>{{ detail_item.code }}</span>
                           <br>
                           <span class="badge badge-success">{{ detail_item.name }}</span>
-                          <v-icon @click="Modal_Updat_Detail(detail_item)" icon="mdi-pencil-box-outline"></v-icon>
+<!--                          <v-icon @click="Modal_Updat_Detail(detail_item)" icon="mdi-pencil-box-outline"></v-icon>-->
                         </td>
                         <td>{{ currency }} {{ helper.formatNumber(detail_item.Total_price, 2) }}</td>
                         <td style="min-width: 140px">
                           <v-text-field
-                              variant="outlined"
-
+                              class="my-1"
                               hide-details="auto"
                               :rules="helper.number"
                               v-model="detail_item.quantity"
@@ -846,7 +843,6 @@ onMounted(() => {
                               title="Delete"
                               icon="mdi-delete"
                               color="error"
-                              density="comfortable"
                               size="small"
                               variant="tonal"
                           >
@@ -919,7 +915,6 @@ onMounted(() => {
                     <!--                          </v-form-group>-->
                     <!--                        </validation-provider>-->
                   </v-col>
-
                 </v-row>
                 <v-row>
                   <v-col md="6" cols="12">
@@ -1143,7 +1138,6 @@ onMounted(() => {
                     :search="searchProducts"
                     :page="products_pos_page"
                     :items-per-page="products_pos.length"
-
                 >
                   <template v-slot:header>
                     <div class="mb-3">
@@ -1154,7 +1148,6 @@ onMounted(() => {
                           prepend-inner-icon="mdi-magnify"
                           placeholder="Search"
                           variant="solo"
-                          density="comfortable"
                       ></v-text-field>
                     </div>
 
@@ -1198,76 +1191,6 @@ onMounted(() => {
         </v-card>
       </v-col>
 
-      <!--        &lt;!&ndash; Sidebar category &ndash;&gt;-->
-      <!--        <v-sidebar-->
-      <!--            id="sidebar-category"-->
-      <!--            :title="$t('ListofCategory')"-->
-      <!--            bg-variant="white"-->
-      <!--            right-->
-      <!--            shadow-->
-      <!--        >-->
-      <!--          <div class="px-3 py-2">-->
-      <!--            <v-row>-->
-      <!--              <div class="col-md-12 d-flex flex-row flex-wrap bd-highlight list-item mt-2">-->
-      <!--                <div-->
-      <!--                    @click="getAllCategory()"-->
-      <!--                    :class="{ 'brand-Active' : category_id == ''}"-->
-      <!--                    class="card o-hidden bd-highlight m-1"-->
-      <!--                >-->
-      <!--                  <div class="list-thumb d-flex">-->
-      <!--                    <img alt :src="'/images/no-image.png'">-->
-      <!--                  </div>-->
-      <!--                  <div class="flex-grow-1 d-bock">-->
-      <!--                    <div-->
-      <!--                        class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"-->
-      <!--                    >-->
-      <!--                      <div class="item-title">{{$t('All_Category')}}</div>-->
-      <!--                    </div>-->
-      <!--                  </div>-->
-      <!--                </div>-->
-      <!--                <div-->
-      <!--                    class="card o-hidden bd-highlight m-1"-->
-      <!--                    v-for="category in paginated_Category"-->
-      <!--                    :key="category.id"-->
-      <!--                    @click="Products_by_Category(category.id)"-->
-      <!--                    :class="{ 'brand-Active' : category.id === category_id}"-->
-      <!--                >-->
-      <!--                  <img alt :src="'/images/no-image.png'">-->
-      <!--                  <div class="flex-grow-1 d-bock">-->
-      <!--                    <div-->
-      <!--                        class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"-->
-      <!--                    >-->
-      <!--                      <div class="item-title">{{category.name}}</div>-->
-      <!--                    </div>-->
-      <!--                  </div>-->
-      <!--                </div>-->
-      <!--              </div>-->
-      <!--            </v-row>-->
-
-      <!--            <v-row>-->
-      <!--              <v-col md="12" class="mt-4">-->
-      <!--                <v-pagination-->
-      <!--                    @change="Category_onPageChanged"-->
-      <!--                    :total-rows="category_totalRows"-->
-      <!--                    :per-page="category_perPage"-->
-      <!--                    v-model="category_currentPage"-->
-      <!--                    class="my-0 gull-pagination align-items-center"-->
-      <!--                    align="center"-->
-      <!--                    first-text-->
-      <!--                    last-text-->
-      <!--                >-->
-      <!--                  <p class="list-arrow m-0" slot="prev-text">-->
-      <!--                    <i class="i-Arrow-Left text-40"></i>-->
-      <!--                  </p>-->
-      <!--                  <p class="list-arrow m-0" slot="next-text">-->
-      <!--                    <i class="i-Arrow-Right text-40"></i>-->
-      <!--                  </p>-->
-      <!--                </v-pagination>-->
-      <!--              </v-col>-->
-      <!--            </v-row>-->
-      <!--          </div>-->
-      <!--        </v-sidebar>-->
-
       <!-- Modal Show Invoice POS-->
       <invoice-dialog :model="dialogInvoice" :invoice_pos="invoice_pos"></invoice-dialog>
 
@@ -1277,28 +1200,25 @@ onMounted(() => {
           <v-toolbar>
             <v-toolbar-title>{{ labels.add_pay }}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon="mdi-close" size="small" density="comfortable" variant="tonal"
+            <v-btn icon="mdi-close" size="small" variant="tonal"
                    @click="dialogAddPayment=false"></v-btn>
           </v-toolbar>
+          <v-form @submit.prevent="Submit_Payment" ref="formAddPayment">
           <v-card-text>
-            <v-form @submit.prevent="Submit_Payment" ref="formAddPayment">
               <v-row>
                 <v-col sm="6" cols="12">
                   <v-row>
                     <!-- Received  Amount  -->
-                    <v-col cols="12" v-if="false">
-                      <v-text-field
-                          @keyup="Verified_Received_Amount(payment.received_amount)"
-                          :label="labels.payment.received_amount"
-                          v-model="payment.received_amount"
-                          :placeholder="labels.payment.received_amount"
-                          variant="outlined"
-                          density="comfortable"
-                          hide-details="auto"
-
-                      >
-                      </v-text-field>
-                    </v-col>
+<!--                    <v-col cols="12" v-if="false">-->
+<!--                      <v-text-field-->
+<!--                          @keyup="Verified_Received_Amount(payment.received_amount)"-->
+<!--                          :label="labels.payment.received_amount"-->
+<!--                          v-model="payment.received_amount"-->
+<!--                          :placeholder="labels.payment.received_amount"-->
+<!--                          hide-details="auto"-->
+<!--                      >-->
+<!--                      </v-text-field>-->
+<!--                    </v-col>-->
                     <!-- Paying  Amount  -->
                     <v-col cols="12">
                       <v-text-field
@@ -1306,8 +1226,6 @@ onMounted(() => {
                           :label="labels.payment.amount"
                           v-model="payment.amount"
                           :placeholder="labels.payment.amount"
-                          variant="outlined"
-                          density="comfortable"
                           hide-details="auto"
                       >
                       </v-text-field>
@@ -1357,8 +1275,6 @@ onMounted(() => {
                       :label="labels.payment.role"
                       item-title="title"
                       item-value="value"
-                      variant="outlined"
-                      density="comfortable"
                       hide-details="auto"
                   ></v-select>
                 </v-col>
@@ -1366,8 +1282,6 @@ onMounted(() => {
                 <v-col lg="4" md="4" cols="12">
                   <v-select
                       v-model="sale.sales_type_id"
-                      variant="outlined"
-
                       hide-details="auto"
                       :items="sales_types"
                       :label="labels.sale.sales_type_id + ' *'"
@@ -1381,8 +1295,6 @@ onMounted(() => {
                 <v-col lg="4" md="4" cols="12">
                   <v-select
                       v-model="sale.statut"
-                      variant="outlined"
-
                       clearable
                       hide-details="auto"
                       :items="helper.statutSale()"
@@ -1397,8 +1309,6 @@ onMounted(() => {
                       :label="labels.payment.notes"
                       v-model="payment.notes"
                       :placeholder="labels.payment.notes"
-                      variant="outlined"
-                      density="comfortable"
                       hide-details="auto"
                   ></v-textarea>
                 </v-col>
@@ -1409,20 +1319,18 @@ onMounted(() => {
                       :label="labels.sale.notes"
                       v-model="sale.notes"
                       :placeholder="labels.sale.notes"
-                      variant="outlined"
-                      density="comfortable"
                       hide-details="auto"
                   ></v-textarea>
                 </v-col>
-                <v-col md="12" class="mt-3">
-                  <v-btn color="primary" type="submit" :disabled="loading">
-                    {{ labels.submit }}
-                  </v-btn>
-
-                </v-col>
               </v-row>
-            </v-form>
           </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+                <v-btn color="primary" variant="elevated" type="submit" :disabled="loading">
+                  {{ labels.submit }}
+                </v-btn>
+            </v-card-actions>
+          </v-form>
         </v-card>
       </v-dialog>
     </v-row>

@@ -1,5 +1,6 @@
 <script setup>
 import helper from "@/helpers";
+import labels from "@/labels";
 
 const props = defineProps({
   model: Boolean,
