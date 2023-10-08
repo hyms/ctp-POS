@@ -498,12 +498,13 @@ function Remove_Sale(id, sale_has_return) {
         <v-toolbar>
           <v-toolbar-title>Pagos realizados</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn icon="mdi-close" size="small" density="comfortable" variant="tonal" @click="dialogShowPayment=false"></v-btn>
+          <v-btn icon="mdi-close" size="small" density="comfortable" variant="tonal"
+                 @click="dialogShowPayment=false"></v-btn>
         </v-toolbar>
         <v-card-text>
           <v-row class="mb-3">
             <v-col>
-              <v-table density="compact" hover>
+              <v-table hover>
                 <thead>
                 <tr>
                   <th>Fecha</th>
@@ -526,15 +527,15 @@ function Remove_Sale(id, sale_has_return) {
                   </td>
                   <td>{{ helper.getReglamentPayment(payment.Reglement)[0].title }}</td>
                   <td>
-<!--                    <v-btn-->
-<!--                        title="Imprimir"-->
-<!--                        size="x-small"-->
-<!--                        color="info"-->
-<!--                        @click="Payment_Sale_PDF(payment,payment.id)"-->
-<!--                        icon="mdi-printer"-->
-<!--                        class="ma-1"-->
-<!--                    >-->
-<!--                    </v-btn>-->
+                    <!--                    <v-btn-->
+                    <!--                        title="Imprimir"-->
+                    <!--                        size="x-small"-->
+                    <!--                        color="info"-->
+                    <!--                        @click="Payment_Sale_PDF(payment,payment.id)"-->
+                    <!--                        icon="mdi-printer"-->
+                    <!--                        class="ma-1"-->
+                    <!--                    >-->
+                    <!--                    </v-btn>-->
                     <v-btn
                         title="Editar"
                         size="small"
@@ -731,7 +732,7 @@ function Remove_Sale(id, sale_has_return) {
           :items="sales"
           :search="search"
           hover
-          density="compact"
+
           no-data-text="No existen datos a mostrar"
           :loading="loading"
           loading-text="Cargando..."
@@ -741,14 +742,16 @@ function Remove_Sale(id, sale_has_return) {
               :color="helper.statutSaleColor(item.statut)"
               variant="tonal"
               size="x-small"
-          >{{helper.statutSale(item.statut)}}</v-chip>
+          >{{ helper.statutSale(item.statut) }}
+          </v-chip>
         </template>
         <template v-slot:item.payment_status="{ item }">
           <v-chip
               :color="helper.statusPaymentColor(item.payment_status)"
               variant="tonal"
               size="x-small"
-          >{{helper.statusPayment(item.payment_status)}}</v-chip>
+          >{{ helper.statusPayment(item.payment_status) }}
+          </v-chip>
         </template>
         <template v-slot:item.Ref="{ item }">
           <v-btn
@@ -772,7 +775,7 @@ function Remove_Sale(id, sale_has_return) {
               >
               </v-btn>
             </template>
-            <v-list density="compact">
+            <v-list>
               <v-list-item
                   @click="router.visit('/sales/detail/' + item.id)"
                   prepend-icon="mdi-eye"
@@ -807,15 +810,15 @@ function Remove_Sale(id, sale_has_return) {
                   Añadir Pago
                 </v-list-item-title>
               </v-list-item>
-<!--              <v-list-item-->
-<!--                  @click="New_Payment(item)"-->
-<!--                  prepend-icon="mdi-hammer"-->
-<!--                  v-if="item.statut!='completed'"-->
-<!--              >-->
-<!--                <v-list-item-title>-->
-<!--                 Completar Trabajo-->
-<!--                </v-list-item-title>-->
-<!--              </v-list-item>-->
+              <!--              <v-list-item-->
+              <!--                  @click="New_Payment(item)"-->
+              <!--                  prepend-icon="mdi-hammer"-->
+              <!--                  v-if="item.statut!='completed'"-->
+              <!--              >-->
+              <!--                <v-list-item-title>-->
+              <!--                 Completar Trabajo-->
+              <!--                </v-list-item-title>-->
+              <!--              </v-list-item>-->
               <v-list-item
                   @click="Invoice_POS(item.id)"
                   prepend-icon="mdi-printer-pos-outline"

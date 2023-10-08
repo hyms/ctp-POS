@@ -56,6 +56,7 @@ function Sale_PDF(id) {
 function print() {
   printJS("print_Invoice", "html");
 }
+
 //------------------------------ Print POS-------------------------\\
 function print_POS() {
   Invoice_POS(props.sale.id);
@@ -65,6 +66,7 @@ function print_POS() {
 function Delete_Sale() {
   dialogDelete.value = true;
 }
+
 function Remove_Sale() {
   snackbar.value = false;
   loading.value = true;
@@ -95,6 +97,7 @@ function Remove_Sale() {
         });
   }
 }
+
 //-------------------------------- Invoice POS ------------------------------\\
 function Invoice_POS(id) {
   loading.value = true;
@@ -115,6 +118,7 @@ function Invoice_POS(id) {
         loading.value = false;
       });
 }
+
 onMounted(() => {
 })
 </script>
@@ -146,15 +150,15 @@ onMounted(() => {
             prepend-icon="mdi-pencil-box-outline"
         > Editar Venta
         </v-btn>
-<!--        <v-btn-->
-<!--            class="mr-1"-->
-<!--            @click="Sale_PDF(sale.id)"-->
-<!--            color="primary"-->
-<!--            size="small"-->
-<!--            prepend-icon="mdi-file-pdf-box"-->
-<!--        >-->
-<!--          PDF-->
-<!--        </v-btn>-->
+        <!--        <v-btn-->
+        <!--            class="mr-1"-->
+        <!--            @click="Sale_PDF(sale.id)"-->
+        <!--            color="primary"-->
+        <!--            size="small"-->
+        <!--            prepend-icon="mdi-file-pdf-box"-->
+        <!--        >-->
+        <!--          PDF-->
+        <!--        </v-btn>-->
         <v-btn
             class="mr-1"
             @click="print()"
@@ -235,7 +239,7 @@ onMounted(() => {
                       color="success"
                       variant="outlined"
                       size="small"
-                      density="compact"
+
                   >Pagado
                   </v-chip>
                   <v-chip
@@ -243,7 +247,7 @@ onMounted(() => {
                       color="primary"
                       variant="outlined"
                       size="small"
-                      density="compact"
+
                   >Parcial
                   </v-chip>
                   <v-chip
@@ -251,7 +255,7 @@ onMounted(() => {
                       color="error"
                       variant="outlined"
                       size="small"
-                      density="compact"
+
                   >Sin Pagar
                   </v-chip>
                 </div>
@@ -263,7 +267,7 @@ onMounted(() => {
                       color="success"
                       variant="outlined"
                       size="small"
-                      density="compact"
+
                   >Completo
                   </v-chip>
                   <v-chip
@@ -271,7 +275,7 @@ onMounted(() => {
                       color="info"
                       variant="outlined"
                       size="small"
-                      density="compact"
+
                   >Pendiente
                   </v-chip>
                   <v-chip
@@ -279,7 +283,7 @@ onMounted(() => {
                       color="warning"
                       variant="outlined"
                       size="small"
-                      density="compact"
+
                   >Ordenado
                   </v-chip>
                 </div>
@@ -291,7 +295,7 @@ onMounted(() => {
                   Resumen de la Orden
                 </p>
                 <div class="table-responsive">
-                  <v-table density="compact" hover>
+                  <v-table hover>
                     <thead class="bg-gray-300">
                     <tr>
                       <th>Producto</th>
@@ -335,7 +339,7 @@ onMounted(() => {
             </v-row>
             <v-row class="mt-4">
               <v-col sm="6" offset-sm="6" md="4" offset-md="8" cols="12">
-                <v-table density="compact" hover>
+                <v-table hover>
                   <tbody>
                   <tr>
                     <td class="font-weight-bold">

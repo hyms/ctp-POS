@@ -223,84 +223,84 @@
 // };
 </script>
 <template>
-<!--  <div class="main-content">-->
-<!--    <breadcumb :page="$t('product_report')" :folder="$t('Reports')"/>-->
-<!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
-<!--    <b-col md="12" class="text-center" v-if="!isLoading">-->
-<!--        <date-range-picker -->
-<!--          v-model="dateRange" -->
-<!--          :startDate="startDate" -->
-<!--          :endDate="endDate" -->
-<!--           @update="Submit_filter_dateRange"-->
-<!--          :locale-data="locale" > -->
+  <!--  <div class="main-content">-->
+  <!--    <breadcumb :page="$t('product_report')" :folder="$t('Reports')"/>-->
+  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+  <!--    <b-col md="12" class="text-center" v-if="!isLoading">-->
+  <!--        <date-range-picker -->
+  <!--          v-model="dateRange" -->
+  <!--          :startDate="startDate" -->
+  <!--          :endDate="endDate" -->
+  <!--           @update="Submit_filter_dateRange"-->
+  <!--          :locale-data="locale" > -->
 
-<!--          <template v-slot:input="picker" style="min-width: 350px;">-->
-<!--              {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}-->
-<!--          </template>        -->
-<!--        </date-range-picker>-->
-<!--      </b-col>-->
+  <!--          <template v-slot:input="picker" style="min-width: 350px;">-->
+  <!--              {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}-->
+  <!--          </template>        -->
+  <!--        </date-range-picker>-->
+  <!--      </b-col>-->
 
-<!--      <vue-good-table-->
-<!--        v-if="!isLoading"-->
-<!--        mode="remote"-->
-<!--        :columns="columns"-->
-<!--        :totalRows="totalRows"-->
-<!--        :rows="products"-->
-<!--        @on-page-change="onPageChange"-->
-<!--        @on-per-page-change="onPerPageChange"-->
-<!--        @on-search="onSearch_products"-->
-<!--          :search-options="{-->
-<!--            placeholder: $t('Search_this_table'),-->
-<!--            enabled: true,-->
-<!--        }"-->
-<!--        :pagination-options="{-->
-<!--        enabled: true,-->
-<!--        mode: 'records',-->
-<!--        nextLabel: 'next',-->
-<!--        prevLabel: 'prev',-->
-<!--      }"-->
-<!--        styleClass="mt-5 table-hover tableOne vgt-table"-->
-<!--      >-->
-<!--      <div slot="table-actions" class="mt-2 mb-3">-->
-<!--        <b-button @click="export_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--          <i class="i-File-Copy"></i> PDF-->
-<!--        </b-button>-->
-<!--         <vue-excel-xlsx-->
-<!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
-<!--              :data="products"-->
-<!--              :columns="columns"-->
-<!--              :file-name="'product_report'"-->
-<!--              :file-type="'xlsx'"-->
-<!--              :sheet-name="'product_report'"-->
-<!--              >-->
-<!--              <i class="i-File-Excel"></i> EXCEL-->
-<!--          </vue-excel-xlsx>-->
+  <!--      <vue-good-table-->
+  <!--        v-if="!isLoading"-->
+  <!--        mode="remote"-->
+  <!--        :columns="columns"-->
+  <!--        :totalRows="totalRows"-->
+  <!--        :rows="products"-->
+  <!--        @on-page-change="onPageChange"-->
+  <!--        @on-per-page-change="onPerPageChange"-->
+  <!--        @on-search="onSearch_products"-->
+  <!--          :search-options="{-->
+  <!--            placeholder: $t('Search_this_table'),-->
+  <!--            enabled: true,-->
+  <!--        }"-->
+  <!--        :pagination-options="{-->
+  <!--        enabled: true,-->
+  <!--        mode: 'records',-->
+  <!--        nextLabel: 'next',-->
+  <!--        prevLabel: 'prev',-->
+  <!--      }"-->
+  <!--        styleClass="mt-5 table-hover tableOne vgt-table"-->
+  <!--      >-->
+  <!--      <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--        <b-button @click="export_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--          <i class="i-File-Copy"></i> PDF-->
+  <!--        </b-button>-->
+  <!--         <vue-excel-xlsx-->
+  <!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
+  <!--              :data="products"-->
+  <!--              :columns="columns"-->
+  <!--              :file-name="'product_report'"-->
+  <!--              :file-type="'xlsx'"-->
+  <!--              :sheet-name="'product_report'"-->
+  <!--              >-->
+  <!--              <i class="i-File-Excel"></i> EXCEL-->
+  <!--          </vue-excel-xlsx>-->
 
-<!--           &lt;!&ndash; warehouse &ndash;&gt;-->
-<!--          <b-form-group :label="$t('warehouse')">-->
-<!--            <v-select-->
-<!--              @input="Selected_Warehouse"-->
-<!--              v-model="warehouse_id"-->
-<!--              :reduce="label => label.value"-->
-<!--              :placeholder="$t('Choose_Warehouse')"-->
-<!--              :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
-<!--            />-->
-<!--          </b-form-group>-->
+  <!--           &lt;!&ndash; warehouse &ndash;&gt;-->
+  <!--          <b-form-group :label="$t('warehouse')">-->
+  <!--            <v-select-->
+  <!--              @input="Selected_Warehouse"-->
+  <!--              v-model="warehouse_id"-->
+  <!--              :reduce="label => label.value"-->
+  <!--              :placeholder="$t('Choose_Warehouse')"-->
+  <!--              :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
+  <!--            />-->
+  <!--          </b-form-group>-->
 
-<!--      </div>-->
-<!--        <template slot="table-row" slot-scope="props">-->
-<!--          <span v-if="props.column.field == 'actions'">-->
-<!--            <router-link title="Report" :to="'/app/reports/detail_product/'+props.row.id">-->
-<!--              <b-button variant="primary">{{$t('Reports')}}</b-button>-->
-<!--            </router-link>-->
-<!--          </span>-->
+  <!--      </div>-->
+  <!--        <template slot="table-row" slot-scope="props">-->
+  <!--          <span v-if="props.column.field == 'actions'">-->
+  <!--            <router-link title="Report" :to="'/app/reports/detail_product/'+props.row.id">-->
+  <!--              <b-button variant="primary">{{$t('Reports')}}</b-button>-->
+  <!--            </router-link>-->
+  <!--          </span>-->
 
-<!--          <div v-else-if="props.column.field == 'sold_amount'">-->
-<!--            <span>{{currentUser.currency}} {{props.row.sold_amount}}</span>-->
-<!--          </div>-->
-<!--        </template>-->
+  <!--          <div v-else-if="props.column.field == 'sold_amount'">-->
+  <!--            <span>{{currentUser.currency}} {{props.row.sold_amount}}</span>-->
+  <!--          </div>-->
+  <!--        </template>-->
 
-<!--      </vue-good-table>-->
-<!--      &lt;!&ndash; </b-card> &ndash;&gt;-->
-<!--    </div>-->
+  <!--      </vue-good-table>-->
+  <!--      &lt;!&ndash; </b-card> &ndash;&gt;-->
+  <!--    </div>-->
 </template>

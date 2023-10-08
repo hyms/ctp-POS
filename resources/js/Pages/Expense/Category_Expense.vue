@@ -202,7 +202,7 @@ function Delete_Category() {
         <v-form ref="form">
           <v-toolbar
               border
-              density="compact"
+
               :title="(editmode ? 'Modificar' : 'Nueva') +' Categoria de gasto'"
           >
           </v-toolbar>

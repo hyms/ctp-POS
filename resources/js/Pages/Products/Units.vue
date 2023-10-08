@@ -242,12 +242,12 @@ function Remove_Unit() {
       <v-card>
         <v-toolbar
             border
-            density="compact"
+
             :title="(editmode ? 'Modificar' : 'Nueva') + ' Unidad'"
         >
         </v-toolbar>
         <v-form ref="form">
-        <v-card-text>
+          <v-card-text>
             <v-row>
               <!-- Name -->
               <v-col cols="12">
@@ -308,28 +308,28 @@ function Remove_Unit() {
                 </v-text-field>
               </v-col>
             </v-row>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-              variant="outlined"
-              color="error"
-              class="ma-1"
-              @click="onClose"
-          >
-            Cancelar
-          </v-btn>
-          <v-btn
-              color="primary"
-              variant="elevated"
-              class="ma-1"
-              @click="Submit_Unit"
-              :loading="loading"
-              :disabled="loading"
-          >
-            Guardar
-          </v-btn>
-        </v-card-actions>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+                variant="outlined"
+                color="error"
+                class="ma-1"
+                @click="onClose"
+            >
+              Cancelar
+            </v-btn>
+            <v-btn
+                color="primary"
+                variant="elevated"
+                class="ma-1"
+                @click="Submit_Unit"
+                :loading="loading"
+                :disabled="loading"
+            >
+              Guardar
+            </v-btn>
+          </v-card-actions>
         </v-form>
       </v-card>
     </v-dialog>

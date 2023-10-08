@@ -805,7 +805,7 @@ onMounted(() => {
                   <td>
                     <v-text-field
                         variant="outlined"
-                        density="compact"
+
                         hide-details="auto"
                         :rules="helper.number"
                         v-model="detail.Net_price"
@@ -830,7 +830,7 @@ onMounted(() => {
                     <div class="quantity">
                       <v-text-field
                           variant="outlined"
-                          density="compact"
+
                           hide-details="auto"
                           :rules="helper.number"
                           v-model="detail.quantity"
@@ -875,7 +875,7 @@ onMounted(() => {
                   </td>
                   <td>
                     <i @click="Modal_Updat_Detail(detail)"
-                        class="i-Edit text-25 text-success"
+                       class="i-Edit text-25 text-success"
                     ></i>
                     <v-btn
                         class="ma-1 rounded"
@@ -903,28 +903,28 @@ onMounted(() => {
               </v-table>
             </v-col>
             <v-col cols="12" md="4" offset-md="8" sm="6" offset-sm="6">
-              <v-table density="compact" hover class="border">
+              <v-table hover class="border">
                 <tbody>
-<!--                <tr>-->
-<!--                  <td class="bold">{{$t('OrderTax')}}</td>-->
-<!--                  <td>-->
-<!--                    <span>{{currentUser.currency}} {{sale.TaxNet.toFixed(2)}} ({{formatNumber(sale.tax_rate ,2)}} %)</span>-->
-<!--                  </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                  <td class="bold">{{$t('Discount')}}</td>-->
-<!--                  <td>{{currentUser.currency}} {{sale.discount.toFixed(2)}}</td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                  <td class="bold">{{$t('Shipping')}}</td>-->
-<!--                  <td>{{currentUser.currency}} {{sale.shipping.toFixed(2)}}</td>-->
-<!--                </tr>-->
+                <!--                <tr>-->
+                <!--                  <td class="bold">{{$t('OrderTax')}}</td>-->
+                <!--                  <td>-->
+                <!--                    <span>{{currentUser.currency}} {{sale.TaxNet.toFixed(2)}} ({{formatNumber(sale.tax_rate ,2)}} %)</span>-->
+                <!--                  </td>-->
+                <!--                </tr>-->
+                <!--                <tr>-->
+                <!--                  <td class="bold">{{$t('Discount')}}</td>-->
+                <!--                  <td>{{currentUser.currency}} {{sale.discount.toFixed(2)}}</td>-->
+                <!--                </tr>-->
+                <!--                <tr>-->
+                <!--                  <td class="bold">{{$t('Shipping')}}</td>-->
+                <!--                  <td>{{currentUser.currency}} {{sale.shipping.toFixed(2)}}</td>-->
+                <!--                </tr>-->
                 <tr>
                   <td class="font-weight-bold">
                     Total
                   </td>
                   <td class="font-weight-bold">
-                          Bs {{GrandTotal.toFixed(2)}}
+                    Bs {{ GrandTotal.toFixed(2) }}
                   </td>
                 </tr>
                 </tbody>
@@ -937,7 +937,7 @@ onMounted(() => {
               <v-text-field
                   :label="saleLabel.discount"
                   variant="outlined"
-                  density="compact"
+
                   hide-details="auto"
                   :rules="helper.number"
                   v-model="saleForm.discount"
@@ -949,7 +949,7 @@ onMounted(() => {
               <v-text-field
                   v-model="payment.amount"
                   variant="outlined"
-                  density="compact"
+
                   hide-details="auto"
                   type="text"
                   label="A pagar"
@@ -961,7 +961,7 @@ onMounted(() => {
               <v-text-field
                   v-model="payment.received_amount"
                   variant="outlined"
-                  density="compact"
+
                   hide-details="auto"
                   type="text"
                   label="Monto Recibido"
@@ -976,7 +976,7 @@ onMounted(() => {
               <v-select
                   v-model="saleForm.statut"
                   variant="outlined"
-                  density="compact"
+
                   clearable
                   hide-details="auto"
                   :items="helper.statutSale()"
@@ -989,7 +989,7 @@ onMounted(() => {
               <v-select
                   v-model="saleForm.sales_type_id"
                   variant="outlined"
-                  density="compact"
+
                   hide-details="auto"
                   :items="sales_types"
                   :label="saleLabel.sales_type_id + ' *'"
@@ -1002,7 +1002,7 @@ onMounted(() => {
               <v-select
                   v-model="payment.Reglement"
                   variant="outlined"
-                  density="compact"
+
                   hide-details="auto"
                   :items="helper.reglamentPayment()"
                   label="Tipo de Pago"

@@ -247,7 +247,7 @@ function Payments_Sales() {
           :items="payments"
           :search="search"
           hover
-          density="compact"
+
           :no-data-text="labels.no_data_table"
           :loading="loading"
       >

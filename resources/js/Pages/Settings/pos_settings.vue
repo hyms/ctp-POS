@@ -1,127 +1,127 @@
 <template>
-    <!--  <div class="main-content">-->
-    <!--    <breadcumb :page="$t('pos_settings')" :folder="$t('Settings')"/>-->
-    <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+  <!--  <div class="main-content">-->
+  <!--    <breadcumb :page="$t('pos_settings')" :folder="$t('Settings')"/>-->
+  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
 
-    <!--     &lt;!&ndash; Reciept Pos Settings &ndash;&gt;-->
-    <!--    <validation-observer ref="Submit_Pos_Settings" v-if="!isLoading">-->
-    <!--      <b-form @submit.prevent="Submit_Pos_Settings">-->
-    <!--        <b-row class="mt-5">-->
-    <!--          <b-col lg="12" md="12" sm="12">-->
-    <!--            <b-card no-body :header="$t('Pos_Settings')">-->
-    <!--              <b-card-body>-->
-    <!--                <b-row>-->
+  <!--     &lt;!&ndash; Reciept Pos Settings &ndash;&gt;-->
+  <!--    <validation-observer ref="Submit_Pos_Settings" v-if="!isLoading">-->
+  <!--      <b-form @submit.prevent="Submit_Pos_Settings">-->
+  <!--        <b-row class="mt-5">-->
+  <!--          <b-col lg="12" md="12" sm="12">-->
+  <!--            <b-card no-body :header="$t('Pos_Settings')">-->
+  <!--              <b-card-body>-->
+  <!--                <b-row>-->
 
-    <!--                   &lt;!&ndash; Note to customer  &ndash;&gt;-->
-    <!--                  <b-col lg="12" md="12" sm="12">-->
-    <!--                    <validation-provider-->
-    <!--                      name="note"-->
-    <!--                      :rules="{ required: true}"-->
-    <!--                      v-slot="validationContext"-->
-    <!--                    >-->
-    <!--                      <b-form-group :label="$t('Note_to_customer') + ' ' + '*'">-->
-    <!--                        <b-form-input-->
-    <!--                          :state="getValidationState(validationContext)"-->
-    <!--                          aria-describedby="note-feedback"-->
-    <!--                          label="Note to customer"-->
-    <!--                          :placeholder="$t('Note_to_customer')"-->
-    <!--                          v-model="pos_settings.note_customer"-->
-    <!--                        ></b-form-input>-->
-    <!--                        <b-form-invalid-feedback-->
-    <!--                          id="note-feedback"-->
-    <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
-    <!--                      </b-form-group>-->
-    <!--                    </validation-provider>-->
-    <!--                  </b-col>-->
+  <!--                   &lt;!&ndash; Note to customer  &ndash;&gt;-->
+  <!--                  <b-col lg="12" md="12" sm="12">-->
+  <!--                    <validation-provider-->
+  <!--                      name="note"-->
+  <!--                      :rules="{ required: true}"-->
+  <!--                      v-slot="validationContext"-->
+  <!--                    >-->
+  <!--                      <b-form-group :label="$t('Note_to_customer') + ' ' + '*'">-->
+  <!--                        <b-form-input-->
+  <!--                          :state="getValidationState(validationContext)"-->
+  <!--                          aria-describedby="note-feedback"-->
+  <!--                          label="Note to customer"-->
+  <!--                          :placeholder="$t('Note_to_customer')"-->
+  <!--                          v-model="pos_settings.note_customer"-->
+  <!--                        ></b-form-input>-->
+  <!--                        <b-form-invalid-feedback-->
+  <!--                          id="note-feedback"-->
+  <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
+  <!--                      </b-form-group>-->
+  <!--                    </validation-provider>-->
+  <!--                  </b-col>-->
 
-    <!--                 -->
+  <!--                 -->
 
-    <!--                   &lt;!&ndash; Show Phone&ndash;&gt;-->
-    <!--                    <b-col md="4" class="mt-3 mb-3">-->
-    <!--                       <label class="switch switch-primary mr-3">-->
-    <!--                         {{$t('Show_Phone')}}-->
-    <!--                          <input  type="checkbox" v-model="pos_settings.show_phone">-->
-    <!--                          <span class="slider"></span>-->
-    <!--                        </label>-->
-    <!--                    </b-col>-->
+  <!--                   &lt;!&ndash; Show Phone&ndash;&gt;-->
+  <!--                    <b-col md="4" class="mt-3 mb-3">-->
+  <!--                       <label class="switch switch-primary mr-3">-->
+  <!--                         {{$t('Show_Phone')}}-->
+  <!--                          <input  type="checkbox" v-model="pos_settings.show_phone">-->
+  <!--                          <span class="slider"></span>-->
+  <!--                        </label>-->
+  <!--                    </b-col>-->
 
-    <!--                     &lt;!&ndash; Show Address &ndash;&gt;-->
-    <!--                    <b-col md="4" class="mt-3 mb-3">-->
-    <!--                       <label class="switch switch-primary mr-3">-->
-    <!--                         {{$t('Show_Address')}}-->
-    <!--                          <input  type="checkbox" v-model="pos_settings.show_address">-->
-    <!--                          <span class="slider"></span>-->
-    <!--                        </label>-->
-    <!--                    </b-col>-->
+  <!--                     &lt;!&ndash; Show Address &ndash;&gt;-->
+  <!--                    <b-col md="4" class="mt-3 mb-3">-->
+  <!--                       <label class="switch switch-primary mr-3">-->
+  <!--                         {{$t('Show_Address')}}-->
+  <!--                          <input  type="checkbox" v-model="pos_settings.show_address">-->
+  <!--                          <span class="slider"></span>-->
+  <!--                        </label>-->
+  <!--                    </b-col>-->
 
-    <!--                      &lt;!&ndash; Show Email  &ndash;&gt;-->
-    <!--                    <b-col md="4" class="mt-3 mb-3">-->
-    <!--                       <label class="switch switch-primary mr-3">-->
-    <!--                         {{$t('Show_Email')}}-->
-    <!--                          <input  type="checkbox" v-model="pos_settings.show_email">-->
-    <!--                          <span class="slider"></span>-->
-    <!--                        </label>-->
-    <!--                    </b-col>-->
+  <!--                      &lt;!&ndash; Show Email  &ndash;&gt;-->
+  <!--                    <b-col md="4" class="mt-3 mb-3">-->
+  <!--                       <label class="switch switch-primary mr-3">-->
+  <!--                         {{$t('Show_Email')}}-->
+  <!--                          <input  type="checkbox" v-model="pos_settings.show_email">-->
+  <!--                          <span class="slider"></span>-->
+  <!--                        </label>-->
+  <!--                    </b-col>-->
 
-    <!--                    &lt;!&ndash; Show Customer  &ndash;&gt;-->
-    <!--                    <b-col md="4" class="mt-3 mb-3">-->
-    <!--                       <label class="switch switch-primary mr-3">-->
-    <!--                         {{$t('Show_Customer')}}-->
-    <!--                          <input  type="checkbox" v-model="pos_settings.show_customer">-->
-    <!--                          <span class="slider"></span>-->
-    <!--                        </label>-->
-    <!--                    </b-col>-->
+  <!--                    &lt;!&ndash; Show Customer  &ndash;&gt;-->
+  <!--                    <b-col md="4" class="mt-3 mb-3">-->
+  <!--                       <label class="switch switch-primary mr-3">-->
+  <!--                         {{$t('Show_Customer')}}-->
+  <!--                          <input  type="checkbox" v-model="pos_settings.show_customer">-->
+  <!--                          <span class="slider"></span>-->
+  <!--                        </label>-->
+  <!--                    </b-col>-->
 
-    <!--                     &lt;!&ndash; Show Tax & Discount  &ndash;&gt;-->
-    <!--                    <b-col md="4" class="mt-3 mb-3">-->
-    <!--                       <label class="switch switch-primary mr-3">-->
-    <!--                         {{$t('Show_Tax_and_Discount')}}-->
-    <!--                          <input  type="checkbox" v-model="pos_settings.show_discount">-->
-    <!--                          <span class="slider"></span>-->
-    <!--                        </label>-->
-    <!--                    </b-col>-->
+  <!--                     &lt;!&ndash; Show Tax & Discount  &ndash;&gt;-->
+  <!--                    <b-col md="4" class="mt-3 mb-3">-->
+  <!--                       <label class="switch switch-primary mr-3">-->
+  <!--                         {{$t('Show_Tax_and_Discount')}}-->
+  <!--                          <input  type="checkbox" v-model="pos_settings.show_discount">-->
+  <!--                          <span class="slider"></span>-->
+  <!--                        </label>-->
+  <!--                    </b-col>-->
 
-    <!--                     &lt;!&ndash; Show barcode  &ndash;&gt;-->
-    <!--                    <b-col md="4" class="mt-3 mb-3">-->
-    <!--                       <label class="switch switch-primary mr-3">-->
-    <!--                         {{$t('Show_barcode')}}-->
-    <!--                          <input  type="checkbox" v-model="pos_settings.show_barcode">-->
-    <!--                          <span class="slider"></span>-->
-    <!--                        </label>-->
-    <!--                    </b-col>-->
+  <!--                     &lt;!&ndash; Show barcode  &ndash;&gt;-->
+  <!--                    <b-col md="4" class="mt-3 mb-3">-->
+  <!--                       <label class="switch switch-primary mr-3">-->
+  <!--                         {{$t('Show_barcode')}}-->
+  <!--                          <input  type="checkbox" v-model="pos_settings.show_barcode">-->
+  <!--                          <span class="slider"></span>-->
+  <!--                        </label>-->
+  <!--                    </b-col>-->
 
-    <!--                      &lt;!&ndash; Show Note_to_customer  &ndash;&gt;-->
-    <!--                    <b-col md="4" class="mt-3 mb-3">-->
-    <!--                       <label class="switch switch-primary mr-3">-->
-    <!--                         {{$t('Show_Note_to_customer')}}-->
-    <!--                          <input  type="checkbox" v-model="pos_settings.show_note">-->
-    <!--                          <span class="slider"></span>-->
-    <!--                        </label>-->
-    <!--                    </b-col>-->
+  <!--                      &lt;!&ndash; Show Note_to_customer  &ndash;&gt;-->
+  <!--                    <b-col md="4" class="mt-3 mb-3">-->
+  <!--                       <label class="switch switch-primary mr-3">-->
+  <!--                         {{$t('Show_Note_to_customer')}}-->
+  <!--                          <input  type="checkbox" v-model="pos_settings.show_note">-->
+  <!--                          <span class="slider"></span>-->
+  <!--                        </label>-->
+  <!--                    </b-col>-->
 
-    <!--                      &lt;!&ndash; Enable_Print_Invoice &ndash;&gt;-->
-    <!--                    <b-col md="4" class="mt-3 mb-3">-->
-    <!--                       <label class="switch switch-primary mr-3">-->
-    <!--                         {{$t('Enable_Print_Invoice')}}-->
-    <!--                          <input  type="checkbox" v-model="pos_settings.is_printable">-->
-    <!--                          <span class="slider"></span>-->
-    <!--                        </label>-->
-    <!--                    </b-col>-->
+  <!--                      &lt;!&ndash; Enable_Print_Invoice &ndash;&gt;-->
+  <!--                    <b-col md="4" class="mt-3 mb-3">-->
+  <!--                       <label class="switch switch-primary mr-3">-->
+  <!--                         {{$t('Enable_Print_Invoice')}}-->
+  <!--                          <input  type="checkbox" v-model="pos_settings.is_printable">-->
+  <!--                          <span class="slider"></span>-->
+  <!--                        </label>-->
+  <!--                    </b-col>-->
 
-    <!--                  <b-col md="12">-->
-    <!--                    <b-form-group>-->
-    <!--                      <b-button variant="primary" type="submit">{{$t('submit')}}</b-button>-->
-    <!--                    </b-form-group>-->
-    <!--                  </b-col>-->
-    <!--                </b-row>-->
-    <!--              </b-card-body>-->
-    <!--            </b-card>-->
-    <!--          </b-col>-->
-    <!--        </b-row>-->
-    <!--      </b-form>-->
-    <!--    </validation-observer>-->
+  <!--                  <b-col md="12">-->
+  <!--                    <b-form-group>-->
+  <!--                      <b-button variant="primary" type="submit">{{$t('submit')}}</b-button>-->
+  <!--                    </b-form-group>-->
+  <!--                  </b-col>-->
+  <!--                </b-row>-->
+  <!--              </b-card-body>-->
+  <!--            </b-card>-->
+  <!--          </b-col>-->
+  <!--        </b-row>-->
+  <!--      </b-form>-->
+  <!--    </validation-observer>-->
 
-    <!--  </div>-->
+  <!--  </div>-->
 </template>
 
 <script>

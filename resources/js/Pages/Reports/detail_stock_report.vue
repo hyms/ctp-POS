@@ -844,400 +844,400 @@
 // };
 </script>
 <template>
-<!--  <div class="main-content">-->
-<!--    <breadcumb :page="$t('stock_report')" :folder="$t('Reports')"/>-->
-<!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+  <!--  <div class="main-content">-->
+  <!--    <breadcumb :page="$t('stock_report')" :folder="$t('Reports')"/>-->
+  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
 
-<!--    <b-row v-if="!isLoading">-->
-<!--        <b-col lg="12">-->
-<!--            <h3 class="text-center">{{product.name}}</h3>-->
-<!--        </b-col>-->
-<!--      &lt;!&ndash; Warehouse Quantity &ndash;&gt;-->
-<!--          <b-col md="5" class="mt-4">-->
-<!--          -->
-<!--            <table class="table table-hover table-sm">-->
-<!--              <thead>-->
-<!--                <tr>-->
-<!--                  <th>{{$t('warehouse')}}</th>-->
-<!--                  <th>{{$t('Quantity')}}</th>-->
-<!--                </tr>-->
-<!--              </thead>-->
-<!--              <tbody>-->
-<!--                <tr v-for="PROD_W in product.CountQTY">-->
-<!--                  <td>{{PROD_W.mag}}</td>-->
-<!--                  <td>{{formatNumber(PROD_W.qte ,2)}} {{product.unit}}</td>-->
-<!--                </tr>-->
-<!--              </tbody>-->
-<!--            </table>-->
-<!--          </b-col>-->
-<!--          &lt;!&ndash; Warehouse Variants Quantity &ndash;&gt;-->
-<!--          <b-col md="7" v-if="product.is_variant == 'yes'" class="mt-4">-->
-<!--            <table class="table table-hover table-sm">-->
-<!--              <thead>-->
-<!--                <tr>-->
-<!--                  <th>{{$t('warehouse')}}</th>-->
-<!--                  <th>{{$t('Variant')}}</th>-->
-<!--                  <th>{{$t('Quantity')}}</th>-->
-<!--                </tr>-->
-<!--              </thead>-->
-<!--              <tbody>-->
-<!--                <tr v-for="PROD_V in product.CountQTY_variants">-->
-<!--                  <td>{{PROD_V.mag}}</td>-->
-<!--                  <td>{{PROD_V.variant}}</td>-->
-<!--                  <td>{{formatNumber(PROD_V.qte ,2)}} {{product.unit}}</td>-->
-<!--                </tr>-->
-<!--              </tbody>-->
-<!--            </table>-->
-<!--          </b-col>-->
+  <!--    <b-row v-if="!isLoading">-->
+  <!--        <b-col lg="12">-->
+  <!--            <h3 class="text-center">{{product.name}}</h3>-->
+  <!--        </b-col>-->
+  <!--      &lt;!&ndash; Warehouse Quantity &ndash;&gt;-->
+  <!--          <b-col md="5" class="mt-4">-->
+  <!--          -->
+  <!--            <table class="table table-hover table-sm">-->
+  <!--              <thead>-->
+  <!--                <tr>-->
+  <!--                  <th>{{$t('warehouse')}}</th>-->
+  <!--                  <th>{{$t('Quantity')}}</th>-->
+  <!--                </tr>-->
+  <!--              </thead>-->
+  <!--              <tbody>-->
+  <!--                <tr v-for="PROD_W in product.CountQTY">-->
+  <!--                  <td>{{PROD_W.mag}}</td>-->
+  <!--                  <td>{{formatNumber(PROD_W.qte ,2)}} {{product.unit}}</td>-->
+  <!--                </tr>-->
+  <!--              </tbody>-->
+  <!--            </table>-->
+  <!--          </b-col>-->
+  <!--          &lt;!&ndash; Warehouse Variants Quantity &ndash;&gt;-->
+  <!--          <b-col md="7" v-if="product.is_variant == 'yes'" class="mt-4">-->
+  <!--            <table class="table table-hover table-sm">-->
+  <!--              <thead>-->
+  <!--                <tr>-->
+  <!--                  <th>{{$t('warehouse')}}</th>-->
+  <!--                  <th>{{$t('Variant')}}</th>-->
+  <!--                  <th>{{$t('Quantity')}}</th>-->
+  <!--                </tr>-->
+  <!--              </thead>-->
+  <!--              <tbody>-->
+  <!--                <tr v-for="PROD_V in product.CountQTY_variants">-->
+  <!--                  <td>{{PROD_V.mag}}</td>-->
+  <!--                  <td>{{PROD_V.variant}}</td>-->
+  <!--                  <td>{{formatNumber(PROD_V.qte ,2)}} {{product.unit}}</td>-->
+  <!--                </tr>-->
+  <!--              </tbody>-->
+  <!--            </table>-->
+  <!--          </b-col>-->
 
-<!--      <b-col md="12">-->
-<!--        <b-card class="card mb-30" header-bg-variant="transparent ">-->
-<!--          <b-tabs active-nav-item-class="nav nav-tabs" content-class="mt-3">-->
-<!--           -->
+  <!--      <b-col md="12">-->
+  <!--        <b-card class="card mb-30" header-bg-variant="transparent ">-->
+  <!--          <b-tabs active-nav-item-class="nav nav-tabs" content-class="mt-3">-->
+  <!--           -->
 
-<!--            &lt;!&ndash; Sales Table &ndash;&gt;-->
-<!--            <b-tab :title="$t('Sales')">-->
-<!--              <vue-good-table-->
-<!--                mode="remote"-->
-<!--                :columns="columns_sales"-->
-<!--                :totalRows="totalRows_sales"-->
-<!--                :rows="sales"-->
-<!--                @on-page-change="PageChangeSales"-->
-<!--                @on-per-page-change="onPerPageChangeSales"-->
-<!--                @on-search="onSearch_sales"-->
-<!--                :search-options="{-->
-<!--                  placeholder: $t('Search_this_table'),-->
-<!--                  enabled: true,-->
-<!--                }"-->
-<!--                :pagination-options="{-->
-<!--                  enabled: true,-->
-<!--                  mode: 'records',-->
-<!--                  nextLabel: 'next',-->
-<!--                  prevLabel: 'prev',-->
-<!--                }"-->
-<!--                styleClass="tableOne table-hover vgt-table"-->
-<!--              >-->
-<!--              <div slot="table-actions" class="mt-2 mb-3">-->
-<!--                <b-button @click="Sales_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--                  <i class="i-File-Copy"></i> PDF-->
-<!--                </b-button>-->
+  <!--            &lt;!&ndash; Sales Table &ndash;&gt;-->
+  <!--            <b-tab :title="$t('Sales')">-->
+  <!--              <vue-good-table-->
+  <!--                mode="remote"-->
+  <!--                :columns="columns_sales"-->
+  <!--                :totalRows="totalRows_sales"-->
+  <!--                :rows="sales"-->
+  <!--                @on-page-change="PageChangeSales"-->
+  <!--                @on-per-page-change="onPerPageChangeSales"-->
+  <!--                @on-search="onSearch_sales"-->
+  <!--                :search-options="{-->
+  <!--                  placeholder: $t('Search_this_table'),-->
+  <!--                  enabled: true,-->
+  <!--                }"-->
+  <!--                :pagination-options="{-->
+  <!--                  enabled: true,-->
+  <!--                  mode: 'records',-->
+  <!--                  nextLabel: 'next',-->
+  <!--                  prevLabel: 'prev',-->
+  <!--                }"-->
+  <!--                styleClass="tableOne table-hover vgt-table"-->
+  <!--              >-->
+  <!--              <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--                <b-button @click="Sales_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--                  <i class="i-File-Copy"></i> PDF-->
+  <!--                </b-button>-->
 
-<!--                <vue-excel-xlsx-->
-<!--                    class="btn btn-sm btn-outline-danger ripple m-1"-->
-<!--                    :data="sales"-->
-<!--                    :columns="columns_sales"-->
-<!--                    :file-name="'sales_report'"-->
-<!--                    :file-type="'xlsx'"-->
-<!--                    :sheet-name="'sales_report'"-->
-<!--                    >-->
-<!--                    <i class="i-File-Excel"></i> EXCEL-->
-<!--                </vue-excel-xlsx>-->
+  <!--                <vue-excel-xlsx-->
+  <!--                    class="btn btn-sm btn-outline-danger ripple m-1"-->
+  <!--                    :data="sales"-->
+  <!--                    :columns="columns_sales"-->
+  <!--                    :file-name="'sales_report'"-->
+  <!--                    :file-type="'xlsx'"-->
+  <!--                    :sheet-name="'sales_report'"-->
+  <!--                    >-->
+  <!--                    <i class="i-File-Excel"></i> EXCEL-->
+  <!--                </vue-excel-xlsx>-->
 
-<!--              </div>-->
-<!--                <template slot="table-row" slot-scope="props">-->
-<!--                  <div v-if="props.column.field == 'Ref'">-->
-<!--                    <router-link-->
-<!--                      :to="'/app/sales/detail/'+props.row.sale_id"-->
-<!--                    >-->
-<!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
-<!--                    </router-link>-->
-<!--                  </div>-->
-<!--                 -->
-<!--                  <div v-else-if="props.column.field == 'total'">-->
-<!--                    <span>{{currentUser.currency}} {{props.row.total}}</span>-->
-<!--                  </div>-->
+  <!--              </div>-->
+  <!--                <template slot="table-row" slot-scope="props">-->
+  <!--                  <div v-if="props.column.field == 'Ref'">-->
+  <!--                    <router-link-->
+  <!--                      :to="'/app/sales/detail/'+props.row.sale_id"-->
+  <!--                    >-->
+  <!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
+  <!--                    </router-link>-->
+  <!--                  </div>-->
+  <!--                 -->
+  <!--                  <div v-else-if="props.column.field == 'total'">-->
+  <!--                    <span>{{currentUser.currency}} {{props.row.total}}</span>-->
+  <!--                  </div>-->
 
-<!--                </template>-->
-<!--              </vue-good-table>-->
-<!--            </b-tab>-->
+  <!--                </template>-->
+  <!--              </vue-good-table>-->
+  <!--            </b-tab>-->
 
-<!--             &lt;!&ndash; Quotations Table &ndash;&gt;-->
-<!--            <b-tab :title="$t('Quotations')">-->
-<!--              <vue-good-table-->
-<!--                mode="remote"-->
-<!--                :columns="columns_quotations"-->
-<!--                :totalRows="totalRows_quotations"-->
-<!--                :rows="quotations"-->
-<!--                @on-page-change="PageChangeQuotation"-->
-<!--                @on-per-page-change="onPerPageChangeQuotation"-->
-<!--                @on-search="onSearch_quotations"-->
-<!--                :search-options="{-->
-<!--                  placeholder: $t('Search_this_table'),-->
-<!--                  enabled: true,-->
-<!--                }"-->
-<!--                :pagination-options="{-->
-<!--                  enabled: true,-->
-<!--                  mode: 'records',-->
-<!--                  nextLabel: 'next',-->
-<!--                  prevLabel: 'prev',-->
-<!--                }"-->
-<!--                styleClass="tableOne table-hover vgt-table"-->
-<!--              >-->
-<!--              <div slot="table-actions" class="mt-2 mb-3">-->
-<!--                <b-button @click="Quotation_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--                  <i class="i-File-Copy"></i> PDF-->
-<!--                </b-button>-->
+  <!--             &lt;!&ndash; Quotations Table &ndash;&gt;-->
+  <!--            <b-tab :title="$t('Quotations')">-->
+  <!--              <vue-good-table-->
+  <!--                mode="remote"-->
+  <!--                :columns="columns_quotations"-->
+  <!--                :totalRows="totalRows_quotations"-->
+  <!--                :rows="quotations"-->
+  <!--                @on-page-change="PageChangeQuotation"-->
+  <!--                @on-per-page-change="onPerPageChangeQuotation"-->
+  <!--                @on-search="onSearch_quotations"-->
+  <!--                :search-options="{-->
+  <!--                  placeholder: $t('Search_this_table'),-->
+  <!--                  enabled: true,-->
+  <!--                }"-->
+  <!--                :pagination-options="{-->
+  <!--                  enabled: true,-->
+  <!--                  mode: 'records',-->
+  <!--                  nextLabel: 'next',-->
+  <!--                  prevLabel: 'prev',-->
+  <!--                }"-->
+  <!--                styleClass="tableOne table-hover vgt-table"-->
+  <!--              >-->
+  <!--              <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--                <b-button @click="Quotation_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--                  <i class="i-File-Copy"></i> PDF-->
+  <!--                </b-button>-->
 
-<!--                <vue-excel-xlsx-->
-<!--                    class="btn btn-sm btn-outline-danger ripple m-1"-->
-<!--                    :data="quotations"-->
-<!--                    :columns="columns_quotations"-->
-<!--                    :file-name="'Quotation_report'"-->
-<!--                    :file-type="'xlsx'"-->
-<!--                    :sheet-name="'Quotation_report'"-->
-<!--                    >-->
-<!--                    <i class="i-File-Excel"></i> EXCEL-->
-<!--                </vue-excel-xlsx>-->
-<!--              </div>-->
-<!--                <template slot="table-row" slot-scope="props">-->
-<!--                  -->
-<!--                   <div v-if="props.column.field == 'Ref'">-->
-<!--                    <router-link-->
-<!--                      :to="'/app/quotations/detail/'+props.row.quotation_id"-->
-<!--                    >-->
-<!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
-<!--                    </router-link>-->
-<!--                  </div>-->
+  <!--                <vue-excel-xlsx-->
+  <!--                    class="btn btn-sm btn-outline-danger ripple m-1"-->
+  <!--                    :data="quotations"-->
+  <!--                    :columns="columns_quotations"-->
+  <!--                    :file-name="'Quotation_report'"-->
+  <!--                    :file-type="'xlsx'"-->
+  <!--                    :sheet-name="'Quotation_report'"-->
+  <!--                    >-->
+  <!--                    <i class="i-File-Excel"></i> EXCEL-->
+  <!--                </vue-excel-xlsx>-->
+  <!--              </div>-->
+  <!--                <template slot="table-row" slot-scope="props">-->
+  <!--                  -->
+  <!--                   <div v-if="props.column.field == 'Ref'">-->
+  <!--                    <router-link-->
+  <!--                      :to="'/app/quotations/detail/'+props.row.quotation_id"-->
+  <!--                    >-->
+  <!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
+  <!--                    </router-link>-->
+  <!--                  </div>-->
 
-<!--                  <div v-else-if="props.column.field == 'total'">-->
-<!--                    <span>{{currentUser.currency}} {{props.row.total}}</span>-->
-<!--                  </div>-->
+  <!--                  <div v-else-if="props.column.field == 'total'">-->
+  <!--                    <span>{{currentUser.currency}} {{props.row.total}}</span>-->
+  <!--                  </div>-->
 
-<!--                </template>-->
-<!--              </vue-good-table>-->
-<!--            </b-tab>-->
+  <!--                </template>-->
+  <!--              </vue-good-table>-->
+  <!--            </b-tab>-->
 
-<!--            &lt;!&ndash; Purchases Table &ndash;&gt;-->
-<!--            <b-tab :title="$t('Purchases')">-->
-<!--              <vue-good-table-->
-<!--                mode="remote"-->
-<!--                :columns="columns_purchases"-->
-<!--                :totalRows="totalRows_purchases"-->
-<!--                :rows="purchases"-->
-<!--                @on-page-change="PageChangePurchases"-->
-<!--                @on-per-page-change="onPerPageChangePurchases"-->
-<!--                @on-search="onSearch_purchases"-->
-<!--                :search-options="{-->
-<!--                  placeholder: $t('Search_this_table'),-->
-<!--                  enabled: true,-->
-<!--                }"-->
-<!--                :pagination-options="{-->
-<!--                  enabled: true,-->
-<!--                  mode: 'records',-->
-<!--                  nextLabel: 'next',-->
-<!--                  prevLabel: 'prev',-->
-<!--                }"-->
-<!--                styleClass="tableOne table-hover vgt-table"-->
-<!--              >-->
-<!--              <div slot="table-actions" class="mt-2 mb-3">-->
-<!--                <b-button @click="Purchase_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--                  <i class="i-File-Copy"></i> PDF-->
-<!--                </b-button>-->
+  <!--            &lt;!&ndash; Purchases Table &ndash;&gt;-->
+  <!--            <b-tab :title="$t('Purchases')">-->
+  <!--              <vue-good-table-->
+  <!--                mode="remote"-->
+  <!--                :columns="columns_purchases"-->
+  <!--                :totalRows="totalRows_purchases"-->
+  <!--                :rows="purchases"-->
+  <!--                @on-page-change="PageChangePurchases"-->
+  <!--                @on-per-page-change="onPerPageChangePurchases"-->
+  <!--                @on-search="onSearch_purchases"-->
+  <!--                :search-options="{-->
+  <!--                  placeholder: $t('Search_this_table'),-->
+  <!--                  enabled: true,-->
+  <!--                }"-->
+  <!--                :pagination-options="{-->
+  <!--                  enabled: true,-->
+  <!--                  mode: 'records',-->
+  <!--                  nextLabel: 'next',-->
+  <!--                  prevLabel: 'prev',-->
+  <!--                }"-->
+  <!--                styleClass="tableOne table-hover vgt-table"-->
+  <!--              >-->
+  <!--              <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--                <b-button @click="Purchase_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--                  <i class="i-File-Copy"></i> PDF-->
+  <!--                </b-button>-->
 
-<!--                <vue-excel-xlsx-->
-<!--                    class="btn btn-sm btn-outline-danger ripple m-1"-->
-<!--                    :data="purchases"-->
-<!--                    :columns="columns_purchases"-->
-<!--                    :file-name="'purchases_report'"-->
-<!--                    :file-type="'xlsx'"-->
-<!--                    :sheet-name="'purchases_report'"-->
-<!--                    >-->
-<!--                    <i class="i-File-Excel"></i> EXCEL-->
-<!--                </vue-excel-xlsx>-->
-<!--              </div>-->
-<!--                <template slot="table-row" slot-scope="props">-->
-<!--                   <div v-if="props.column.field == 'Ref'">-->
-<!--                    <router-link-->
-<!--                      :to="'/app/purchases/detail/'+props.row.purchase_id"-->
-<!--                    >-->
-<!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
-<!--                    </router-link>-->
-<!--                  </div>-->
+  <!--                <vue-excel-xlsx-->
+  <!--                    class="btn btn-sm btn-outline-danger ripple m-1"-->
+  <!--                    :data="purchases"-->
+  <!--                    :columns="columns_purchases"-->
+  <!--                    :file-name="'purchases_report'"-->
+  <!--                    :file-type="'xlsx'"-->
+  <!--                    :sheet-name="'purchases_report'"-->
+  <!--                    >-->
+  <!--                    <i class="i-File-Excel"></i> EXCEL-->
+  <!--                </vue-excel-xlsx>-->
+  <!--              </div>-->
+  <!--                <template slot="table-row" slot-scope="props">-->
+  <!--                   <div v-if="props.column.field == 'Ref'">-->
+  <!--                    <router-link-->
+  <!--                      :to="'/app/purchases/detail/'+props.row.purchase_id"-->
+  <!--                    >-->
+  <!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
+  <!--                    </router-link>-->
+  <!--                  </div>-->
 
-<!--                  <div v-else-if="props.column.field == 'total'">-->
-<!--                    <span>{{currentUser.currency}} {{props.row.total}}</span>-->
-<!--                  </div>-->
+  <!--                  <div v-else-if="props.column.field == 'total'">-->
+  <!--                    <span>{{currentUser.currency}} {{props.row.total}}</span>-->
+  <!--                  </div>-->
 
-<!--                </template>-->
-<!--              </vue-good-table>-->
-<!--            </b-tab>-->
+  <!--                </template>-->
+  <!--              </vue-good-table>-->
+  <!--            </b-tab>-->
 
-<!--            &lt;!&ndash; Sales Return Table &ndash;&gt;-->
-<!--            <b-tab :title="$t('SalesReturn')">-->
-<!--              <vue-good-table-->
-<!--                mode="remote"-->
-<!--                :columns="columns_sales_return"-->
-<!--                :totalRows="totalRows_sales_return"-->
-<!--                :rows="sales_return"-->
-<!--                @on-page-change="Page_Change_sales_Return"-->
-<!--                @on-per-page-change="onPerPage_Change_sales_Return"-->
-<!--                @on-search="onSearch_return_sales"-->
-<!--                :search-options="{-->
-<!--                  placeholder: $t('Search_this_table'),-->
-<!--                  enabled: true,-->
-<!--                }"-->
-<!--                :pagination-options="{-->
-<!--                  enabled: true,-->
-<!--                  mode: 'records',-->
-<!--                  nextLabel: 'next',-->
-<!--                  prevLabel: 'prev',-->
-<!--                }"-->
-<!--                styleClass="tableOne table-hover vgt-table"-->
-<!--              >-->
-<!--              <div slot="table-actions" class="mt-2 mb-3">-->
-<!--                <b-button @click="Sale_Return_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--                  <i class="i-File-Copy"></i> PDF-->
-<!--                </b-button>-->
+  <!--            &lt;!&ndash; Sales Return Table &ndash;&gt;-->
+  <!--            <b-tab :title="$t('SalesReturn')">-->
+  <!--              <vue-good-table-->
+  <!--                mode="remote"-->
+  <!--                :columns="columns_sales_return"-->
+  <!--                :totalRows="totalRows_sales_return"-->
+  <!--                :rows="sales_return"-->
+  <!--                @on-page-change="Page_Change_sales_Return"-->
+  <!--                @on-per-page-change="onPerPage_Change_sales_Return"-->
+  <!--                @on-search="onSearch_return_sales"-->
+  <!--                :search-options="{-->
+  <!--                  placeholder: $t('Search_this_table'),-->
+  <!--                  enabled: true,-->
+  <!--                }"-->
+  <!--                :pagination-options="{-->
+  <!--                  enabled: true,-->
+  <!--                  mode: 'records',-->
+  <!--                  nextLabel: 'next',-->
+  <!--                  prevLabel: 'prev',-->
+  <!--                }"-->
+  <!--                styleClass="tableOne table-hover vgt-table"-->
+  <!--              >-->
+  <!--              <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--                <b-button @click="Sale_Return_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--                  <i class="i-File-Copy"></i> PDF-->
+  <!--                </b-button>-->
 
-<!--                <vue-excel-xlsx-->
-<!--                    class="btn btn-sm btn-outline-danger ripple m-1"-->
-<!--                    :data="sales_return"-->
-<!--                    :columns="columns_sales_return"-->
-<!--                    :file-name="'sales_return_report'"-->
-<!--                    :file-type="'xlsx'"-->
-<!--                    :sheet-name="'sales_return_report'"-->
-<!--                    >-->
-<!--                    <i class="i-File-Excel"></i> EXCEL-->
-<!--                </vue-excel-xlsx>-->
-<!--              </div>-->
-<!--                <template slot="table-row" slot-scope="props">-->
-<!--                  -->
-<!--                  <div v-if="props.column.field == 'Ref'">-->
-<!--                    <router-link-->
-<!--                      :to="'/app/sale_return/detail/'+props.row.return_sale_id"-->
-<!--                    >-->
-<!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
-<!--                    </router-link>-->
-<!--                  </div>-->
+  <!--                <vue-excel-xlsx-->
+  <!--                    class="btn btn-sm btn-outline-danger ripple m-1"-->
+  <!--                    :data="sales_return"-->
+  <!--                    :columns="columns_sales_return"-->
+  <!--                    :file-name="'sales_return_report'"-->
+  <!--                    :file-type="'xlsx'"-->
+  <!--                    :sheet-name="'sales_return_report'"-->
+  <!--                    >-->
+  <!--                    <i class="i-File-Excel"></i> EXCEL-->
+  <!--                </vue-excel-xlsx>-->
+  <!--              </div>-->
+  <!--                <template slot="table-row" slot-scope="props">-->
+  <!--                  -->
+  <!--                  <div v-if="props.column.field == 'Ref'">-->
+  <!--                    <router-link-->
+  <!--                      :to="'/app/sale_return/detail/'+props.row.return_sale_id"-->
+  <!--                    >-->
+  <!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
+  <!--                    </router-link>-->
+  <!--                  </div>-->
 
-<!--                  <div v-else-if="props.column.field == 'total'">-->
-<!--                    <span>{{currentUser.currency}} {{props.row.total}}</span>-->
-<!--                  </div>-->
-<!--                </template>-->
-<!--              </vue-good-table>-->
-<!--            </b-tab>-->
+  <!--                  <div v-else-if="props.column.field == 'total'">-->
+  <!--                    <span>{{currentUser.currency}} {{props.row.total}}</span>-->
+  <!--                  </div>-->
+  <!--                </template>-->
+  <!--              </vue-good-table>-->
+  <!--            </b-tab>-->
 
-<!--             &lt;!&ndash; Purchase Return Table &ndash;&gt;-->
-<!--            <b-tab :title="$t('PurchasesReturn')">-->
-<!--              <vue-good-table-->
-<!--                mode="remote"-->
-<!--                :columns="columns_purchase_return"-->
-<!--                :totalRows="totalRows_purchase_return"-->
-<!--                :rows="purchases_return"-->
-<!--                @on-page-change="Page_Change_purchases_Return"-->
-<!--                @on-per-page-change="onPerPage_Change_purchases_Return"-->
-<!--                @on-search="onSearch_return_purchases"-->
-<!--                :search-options="{-->
-<!--                  placeholder: $t('Search_this_table'),-->
-<!--                  enabled: true,-->
-<!--                }"-->
-<!--                :pagination-options="{-->
-<!--                  enabled: true,-->
-<!--                  mode: 'records',-->
-<!--                  nextLabel: 'next',-->
-<!--                  prevLabel: 'prev',-->
-<!--                }"-->
-<!--                styleClass="tableOne table-hover vgt-table"-->
-<!--              >-->
-<!--               <div slot="table-actions" class="mt-2 mb-3">-->
-<!--                <b-button @click="Returns_Purchase_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--                  <i class="i-File-Copy"></i> PDF-->
-<!--                </b-button>-->
+  <!--             &lt;!&ndash; Purchase Return Table &ndash;&gt;-->
+  <!--            <b-tab :title="$t('PurchasesReturn')">-->
+  <!--              <vue-good-table-->
+  <!--                mode="remote"-->
+  <!--                :columns="columns_purchase_return"-->
+  <!--                :totalRows="totalRows_purchase_return"-->
+  <!--                :rows="purchases_return"-->
+  <!--                @on-page-change="Page_Change_purchases_Return"-->
+  <!--                @on-per-page-change="onPerPage_Change_purchases_Return"-->
+  <!--                @on-search="onSearch_return_purchases"-->
+  <!--                :search-options="{-->
+  <!--                  placeholder: $t('Search_this_table'),-->
+  <!--                  enabled: true,-->
+  <!--                }"-->
+  <!--                :pagination-options="{-->
+  <!--                  enabled: true,-->
+  <!--                  mode: 'records',-->
+  <!--                  nextLabel: 'next',-->
+  <!--                  prevLabel: 'prev',-->
+  <!--                }"-->
+  <!--                styleClass="tableOne table-hover vgt-table"-->
+  <!--              >-->
+  <!--               <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--                <b-button @click="Returns_Purchase_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--                  <i class="i-File-Copy"></i> PDF-->
+  <!--                </b-button>-->
 
-<!--                <vue-excel-xlsx-->
-<!--                    class="btn btn-sm btn-outline-danger ripple m-1"-->
-<!--                    :data="purchases_return"-->
-<!--                    :columns="columns_purchase_return"-->
-<!--                    :file-name="'purchases_return_report'"-->
-<!--                    :file-type="'xlsx'"-->
-<!--                    :sheet-name="'purchases_return_report'"-->
-<!--                    >-->
-<!--                    <i class="i-File-Excel"></i> EXCEL-->
-<!--                </vue-excel-xlsx>-->
-<!--              </div>-->
-<!--                <template slot="table-row" slot-scope="props">-->
-<!--                  -->
-<!--                  <div v-if="props.column.field == 'Ref'">-->
-<!--                    <router-link-->
-<!--                      :to="'/app/purchase_return/detail/'+props.row.return_purchase_id"-->
-<!--                    >-->
-<!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
-<!--                    </router-link>-->
-<!--                  </div>-->
+  <!--                <vue-excel-xlsx-->
+  <!--                    class="btn btn-sm btn-outline-danger ripple m-1"-->
+  <!--                    :data="purchases_return"-->
+  <!--                    :columns="columns_purchase_return"-->
+  <!--                    :file-name="'purchases_return_report'"-->
+  <!--                    :file-type="'xlsx'"-->
+  <!--                    :sheet-name="'purchases_return_report'"-->
+  <!--                    >-->
+  <!--                    <i class="i-File-Excel"></i> EXCEL-->
+  <!--                </vue-excel-xlsx>-->
+  <!--              </div>-->
+  <!--                <template slot="table-row" slot-scope="props">-->
+  <!--                  -->
+  <!--                  <div v-if="props.column.field == 'Ref'">-->
+  <!--                    <router-link-->
+  <!--                      :to="'/app/purchase_return/detail/'+props.row.return_purchase_id"-->
+  <!--                    >-->
+  <!--                      <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>-->
+  <!--                    </router-link>-->
+  <!--                  </div>-->
 
-<!--                  <div v-else-if="props.column.field == 'total'">-->
-<!--                    <span>{{currentUser.currency}} {{props.row.total}}</span>-->
-<!--                  </div>-->
-<!--                </template>-->
-<!--              </vue-good-table>-->
-<!--            </b-tab>-->
+  <!--                  <div v-else-if="props.column.field == 'total'">-->
+  <!--                    <span>{{currentUser.currency}} {{props.row.total}}</span>-->
+  <!--                  </div>-->
+  <!--                </template>-->
+  <!--              </vue-good-table>-->
+  <!--            </b-tab>-->
 
-<!--             &lt;!&ndash; Transfers Table &ndash;&gt;-->
-<!--            <b-tab :title="$t('StockTransfers')">-->
-<!--              <vue-good-table-->
-<!--                mode="remote"-->
-<!--                :columns="columns_transfers"-->
-<!--                :totalRows="totalRows_transfers"-->
-<!--                :rows="transfers"-->
-<!--                @on-page-change="PageChangeTransfer"-->
-<!--                @on-per-page-change="onPerPageChangeTransfer"-->
-<!--                @on-search="onSearch_transfers"-->
-<!--                :search-options="{-->
-<!--                  placeholder: $t('Search_this_table'),-->
-<!--                  enabled: true,-->
-<!--                }"-->
-<!--                :pagination-options="{-->
-<!--                  enabled: true,-->
-<!--                  mode: 'records',-->
-<!--                  nextLabel: 'next',-->
-<!--                  prevLabel: 'prev',-->
-<!--                }"-->
-<!--                styleClass="tableOne table-hover vgt-table"-->
-<!--              >-->
-<!--              <div slot="table-actions" class="mt-2 mb-3">-->
-<!--                <b-button @click="Transfer_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--                  <i class="i-File-Copy"></i> PDF-->
-<!--                </b-button>-->
-<!--              </div>-->
-<!--               -->
-<!--              </vue-good-table>-->
-<!--            </b-tab>-->
+  <!--             &lt;!&ndash; Transfers Table &ndash;&gt;-->
+  <!--            <b-tab :title="$t('StockTransfers')">-->
+  <!--              <vue-good-table-->
+  <!--                mode="remote"-->
+  <!--                :columns="columns_transfers"-->
+  <!--                :totalRows="totalRows_transfers"-->
+  <!--                :rows="transfers"-->
+  <!--                @on-page-change="PageChangeTransfer"-->
+  <!--                @on-per-page-change="onPerPageChangeTransfer"-->
+  <!--                @on-search="onSearch_transfers"-->
+  <!--                :search-options="{-->
+  <!--                  placeholder: $t('Search_this_table'),-->
+  <!--                  enabled: true,-->
+  <!--                }"-->
+  <!--                :pagination-options="{-->
+  <!--                  enabled: true,-->
+  <!--                  mode: 'records',-->
+  <!--                  nextLabel: 'next',-->
+  <!--                  prevLabel: 'prev',-->
+  <!--                }"-->
+  <!--                styleClass="tableOne table-hover vgt-table"-->
+  <!--              >-->
+  <!--              <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--                <b-button @click="Transfer_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--                  <i class="i-File-Copy"></i> PDF-->
+  <!--                </b-button>-->
+  <!--              </div>-->
+  <!--               -->
+  <!--              </vue-good-table>-->
+  <!--            </b-tab>-->
 
-<!--             &lt;!&ndash; Adjustment Table &ndash;&gt;-->
-<!--            <b-tab :title="$t('Adjustment')">-->
-<!--              <vue-good-table-->
-<!--                mode="remote"-->
-<!--                :columns="columns_adjustments"-->
-<!--                :totalRows="totalRows_adjustments"-->
-<!--                :rows="adjustments"-->
-<!--                @on-page-change="PageChangeAdjustment"-->
-<!--                @on-per-page-change="onPerPageChangeAdjustment"-->
-<!--                @on-search="onSearch_adjustments"-->
-<!--                :search-options="{-->
-<!--                  placeholder: $t('Search_this_table'),-->
-<!--                  enabled: true,-->
-<!--                }"-->
-<!--                :pagination-options="{-->
-<!--                  enabled: true,-->
-<!--                  mode: 'records',-->
-<!--                  nextLabel: 'next',-->
-<!--                  prevLabel: 'prev',-->
-<!--                }"-->
-<!--                styleClass="tableOne table-hover vgt-table"-->
-<!--              >-->
-<!--               <div slot="table-actions" class="mt-2 mb-3">-->
-<!--                <b-button @click="Adjustment_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--                  <i class="i-File-Copy"></i> PDF-->
-<!--                </b-button>-->
-<!--              </div>-->
-<!--              </vue-good-table>-->
-<!--            </b-tab>-->
+  <!--             &lt;!&ndash; Adjustment Table &ndash;&gt;-->
+  <!--            <b-tab :title="$t('Adjustment')">-->
+  <!--              <vue-good-table-->
+  <!--                mode="remote"-->
+  <!--                :columns="columns_adjustments"-->
+  <!--                :totalRows="totalRows_adjustments"-->
+  <!--                :rows="adjustments"-->
+  <!--                @on-page-change="PageChangeAdjustment"-->
+  <!--                @on-per-page-change="onPerPageChangeAdjustment"-->
+  <!--                @on-search="onSearch_adjustments"-->
+  <!--                :search-options="{-->
+  <!--                  placeholder: $t('Search_this_table'),-->
+  <!--                  enabled: true,-->
+  <!--                }"-->
+  <!--                :pagination-options="{-->
+  <!--                  enabled: true,-->
+  <!--                  mode: 'records',-->
+  <!--                  nextLabel: 'next',-->
+  <!--                  prevLabel: 'prev',-->
+  <!--                }"-->
+  <!--                styleClass="tableOne table-hover vgt-table"-->
+  <!--              >-->
+  <!--               <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--                <b-button @click="Adjustment_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--                  <i class="i-File-Copy"></i> PDF-->
+  <!--                </b-button>-->
+  <!--              </div>-->
+  <!--              </vue-good-table>-->
+  <!--            </b-tab>-->
 
-<!--             -->
+  <!--             -->
 
-<!--          </b-tabs>-->
-<!--        </b-card>-->
-<!--      </b-col>-->
-<!--    </b-row>-->
-<!--  </div>-->
+  <!--          </b-tabs>-->
+  <!--        </b-card>-->
+  <!--      </b-col>-->
+  <!--    </b-row>-->
+  <!--  </div>-->
 </template>

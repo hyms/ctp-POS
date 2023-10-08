@@ -324,7 +324,7 @@ function onCloseDelete() {
               :items="warehouses"
               :search="search"
               hover
-              density="compact"
+
               :no-data-text="labels.no_data_table"
               :loading="loading"
           >

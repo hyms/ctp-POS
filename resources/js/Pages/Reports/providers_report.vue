@@ -1,48 +1,48 @@
 <template>
-<!--  <div class="main-content">-->
-<!--    <breadcumb :page="$t('SuppliersReport')" :folder="$t('Reports')"/>-->
+  <!--  <div class="main-content">-->
+  <!--    <breadcumb :page="$t('SuppliersReport')" :folder="$t('Reports')"/>-->
 
-<!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
 
-<!--    <b-card class="wrapper" v-if="!isLoading">-->
-<!--      <vue-good-table-->
-<!--        mode="remote"-->
-<!--        :columns="columns"-->
-<!--        :totalRows="totalRows"-->
-<!--        :rows="rows"-->
-<!--        :group-options="{-->
-<!--          enabled: true,-->
-<!--          headerPosition: 'bottom',-->
-<!--        }"-->
-<!--        @on-page-change="onPageChange"-->
-<!--        @on-per-page-change="onPerPageChange"-->
-<!--        @on-sort-change="onSortChange"-->
-<!--        @on-search="onSearch"-->
-<!--        :search-options="{-->
-<!--        placeholder: $t('Search_this_table'),-->
-<!--        enabled: true,-->
-<!--      }"-->
-<!--        :pagination-options="{-->
-<!--        enabled: true,-->
-<!--        mode: 'records',-->
-<!--        nextLabel: 'next',-->
-<!--        prevLabel: 'prev',-->
-<!--      }"-->
-<!--        styleClass="tableOne table-hover vgt-table mt-4"-->
-<!--      >-->
-<!--       <template slot="table-row" slot-scope="props">-->
-<!--          <span v-if="props.column.field == 'actions'">-->
-<!--            <a title="PDF" class="cursor-pointer" v-b-tooltip.hover @click="Download_PDF(props.row , props.row.id)">-->
-<!--              <i class="i-File-Copy text-25 text-success"></i>-->
-<!--            </a>-->
-<!--            <router-link title="Report" :to="'/app/reports/detail_supplier/'+props.row.id">-->
-<!--             <i class="i-Eye text-25 text-info"></i>-->
-<!--            </router-link>-->
-<!--          </span>-->
-<!--        </template>-->
-<!--      </vue-good-table>-->
-<!--    </b-card>-->
-<!--  </div>-->
+  <!--    <b-card class="wrapper" v-if="!isLoading">-->
+  <!--      <vue-good-table-->
+  <!--        mode="remote"-->
+  <!--        :columns="columns"-->
+  <!--        :totalRows="totalRows"-->
+  <!--        :rows="rows"-->
+  <!--        :group-options="{-->
+  <!--          enabled: true,-->
+  <!--          headerPosition: 'bottom',-->
+  <!--        }"-->
+  <!--        @on-page-change="onPageChange"-->
+  <!--        @on-per-page-change="onPerPageChange"-->
+  <!--        @on-sort-change="onSortChange"-->
+  <!--        @on-search="onSearch"-->
+  <!--        :search-options="{-->
+  <!--        placeholder: $t('Search_this_table'),-->
+  <!--        enabled: true,-->
+  <!--      }"-->
+  <!--        :pagination-options="{-->
+  <!--        enabled: true,-->
+  <!--        mode: 'records',-->
+  <!--        nextLabel: 'next',-->
+  <!--        prevLabel: 'prev',-->
+  <!--      }"-->
+  <!--        styleClass="tableOne table-hover vgt-table mt-4"-->
+  <!--      >-->
+  <!--       <template slot="table-row" slot-scope="props">-->
+  <!--          <span v-if="props.column.field == 'actions'">-->
+  <!--            <a title="PDF" class="cursor-pointer" v-b-tooltip.hover @click="Download_PDF(props.row , props.row.id)">-->
+  <!--              <i class="i-File-Copy text-25 text-success"></i>-->
+  <!--            </a>-->
+  <!--            <router-link title="Report" :to="'/app/reports/detail_supplier/'+props.row.id">-->
+  <!--             <i class="i-Eye text-25 text-info"></i>-->
+  <!--            </router-link>-->
+  <!--          </span>-->
+  <!--        </template>-->
+  <!--      </vue-good-table>-->
+  <!--    </b-card>-->
+  <!--  </div>-->
 </template>
 
 

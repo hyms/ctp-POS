@@ -44,6 +44,7 @@ function sumCount(rowObj) {
   }
   return sum;
 }
+
 function sumCount2(rowObj) {
   let sum = 0;
   for (let i = 0; i < rowObj.length; i++) {
@@ -51,13 +52,15 @@ function sumCount2(rowObj) {
   }
   return sum;
 }
-function  sumCount3(rowObj) {
+
+function sumCount3(rowObj) {
   let sum = 0;
   for (let i = 0; i < rowObj.length; i++) {
     sum += rowObj[i].due;
   }
   return sum;
 }
+
 function sumCount4(rowObj) {
   let sum = 0;
   for (let i = 0; i < rowObj.length; i++) {
@@ -65,25 +68,26 @@ function sumCount4(rowObj) {
   }
   return sum;
 }
-    //--------------------------- Get Customer Report -------------\\
 
-  function  Get_Client_Report(page) {
-    router.get("/report/client",
-        {filter: form.value},
-        {
-          preserveState: true,
-          onStart: page => {
-            loading.value = true;
-          },
-          onSuccess: page => {
-            menu.value = false;
-          },
-          onFinish: visit => {
-            loading.value = false;
-          },
-        }
-    )
-  }
+//--------------------------- Get Customer Report -------------\\
+
+function Get_Client_Report(page) {
+  router.get("/report/client",
+      {filter: form.value},
+      {
+        preserveState: true,
+        onStart: page => {
+          loading.value = true;
+        },
+        onSuccess: page => {
+          menu.value = false;
+        },
+        onFinish: visit => {
+          loading.value = false;
+        },
+      }
+  )
+}
 </script>
 <template>
   <layout>
@@ -113,7 +117,7 @@ function sumCount4(rowObj) {
           :items="report"
           :search="search"
           hover
-          density="compact"
+
           :no-data-text="labels.no_data_table"
           :loading="loading"
       >

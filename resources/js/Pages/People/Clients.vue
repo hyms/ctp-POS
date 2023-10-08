@@ -1,7 +1,6 @@
 <script setup>
 import {computed, ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import helper from "@/helpers";
 import labels from "@/labels";
@@ -72,18 +71,18 @@ const client = ref({
 
 
 const fields = ref([
-  {title: "Codigo", key: "code"},
-  // { title: "Nombre", key: "name" },
-  {title: "Nombre de Empresa", key: "company_name"},
-  {title: "Telefono", key: "phone"},
-  {title: "NIT", key: "nit_ci"},
+  {title: labels.client.code, key: "code"},
+  {title: labels.client.company_name, key: "company_name"},
+  {title: labels.client.phone, key: "phone"},
+  {title: labels.client.name, key: "name"},
+  {title: labels.client.nit_ci, key: "nit_ci"},
   {title: "Deuda Total", key: "due"},
   // { title: "Deuda Total Devolucion", key: "return_Due" },
   {title: "Acciones", key: "actions"},
 ]);
 const jsonFields = ref({
   Codigo: "code",
-  Nombre: "name",
+  Nombre_Factura: "name",
   Nombre_Empresa: "company_name",
   Telefono: "phone",
   Nit: "nit_ci",
@@ -336,7 +335,6 @@ async function Submit_Payment_sell_due() {
 }
 
 //---------- keyup paid Amount
-
 function Verified_paidAmount() {
   snackbar.value = false;
   if (isNaN(payment.value.amount)) {
@@ -517,16 +515,14 @@ function Submit_Pay_due() {
 </script>
 
 <template>
-  <layout>
-    <snackbar
-        :snackbar="snackbar"
-        :snackbar-text="snackbarText"
-        :snackbar-color="snackbarColor"
-    ></snackbar>
+  <layout
+      :snackbar-view="snackbar"
+      :snackbar-text="snackbarText"
+      :snackbar-color="snackbarColor">
     <!-- Modal Show Import Clients -->
     <!--        <v-dialog v-model="dialogImport" max-width="600px" scrollable>
                 <v-card>
-                    <v-toolbar border density="compact" title="Importar Clientes">
+                    <v-toolbar border  title="Importar Clientes">
                     </v-toolbar>
                     <v-card-text>
                         <v-form
@@ -579,14 +575,14 @@ function Submit_Pay_due() {
                                 </v-col>
 
                                 <v-col md="12" sm="12">
-                                    <v-table density="compact">
+                                    <v-table >
                                         <tbody>
                                             <tr>
                                                 <td>Nombre</td>
                                                 <th>
                                                     <v-btn
                                                         variant="outlined"
-                                                        density="compact"
+
                                                         size="small"
                                                         color="success"
                                                         >campo requerido
@@ -640,11 +636,10 @@ function Submit_Pay_due() {
       <v-card>
         <v-toolbar
             border
-            density="compact"
             :title=labels.client_detail
         ></v-toolbar>
         <v-card-text>
-          <v-table density="compact" hover>
+          <v-table hover>
             <tbody>
             <tr>
               <!-- Customer Code -->
@@ -745,7 +740,6 @@ function Submit_Pay_due() {
     >
       <v-card>
         <v-toolbar
-            density="compact"
             border
             :title="(editmode ? 'Editar ' : 'Añadir ') + 'Cliente'"
         ></v-toolbar>
@@ -759,8 +753,6 @@ function Submit_Pay_due() {
                     v-model="client.name"
                     :placeholder="labels.client.name"
                     :rules="helper.required"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -773,8 +765,6 @@ function Submit_Pay_due() {
                     v-model="client.company_name"
                     :placeholder="labels.client.company_name"
                     :rules="helper.required"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -786,8 +776,6 @@ function Submit_Pay_due() {
                     :label="labels.client.email"
                     v-model="client.email"
                     :placeholder="labels.client.email"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -799,8 +787,6 @@ function Submit_Pay_due() {
                     :label="labels.client.phone"
                     v-model="client.phone"
                     :placeholder="labels.client.phone"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -812,8 +798,6 @@ function Submit_Pay_due() {
                     :label="labels.client.city"
                     v-model="client.city"
                     :placeholder="labels.client.city"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
@@ -825,8 +809,6 @@ function Submit_Pay_due() {
                     :label="labels.client.nit_ci"
                     v-model="client.nit_ci"
                     :placeholder="labels.client.nit_ci"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 ></v-text-field>
               </v-col>
@@ -838,8 +820,6 @@ function Submit_Pay_due() {
                     :label="labels.client.adresse"
                     v-model="client.adresse"
                     :placeholder="labels.client.adresse"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 ></v-textarea>
               </v-col>
@@ -848,7 +828,6 @@ function Submit_Pay_due() {
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
-                size="small"
                 variant="outlined"
                 color="error"
                 class="ma-1"
@@ -857,7 +836,6 @@ function Submit_Pay_due() {
               {{ labels.cancel }}
             </v-btn>
             <v-btn
-                size="small"
                 color="primary"
                 variant="flat"
                 class="ma-1"
@@ -882,7 +860,6 @@ function Submit_Pay_due() {
         <v-text-field
             v-model="search"
             prepend-icon="mdi-magnify"
-            density="compact"
             hide-details
             label="Buscar"
             single-line
@@ -907,7 +884,6 @@ function Submit_Pay_due() {
         <!--                    Importar-->
         <!--                </v-btn>-->
         <v-btn
-            size="small"
             color="primary"
             class="ma-1"
             prepend-icon="mdi-account-plus"
@@ -925,7 +901,6 @@ function Submit_Pay_due() {
             :search="search"
             hover
             class="elevation-2"
-            density="compact"
             :no-data-text=labels.no_data_table
             :loading="loading"
         >
@@ -942,7 +917,7 @@ function Submit_Pay_due() {
                 >
                 </v-btn>
               </template>
-              <v-list density="compact">
+              <v-list>
                 <v-list-item
                     v-if="item.due > 0"
                     @click="Pay_due(item)"
@@ -1007,7 +982,6 @@ function Submit_Pay_due() {
   >
     <v-card>
       <v-toolbar
-          density="compact"
           border
           title="Pagar Deuda"
       ></v-toolbar>
@@ -1021,8 +995,6 @@ function Submit_Pay_due() {
                   v-model="payment.amount"
                   :placeholder="labels.payment.amount"
                   :rules="helper.required.concat(helper.numberWithDecimal)"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
               >
               </v-text-field>
@@ -1032,8 +1004,6 @@ function Submit_Pay_due() {
             <v-col md="6" cols="12">
               <v-select
                   v-model="payment.Reglement"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
                   :items="helper.reglamentPayment()"
                   label="Tipo de Pago"
@@ -1056,6 +1026,14 @@ function Submit_Pay_due() {
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
+          <v-btn
+              variant="outlined"
+              color="error"
+              class="ma-1"
+              @click="dialogPayDue = false"
+          >
+            {{ labels.cancel }}
+          </v-btn>
           <v-btn
               color="primary"
               variant="elevated"
@@ -1226,7 +1204,7 @@ function Submit_Pay_due() {
             </p>
           </div>
 
-          <v-table density="compact" hover>
+          <v-table hover>
             <thead>
             <tr style="background: #eee">
               <th style="text-align: left" colspan="1">
@@ -1262,16 +1240,19 @@ function Submit_Pay_due() {
             </tr>
             </tbody>
           </v-table>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn prepend-icon="mdi-printer" @click="helper.print_pos('invoice-POS')" color="primary"
-                   variant="outlined">
-              {{ labels.print }}
-            </v-btn>
-            <v-spacer></v-spacer>
-          </v-card-actions>
         </div>
       </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn prepend-icon="mdi-printer" @click="helper.print_pdf('invoice-POS',payment.client_name)" color="primary" variant="outlined">
+          {{ labels.print }} PDF
+        </v-btn>
+        <v-btn prepend-icon="mdi-printer" @click="helper.print_pos('invoice-POS')" color="primary"
+               variant="outlined">
+          {{ labels.print }}
+        </v-btn>
+        <v-spacer></v-spacer>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 

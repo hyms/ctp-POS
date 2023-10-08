@@ -320,7 +320,7 @@ function all_dashboard_data() {
 
 onMounted(() => {
   all_dashboard_data();
-  CurrentMonth.value=helper.GetMonth();
+  CurrentMonth.value = helper.GetMonth();
 })
 const roles = computed(() => usePage().props.rolesP);
 const user = computed(() => usePage().props.user);
@@ -380,11 +380,11 @@ function getPermission(role) {
       <v-col md="4" cols="12">
         <v-card :loading="loading">
           <v-card-title>
-            {{ labels.top_customers }} ({{CurrentMonth}})
+            {{ labels.top_customers }} ({{ CurrentMonth }})
           </v-card-title>
           <v-card-text>
             <div class="chart-wrapper">
-<!--              <v-chart v-if="!loading" :option="echartProduct" :autoresize="true"></v-chart>-->
+              <!--              <v-chart v-if="!loading" :option="echartProduct" :autoresize="true"></v-chart>-->
               <v-chart v-if="!loading" :option="echartCustomer" :autoresize="true"></v-chart>
             </div>
           </v-card-text>
@@ -417,7 +417,7 @@ function getPermission(role) {
       <v-col cols="12" md="4">
         <v-card :loading="loading">
           <v-card-title>
-            {{labels.top_selling_products}} ({{CurrentMonth}})
+            {{ labels.top_selling_products }} ({{ CurrentMonth }})
           </v-card-title>
           <v-data-table :headers="columns_products"
                         :items="products"
@@ -428,11 +428,11 @@ function getPermission(role) {
       </v-col>
     </v-row>
     <!-- Last Sales -->
-    <v-row >
+    <v-row>
       <v-col cols="12">
         <v-card>
           <v-card-title>
-            {{labels.recent_sales}}
+            {{ labels.recent_sales }}
           </v-card-title>
           <v-data-table :headers="columns_sales"
                         :items="sales"
@@ -443,14 +443,16 @@ function getPermission(role) {
                   :color="helper.statutSaleColor(item.statut)"
                   variant="tonal"
                   size="x-small"
-              >{{helper.statutSale(item.statut)}}</v-chip>
+              >{{ helper.statutSale(item.statut) }}
+              </v-chip>
             </template>
             <template v-slot:item.payment_status="{ item }">
               <v-chip
                   :color="helper.statusPaymentColor(item.payment_status)"
                   variant="tonal"
                   size="x-small"
-              >{{helper.statusPayment(item.payment_status)}}</v-chip>
+              >{{ helper.statusPayment(item.payment_status) }}
+              </v-chip>
             </template>
           </v-data-table>
         </v-card>

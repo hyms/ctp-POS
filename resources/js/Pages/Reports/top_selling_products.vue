@@ -201,67 +201,67 @@
 // };
 </script>
 <template>
-<!--  <div class="main-content">-->
-<!--    <breadcumb :page="$t('Top_Selling_Products')" :folder="$t('Reports')"/>-->
-<!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
-<!--    <b-col md="12" class="text-center" v-if="!isLoading">-->
-<!--        <date-range-picker -->
-<!--          v-model="dateRange" -->
-<!--          :startDate="startDate" -->
-<!--          :endDate="endDate" -->
-<!--           @update="Submit_filter_dateRange"-->
-<!--          :locale-data="locale" > -->
+  <!--  <div class="main-content">-->
+  <!--    <breadcumb :page="$t('Top_Selling_Products')" :folder="$t('Reports')"/>-->
+  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+  <!--    <b-col md="12" class="text-center" v-if="!isLoading">-->
+  <!--        <date-range-picker -->
+  <!--          v-model="dateRange" -->
+  <!--          :startDate="startDate" -->
+  <!--          :endDate="endDate" -->
+  <!--           @update="Submit_filter_dateRange"-->
+  <!--          :locale-data="locale" > -->
 
-<!--          <template v-slot:input="picker" style="min-width: 350px;">-->
-<!--              {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}-->
-<!--          </template>        -->
-<!--        </date-range-picker>-->
-<!--      </b-col>-->
+  <!--          <template v-slot:input="picker" style="min-width: 350px;">-->
+  <!--              {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}-->
+  <!--          </template>        -->
+  <!--        </date-range-picker>-->
+  <!--      </b-col>-->
 
-<!--      <vue-good-table-->
-<!--        v-if="!isLoading"-->
-<!--        mode="remote"-->
-<!--        :columns="columns"-->
-<!--        :totalRows="totalRows"-->
-<!--        :rows="products"-->
-<!--        @on-page-change="onPageChange"-->
-<!--        @on-per-page-change="onPerPageChange"-->
-<!--        @on-search="onSearch_products"-->
-<!--          :search-options="{-->
-<!--            placeholder: $t('Search_this_table'),-->
-<!--            enabled: true,-->
-<!--        }"-->
-<!--        :pagination-options="{-->
-<!--        enabled: true,-->
-<!--        mode: 'records',-->
-<!--        nextLabel: 'next',-->
-<!--        prevLabel: 'prev',-->
-<!--      }"-->
-<!--        styleClass="mt-5 table-hover tableOne vgt-table"-->
-<!--      >-->
-<!--      <div slot="table-actions" class="mt-2 mb-3">-->
-<!--        <b-button @click="export_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--          <i class="i-File-Copy"></i> PDF-->
-<!--        </b-button>-->
+  <!--      <vue-good-table-->
+  <!--        v-if="!isLoading"-->
+  <!--        mode="remote"-->
+  <!--        :columns="columns"-->
+  <!--        :totalRows="totalRows"-->
+  <!--        :rows="products"-->
+  <!--        @on-page-change="onPageChange"-->
+  <!--        @on-per-page-change="onPerPageChange"-->
+  <!--        @on-search="onSearch_products"-->
+  <!--          :search-options="{-->
+  <!--            placeholder: $t('Search_this_table'),-->
+  <!--            enabled: true,-->
+  <!--        }"-->
+  <!--        :pagination-options="{-->
+  <!--        enabled: true,-->
+  <!--        mode: 'records',-->
+  <!--        nextLabel: 'next',-->
+  <!--        prevLabel: 'prev',-->
+  <!--      }"-->
+  <!--        styleClass="mt-5 table-hover tableOne vgt-table"-->
+  <!--      >-->
+  <!--      <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--        <b-button @click="export_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--          <i class="i-File-Copy"></i> PDF-->
+  <!--        </b-button>-->
 
-<!--         <vue-excel-xlsx-->
-<!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
-<!--              :data="products"-->
-<!--              :columns="columns"-->
-<!--              :file-name="'product_report'"-->
-<!--              :file-type="'xlsx'"-->
-<!--              :sheet-name="'product_report'"-->
-<!--              >-->
-<!--              <i class="i-File-Excel"></i> EXCEL-->
-<!--          </vue-excel-xlsx>-->
+  <!--         <vue-excel-xlsx-->
+  <!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
+  <!--              :data="products"-->
+  <!--              :columns="columns"-->
+  <!--              :file-name="'product_report'"-->
+  <!--              :file-type="'xlsx'"-->
+  <!--              :sheet-name="'product_report'"-->
+  <!--              >-->
+  <!--              <i class="i-File-Excel"></i> EXCEL-->
+  <!--          </vue-excel-xlsx>-->
 
-<!--      </div>-->
-<!--        <template slot="table-row" slot-scope="props">-->
-<!--          <div v-if="props.column.field == 'total'">-->
-<!--            <span>{{currentUser.currency}} {{props.row.total}}</span>-->
-<!--          </div>-->
-<!--        </template>-->
-<!--      </vue-good-table>-->
-<!--      &lt;!&ndash; </b-card> &ndash;&gt;-->
-<!--    </div>-->
+  <!--      </div>-->
+  <!--        <template slot="table-row" slot-scope="props">-->
+  <!--          <div v-if="props.column.field == 'total'">-->
+  <!--            <span>{{currentUser.currency}} {{props.row.total}}</span>-->
+  <!--          </div>-->
+  <!--        </template>-->
+  <!--      </vue-good-table>-->
+  <!--      &lt;!&ndash; </b-card> &ndash;&gt;-->
+  <!--    </div>-->
 </template>

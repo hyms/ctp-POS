@@ -109,7 +109,7 @@ function Get_Sales(page) {
       <v-col sm="4" cols="12">
         <v-card class="mb-30 text-center">
           <v-card-text class="text-center  text-h6">
-            <p class="text-disabled mt-2 mb-1">Total ({{currency}})</p>
+            <p class="text-disabled mt-2 mb-1">Total ({{ currency }})</p>
             <p class="text-primary text-24 line-height-1 mb-2">{{ sumCount(sales) }}</p>
           </v-card-text>
         </v-card>
@@ -117,7 +117,7 @@ function Get_Sales(page) {
       <v-col sm="4" cols="12">
         <v-card class="mb-30 text-center  ">
           <v-card-text class="text-center text-h6">
-            <p class="text-disabled mt-2 mb-1">Pagado ({{currency}})</p>
+            <p class="text-disabled mt-2 mb-1">Pagado ({{ currency }})</p>
             <p class="text-primary text-24 line-height-1 mb-2">{{ sumCount2(sales) }}</p>
           </v-card-text>
         </v-card>
@@ -125,7 +125,7 @@ function Get_Sales(page) {
       <v-col sm="4" cols="12">
         <v-card class="mb-30 text-center">
           <v-card-text class="text-center  text-h6">
-            <p class="text-disabled mt-2 mb-1">Deuda ({{currency}})</p>
+            <p class="text-disabled mt-2 mb-1">Deuda ({{ currency }})</p>
             <p class="text-primary text-24 line-height-1 mb-2">{{ sumCount3(sales) }}</p>
           </v-card-text>
         </v-card>
@@ -289,7 +289,7 @@ function Get_Sales(page) {
           :items="sales"
           :search="search"
           hover
-          density="compact"
+
           :no-data-text="labels.no_data_table"
           :loading="loading"
       >

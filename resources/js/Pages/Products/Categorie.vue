@@ -206,7 +206,7 @@ function Remove_Category() {
       <v-card>
         <v-toolbar
             border
-            density="compact"
+
             :title="(editmode ? 'Modificar' : 'Nueva') + ' Categoria'"
         >
         </v-toolbar>

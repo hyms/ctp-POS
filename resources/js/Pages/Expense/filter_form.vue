@@ -21,10 +21,10 @@ const menu = ref(false);
 
 onMounted(() => {
   form.value = props.filter_form;
-  if(form.value.category) {
+  if (form.value.category) {
     form.value.category = helpers.getObjectValue(form.value.category, props.categories)
   }
-  if(form.value.warehouse) {
+  if (form.value.warehouse) {
     form.value.warehouse = helpers.getObjectValue(form.value.warehouse, props.warehouses)
   }
 });
@@ -62,7 +62,7 @@ function search() {
 
     <v-card max-width="500">
       <v-form>
-      <v-card-text>
+        <v-card-text>
           <v-row>
             <v-col cols="12" sm="6">
               <v-text-field
@@ -114,24 +114,24 @@ function search() {
               ></v-select>
             </v-col>
           </v-row>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn
-            variant="text"
-            color="error"
-            @click="menu = false"
-        >
-          {{ labels.cancel }}
-        </v-btn>
-        <v-btn
-            variant="tonal"
-            color="primary"
-            @click="search"
-        >
-          {{ labels.search }}
-        </v-btn>
-      </v-card-actions>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+              variant="text"
+              color="error"
+              @click="menu = false"
+          >
+            {{ labels.cancel }}
+          </v-btn>
+          <v-btn
+              variant="tonal"
+              color="primary"
+              @click="search"
+          >
+            {{ labels.search }}
+          </v-btn>
+        </v-card-actions>
       </v-form>
     </v-card>
   </v-menu>

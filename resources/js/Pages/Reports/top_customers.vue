@@ -146,40 +146,40 @@
 // };
 </script>
 <template>
-<!--  <div class="main-content">-->
-<!--    <breadcumb :page="$t('Top_customers')" :folder="$t('Reports')"/>-->
-<!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+  <!--  <div class="main-content">-->
+  <!--    <breadcumb :page="$t('Top_customers')" :folder="$t('Reports')"/>-->
+  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
 
-<!--    <vue-good-table-->
-<!--      v-if="!isLoading"-->
-<!--      mode="remote"-->
-<!--      :columns="columns"-->
-<!--      :totalRows="totalRows"-->
-<!--      :rows="customers"-->
-<!--      @on-page-change="onPageChange"-->
-<!--      @on-per-page-change="onPerPageChange"-->
-<!--      :pagination-options="{-->
-<!--        enabled: true,-->
-<!--        mode: 'records',-->
-<!--        nextLabel: 'next',-->
-<!--        prevLabel: 'prev',-->
-<!--      }"-->
-<!--      styleClass="table-hover tableOne vgt-table"-->
-<!--    >-->
-<!--     <div slot="table-actions" class="mt-2 mb-3">-->
-<!--        <b-button @click="export_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--          <i class="i-File-Copy"></i> PDF-->
-<!--        </b-button>-->
-<!--      </div>-->
+  <!--    <vue-good-table-->
+  <!--      v-if="!isLoading"-->
+  <!--      mode="remote"-->
+  <!--      :columns="columns"-->
+  <!--      :totalRows="totalRows"-->
+  <!--      :rows="customers"-->
+  <!--      @on-page-change="onPageChange"-->
+  <!--      @on-per-page-change="onPerPageChange"-->
+  <!--      :pagination-options="{-->
+  <!--        enabled: true,-->
+  <!--        mode: 'records',-->
+  <!--        nextLabel: 'next',-->
+  <!--        prevLabel: 'prev',-->
+  <!--      }"-->
+  <!--      styleClass="table-hover tableOne vgt-table"-->
+  <!--    >-->
+  <!--     <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--        <b-button @click="export_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--          <i class="i-File-Copy"></i> PDF-->
+  <!--        </b-button>-->
+  <!--      </div>-->
 
-<!--     <template slot="table-row" slot-scope="props">-->
-<!--      -->
-<!--        <div v-if="props.column.field == 'total'">-->
-<!--          <span>{{currentUser.currency}} {{props.row.total}}</span>-->
-<!--        </div>-->
-<!--      </template>-->
+  <!--     <template slot="table-row" slot-scope="props">-->
+  <!--      -->
+  <!--        <div v-if="props.column.field == 'total'">-->
+  <!--          <span>{{currentUser.currency}} {{props.row.total}}</span>-->
+  <!--        </div>-->
+  <!--      </template>-->
 
-<!--    </vue-good-table>-->
-<!--    &lt;!&ndash; </b-card> &ndash;&gt;-->
-<!--  </div>-->
+  <!--    </vue-good-table>-->
+  <!--    &lt;!&ndash; </b-card> &ndash;&gt;-->
+  <!--  </div>-->
 </template>

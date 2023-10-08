@@ -1,61 +1,61 @@
 <template>
-<!--  <div class="main-content">-->
-<!--    <breadcumb :page="$t('payment_gateway')" :folder="$t('Settings')"/>-->
-<!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+  <!--  <div class="main-content">-->
+  <!--    <breadcumb :page="$t('payment_gateway')" :folder="$t('Settings')"/>-->
+  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
 
-<!--    &lt;!&ndash; Payment Gateway &ndash;&gt;-->
-<!--    <validation-observer ref="form_payment" v-if="!isLoading">-->
-<!--      <b-form @submit.prevent="Submit_Payment">-->
-<!--        <b-row class="mt-5">-->
-<!--          <b-col lg="12" md="12" sm="12">-->
-<!--            <b-card no-body :header="$t('Payment_Gateway')">-->
-<!--              <b-card-body>-->
-<!--                <b-row>-->
-<!--                   &lt;!&ndash; Strip key  &ndash;&gt;-->
-<!--                  <b-col lg="6" md="6" sm="12">-->
-<!--                      <b-form-group label="STRIPE_KEY">-->
-<!--                        <b-form-input-->
-<!--                           type="password"-->
-<!--                           v-model="gateway.stripe_key"-->
-<!--                            :placeholder="$t('LeaveBlank')"-->
-<!--                        ></b-form-input>-->
-<!--                      </b-form-group>-->
-<!--                  </b-col>-->
+  <!--    &lt;!&ndash; Payment Gateway &ndash;&gt;-->
+  <!--    <validation-observer ref="form_payment" v-if="!isLoading">-->
+  <!--      <b-form @submit.prevent="Submit_Payment">-->
+  <!--        <b-row class="mt-5">-->
+  <!--          <b-col lg="12" md="12" sm="12">-->
+  <!--            <b-card no-body :header="$t('Payment_Gateway')">-->
+  <!--              <b-card-body>-->
+  <!--                <b-row>-->
+  <!--                   &lt;!&ndash; Strip key  &ndash;&gt;-->
+  <!--                  <b-col lg="6" md="6" sm="12">-->
+  <!--                      <b-form-group label="STRIPE_KEY">-->
+  <!--                        <b-form-input-->
+  <!--                           type="password"-->
+  <!--                           v-model="gateway.stripe_key"-->
+  <!--                            :placeholder="$t('LeaveBlank')"-->
+  <!--                        ></b-form-input>-->
+  <!--                      </b-form-group>-->
+  <!--                  </b-col>-->
 
-<!--                   &lt;!&ndash; Strip Secret  &ndash;&gt;-->
-<!--                  <b-col lg="6" md="6" sm="12">-->
-<!--                      <b-form-group label="STRIPE_SECRET">-->
-<!--                        <b-form-input-->
-<!--                          type="password"-->
-<!--                          v-model="gateway.stripe_secret"-->
-<!--                           :placeholder="$t('LeaveBlank')"-->
-<!--                        ></b-form-input>-->
-<!--                      </b-form-group>-->
-<!--                  </b-col>-->
+  <!--                   &lt;!&ndash; Strip Secret  &ndash;&gt;-->
+  <!--                  <b-col lg="6" md="6" sm="12">-->
+  <!--                      <b-form-group label="STRIPE_SECRET">-->
+  <!--                        <b-form-input-->
+  <!--                          type="password"-->
+  <!--                          v-model="gateway.stripe_secret"-->
+  <!--                           :placeholder="$t('LeaveBlank')"-->
+  <!--                        ></b-form-input>-->
+  <!--                      </b-form-group>-->
+  <!--                  </b-col>-->
 
-<!--                   &lt;!&ndash; Remove Stripe Key & Secret&ndash;&gt;-->
-<!--                    <b-col md="6" class="mt-3 mb-3">-->
-<!--                       <label class="switch switch-primary mr-3">-->
-<!--                         {{$t('Remove_Stripe_Key_Secret')}}-->
-<!--                          <input  type="checkbox" v-model="gateway.deleted">-->
-<!--                          <span class="slider"></span>-->
-<!--                        </label>-->
-<!--                    </b-col>-->
+  <!--                   &lt;!&ndash; Remove Stripe Key & Secret&ndash;&gt;-->
+  <!--                    <b-col md="6" class="mt-3 mb-3">-->
+  <!--                       <label class="switch switch-primary mr-3">-->
+  <!--                         {{$t('Remove_Stripe_Key_Secret')}}-->
+  <!--                          <input  type="checkbox" v-model="gateway.deleted">-->
+  <!--                          <span class="slider"></span>-->
+  <!--                        </label>-->
+  <!--                    </b-col>-->
 
-<!--                  <b-col md="12">-->
-<!--                    <b-form-group>-->
-<!--                      <b-button variant="primary" type="submit">{{$t('submit')}}</b-button>-->
-<!--                    </b-form-group>-->
-<!--                  </b-col>-->
-<!--                </b-row>-->
-<!--              </b-card-body>-->
-<!--            </b-card>-->
-<!--          </b-col>-->
-<!--        </b-row>-->
-<!--      </b-form>-->
-<!--    </validation-observer>-->
+  <!--                  <b-col md="12">-->
+  <!--                    <b-form-group>-->
+  <!--                      <b-button variant="primary" type="submit">{{$t('submit')}}</b-button>-->
+  <!--                    </b-form-group>-->
+  <!--                  </b-col>-->
+  <!--                </b-row>-->
+  <!--              </b-card-body>-->
+  <!--            </b-card>-->
+  <!--          </b-col>-->
+  <!--        </b-row>-->
+  <!--      </b-form>-->
+  <!--    </validation-observer>-->
 
-<!--  </div>-->
+  <!--  </div>-->
 </template>
 
 <script>

@@ -205,71 +205,71 @@
 // };
 </script>
 <template>
-<!--  <div class="main-content">-->
-<!--    <breadcumb :page="$t('stock_report')" :folder="$t('Reports')"/>-->
+  <!--  <div class="main-content">-->
+  <!--    <breadcumb :page="$t('stock_report')" :folder="$t('Reports')"/>-->
 
-<!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
-<!--    <b-card class="wrapper" v-if="!isLoading">-->
-<!--      <vue-good-table-->
-<!--        mode="remote"-->
-<!--        :columns="columns"-->
-<!--        :totalRows="totalRows"-->
-<!--        :rows="reports"-->
-<!--        @on-page-change="onPageChange"-->
-<!--        @on-per-page-change="onPerPageChange"-->
-<!--        @on-sort-change="onSortChange"-->
-<!--        @on-search="onSearch"-->
-<!--        :search-options="{-->
-<!--        placeholder: $t('Search_this_table'),-->
-<!--        enabled: true,-->
-<!--      }"-->
-<!--        :pagination-options="{-->
-<!--        enabled: true,-->
-<!--        mode: 'records',-->
-<!--        nextLabel: 'next',-->
-<!--        prevLabel: 'prev',-->
-<!--      }"-->
-<!--        styleClass="tableOne table-hover vgt-table mt-3"-->
-<!--      >-->
+  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+  <!--    <b-card class="wrapper" v-if="!isLoading">-->
+  <!--      <vue-good-table-->
+  <!--        mode="remote"-->
+  <!--        :columns="columns"-->
+  <!--        :totalRows="totalRows"-->
+  <!--        :rows="reports"-->
+  <!--        @on-page-change="onPageChange"-->
+  <!--        @on-per-page-change="onPerPageChange"-->
+  <!--        @on-sort-change="onSortChange"-->
+  <!--        @on-search="onSearch"-->
+  <!--        :search-options="{-->
+  <!--        placeholder: $t('Search_this_table'),-->
+  <!--        enabled: true,-->
+  <!--      }"-->
+  <!--        :pagination-options="{-->
+  <!--        enabled: true,-->
+  <!--        mode: 'records',-->
+  <!--        nextLabel: 'next',-->
+  <!--        prevLabel: 'prev',-->
+  <!--      }"-->
+  <!--        styleClass="tableOne table-hover vgt-table mt-3"-->
+  <!--      >-->
 
-<!--       <div slot="table-actions" class="mt-2 mb-3 quantity_alert_warehouse">-->
-<!--        &lt;!&ndash; warehouse &ndash;&gt;-->
-<!--        <b-form-group :label="$t('warehouse')">-->
-<!--          <v-select-->
-<!--            @input="Selected_Warehouse"-->
-<!--            v-model="warehouse_id"-->
-<!--            :reduce="label => label.value"-->
-<!--            :placeholder="$t('Choose_Warehouse')"-->
-<!--            :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
-<!--          />-->
-<!--        </b-form-group>-->
-<!--      </div>-->
+  <!--       <div slot="table-actions" class="mt-2 mb-3 quantity_alert_warehouse">-->
+  <!--        &lt;!&ndash; warehouse &ndash;&gt;-->
+  <!--        <b-form-group :label="$t('warehouse')">-->
+  <!--          <v-select-->
+  <!--            @input="Selected_Warehouse"-->
+  <!--            v-model="warehouse_id"-->
+  <!--            :reduce="label => label.value"-->
+  <!--            :placeholder="$t('Choose_Warehouse')"-->
+  <!--            :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
+  <!--          />-->
+  <!--        </b-form-group>-->
+  <!--      </div>-->
 
-<!--       <div slot="table-actions" class="mt-2 mb-3">-->
-<!--        -->
-<!--          <b-button @click="stock_report_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--            <i class="i-File-Copy"></i> PDF-->
-<!--          </b-button>-->
-<!--           <vue-excel-xlsx-->
-<!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
-<!--              :data="reports"-->
-<!--              :columns="columns"-->
-<!--              :file-name="'stock_report'"-->
-<!--              :file-type="'xlsx'"-->
-<!--              :sheet-name="'stock_report'"-->
-<!--              >-->
-<!--              <i class="i-File-Excel"></i> EXCEL-->
-<!--          </vue-excel-xlsx>-->
-<!--        </div>-->
+  <!--       <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--        -->
+  <!--          <b-button @click="stock_report_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--            <i class="i-File-Copy"></i> PDF-->
+  <!--          </b-button>-->
+  <!--           <vue-excel-xlsx-->
+  <!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
+  <!--              :data="reports"-->
+  <!--              :columns="columns"-->
+  <!--              :file-name="'stock_report'"-->
+  <!--              :file-type="'xlsx'"-->
+  <!--              :sheet-name="'stock_report'"-->
+  <!--              >-->
+  <!--              <i class="i-File-Excel"></i> EXCEL-->
+  <!--          </vue-excel-xlsx>-->
+  <!--        </div>-->
 
-<!--        <template slot="table-row" slot-scope="props">-->
-<!--          <span v-if="props.column.field == 'actions'">-->
-<!--            <router-link title="Report" :to="'/app/reports/detail_stock/'+props.row.id">-->
-<!--              <b-button variant="primary">{{$t('Reports')}}</b-button>-->
-<!--            </router-link>-->
-<!--          </span>-->
-<!--        </template>-->
-<!--      </vue-good-table>-->
-<!--    </b-card>-->
-<!--  </div>-->
+  <!--        <template slot="table-row" slot-scope="props">-->
+  <!--          <span v-if="props.column.field == 'actions'">-->
+  <!--            <router-link title="Report" :to="'/app/reports/detail_stock/'+props.row.id">-->
+  <!--              <b-button variant="primary">{{$t('Reports')}}</b-button>-->
+  <!--            </router-link>-->
+  <!--          </span>-->
+  <!--        </template>-->
+  <!--      </vue-good-table>-->
+  <!--    </b-card>-->
+  <!--  </div>-->
 </template>

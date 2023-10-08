@@ -85,8 +85,8 @@ const sale = ref({
   discount: 0,
   TaxNet: 0,
   notes: '',
-  sales_type_id:"",
-  statut:''
+  sales_type_id: "",
+  statut: ''
 });
 
 const category_id = ref("");
@@ -383,7 +383,7 @@ function CreatePOS() {
         shipping: sale.value.shipping ? sale.value.shipping : 0,
         sales_type: sale.value.sales_type_id,
         notes: sale.value.notes,
-        statut:sale.value.statut,
+        statut: sale.value.statut,
         details: details.value,
         GrandTotal: GrandTotal.value,
         payment: payment.value,
@@ -729,7 +729,7 @@ function created() {
   dialogAddPayment.value = true;
 }
 
-onMounted(()=>{
+onMounted(() => {
   if (props.warehouses.length == 1) {
     sale.value.warehouse_id = props.warehouses[0].id;
     Get_Products_By_Warehouse(props.warehouses[0].id);
@@ -788,7 +788,7 @@ onMounted(()=>{
                 <!-- Details Product  -->
                 <v-col cols="12">
                   <div class="pos-detail">
-                    <v-table density="compact" hover>
+                    <v-table hover>
                       <thead>
                       <tr>
                         <th>{{ labels.sale.details.product }}</th>
@@ -815,7 +815,7 @@ onMounted(()=>{
                         <td style="min-width: 140px">
                           <v-text-field
                               variant="outlined"
-                              density="compact"
+
                               hide-details="auto"
                               :rules="helper.number"
                               v-model="detail_item.quantity"
@@ -1367,7 +1367,7 @@ onMounted(()=>{
                   <v-select
                       v-model="sale.sales_type_id"
                       variant="outlined"
-                      density="compact"
+
                       hide-details="auto"
                       :items="sales_types"
                       :label="labels.sale.sales_type_id + ' *'"
@@ -1382,7 +1382,7 @@ onMounted(()=>{
                   <v-select
                       v-model="sale.statut"
                       variant="outlined"
-                      density="compact"
+
                       clearable
                       hide-details="auto"
                       :items="helper.statutSale()"

@@ -1,149 +1,149 @@
 <template>
-<!--  <div class="main-content">-->
-<!--    <breadcumb :page="$t('PurchaseInvoice')" :folder="$t('Reports')"/>-->
+  <!--  <div class="main-content">-->
+  <!--    <breadcumb :page="$t('PurchaseInvoice')" :folder="$t('Reports')"/>-->
 
-<!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
 
-<!--    <b-col md="12" class="text-center" v-if="!isLoading">-->
-<!--        <date-range-picker -->
-<!--          v-model="dateRange" -->
-<!--          :startDate="startDate" -->
-<!--          :endDate="endDate" -->
-<!--           @update="Submit_filter_dateRange"-->
-<!--          :locale-data="locale" > -->
+  <!--    <b-col md="12" class="text-center" v-if="!isLoading">-->
+  <!--        <date-range-picker -->
+  <!--          v-model="dateRange" -->
+  <!--          :startDate="startDate" -->
+  <!--          :endDate="endDate" -->
+  <!--           @update="Submit_filter_dateRange"-->
+  <!--          :locale-data="locale" > -->
 
-<!--          <template v-slot:input="picker" style="min-width: 350px;">-->
-<!--              {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}-->
-<!--          </template>        -->
-<!--        </date-range-picker>-->
-<!--      </b-col>-->
+  <!--          <template v-slot:input="picker" style="min-width: 350px;">-->
+  <!--              {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}-->
+  <!--          </template>        -->
+  <!--        </date-range-picker>-->
+  <!--      </b-col>-->
 
-<!--    <b-card class="wrapper" v-if="!isLoading">-->
-<!--      <vue-good-table-->
-<!--        mode="remote"-->
-<!--        :columns="columns"-->
-<!--        :totalRows="totalRows"-->
-<!--        :rows="rows"-->
-<!--        :group-options="{-->
-<!--          enabled: true,-->
-<!--          headerPosition: 'bottom',-->
-<!--        }"-->
-<!--        @on-page-change="onPageChange"-->
-<!--        @on-per-page-change="onPerPageChange"-->
-<!--        @on-sort-change="onSortChange"-->
-<!--        @on-search="onSearch"-->
-<!--        :search-options="{-->
-<!--        placeholder: $t('Search_this_table'),-->
-<!--        enabled: true,-->
-<!--      }"-->
-<!--        :pagination-options="{-->
-<!--        enabled: true,-->
-<!--        mode: 'records',-->
-<!--        nextLabel: 'next',-->
-<!--        prevLabel: 'prev',-->
-<!--      }"-->
-<!--        styleClass="table-hover tableOne vgt-table"-->
-<!--      >-->
-<!--        <div slot="table-actions" class="mt-2 mb-3">-->
-<!--          <b-button variant="outline-info ripple m-1" size="sm" v-b-toggle.sidebar-right>-->
-<!--            <i class="i-Filter-2"></i>-->
-<!--            {{ $t("Filter") }}-->
-<!--          </b-button>-->
-<!--          <b-button @click="Payment_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--            <i class="i-File-Copy"></i> PDF-->
-<!--          </b-button>-->
-<!--           <vue-excel-xlsx-->
-<!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
-<!--              :data="payments"-->
-<!--              :columns="columns"-->
-<!--              :file-name="'payments'"-->
-<!--              :file-type="'xlsx'"-->
-<!--              :sheet-name="'payments'"-->
-<!--              >-->
-<!--              <i class="i-File-Excel"></i> EXCEL-->
-<!--          </vue-excel-xlsx>-->
-<!--        </div>-->
-<!--      </vue-good-table>-->
-<!--    </b-card>-->
+  <!--    <b-card class="wrapper" v-if="!isLoading">-->
+  <!--      <vue-good-table-->
+  <!--        mode="remote"-->
+  <!--        :columns="columns"-->
+  <!--        :totalRows="totalRows"-->
+  <!--        :rows="rows"-->
+  <!--        :group-options="{-->
+  <!--          enabled: true,-->
+  <!--          headerPosition: 'bottom',-->
+  <!--        }"-->
+  <!--        @on-page-change="onPageChange"-->
+  <!--        @on-per-page-change="onPerPageChange"-->
+  <!--        @on-sort-change="onSortChange"-->
+  <!--        @on-search="onSearch"-->
+  <!--        :search-options="{-->
+  <!--        placeholder: $t('Search_this_table'),-->
+  <!--        enabled: true,-->
+  <!--      }"-->
+  <!--        :pagination-options="{-->
+  <!--        enabled: true,-->
+  <!--        mode: 'records',-->
+  <!--        nextLabel: 'next',-->
+  <!--        prevLabel: 'prev',-->
+  <!--      }"-->
+  <!--        styleClass="table-hover tableOne vgt-table"-->
+  <!--      >-->
+  <!--        <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--          <b-button variant="outline-info ripple m-1" size="sm" v-b-toggle.sidebar-right>-->
+  <!--            <i class="i-Filter-2"></i>-->
+  <!--            {{ $t("Filter") }}-->
+  <!--          </b-button>-->
+  <!--          <b-button @click="Payment_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--            <i class="i-File-Copy"></i> PDF-->
+  <!--          </b-button>-->
+  <!--           <vue-excel-xlsx-->
+  <!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
+  <!--              :data="payments"-->
+  <!--              :columns="columns"-->
+  <!--              :file-name="'payments'"-->
+  <!--              :file-type="'xlsx'"-->
+  <!--              :sheet-name="'payments'"-->
+  <!--              >-->
+  <!--              <i class="i-File-Excel"></i> EXCEL-->
+  <!--          </vue-excel-xlsx>-->
+  <!--        </div>-->
+  <!--      </vue-good-table>-->
+  <!--    </b-card>-->
 
-<!--    &lt;!&ndash; Sidebar Filter &ndash;&gt;-->
-<!--    <b-sidebar id="sidebar-right" :title="$t('Filter')" bg-variant="white" right shadow>-->
-<!--      <div class="px-3 py-2">-->
-<!--        <b-row>-->
+  <!--    &lt;!&ndash; Sidebar Filter &ndash;&gt;-->
+  <!--    <b-sidebar id="sidebar-right" :title="$t('Filter')" bg-variant="white" right shadow>-->
+  <!--      <div class="px-3 py-2">-->
+  <!--        <b-row>-->
 
-<!--          &lt;!&ndash; Reference &ndash;&gt;-->
-<!--          <b-col md="12">-->
-<!--            <b-form-group :label="$t('Reference')">-->
-<!--              <b-form-input label="Reference" :placeholder="$t('Reference')" v-model="Filter_Ref"></b-form-input>-->
-<!--            </b-form-group>-->
-<!--          </b-col>-->
+  <!--          &lt;!&ndash; Reference &ndash;&gt;-->
+  <!--          <b-col md="12">-->
+  <!--            <b-form-group :label="$t('Reference')">-->
+  <!--              <b-form-input label="Reference" :placeholder="$t('Reference')" v-model="Filter_Ref"></b-form-input>-->
+  <!--            </b-form-group>-->
+  <!--          </b-col>-->
 
-<!--          &lt;!&ndash; Supplier  &ndash;&gt;-->
-<!--          <b-col md="12">-->
-<!--            <b-form-group :label="$t('Supplier')">-->
-<!--              <v-select-->
-<!--                :reduce="label => label.value"-->
-<!--                :placeholder="$t('Choose_Supplier')"-->
-<!--                v-model="Filter_Supplier"-->
-<!--                :options="suppliers.map(suppliers => ({label: suppliers.name, value: suppliers.id}))"-->
-<!--              />-->
-<!--            </b-form-group>-->
-<!--          </b-col>-->
+  <!--          &lt;!&ndash; Supplier  &ndash;&gt;-->
+  <!--          <b-col md="12">-->
+  <!--            <b-form-group :label="$t('Supplier')">-->
+  <!--              <v-select-->
+  <!--                :reduce="label => label.value"-->
+  <!--                :placeholder="$t('Choose_Supplier')"-->
+  <!--                v-model="Filter_Supplier"-->
+  <!--                :options="suppliers.map(suppliers => ({label: suppliers.name, value: suppliers.id}))"-->
+  <!--              />-->
+  <!--            </b-form-group>-->
+  <!--          </b-col>-->
 
-<!--          &lt;!&ndash; Purchase  &ndash;&gt;-->
-<!--          <b-col md="12">-->
-<!--            <b-form-group :label="$t('Purchase')">-->
-<!--              <v-select-->
-<!--                :reduce="label => label.value"-->
-<!--                :placeholder="$t('PleaseSelect')"-->
-<!--                v-model="Filter_purchase"-->
-<!--                :options="purchases.map(purchases => ({label: purchases.Ref, value: purchases.id}))"-->
-<!--              />-->
-<!--            </b-form-group>-->
-<!--          </b-col>-->
+  <!--          &lt;!&ndash; Purchase  &ndash;&gt;-->
+  <!--          <b-col md="12">-->
+  <!--            <b-form-group :label="$t('Purchase')">-->
+  <!--              <v-select-->
+  <!--                :reduce="label => label.value"-->
+  <!--                :placeholder="$t('PleaseSelect')"-->
+  <!--                v-model="Filter_purchase"-->
+  <!--                :options="purchases.map(purchases => ({label: purchases.Ref, value: purchases.id}))"-->
+  <!--              />-->
+  <!--            </b-form-group>-->
+  <!--          </b-col>-->
 
-<!--          &lt;!&ndash; Payment choice &ndash;&gt;-->
-<!--          <b-col md="12">-->
-<!--            <b-form-group :label="$t('Paymentchoice')">-->
-<!--              <v-select-->
-<!--                v-model="Filter_Reg"-->
-<!--                :reduce="label => label.value"-->
-<!--                :placeholder="$t('PleaseSelect')"-->
-<!--                :options="-->
-<!--                          [-->
-<!--                          {label: 'Cash', value: 'Cash'},-->
-<!--                          {label: 'cheque', value: 'cheque'},-->
-<!--                          {label: 'TPE', value: 'tpe'},-->
-<!--                          {label: 'Western Union', value: 'Western Union'},-->
-<!--                          {label: 'bank transfer', value: 'bank transfer'},-->
-<!--                          {label: 'credit card', value: 'credit card'},-->
-<!--                          {label: 'other', value: 'other'},-->
-<!--                          ]"-->
-<!--              ></v-select>-->
-<!--            </b-form-group>-->
-<!--          </b-col>-->
+  <!--          &lt;!&ndash; Payment choice &ndash;&gt;-->
+  <!--          <b-col md="12">-->
+  <!--            <b-form-group :label="$t('Paymentchoice')">-->
+  <!--              <v-select-->
+  <!--                v-model="Filter_Reg"-->
+  <!--                :reduce="label => label.value"-->
+  <!--                :placeholder="$t('PleaseSelect')"-->
+  <!--                :options="-->
+  <!--                          [-->
+  <!--                          {label: 'Cash', value: 'Cash'},-->
+  <!--                          {label: 'cheque', value: 'cheque'},-->
+  <!--                          {label: 'TPE', value: 'tpe'},-->
+  <!--                          {label: 'Western Union', value: 'Western Union'},-->
+  <!--                          {label: 'bank transfer', value: 'bank transfer'},-->
+  <!--                          {label: 'credit card', value: 'credit card'},-->
+  <!--                          {label: 'other', value: 'other'},-->
+  <!--                          ]"-->
+  <!--              ></v-select>-->
+  <!--            </b-form-group>-->
+  <!--          </b-col>-->
 
-<!--          <b-col md="6" sm="12">-->
-<!--            <b-button-->
-<!--              @click="Payments_Purchases(serverParams.page)"-->
-<!--              variant="primary ripple m-1"-->
-<!--              size="sm"-->
-<!--              block-->
-<!--            >-->
-<!--              <i class="i-Filter-2"></i>-->
-<!--              {{ $t("Filter") }}-->
-<!--            </b-button>-->
-<!--          </b-col>-->
-<!--          <b-col md="6" sm="12">-->
-<!--            <b-button @click="Reset_Filter()" variant="danger ripple m-1" size="sm" block>-->
-<!--              <i class="i-Power-2"></i>-->
-<!--              {{ $t("Reset") }}-->
-<!--            </b-button>-->
-<!--          </b-col>-->
-<!--        </b-row>-->
-<!--      </div>-->
-<!--    </b-sidebar>-->
-<!--  </div>-->
+  <!--          <b-col md="6" sm="12">-->
+  <!--            <b-button-->
+  <!--              @click="Payments_Purchases(serverParams.page)"-->
+  <!--              variant="primary ripple m-1"-->
+  <!--              size="sm"-->
+  <!--              block-->
+  <!--            >-->
+  <!--              <i class="i-Filter-2"></i>-->
+  <!--              {{ $t("Filter") }}-->
+  <!--            </b-button>-->
+  <!--          </b-col>-->
+  <!--          <b-col md="6" sm="12">-->
+  <!--            <b-button @click="Reset_Filter()" variant="danger ripple m-1" size="sm" block>-->
+  <!--              <i class="i-Power-2"></i>-->
+  <!--              {{ $t("Reset") }}-->
+  <!--            </b-button>-->
+  <!--          </b-col>-->
+  <!--        </b-row>-->
+  <!--      </div>-->
+  <!--    </b-sidebar>-->
+  <!--  </div>-->
 </template>
 
 <script>

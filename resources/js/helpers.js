@@ -7,6 +7,7 @@ const reglaments = [
     {title: "Efectivo", value: "cash"},
     {title: "Cheque", value: "cheque"},
     {title: "Transferencia Bancaria", value: "bank_transfer"},
+    {title: "QR", value: "qr"},
     {title: "Otros", value: "other"},
 ];
 const toggleFullScreen = () => {

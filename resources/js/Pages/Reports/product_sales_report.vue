@@ -347,125 +347,125 @@
 // };
 </script>
 <template>
-<!--  <div class="main-content">-->
-<!--    <breadcumb :page="$t('product_sales_report')" :folder="$t('Reports')"/>-->
-<!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+  <!--  <div class="main-content">-->
+  <!--    <breadcumb :page="$t('product_sales_report')" :folder="$t('Reports')"/>-->
+  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
 
-<!--     <b-col md="12" class="text-center" v-if="!isLoading">-->
-<!--        <date-range-picker -->
-<!--          v-model="dateRange" -->
-<!--          :startDate="startDate" -->
-<!--          :endDate="endDate" -->
-<!--           @update="Submit_filter_dateRange"-->
-<!--          :locale-data="locale" > -->
+  <!--     <b-col md="12" class="text-center" v-if="!isLoading">-->
+  <!--        <date-range-picker -->
+  <!--          v-model="dateRange" -->
+  <!--          :startDate="startDate" -->
+  <!--          :endDate="endDate" -->
+  <!--           @update="Submit_filter_dateRange"-->
+  <!--          :locale-data="locale" > -->
 
-<!--          <template v-slot:input="picker" style="min-width: 350px;">-->
-<!--              {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}-->
-<!--          </template>        -->
-<!--        </date-range-picker>-->
-<!--      </b-col>-->
+  <!--          <template v-slot:input="picker" style="min-width: 350px;">-->
+  <!--              {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}-->
+  <!--          </template>        -->
+  <!--        </date-range-picker>-->
+  <!--      </b-col>-->
 
 
-<!--    <div v-if="!isLoading">-->
-<!--      <vue-good-table-->
-<!--        mode="remote"-->
-<!--        :columns="columns"-->
-<!--        :totalRows="totalRows"-->
-<!--        :rows="rows"-->
-<!--        @on-page-change="onPageChange"-->
-<!--        @on-per-page-change="onPerPageChange"-->
-<!--        @on-sort-change="onSortChange"-->
-<!--        @on-search="onSearch"-->
-<!--        :search-options="{-->
-<!--        placeholder: $t('Search_this_table'),-->
-<!--        enabled: true,-->
-<!--      }"-->
-<!--       :group-options="{-->
-<!--          enabled: true,-->
-<!--          headerPosition: 'bottom',-->
-<!--        }"-->
-<!--       -->
-<!--        :pagination-options="{-->
-<!--        enabled: true,-->
-<!--        mode: 'records',-->
-<!--        nextLabel: 'next',-->
-<!--        prevLabel: 'prev',-->
-<!--      }"-->
-<!--        :styleClass="showDropdown?'tableOne table-hover vgt-table full-height':'tableOne table-hover vgt-table non-height'"-->
-<!--      >-->
-<!--       -->
-<!--        <div slot="table-actions" class="mt-2 mb-3">-->
-<!--          <b-button variant="outline-info ripple m-1" size="sm" v-b-toggle.sidebar-right>-->
-<!--            <i class="i-Filter-2"></i>-->
-<!--            {{ $t("Filter") }}-->
-<!--          </b-button>-->
-<!--          <b-button @click="Sales_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--            <i class="i-File-Copy"></i> PDF-->
-<!--          </b-button>-->
-<!--          <vue-excel-xlsx-->
-<!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
-<!--              :data="sales"-->
-<!--              :columns="columns"-->
-<!--              :file-name="'sales'"-->
-<!--              :file-type="'xlsx'"-->
-<!--              :sheet-name="'sales'"-->
-<!--              >-->
-<!--              <i class="i-File-Excel"></i> EXCEL-->
-<!--          </vue-excel-xlsx>-->
-<!--         -->
-<!--        </div>-->
+  <!--    <div v-if="!isLoading">-->
+  <!--      <vue-good-table-->
+  <!--        mode="remote"-->
+  <!--        :columns="columns"-->
+  <!--        :totalRows="totalRows"-->
+  <!--        :rows="rows"-->
+  <!--        @on-page-change="onPageChange"-->
+  <!--        @on-per-page-change="onPerPageChange"-->
+  <!--        @on-sort-change="onSortChange"-->
+  <!--        @on-search="onSearch"-->
+  <!--        :search-options="{-->
+  <!--        placeholder: $t('Search_this_table'),-->
+  <!--        enabled: true,-->
+  <!--      }"-->
+  <!--       :group-options="{-->
+  <!--          enabled: true,-->
+  <!--          headerPosition: 'bottom',-->
+  <!--        }"-->
+  <!--       -->
+  <!--        :pagination-options="{-->
+  <!--        enabled: true,-->
+  <!--        mode: 'records',-->
+  <!--        nextLabel: 'next',-->
+  <!--        prevLabel: 'prev',-->
+  <!--      }"-->
+  <!--        :styleClass="showDropdown?'tableOne table-hover vgt-table full-height':'tableOne table-hover vgt-table non-height'"-->
+  <!--      >-->
+  <!--       -->
+  <!--        <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--          <b-button variant="outline-info ripple m-1" size="sm" v-b-toggle.sidebar-right>-->
+  <!--            <i class="i-Filter-2"></i>-->
+  <!--            {{ $t("Filter") }}-->
+  <!--          </b-button>-->
+  <!--          <b-button @click="Sales_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--            <i class="i-File-Copy"></i> PDF-->
+  <!--          </b-button>-->
+  <!--          <vue-excel-xlsx-->
+  <!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
+  <!--              :data="sales"-->
+  <!--              :columns="columns"-->
+  <!--              :file-name="'sales'"-->
+  <!--              :file-type="'xlsx'"-->
+  <!--              :sheet-name="'sales'"-->
+  <!--              >-->
+  <!--              <i class="i-File-Excel"></i> EXCEL-->
+  <!--          </vue-excel-xlsx>-->
+  <!--         -->
+  <!--        </div>-->
 
-<!--      </vue-good-table>-->
-<!--    </div>-->
+  <!--      </vue-good-table>-->
+  <!--    </div>-->
 
-<!--    &lt;!&ndash; Sidebar Filter &ndash;&gt;-->
-<!--    <b-sidebar id="sidebar-right" :title="$t('Filter')" bg-variant="white" right shadow>-->
-<!--      <div class="px-3 py-2">-->
-<!--        <b-row>-->
+  <!--    &lt;!&ndash; Sidebar Filter &ndash;&gt;-->
+  <!--    <b-sidebar id="sidebar-right" :title="$t('Filter')" bg-variant="white" right shadow>-->
+  <!--      <div class="px-3 py-2">-->
+  <!--        <b-row>-->
 
-<!--          &lt;!&ndash; Customer  &ndash;&gt;-->
-<!--          <b-col md="12">-->
-<!--            <b-form-group :label="$t('Customer')">-->
-<!--              <v-select-->
-<!--                :reduce="label => label.value"-->
-<!--                :placeholder="$t('Choose_Customer')"-->
-<!--                v-model="Filter_Client"-->
-<!--                :options="customers.map(customers => ({label: customers.name, value: customers.id}))"-->
-<!--              />-->
-<!--            </b-form-group>-->
-<!--          </b-col>-->
+  <!--          &lt;!&ndash; Customer  &ndash;&gt;-->
+  <!--          <b-col md="12">-->
+  <!--            <b-form-group :label="$t('Customer')">-->
+  <!--              <v-select-->
+  <!--                :reduce="label => label.value"-->
+  <!--                :placeholder="$t('Choose_Customer')"-->
+  <!--                v-model="Filter_Client"-->
+  <!--                :options="customers.map(customers => ({label: customers.name, value: customers.id}))"-->
+  <!--              />-->
+  <!--            </b-form-group>-->
+  <!--          </b-col>-->
 
-<!--          &lt;!&ndash; warehouse &ndash;&gt;-->
-<!--          <b-col md="12">-->
-<!--            <b-form-group :label="$t('warehouse')">-->
-<!--              <v-select-->
-<!--                v-model="Filter_warehouse"-->
-<!--                :reduce="label => label.value"-->
-<!--                :placeholder="$t('Choose_Warehouse')"-->
-<!--                :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
-<!--              />-->
-<!--            </b-form-group>-->
-<!--          </b-col>-->
+  <!--          &lt;!&ndash; warehouse &ndash;&gt;-->
+  <!--          <b-col md="12">-->
+  <!--            <b-form-group :label="$t('warehouse')">-->
+  <!--              <v-select-->
+  <!--                v-model="Filter_warehouse"-->
+  <!--                :reduce="label => label.value"-->
+  <!--                :placeholder="$t('Choose_Warehouse')"-->
+  <!--                :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
+  <!--              />-->
+  <!--            </b-form-group>-->
+  <!--          </b-col>-->
 
-<!--          <b-col md="6" sm="12">-->
-<!--            <b-button-->
-<!--              @click="Get_Sales(serverParams.page)"-->
-<!--              variant="primary btn-block ripple m-1"-->
-<!--              size="sm"-->
-<!--            >-->
-<!--              <i class="i-Filter-2"></i>-->
-<!--              {{ $t("Filter") }}-->
-<!--            </b-button>-->
-<!--          </b-col>-->
-<!--          <b-col md="6" sm="12">-->
-<!--            <b-button @click="Reset_Filter()" variant="danger ripple btn-block m-1" size="sm">-->
-<!--              <i class="i-Power-2"></i>-->
-<!--              {{ $t("Reset") }}-->
-<!--            </b-button>-->
-<!--          </b-col>-->
-<!--        </b-row>-->
-<!--      </div>-->
-<!--    </b-sidebar>-->
+  <!--          <b-col md="6" sm="12">-->
+  <!--            <b-button-->
+  <!--              @click="Get_Sales(serverParams.page)"-->
+  <!--              variant="primary btn-block ripple m-1"-->
+  <!--              size="sm"-->
+  <!--            >-->
+  <!--              <i class="i-Filter-2"></i>-->
+  <!--              {{ $t("Filter") }}-->
+  <!--            </b-button>-->
+  <!--          </b-col>-->
+  <!--          <b-col md="6" sm="12">-->
+  <!--            <b-button @click="Reset_Filter()" variant="danger ripple btn-block m-1" size="sm">-->
+  <!--              <i class="i-Power-2"></i>-->
+  <!--              {{ $t("Reset") }}-->
+  <!--            </b-button>-->
+  <!--          </b-col>-->
+  <!--        </b-row>-->
+  <!--      </div>-->
+  <!--    </b-sidebar>-->
 
-<!--  </div>-->
+  <!--  </div>-->
 </template>

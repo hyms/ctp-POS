@@ -3,14 +3,14 @@ import {ref} from "vue";
 export default {
     //forms
     client: {
-        name: "Nombre",
+        name: "Nombre en Factura",
         company_name: "Nombre de Empresa",
         code: "Codigo",
         email: "Correo",
         phone: "Telefono",
         city: "Ciudad",
         adresse: "Direccion",
-        nit_ci: "NIT",
+        nit_ci: "NIT/CI",
     },
     warehouse: {
         name: "Nombre",

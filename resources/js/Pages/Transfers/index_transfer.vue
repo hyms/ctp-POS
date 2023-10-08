@@ -1,258 +1,258 @@
 <template>
-<!--  <div class="main-content">-->
-<!--    <breadcumb :page="$t('ListTransfers')" :folder="$t('StockTransfers')"/>-->
+  <!--  <div class="main-content">-->
+  <!--    <breadcumb :page="$t('ListTransfers')" :folder="$t('StockTransfers')"/>-->
 
-<!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
-<!--    <div v-else>-->
-<!--      <vue-good-table-->
-<!--        mode="remote"-->
-<!--        :columns="columns"-->
-<!--        :totalRows="totalRows"-->
-<!--        :rows="transfers"-->
-<!--        @on-page-change="onPageChange"-->
-<!--        @on-per-page-change="onPerPageChange"-->
-<!--        @on-sort-change="onSortChange"-->
-<!--        @on-search="onSearch"-->
-<!--        :search-options="{-->
-<!--        enabled: true,-->
-<!--        placeholder: $t('Search_this_table'),  -->
-<!--      }"-->
-<!--        :select-options="{ -->
-<!--          enabled: true ,-->
-<!--          clearSelectionText: '',-->
-<!--        }"-->
-<!--        @on-selected-rows-change="selectionChanged"-->
-<!--        :pagination-options="{-->
-<!--        enabled: true,-->
-<!--        mode: 'records',-->
-<!--        nextLabel: 'next',-->
-<!--        prevLabel: 'prev',-->
-<!--      }"-->
-<!--        styleClass="tableOne table-hover vgt-table"-->
-<!--      >-->
-<!--        <div slot="selected-row-actions">-->
-<!--          <button class="btn btn-danger btn-sm" @click="delete_by_selected()">{{$t('Del')}}</button>-->
-<!--        </div>-->
-<!--        <div slot="table-actions" class="mt-2 mb-3">-->
-<!--          <b-button variant="outline-info ripple m-1" size="sm" v-b-toggle.sidebar-right>-->
-<!--            <i class="i-Filter-2"></i>-->
-<!--            {{ $t("Filter") }}-->
-<!--          </b-button>-->
-<!--          <b-button @click="Transfer_PDF()" size="sm" variant="outline-success ripple m-1">-->
-<!--            <i class="i-File-Copy"></i> PDF-->
-<!--          </b-button>-->
-<!--           <vue-excel-xlsx-->
-<!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
-<!--              :data="transfers"-->
-<!--              :columns="columns"-->
-<!--              :file-name="'transfers'"-->
-<!--              :file-type="'xlsx'"-->
-<!--              :sheet-name="'transfers'"-->
-<!--              >-->
-<!--              <i class="i-File-Excel"></i> EXCEL-->
-<!--          </vue-excel-xlsx>-->
-<!--          <router-link-->
-<!--            class="btn-sm btn btn-primary ripple btn-icon m-1"-->
-<!--            v-if="currentUserPermissions && currentUserPermissions.includes('transfer_add')"-->
-<!--            to="/app/transfers/store"-->
-<!--          >-->
-<!--            <span class="ul-btn__icon">-->
-<!--              <i class="i-Add"></i>-->
-<!--            </span>-->
-<!--            <span class="ul-btn__text ml-1">{{$t('Add')}}</span>-->
-<!--          </router-link>-->
-<!--        </div>-->
+  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+  <!--    <div v-else>-->
+  <!--      <vue-good-table-->
+  <!--        mode="remote"-->
+  <!--        :columns="columns"-->
+  <!--        :totalRows="totalRows"-->
+  <!--        :rows="transfers"-->
+  <!--        @on-page-change="onPageChange"-->
+  <!--        @on-per-page-change="onPerPageChange"-->
+  <!--        @on-sort-change="onSortChange"-->
+  <!--        @on-search="onSearch"-->
+  <!--        :search-options="{-->
+  <!--        enabled: true,-->
+  <!--        placeholder: $t('Search_this_table'),  -->
+  <!--      }"-->
+  <!--        :select-options="{ -->
+  <!--          enabled: true ,-->
+  <!--          clearSelectionText: '',-->
+  <!--        }"-->
+  <!--        @on-selected-rows-change="selectionChanged"-->
+  <!--        :pagination-options="{-->
+  <!--        enabled: true,-->
+  <!--        mode: 'records',-->
+  <!--        nextLabel: 'next',-->
+  <!--        prevLabel: 'prev',-->
+  <!--      }"-->
+  <!--        styleClass="tableOne table-hover vgt-table"-->
+  <!--      >-->
+  <!--        <div slot="selected-row-actions">-->
+  <!--          <button class="btn btn-danger btn-sm" @click="delete_by_selected()">{{$t('Del')}}</button>-->
+  <!--        </div>-->
+  <!--        <div slot="table-actions" class="mt-2 mb-3">-->
+  <!--          <b-button variant="outline-info ripple m-1" size="sm" v-b-toggle.sidebar-right>-->
+  <!--            <i class="i-Filter-2"></i>-->
+  <!--            {{ $t("Filter") }}-->
+  <!--          </b-button>-->
+  <!--          <b-button @click="Transfer_PDF()" size="sm" variant="outline-success ripple m-1">-->
+  <!--            <i class="i-File-Copy"></i> PDF-->
+  <!--          </b-button>-->
+  <!--           <vue-excel-xlsx-->
+  <!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
+  <!--              :data="transfers"-->
+  <!--              :columns="columns"-->
+  <!--              :file-name="'transfers'"-->
+  <!--              :file-type="'xlsx'"-->
+  <!--              :sheet-name="'transfers'"-->
+  <!--              >-->
+  <!--              <i class="i-File-Excel"></i> EXCEL-->
+  <!--          </vue-excel-xlsx>-->
+  <!--          <router-link-->
+  <!--            class="btn-sm btn btn-primary ripple btn-icon m-1"-->
+  <!--            v-if="currentUserPermissions && currentUserPermissions.includes('transfer_add')"-->
+  <!--            to="/app/transfers/store"-->
+  <!--          >-->
+  <!--            <span class="ul-btn__icon">-->
+  <!--              <i class="i-Add"></i>-->
+  <!--            </span>-->
+  <!--            <span class="ul-btn__text ml-1">{{$t('Add')}}</span>-->
+  <!--          </router-link>-->
+  <!--        </div>-->
 
-<!--        <template slot="table-row" slot-scope="props">-->
-<!--          <span v-if="props.column.field == 'actions'">-->
-<!--            <a title="View" v-b-tooltip.hover @click="showDetails(props.row.id)">-->
-<!--              <i class="i-Eye text-25 text-info"></i>-->
-<!--            </a>-->
-<!--            <router-link-->
-<!--              v-if="currentUserPermissions && currentUserPermissions.includes('transfer_edit')"-->
-<!--              title="Edit"-->
-<!--              v-b-tooltip.hover-->
-<!--              :to="{ name:'edit_transfer', params: { id: props.row.id } }"-->
-<!--            >-->
-<!--              <i class="i-Edit text-25 text-success"></i>-->
-<!--            </router-link>-->
-<!--            <a-->
-<!--              title="Delete"-->
-<!--              v-b-tooltip.hover-->
-<!--              v-if="currentUserPermissions && currentUserPermissions.includes('transfer_delete')"-->
-<!--              @click="Remove_Transfer(props.row.id)"-->
-<!--            >-->
-<!--              <i class="i-Close-Window text-25 text-danger"></i>-->
-<!--            </a>-->
-<!--          </span>-->
-<!--          <div v-else-if="props.column.field == 'statut'">-->
-<!--            <span-->
-<!--              v-if="props.row.statut == 'completed'"-->
-<!--              class="badge badge-outline-success"-->
-<!--            >{{$t('complete')}}</span>-->
-<!--            <span-->
-<!--              v-else-if="props.row.statut == 'sent'"-->
-<!--              class="badge badge-outline-warning"-->
-<!--            >{{$t('Sent')}}</span>-->
-<!--            <span v-else class="badge badge-outline-danger">{{$t('Pending')}}</span>-->
-<!--          </div>-->
-<!--        </template>-->
-<!--      </vue-good-table>-->
-<!--    </div>-->
+  <!--        <template slot="table-row" slot-scope="props">-->
+  <!--          <span v-if="props.column.field == 'actions'">-->
+  <!--            <a title="View" v-b-tooltip.hover @click="showDetails(props.row.id)">-->
+  <!--              <i class="i-Eye text-25 text-info"></i>-->
+  <!--            </a>-->
+  <!--            <router-link-->
+  <!--              v-if="currentUserPermissions && currentUserPermissions.includes('transfer_edit')"-->
+  <!--              title="Edit"-->
+  <!--              v-b-tooltip.hover-->
+  <!--              :to="{ name:'edit_transfer', params: { id: props.row.id } }"-->
+  <!--            >-->
+  <!--              <i class="i-Edit text-25 text-success"></i>-->
+  <!--            </router-link>-->
+  <!--            <a-->
+  <!--              title="Delete"-->
+  <!--              v-b-tooltip.hover-->
+  <!--              v-if="currentUserPermissions && currentUserPermissions.includes('transfer_delete')"-->
+  <!--              @click="Remove_Transfer(props.row.id)"-->
+  <!--            >-->
+  <!--              <i class="i-Close-Window text-25 text-danger"></i>-->
+  <!--            </a>-->
+  <!--          </span>-->
+  <!--          <div v-else-if="props.column.field == 'statut'">-->
+  <!--            <span-->
+  <!--              v-if="props.row.statut == 'completed'"-->
+  <!--              class="badge badge-outline-success"-->
+  <!--            >{{$t('complete')}}</span>-->
+  <!--            <span-->
+  <!--              v-else-if="props.row.statut == 'sent'"-->
+  <!--              class="badge badge-outline-warning"-->
+  <!--            >{{$t('Sent')}}</span>-->
+  <!--            <span v-else class="badge badge-outline-danger">{{$t('Pending')}}</span>-->
+  <!--          </div>-->
+  <!--        </template>-->
+  <!--      </vue-good-table>-->
+  <!--    </div>-->
 
-<!--    &lt;!&ndash; multiple filters &ndash;&gt;-->
-<!--    <b-sidebar id="sidebar-right" :title="$t('Filter')" bg-variant="white" right shadow>-->
-<!--      <div class="px-3 py-2">-->
-<!--        <b-row>-->
-<!--          &lt;!&ndash; Reference  &ndash;&gt;-->
-<!--          <b-col md="12">-->
-<!--            <b-form-group :label="$t('Reference')">-->
-<!--              <b-form-input label="Reference" :placeholder="$t('Reference')" v-model="Filter_Ref"></b-form-input>-->
-<!--            </b-form-group>-->
-<!--          </b-col>-->
+  <!--    &lt;!&ndash; multiple filters &ndash;&gt;-->
+  <!--    <b-sidebar id="sidebar-right" :title="$t('Filter')" bg-variant="white" right shadow>-->
+  <!--      <div class="px-3 py-2">-->
+  <!--        <b-row>-->
+  <!--          &lt;!&ndash; Reference  &ndash;&gt;-->
+  <!--          <b-col md="12">-->
+  <!--            <b-form-group :label="$t('Reference')">-->
+  <!--              <b-form-input label="Reference" :placeholder="$t('Reference')" v-model="Filter_Ref"></b-form-input>-->
+  <!--            </b-form-group>-->
+  <!--          </b-col>-->
 
-<!--          &lt;!&ndash; From warehouse  &ndash;&gt;-->
-<!--          <b-col md="12">-->
-<!--            <b-form-group :label="$t('FromWarehouse')">-->
-<!--              <v-select-->
-<!--                :reduce="label => label.value"-->
-<!--                :placeholder="$t('Choose_Warehouse')"-->
-<!--                v-model="Filter_From"-->
-<!--                :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
-<!--              />-->
-<!--            </b-form-group>-->
-<!--          </b-col>-->
+  <!--          &lt;!&ndash; From warehouse  &ndash;&gt;-->
+  <!--          <b-col md="12">-->
+  <!--            <b-form-group :label="$t('FromWarehouse')">-->
+  <!--              <v-select-->
+  <!--                :reduce="label => label.value"-->
+  <!--                :placeholder="$t('Choose_Warehouse')"-->
+  <!--                v-model="Filter_From"-->
+  <!--                :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
+  <!--              />-->
+  <!--            </b-form-group>-->
+  <!--          </b-col>-->
 
-<!--          &lt;!&ndash; To warehouse  &ndash;&gt;-->
-<!--          <b-col md="12">-->
-<!--            <b-form-group :label="$t('ToWarehouse')">-->
-<!--              <v-select-->
-<!--                :reduce="label => label.value"-->
-<!--                :placeholder="$t('Choose_Warehouse')"-->
-<!--                v-model="Filter_To"-->
-<!--                :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
-<!--              />-->
-<!--            </b-form-group>-->
-<!--          </b-col>-->
+  <!--          &lt;!&ndash; To warehouse  &ndash;&gt;-->
+  <!--          <b-col md="12">-->
+  <!--            <b-form-group :label="$t('ToWarehouse')">-->
+  <!--              <v-select-->
+  <!--                :reduce="label => label.value"-->
+  <!--                :placeholder="$t('Choose_Warehouse')"-->
+  <!--                v-model="Filter_To"-->
+  <!--                :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
+  <!--              />-->
+  <!--            </b-form-group>-->
+  <!--          </b-col>-->
 
-<!--          &lt;!&ndash; Status  &ndash;&gt;-->
-<!--          <b-col md="12">-->
-<!--            <b-form-group :label="$t('Status')">-->
-<!--              <v-select-->
-<!--                v-model="Filter_status"-->
-<!--                :reduce="label => label.value"-->
-<!--                :placeholder="$t('Choose_Status')"-->
-<!--                :options="-->
-<!--                      [-->
-<!--                        {label: 'Completed', value: 'completed'},-->
-<!--                        {label: 'Sent', value: 'sent'},-->
-<!--                        {label: 'Pending', value: 'pending'},-->
-<!--                      ]"-->
-<!--              ></v-select>-->
-<!--            </b-form-group>-->
-<!--          </b-col>-->
+  <!--          &lt;!&ndash; Status  &ndash;&gt;-->
+  <!--          <b-col md="12">-->
+  <!--            <b-form-group :label="$t('Status')">-->
+  <!--              <v-select-->
+  <!--                v-model="Filter_status"-->
+  <!--                :reduce="label => label.value"-->
+  <!--                :placeholder="$t('Choose_Status')"-->
+  <!--                :options="-->
+  <!--                      [-->
+  <!--                        {label: 'Completed', value: 'completed'},-->
+  <!--                        {label: 'Sent', value: 'sent'},-->
+  <!--                        {label: 'Pending', value: 'pending'},-->
+  <!--                      ]"-->
+  <!--              ></v-select>-->
+  <!--            </b-form-group>-->
+  <!--          </b-col>-->
 
-<!--          <b-col md="6" sm="12">-->
-<!--            <b-button-->
-<!--              @click="Get_Transfers(serverParams.page)"-->
-<!--              variant="primary ripple m-1"-->
-<!--              size="sm"-->
-<!--              block-->
-<!--            >-->
-<!--              <i class="i-Filter-2"></i>-->
-<!--              {{ $t("Filter") }}-->
-<!--            </b-button>-->
-<!--          </b-col>-->
-<!--          <b-col md="6" sm="12">-->
-<!--            <b-button @click="Reset_Filter()" variant="danger ripple m-1" size="sm" block>-->
-<!--              <i class="i-Power-2"></i>-->
-<!--              {{ $t("Reset") }}-->
-<!--            </b-button>-->
-<!--          </b-col>-->
-<!--        </b-row>-->
-<!--      </div>-->
-<!--    </b-sidebar>-->
+  <!--          <b-col md="6" sm="12">-->
+  <!--            <b-button-->
+  <!--              @click="Get_Transfers(serverParams.page)"-->
+  <!--              variant="primary ripple m-1"-->
+  <!--              size="sm"-->
+  <!--              block-->
+  <!--            >-->
+  <!--              <i class="i-Filter-2"></i>-->
+  <!--              {{ $t("Filter") }}-->
+  <!--            </b-button>-->
+  <!--          </b-col>-->
+  <!--          <b-col md="6" sm="12">-->
+  <!--            <b-button @click="Reset_Filter()" variant="danger ripple m-1" size="sm" block>-->
+  <!--              <i class="i-Power-2"></i>-->
+  <!--              {{ $t("Reset") }}-->
+  <!--            </b-button>-->
+  <!--          </b-col>-->
+  <!--        </b-row>-->
+  <!--      </div>-->
+  <!--    </b-sidebar>-->
 
-<!--    &lt;!&ndash; Transfer Details &ndash;&gt;-->
-<!--    <b-modal ok-only size="lg" id="showDetails" :title="$t('TransferDetail')">-->
-<!--      <b-row>-->
-<!--        <b-col lg="5" md="12" sm="12" class="mt-3">-->
-<!--          <table class="table table-hover table-bordered table-sm">-->
-<!--            <tbody>-->
-<!--              &lt;!&ndash; date &ndash;&gt;-->
-<!--              <tr>-->
-<!--                <td>{{$t('date')}}</td>-->
-<!--                <th>{{transfer.date}}</th>-->
-<!--              </tr>-->
-<!--              &lt;!&ndash; Reference &ndash;&gt;-->
-<!--              <tr>-->
-<!--                <td>{{$t('Reference')}}</td>-->
-<!--                <th>{{transfer.Ref}}</th>-->
-<!--              </tr>-->
-<!--              &lt;!&ndash; From warehouse &ndash;&gt;-->
-<!--              <tr>-->
-<!--                <td>{{$t('FromWarehouse')}}</td>-->
-<!--                <th>{{transfer.from_warehouse}}</th>-->
-<!--              </tr>-->
-<!--              &lt;!&ndash; To warehouse &ndash;&gt;-->
-<!--              <tr>-->
-<!--                <td>{{$t('ToWarehouse')}}</td>-->
-<!--                <th>{{transfer.to_warehouse}}</th>-->
-<!--              </tr>-->
-<!--              &lt;!&ndash; Grand Total &ndash;&gt;-->
-<!--              <tr>-->
-<!--                <td>{{$t('Total')}}</td>-->
-<!--                <th>{{currentUser.currency}}{{formatNumber(transfer.GrandTotal ,2)}}</th>-->
-<!--              </tr>-->
-<!--              &lt;!&ndash; Status &ndash;&gt;-->
-<!--              <tr>-->
-<!--                <td>{{$t('Status')}}</td>-->
-<!--                <th>-->
-<!--                  <span-->
-<!--                    v-if="transfer.statut == 'completed'"-->
-<!--                    class="badge badge-outline-success"-->
-<!--                  >{{$t('complete')}}</span>-->
-<!--                  <span-->
-<!--                    v-else-if="transfer.statut == 'sent'"-->
-<!--                    class="badge badge-outline-warning"-->
-<!--                  >{{$t('Sent')}}</span>-->
-<!--                  <span v-else class="badge badge-outline-danger">{{$t('Pending')}}</span>-->
-<!--                </th>-->
-<!--              </tr>-->
-<!--            </tbody>-->
-<!--          </table>-->
-<!--        </b-col>-->
-<!--        <b-col lg="7" md="12" sm="12" class="mt-3">-->
-<!--          <div class="table-responsive">-->
-<!--            <table class="table table-hover table-bordered table-sm">-->
-<!--              <thead>-->
-<!--                <tr>-->
-<!--                  <th scope="col">{{$t('ProductName')}}</th>-->
-<!--                  <th scope="col">{{$t('CodeProduct')}}</th>-->
-<!--                  <th scope="col">{{$t('Quantity')}}</th>-->
-<!--                  <th scope="col">{{$t('SubTotal')}}</th>-->
-<!--                </tr>-->
-<!--              </thead>-->
-<!--              <tbody>-->
-<!--                <tr v-for="detail in details">-->
-<!--                  <td>{{detail.name}}</td>-->
-<!--                  <td>{{detail.code}}</td>-->
-<!--                  <td>{{formatNumber(detail.quantity ,2)}} {{detail.unit}}</td>-->
-<!--                  <td>{{currentUser.currency}} {{detail.total.toFixed(2)}}</td>-->
-<!--                </tr>-->
-<!--              </tbody>-->
-<!--            </table>-->
-<!--          </div>-->
-<!--        </b-col>-->
-<!--      </b-row>-->
-<!--         <hr v-show="transfer.note">-->
-<!--          <b-row class="mt-4">-->
-<!--           <b-col md="12">-->
-<!--             <p>{{transfer.note}}</p>-->
-<!--           </b-col>-->
-<!--        </b-row>-->
-<!--    </b-modal>-->
-<!--  </div>-->
+  <!--    &lt;!&ndash; Transfer Details &ndash;&gt;-->
+  <!--    <b-modal ok-only size="lg" id="showDetails" :title="$t('TransferDetail')">-->
+  <!--      <b-row>-->
+  <!--        <b-col lg="5" md="12" sm="12" class="mt-3">-->
+  <!--          <table class="table table-hover table-bordered table-sm">-->
+  <!--            <tbody>-->
+  <!--              &lt;!&ndash; date &ndash;&gt;-->
+  <!--              <tr>-->
+  <!--                <td>{{$t('date')}}</td>-->
+  <!--                <th>{{transfer.date}}</th>-->
+  <!--              </tr>-->
+  <!--              &lt;!&ndash; Reference &ndash;&gt;-->
+  <!--              <tr>-->
+  <!--                <td>{{$t('Reference')}}</td>-->
+  <!--                <th>{{transfer.Ref}}</th>-->
+  <!--              </tr>-->
+  <!--              &lt;!&ndash; From warehouse &ndash;&gt;-->
+  <!--              <tr>-->
+  <!--                <td>{{$t('FromWarehouse')}}</td>-->
+  <!--                <th>{{transfer.from_warehouse}}</th>-->
+  <!--              </tr>-->
+  <!--              &lt;!&ndash; To warehouse &ndash;&gt;-->
+  <!--              <tr>-->
+  <!--                <td>{{$t('ToWarehouse')}}</td>-->
+  <!--                <th>{{transfer.to_warehouse}}</th>-->
+  <!--              </tr>-->
+  <!--              &lt;!&ndash; Grand Total &ndash;&gt;-->
+  <!--              <tr>-->
+  <!--                <td>{{$t('Total')}}</td>-->
+  <!--                <th>{{currentUser.currency}}{{formatNumber(transfer.GrandTotal ,2)}}</th>-->
+  <!--              </tr>-->
+  <!--              &lt;!&ndash; Status &ndash;&gt;-->
+  <!--              <tr>-->
+  <!--                <td>{{$t('Status')}}</td>-->
+  <!--                <th>-->
+  <!--                  <span-->
+  <!--                    v-if="transfer.statut == 'completed'"-->
+  <!--                    class="badge badge-outline-success"-->
+  <!--                  >{{$t('complete')}}</span>-->
+  <!--                  <span-->
+  <!--                    v-else-if="transfer.statut == 'sent'"-->
+  <!--                    class="badge badge-outline-warning"-->
+  <!--                  >{{$t('Sent')}}</span>-->
+  <!--                  <span v-else class="badge badge-outline-danger">{{$t('Pending')}}</span>-->
+  <!--                </th>-->
+  <!--              </tr>-->
+  <!--            </tbody>-->
+  <!--          </table>-->
+  <!--        </b-col>-->
+  <!--        <b-col lg="7" md="12" sm="12" class="mt-3">-->
+  <!--          <div class="table-responsive">-->
+  <!--            <table class="table table-hover table-bordered table-sm">-->
+  <!--              <thead>-->
+  <!--                <tr>-->
+  <!--                  <th scope="col">{{$t('ProductName')}}</th>-->
+  <!--                  <th scope="col">{{$t('CodeProduct')}}</th>-->
+  <!--                  <th scope="col">{{$t('Quantity')}}</th>-->
+  <!--                  <th scope="col">{{$t('SubTotal')}}</th>-->
+  <!--                </tr>-->
+  <!--              </thead>-->
+  <!--              <tbody>-->
+  <!--                <tr v-for="detail in details">-->
+  <!--                  <td>{{detail.name}}</td>-->
+  <!--                  <td>{{detail.code}}</td>-->
+  <!--                  <td>{{formatNumber(detail.quantity ,2)}} {{detail.unit}}</td>-->
+  <!--                  <td>{{currentUser.currency}} {{detail.total.toFixed(2)}}</td>-->
+  <!--                </tr>-->
+  <!--              </tbody>-->
+  <!--            </table>-->
+  <!--          </div>-->
+  <!--        </b-col>-->
+  <!--      </b-row>-->
+  <!--         <hr v-show="transfer.note">-->
+  <!--          <b-row class="mt-4">-->
+  <!--           <b-col md="12">-->
+  <!--             <p>{{transfer.note}}</p>-->
+  <!--           </b-col>-->
+  <!--        </b-row>-->
+  <!--    </b-modal>-->
+  <!--  </div>-->
 </template>
 
 <script>

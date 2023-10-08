@@ -136,7 +136,7 @@ function print_product() {
             <v-row class="mt-4">
               <!-- Warehouse Quantity -->
               <v-col cols="12" md="5">
-                <v-table hover density="compact">
+                <v-table hover>
                   <thead>
                   <tr>
                     <th>Agencia</th>
@@ -165,7 +165,7 @@ function print_product() {
                   md="7"
                   v-if="product.is_variant == 'yes'"
               >
-                <v-table density="compact" hover>
+                <v-table hover>
                   <thead>
                   <tr>
                     <th>Agencia</th>

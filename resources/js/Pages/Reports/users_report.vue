@@ -1,40 +1,40 @@
 <template>
-<!--  <div class="main-content">-->
-<!--    <breadcumb :page="$t('Users_Report')" :folder="$t('Reports')"/>-->
+  <!--  <div class="main-content">-->
+  <!--    <breadcumb :page="$t('Users_Report')" :folder="$t('Reports')"/>-->
 
-<!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
-<!--    <b-card class="wrapper" v-if="!isLoading">-->
-<!--      <vue-good-table-->
-<!--        mode="remote"-->
-<!--        :columns="columns"-->
-<!--        :totalRows="totalRows"-->
-<!--        :rows="users"-->
-<!--        @on-page-change="onPageChange"-->
-<!--        @on-per-page-change="onPerPageChange"-->
-<!--        @on-sort-change="onSortChange"-->
-<!--        @on-search="onSearch"-->
-<!--        :search-options="{-->
-<!--        placeholder: $t('Search_this_table'),-->
-<!--        enabled: true,-->
-<!--      }"-->
-<!--        :pagination-options="{-->
-<!--        enabled: true,-->
-<!--        mode: 'records',-->
-<!--        nextLabel: 'next',-->
-<!--        prevLabel: 'prev',-->
-<!--      }"-->
-<!--        styleClass="tableOne table-hover vgt-table mt-3"-->
-<!--      >-->
-<!--        <template slot="table-row" slot-scope="props">-->
-<!--          <span v-if="props.column.field == 'actions'">-->
-<!--            <router-link title="Report" :to="'/app/reports/detail_user/'+props.row.id">-->
-<!--              <b-button variant="primary">{{$t('Reports')}}</b-button>-->
-<!--            </router-link>-->
-<!--          </span>-->
-<!--        </template>-->
-<!--      </vue-good-table>-->
-<!--    </b-card>-->
-<!--  </div>-->
+  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+  <!--    <b-card class="wrapper" v-if="!isLoading">-->
+  <!--      <vue-good-table-->
+  <!--        mode="remote"-->
+  <!--        :columns="columns"-->
+  <!--        :totalRows="totalRows"-->
+  <!--        :rows="users"-->
+  <!--        @on-page-change="onPageChange"-->
+  <!--        @on-per-page-change="onPerPageChange"-->
+  <!--        @on-sort-change="onSortChange"-->
+  <!--        @on-search="onSearch"-->
+  <!--        :search-options="{-->
+  <!--        placeholder: $t('Search_this_table'),-->
+  <!--        enabled: true,-->
+  <!--      }"-->
+  <!--        :pagination-options="{-->
+  <!--        enabled: true,-->
+  <!--        mode: 'records',-->
+  <!--        nextLabel: 'next',-->
+  <!--        prevLabel: 'prev',-->
+  <!--      }"-->
+  <!--        styleClass="tableOne table-hover vgt-table mt-3"-->
+  <!--      >-->
+  <!--        <template slot="table-row" slot-scope="props">-->
+  <!--          <span v-if="props.column.field == 'actions'">-->
+  <!--            <router-link title="Report" :to="'/app/reports/detail_user/'+props.row.id">-->
+  <!--              <b-button variant="primary">{{$t('Reports')}}</b-button>-->
+  <!--            </router-link>-->
+  <!--          </span>-->
+  <!--        </template>-->
+  <!--      </vue-good-table>-->
+  <!--    </b-card>-->
+  <!--  </div>-->
 </template>
 
 
