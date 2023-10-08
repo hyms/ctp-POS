@@ -26,33 +26,33 @@ class Payment_gateway_SettingsController extends Controller
         return response()->json(['gateway' => $item], 200);
     }
 
-      //-------------- Update  Payment Gateway ---------------\\
+    //-------------- Update  Payment Gateway ---------------\\
 
-      public function Update_payment_gateway(Request $request)
-      {
-          $this->authorizeForUser($request->user('api'), 'payment_gateway', Setting::class);
+    public function Update_payment_gateway(Request $request)
+    {
+        $this->authorizeForUser($request->user('api'), 'payment_gateway', Setting::class);
 
-          if($request['deleted'] == 'true'){
+        if ($request['deleted'] == 'true') {
             $this->setEnvironmentValue([
                 'STRIPE_KEY' => '',
                 'STRIPE_SECRET' => '',
             ]);
 
-        }else{
+        } else {
             $this->setEnvironmentValue([
-                'STRIPE_KEY' => $request['stripe_key'] !== null?'"' . $request['stripe_key'] . '"':'',
-                'STRIPE_SECRET' => $request['stripe_secret'] !== null?'"' . $request['stripe_secret'] . '"':'"' . env('STRIPE_SECRET') . '"',
+                'STRIPE_KEY' => $request['stripe_key'] !== null ? '"' . $request['stripe_key'] . '"' : '',
+                'STRIPE_SECRET' => $request['stripe_secret'] !== null ? '"' . $request['stripe_secret'] . '"' : '"' . env('STRIPE_SECRET') . '"',
             ]);
         }
 
-            Artisan::call('config:cache');
-            Artisan::call('config:clear');
+        Artisan::call('config:cache');
+        Artisan::call('config:clear');
 
         return response()->json(['success' => true]);
 
-      }
+    }
 
-   
+
     //-------------- Set Environment Value ---------------\\
 
     public function setEnvironmentValue(array $values)
@@ -62,11 +62,11 @@ class Payment_gateway_SettingsController extends Controller
         $str .= "\r\n";
         if (count($values) > 0) {
             foreach ($values as $envKey => $envValue) {
-    
+
                 $keyPosition = strpos($str, "$envKey=");
                 $endOfLinePosition = strpos($str, "\n", $keyPosition);
                 $oldLine = substr($str, $keyPosition, $endOfLinePosition - $keyPosition);
-    
+
                 if (is_bool($keyPosition) && $keyPosition === false) {
                     // variable doesnot exist
                     $str .= "$envKey=$envValue";
@@ -74,17 +74,17 @@ class Payment_gateway_SettingsController extends Controller
                 } else {
                     // variable exist                    
                     $str = str_replace($oldLine, "$envKey=$envValue", $str);
-                }            
+                }
             }
         }
-    
+
         $str = substr($str, 0, -1);
         if (!file_put_contents($envFile, $str)) {
             return false;
         }
-    
-        app()->loadEnvironmentFrom($envFile);    
-    
+
+        app()->loadEnvironmentFrom($envFile);
+
         return true;
     }
 

@@ -35,20 +35,19 @@ class DashboardController extends Controller
     public function dashboard_data(Request $request)
     {
         $user_auth = auth()->user();
-        if($user_auth->is_all_warehouses){
+        if ($user_auth->is_all_warehouses) {
             $array_warehouses_id = Warehouse::where('deleted_at', '=', null)->pluck('id')->toArray();
             $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        }else{
+        } else {
             $array_warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $array_warehouses_id)->get(['id', 'name']);
         }
 
-        if(empty($request->warehouse_id)){
+        if (empty($request->warehouse_id)) {
             $warehouse_id = 0;
-        }else{
+        } else {
             $warehouse_id = $request->warehouse_id;
         }
-
 
 
         $dataSales = $this->SalesChart($warehouse_id, $array_warehouses_id);
@@ -58,7 +57,7 @@ class DashboardController extends Controller
         $Top_Products_Year = $this->Top_Products_Year($warehouse_id, $array_warehouses_id);
         $report_dashboard = $this->report_dashboard($warehouse_id, $array_warehouses_id);
 
-        return Inertia::render('Dashboard',[
+        return Inertia::render('Dashboard', [
 //        return response()->json([
             'warehouses' => $warehouses,
             'sales_report' => $dataSales,
@@ -98,11 +97,10 @@ class DashboardController extends Controller
             ->where(function ($query) use ($warehouse_id, $array_warehouses_id) {
                 if ($warehouse_id !== 0) {
                     return $query->where('warehouse_id', $warehouse_id);
-                }else{
+                } else {
                     return $query->whereIn('warehouse_id', $array_warehouses_id);
                 }
             })
-
             ->groupBy(DB::raw("DATE_FORMAT(date,'%Y-%m-%d')"))
             ->orderBy('date', 'asc')
             ->get([
@@ -153,7 +151,7 @@ class DashboardController extends Controller
             ->where(function ($query) use ($warehouse_id, $array_warehouses_id) {
                 if ($warehouse_id !== 0) {
                     return $query->where('warehouse_id', $warehouse_id);
-                }else{
+                } else {
                     return $query->whereIn('warehouse_id', $array_warehouses_id);
                 }
             })
@@ -199,11 +197,10 @@ class DashboardController extends Controller
             ->where(function ($query) use ($warehouse_id, $array_warehouses_id) {
                 if ($warehouse_id !== 0) {
                     return $query->where('sales.warehouse_id', $warehouse_id);
-                }else{
+                } else {
                     return $query->whereIn('sales.warehouse_id', $array_warehouses_id);
                 }
             })
-
             ->join('clients', 'sales.client_id', '=', 'clients.id')
             ->select(DB::raw('clients.company_name as name'), DB::raw("count(*) as value"))
             ->groupBy('clients.company_name')
@@ -238,7 +235,7 @@ class DashboardController extends Controller
             ->where(function ($query) use ($warehouse_id, $array_warehouses_id) {
                 if ($warehouse_id !== 0) {
                     return $query->where('sales.warehouse_id', $warehouse_id);
-                }else{
+                } else {
                     return $query->whereIn('sales.warehouse_id', $array_warehouses_id);
                 }
             })
@@ -279,7 +276,7 @@ class DashboardController extends Controller
             ->where(function ($query) use ($warehouse_id, $array_warehouses_id) {
                 if ($warehouse_id !== 0) {
                     return $query->where('sales.warehouse_id', $warehouse_id);
-                }else{
+                } else {
                     return $query->whereIn('sales.warehouse_id', $array_warehouses_id);
                 }
             })
@@ -294,18 +291,17 @@ class DashboardController extends Controller
             ->get();
 
         // Stock Alerts
-        $product_warehouse_data = product_warehouse::with('warehouse', 'product' ,'productVariant')
+        $product_warehouse_data = product_warehouse::with('warehouse', 'product', 'productVariant')
             ->join('products', 'product_warehouse.product_id', '=', 'products.id')
             ->whereRaw('qty <= stock_alert')
             ->where('product_warehouse.deleted_at', null)
             ->where(function ($query) use ($warehouse_id, $array_warehouses_id) {
                 if ($warehouse_id !== 0) {
                     return $query->where('product_warehouse.warehouse_id', $warehouse_id);
-                }else{
+                } else {
                     return $query->whereIn('product_warehouse.warehouse_id', $array_warehouses_id);
                 }
             })
-
             ->take('5')->get();
 
         $stock_alert = [];
@@ -340,7 +336,7 @@ class DashboardController extends Controller
             ->where(function ($query) use ($warehouse_id, $array_warehouses_id) {
                 if ($warehouse_id !== 0) {
                     return $query->where('warehouse_id', $warehouse_id);
-                }else{
+                } else {
                     return $query->whereIn('warehouse_id', $array_warehouses_id);
                 }
             })
@@ -362,7 +358,7 @@ class DashboardController extends Controller
             ->where(function ($query) use ($warehouse_id, $array_warehouses_id) {
                 if ($warehouse_id !== 0) {
                     return $query->where('warehouse_id', $warehouse_id);
-                }else{
+                } else {
                     return $query->whereIn('warehouse_id', $array_warehouses_id);
                 }
             })
@@ -416,7 +412,7 @@ class DashboardController extends Controller
         $last_sales = [];
 
         //last sales
-        $Sales = Sale::with('details', 'client', 'facture','warehouse')->where('deleted_at', '=', null)
+        $Sales = Sale::with('details', 'client', 'facture', 'warehouse')->where('deleted_at', '=', null)
 //            ->where(function ($query) use ($view_records) {
 //                if (!$view_records) {
 //                    return $query->where('user_id', '=', Auth::user()->id);
@@ -425,7 +421,7 @@ class DashboardController extends Controller
             ->where(function ($query) use ($warehouse_id, $array_warehouses_id) {
                 if ($warehouse_id !== 0) {
                     return $query->where('warehouse_id', $warehouse_id);
-                }else{
+                } else {
                     return $query->whereIn('warehouse_id', $array_warehouses_id);
                 }
             })
@@ -484,7 +480,7 @@ class DashboardController extends Controller
                     return $query->whereHas('sale', function ($q) use ($array_warehouses_id, $warehouse_id) {
                         $q->where('warehouse_id', $warehouse_id);
                     });
-                }else{
+                } else {
                     return $query->whereHas('sale', function ($q) use ($array_warehouses_id, $warehouse_id) {
                         $q->whereIn('warehouse_id', $array_warehouses_id);
                     });
@@ -510,7 +506,7 @@ class DashboardController extends Controller
                     return $query->whereHas('SaleReturn', function ($q) use ($array_warehouses_id, $warehouse_id) {
                         $q->where('warehouse_id', $warehouse_id);
                     });
-                }else{
+                } else {
                     return $query->whereHas('SaleReturn', function ($q) use ($array_warehouses_id, $warehouse_id) {
                         $q->whereIn('warehouse_id', $array_warehouses_id);
                     });
@@ -586,7 +582,7 @@ class DashboardController extends Controller
             ->where(function ($query) use ($warehouse_id, $array_warehouses_id) {
                 if ($warehouse_id !== 0) {
                     return $query->where('warehouse_id', $warehouse_id);
-                }else{
+                } else {
                     return $query->whereIn('warehouse_id', $array_warehouses_id);
                 }
             })
@@ -599,7 +595,7 @@ class DashboardController extends Controller
             ->pluck('count', 'date');
 
         $paymen_recieved = $this->array_merge_numeric_values($Payment_Sale);
-        $payment_sent = $this->array_merge_numeric_values( $Payment_Sale_Returns, $Payment_Expense);
+        $payment_sent = $this->array_merge_numeric_values($Payment_Sale_Returns, $Payment_Expense);
 
         $dates_recieved = $dates->merge($paymen_recieved);
         $dates_sent = $dates->merge($payment_sent);

@@ -23,7 +23,7 @@ class SetupController extends Controller
             $env = preg_split('/(\r\n|\n|\r)/', $env);
 
             // Loop through given data
-            foreach ((array) $data as $key => $value) {
+            foreach ((array)$data as $key => $value) {
 
                 // Loop through .env-data
                 foreach ($env as $env_key => $env_value) {
@@ -171,14 +171,14 @@ class SetupController extends Controller
             Artisan::call('passport:install --force');
             Storage::disk('public')->put('installed', 'Contents');
 
-            
+
         } catch (Exception $e) {
-            
+
             return $e->getMessage();
-            
+
             return 'Something went wrong';
         }
-        
+
         return view('setup.finishedSetup');
     }
 
@@ -205,7 +205,7 @@ class SetupController extends Controller
         if (strlen($request->app_key) > 0) {
             $request->session()->put('env.APP_KEY', $request->app_key);
         }
-        
+
 
         return $this->viewStep2();
     }

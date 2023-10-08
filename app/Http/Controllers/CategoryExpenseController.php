@@ -22,7 +22,7 @@ class CategoryExpenseController extends Controller
         $ExpenseCategory = ExpenseCategory::where('deleted_at', '=', null)->get();
 
         Inertia::share('titlePage', 'Categoria de Gastos');
-        return Inertia::render('Expense/Category_Expense',[
+        return Inertia::render('Expense/Category_Expense', [
             'Expenses_category' => $ExpenseCategory,
         ]);
     }
@@ -39,7 +39,7 @@ class CategoryExpenseController extends Controller
 
         ExpenseCategory::create([
             'user_id' => Auth::user()->id,
-            'description' => $request['description']??"",
+            'description' => $request['description'] ?? "",
             'name' => $request['name'],
         ]);
 
@@ -48,9 +48,10 @@ class CategoryExpenseController extends Controller
 
     //------------ function show -----------\\
 
-    public function show($id){
-    //
-    
+    public function show($id)
+    {
+        //
+
     }
 
     //-------------- Update Category ---------------\\

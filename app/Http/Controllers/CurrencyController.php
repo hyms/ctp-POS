@@ -26,7 +26,7 @@ class CurrencyController extends Controller
 
         $currencies = Currency::where('deleted_at', '=', null)
 
-        // Search With Multiple Param
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('name', 'LIKE', "%{$request->search}%")
@@ -34,7 +34,7 @@ class CurrencyController extends Controller
                 });
             });
         $totalRows = $currencies->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $currencies = $currencies->offset($offSet)
@@ -72,10 +72,11 @@ class CurrencyController extends Controller
 
     //------------ function show -----------\\
 
-    public function show($id){
+    public function show($id)
+    {
         //
-        
-        }
+
+    }
 
     //---------------- UPDATE Currency -------------\\
 

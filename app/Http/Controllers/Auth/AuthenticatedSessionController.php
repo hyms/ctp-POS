@@ -48,7 +48,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(RouteServiceProvider::HOME);
         }
 
-        return Redirect::back()->withErrors(['Error'=>'Usuario o Contraseña Invalido']);
+        return Redirect::back()->withErrors(['Error' => 'Usuario o Contraseña Invalido']);
     }
 
     /**

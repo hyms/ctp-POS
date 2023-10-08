@@ -24,13 +24,14 @@ class PDFController extends Controller
 {
     protected $mpdf;
 
-    public function printHtml(Request $request){
+    public function printHtml(Request $request)
+    {
         try {
             request()->validate([
                 'body' => 'required',
             ]);
 
-            $this->mpdf = new Mpdf(['tempDir' =>storage_path('app/tmp')]);
+            $this->mpdf = new Mpdf(['tempDir' => storage_path('app/tmp')]);
             $view = View::make('pdfClean', $request->all());
             $html = $view->render();
             $this->mpdf->WriteHTML($html);

@@ -42,7 +42,7 @@ class ProvidersController extends BaseController
 
         //Multiple Filter
         $Filtred = $helpers->filter($providers, $columns, $param, $request)
-        // Search With Multiple Param
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('name', 'LIKE', "%{$request->search}%")
@@ -52,7 +52,7 @@ class ProvidersController extends BaseController
                 });
             });
         $totalRows = $Filtred->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $providers = $Filtred->offset($offSet)
@@ -132,10 +132,11 @@ class ProvidersController extends BaseController
 
     //------------ function show -----------\\
 
-    public function show($id){
+    public function show($id)
+    {
         //
-        
-        }
+
+    }
 
     //----------- Update Supplier-------\\
 
@@ -258,7 +259,7 @@ class ProvidersController extends BaseController
                         'tax_number' => $value['tax_number'] == '' ? null : $value['tax_number'],
                     ]);
                 }
-                
+
             }
 
             return response()->json([
@@ -274,76 +275,76 @@ class ProvidersController extends BaseController
     public function pay_supplier_due(Request $request)
     {
         $this->authorizeForUser($request->user('api'), 'pay_supplier_due', Provider::class);
-       
-        if($request['amount'] > 0){
-           $provider_purchases_due = Purchase::where('deleted_at', '=', null)
-           ->where([
-               ['payment_statut', '!=', 'paid'],
-               ['provider_id', $request->provider_id]
-           ])->get();
 
-           $paid_amount_total = $request->amount;
+        if ($request['amount'] > 0) {
+            $provider_purchases_due = Purchase::where('deleted_at', '=', null)
+                ->where([
+                    ['payment_statut', '!=', 'paid'],
+                    ['provider_id', $request->provider_id]
+                ])->get();
 
-           foreach($provider_purchases_due as $key => $provider_purchase){
-               if($paid_amount_total == 0)
-               break;
-               $due = $provider_purchase->GrandTotal  - $provider_purchase->paid_amount;
+            $paid_amount_total = $request->amount;
 
-               if($paid_amount_total >= $due){
-                   $amount = $due;
-                   $payment_status = 'paid';
-               }else{
-                   $amount = $paid_amount_total;
-                   $payment_status = 'partial';
-               }
+            foreach ($provider_purchases_due as $key => $provider_purchase) {
+                if ($paid_amount_total == 0)
+                    break;
+                $due = $provider_purchase->GrandTotal - $provider_purchase->paid_amount;
 
-               $payment_purchase = new PaymentPurchase();
-               $payment_purchase->purchase_id = $provider_purchase->id;
-               $payment_purchase->Ref = app('App\Http\Controllers\PaymentPurchasesController')->getNumberOrder();
-               $payment_purchase->date = Carbon::now();
-               $payment_purchase->Reglement = $request['Reglement'];
-               $payment_purchase->montant = $amount;
-               $payment_purchase->change = 0;
-               $payment_purchase->notes = $request['notes'];
-               $payment_purchase->user_id = Auth::user()->id;
-               $payment_purchase->save();
+                if ($paid_amount_total >= $due) {
+                    $amount = $due;
+                    $payment_status = 'paid';
+                } else {
+                    $amount = $paid_amount_total;
+                    $payment_status = 'partial';
+                }
 
-               $provider_purchase->paid_amount += $amount;
-               $provider_purchase->payment_statut = $payment_status;
-               $provider_purchase->save();
+                $payment_purchase = new PaymentPurchase();
+                $payment_purchase->purchase_id = $provider_purchase->id;
+                $payment_purchase->Ref = app('App\Http\Controllers\PaymentPurchasesController')->getNumberOrder();
+                $payment_purchase->date = Carbon::now();
+                $payment_purchase->Reglement = $request['Reglement'];
+                $payment_purchase->montant = $amount;
+                $payment_purchase->change = 0;
+                $payment_purchase->notes = $request['notes'];
+                $payment_purchase->user_id = Auth::user()->id;
+                $payment_purchase->save();
 
-               $paid_amount_total -= $amount;
-           }
-       }
-       
+                $provider_purchase->paid_amount += $amount;
+                $provider_purchase->payment_statut = $payment_status;
+                $provider_purchase->save();
+
+                $paid_amount_total -= $amount;
+            }
+        }
+
         return response()->json(['success' => true]);
 
     }
 
-     //------------- pay_purchase_return_due -------------\\
+    //------------- pay_purchase_return_due -------------\\
 
     public function pay_purchase_return_due(Request $request)
     {
         $this->authorizeForUser($request->user('api'), 'pay_purchase_return_due', Provider::class);
-        
-        if($request['amount'] > 0){
+
+        if ($request['amount'] > 0) {
             $supplier_purchase_return_due = PurchaseReturn::where('deleted_at', '=', null)
-            ->where([
-                ['payment_statut', '!=', 'paid'],
-                ['provider_id', $request->provider_id]
-            ])->get();
+                ->where([
+                    ['payment_statut', '!=', 'paid'],
+                    ['provider_id', $request->provider_id]
+                ])->get();
 
             $paid_amount_total = $request->amount;
 
-            foreach($supplier_purchase_return_due as $key => $supplier_purchase_return){
-                if($paid_amount_total == 0)
-                break;
-                $due = $supplier_purchase_return->GrandTotal  - $supplier_purchase_return->paid_amount;
+            foreach ($supplier_purchase_return_due as $key => $supplier_purchase_return) {
+                if ($paid_amount_total == 0)
+                    break;
+                $due = $supplier_purchase_return->GrandTotal - $supplier_purchase_return->paid_amount;
 
-                if($paid_amount_total >= $due){
+                if ($paid_amount_total >= $due) {
                     $amount = $due;
                     $payment_status = 'paid';
-                }else{
+                } else {
                     $amount = $paid_amount_total;
                     $payment_status = 'partial';
                 }
@@ -366,7 +367,7 @@ class ProvidersController extends BaseController
                 $paid_amount_total -= $amount;
             }
         }
-        
+
         return response()->json(['success' => true]);
 
     }

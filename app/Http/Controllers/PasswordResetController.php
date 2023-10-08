@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Mail\Password_Reset_Request;
@@ -49,6 +50,7 @@ class PasswordResetController extends BaseController
             'message' => 'We have e-mailed your password reset link!',
         ], 200);
     }
+
     /**
      * Find token password reset
      *
@@ -77,9 +79,9 @@ class PasswordResetController extends BaseController
 
         return view('auth.passwords.reset', ["token" => $token]);
     }
+
     /**
      * Reset password
-
      */
     public function reset(Request $request)
     {

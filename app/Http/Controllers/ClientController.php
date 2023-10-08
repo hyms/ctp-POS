@@ -70,7 +70,7 @@ class ClientController extends Controller
         $company_info = Setting::where('deleted_at', '=', null)->first();
 
         Inertia::share('titlePage', 'Clientes');
-        return Inertia::render('People/Clients',[
+        return Inertia::render('People/Clients', [
             'clients' => $data,
             'company_info' => $company_info,
         ]);
@@ -83,28 +83,29 @@ class ClientController extends Controller
 //        $this->authorizeForUser($request->user('api'), 'create', Client::class);
 
         $this->validate($request, [
-            'name' => 'required',
+                'name' => 'required',
             ]
         );
 
         Client::create([
             'name' => $request['name'],
             'code' => $this->getNumberOrder(),
-            'adresse' => $request['adresse']??'',
-            'phone' => $request['phone']??'',
-            'email' => $request['email']??'',
-            'company_name' => $request['company_name']??'',
-            'city' => $request['city']??'',
-            'nit_ci' => $request['nit_ci']??'',
+            'adresse' => $request['adresse'] ?? '',
+            'phone' => $request['phone'] ?? '',
+            'email' => $request['email'] ?? '',
+            'company_name' => $request['company_name'] ?? '',
+            'city' => $request['city'] ?? '',
+            'nit_ci' => $request['nit_ci'] ?? '',
         ]);
         return response()->json(['success' => true]);
     }
 
     //------------ function show -----------\\
 
-    public function show($id){
+    public function show($id)
+    {
         //
-        
+
     }
 
     //------------- Update Customer -------------\\
@@ -112,20 +113,20 @@ class ClientController extends Controller
     public function update(Request $request, $id)
     {
 //        $this->authorizeForUser($request->user('api'), 'update', Client::class);
-        
+
         $this->validate($request, [
-            'name' => 'required',
+                'name' => 'required',
             ]
         );
 
         Client::whereId($id)->update([
             'name' => $request['name'],
-            'adresse' => $request['adresse']??'',
-            'phone' => $request['phone']??'',
-            'email' => $request['email']??'',
-            'company_name' => $request['company_name']??'',
-            'city' => $request['city']??'',
-            'nit_ci' => $request['nit_ci']??'',
+            'adresse' => $request['adresse'] ?? '',
+            'phone' => $request['phone'] ?? '',
+            'email' => $request['email'] ?? '',
+            'company_name' => $request['company_name'] ?? '',
+            'city' => $request['city'] ?? '',
+            'nit_ci' => $request['nit_ci'] ?? '',
         ]);
         return response()->json(['success' => true]);
 
@@ -154,10 +155,10 @@ class ClientController extends Controller
         } else {
             $code = 1;
         }
-        $exits = DB::table('clients')->where('code',$code)->exists();
-        while($exits){
+        $exits = DB::table('clients')->where('code', $code)->exists();
+        while ($exits) {
             $code = $code + 1;
-            $exits = DB::table('clients')->where('code',$code)->exists();
+            $exits = DB::table('clients')->where('code', $code)->exists();
         }
         return $code;
     }
@@ -201,7 +202,7 @@ class ClientController extends Controller
             } else {
                 return null;
             }
-           
+
             $rules = array('name' => 'required');
 
             //-- Create New Client
@@ -210,7 +211,7 @@ class ClientController extends Controller
 
                 $validator = Validator::make($input, $rules);
                 if (!$validator->fails()) {
-                    
+
                     Client::create([
                         'name' => $value['name'],
                         'code' => $this->getNumberOrder(),
@@ -223,7 +224,7 @@ class ClientController extends Controller
                     ]);
 
                 }
-               
+
 
             }
 
@@ -235,30 +236,30 @@ class ClientController extends Controller
     }
 
 
-     //------------- clients_pay_due -------------\\
+    //------------- clients_pay_due -------------\\
 
-     public function clients_pay_due(Request $request)
-     {
+    public function clients_pay_due(Request $request)
+    {
 //         $this->authorizeForUser($request->user('api'), 'pay_due', Client::class);
-        
-         if($request['amount'] > 0){
+
+        if ($request['amount'] > 0) {
             $client_sales_due = Sale::where('deleted_at', '=', null)
-            ->where([
-                ['payment_statut', '!=', 'paid'],
-                ['client_id', $request->client_id]
-            ])->get();
+                ->where([
+                    ['payment_statut', '!=', 'paid'],
+                    ['client_id', $request->client_id]
+                ])->get();
 
             $paid_amount_total = $request->amount;
-             $payment_codes="";
-            foreach($client_sales_due as $key => $client_sale){
-                if($paid_amount_total == 0)
-                break;
-                $due = $client_sale->GrandTotal  - $client_sale->paid_amount;
+            $payment_codes = "";
+            foreach ($client_sales_due as $key => $client_sale) {
+                if ($paid_amount_total == 0)
+                    break;
+                $due = $client_sale->GrandTotal - $client_sale->paid_amount;
 
-                if($paid_amount_total >= $due){
+                if ($paid_amount_total >= $due) {
                     $amount = $due;
                     $payment_status = 'paid';
-                }else{
+                } else {
                     $amount = $paid_amount_total;
                     $payment_status = 'partial';
                 }
@@ -281,35 +282,35 @@ class ClientController extends Controller
                 $paid_amount_total -= $amount;
             }
         }
-        
-         return response()->json(['success' => true,'payment_codes'=>$payment_codes]);
- 
-     }
+
+        return response()->json(['success' => true, 'payment_codes' => $payment_codes]);
+
+    }
 
     //------------- clients_pay_sale_return_due -------------\\
 
     public function pay_sale_return_due(Request $request)
     {
 //        $this->authorizeForUser($request->user('api'), 'pay_sale_return_due', Client::class);
-        
-        if($request['amount'] > 0){
+
+        if ($request['amount'] > 0) {
             $client_sell_return_due = SaleReturn::where('deleted_at', '=', null)
-            ->where([
-                ['payment_statut', '!=', 'paid'],
-                ['client_id', $request->client_id]
-            ])->get();
+                ->where([
+                    ['payment_statut', '!=', 'paid'],
+                    ['client_id', $request->client_id]
+                ])->get();
 
             $paid_amount_total = $request->amount;
 
-            foreach($client_sell_return_due as $key => $client_sale_return){
-                if($paid_amount_total == 0)
-                break;
-                $due = $client_sale_return->GrandTotal  - $client_sale_return->paid_amount;
+            foreach ($client_sell_return_due as $key => $client_sale_return) {
+                if ($paid_amount_total == 0)
+                    break;
+                $due = $client_sale_return->GrandTotal - $client_sale_return->paid_amount;
 
-                if($paid_amount_total >= $due){
+                if ($paid_amount_total >= $due) {
                     $amount = $due;
                     $payment_status = 'paid';
-                }else{
+                } else {
                     $amount = $paid_amount_total;
                     $payment_status = 'partial';
                 }
@@ -332,7 +333,7 @@ class ClientController extends Controller
                 $paid_amount_total -= $amount;
             }
         }
-        
+
         return response()->json(['success' => true]);
 
     }

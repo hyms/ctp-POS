@@ -378,7 +378,7 @@ class SalesController extends Controller
                 $current_Sale->update([
                     'date' => $request['date'],
                     'client_id' => $request['client_id'],
-                    'user_id' =>  Auth::user()->id,
+                    'user_id' => Auth::user()->id,
                     'warehouse_id' => $request['warehouse_id'],
                     'notes' => $request['notes'],
                     'statut' => $request['statut'],
@@ -395,6 +395,7 @@ class SalesController extends Controller
 
         return response()->json(['success' => true]);
     }
+
     public function getProduct_warehouse(mixed $value, $current_Sale): mixed
     {
         if ($value['product_variant_id'] !== null) {
@@ -411,6 +412,7 @@ class SalesController extends Controller
         }
         return $product_warehouse;
     }
+
     //------------- Remove SALE BY ID -----------\\
 
     public function destroy(Request $request, $id)
@@ -478,7 +480,7 @@ class SalesController extends Controller
 //        $this->authorizeForUser($request->user('api'), 'view', Sale::class);
 //        $role = Auth::user()->roles()->first();
 //        $view_records = Role::findOrFail($role->id)->inRole('record_view');
-        $sale_data = Sale::with(['details.product.unitSale','client'])
+        $sale_data = Sale::with(['details.product.unitSale', 'client'])
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
 
@@ -591,7 +593,7 @@ class SalesController extends Controller
         $helpers = new helpers();
         $details = collect();
 
-        $sale = Sale::with(['details.product.unitSale','warehouse','client'])
+        $sale = Sale::with(['details.product.unitSale', 'warehouse', 'client'])
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
 
@@ -701,7 +703,7 @@ class SalesController extends Controller
     {
         $last = DB::table('sales')->latest('id')->where('sales_type_id', '=', $type)->first();
         $base_code = DB::table('sales_type')->where('id', '=', $type)->first();
-        return helpers::get_code($last?->Ref,$base_code->code);
+        return helpers::get_code($last?->Ref, $base_code->code);
     }
 
     //------------- SALE PDF -----------\\
@@ -711,7 +713,7 @@ class SalesController extends Controller
 
         $details = collect();
         $helpers = new helpers();
-        $sale_data = Sale::with(['details.product.unitSale','client'])
+        $sale_data = Sale::with(['details.product.unitSale', 'client'])
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
 

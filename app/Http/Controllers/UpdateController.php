@@ -19,11 +19,12 @@ use App\Models\Permission;
 class UpdateController extends Controller
 {
 
-    public function get_version_info(request $request){
+    public function get_version_info(request $request)
+    {
 
         $this->authorizeForUser($request->user('api'), 'update', Setting::class);
         $version = $this->check();
-        
+
         return response()->json($version);
     }
 
@@ -31,9 +32,10 @@ class UpdateController extends Controller
     /*
     * Return current version (as plain text).
     */
-    public function getCurrentVersion(){
+    public function getCurrentVersion()
+    {
         // todo: env file version
-        $version = File::get(base_path().'/version.txt');
+        $version = File::get(base_path() . '/version.txt');
         return $version;
     }
 
@@ -43,38 +45,39 @@ class UpdateController extends Controller
     public function check()
     {
         $lastVersionInfo = $this->getLastVersion();
-        if( version_compare($lastVersionInfo['version'], $this->getCurrentVersion(), ">") )
+        if (version_compare($lastVersionInfo['version'], $this->getCurrentVersion(), ">"))
             return $lastVersionInfo['version'];
 
         return '';
     }
 
-    private function getLastVersion(){
+    private function getLastVersion()
+    {
         $content = file_get_contents('https://update-stocky.ui-lib.com/stocky_version.json');
         $content = json_decode($content, true);
         return $content;
     }
 
-    
+
     public function viewStep1(Request $request)
     {
         $role = Auth::user()->roles()->first();
         $permission = Role::findOrFail($role->id)->inRole('setting_system');
-        if($permission){
+        if ($permission) {
             return view('update.viewStep1');
         }
     }
-    
+
     public function lastStep(Request $request)
     {
         $role = Auth::user()->roles()->first();
         $permission = Role::findOrFail($role->id)->inRole('setting_system');
 
-        if($permission){
+        if ($permission) {
             ini_set('max_execution_time', 600); //600 seconds = 10 minutes 
 
             try {
-            
+
                 Artisan::call('config:cache');
                 Artisan::call('config:clear');
 
@@ -120,14 +123,14 @@ class UpdateController extends Controller
 
                 $permissions_data = Permission::pluck('id')->toArray();
                 $role->permissions()->attach($permissions_data);
-                
+
             } catch (Exception $e) {
-                
+
                 return $e->getMessage();
-                
+
                 return 'Something went wrong';
             }
-            
+
             return view('update.finishedUpdate');
         }
     }

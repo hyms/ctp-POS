@@ -207,7 +207,7 @@ class ReportController extends Controller
 //                }
 //            })
             ->where('client_id', $request->get('id'));
-            // Search With Multiple Param
+        // Search With Multiple Param
 //            ->where(function ($query) use ($request) {
 //                return $query->when($request->filled('search'), function ($query) use ($request) {
 //                    return $query->where('Ref', 'LIKE', "%{$request->search}%")

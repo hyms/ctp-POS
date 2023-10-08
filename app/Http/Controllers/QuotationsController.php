@@ -74,7 +74,7 @@ class QuotationsController extends BaseController
 
         //Multiple Filter
         $Filtred = $helpers->filter($Quotations, $columns, $param, $request)
-        //Search With Multiple Param
+            //Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
@@ -94,7 +94,7 @@ class QuotationsController extends BaseController
             });
 
         $totalRows = $Filtred->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $Quotations = $Filtred->offset($offSet)
@@ -117,12 +117,12 @@ class QuotationsController extends BaseController
         }
 
         $customers = client::where('deleted_at', '=', null)->get();
-        
+
         //get warehouses assigned to user
         $user_auth = auth()->user();
-        if($user_auth->is_all_warehouses){
+        if ($user_auth->is_all_warehouses) {
             $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        }else{
+        } else {
             $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
         }
@@ -173,7 +173,7 @@ class QuotationsController extends BaseController
                 $orderDetails[] = [
                     'quotation_id' => $order->id,
                     'quantity' => $value['quantity'],
-                    'sale_unit_id' =>  $value['sale_unit_id'],
+                    'sale_unit_id' => $value['sale_unit_id'],
                     'price' => $value['Unit_price'],
                     'TaxNet' => $value['tax_percent'],
                     'tax_method' => $value['tax_method'],
@@ -389,13 +389,13 @@ class QuotationsController extends BaseController
 
         foreach ($quotation_data['details'] as $detail) {
 
-             //check if detail has sale_unit_id Or Null
-             if($detail->sale_unit_id !== null){
+            //check if detail has sale_unit_id Or Null
+            if ($detail->sale_unit_id !== null) {
                 $unit = Unit::where('id', $detail->sale_unit_id)->first();
-            }else{
+            } else {
                 $product_unit_sale_id = Product::with('unitSale')
-                ->where('id', $detail->product_id)
-                ->first();
+                    ->where('id', $detail->product_id)
+                    ->first();
                 $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
             }
 
@@ -409,7 +409,7 @@ class QuotationsController extends BaseController
             } else {
                 $data['code'] = $detail['product']['code'];
             }
-            
+
             $data['quantity'] = $detail->quantity;
             $data['total'] = $detail->total;
             $data['name'] = $detail['product']['name'];
@@ -496,12 +496,12 @@ class QuotationsController extends BaseController
         foreach ($Quotation['details'] as $detail) {
 
             //check if detail has sale_unit_id Or Null
-             if($detail->sale_unit_id !== null){
+            if ($detail->sale_unit_id !== null) {
                 $unit = Unit::where('id', $detail->sale_unit_id)->first();
-            }else{
+            } else {
                 $product_unit_sale_id = Product::with('unitSale')
-                ->where('id', $detail->product_id)
-                ->first();
+                    ->where('id', $detail->product_id)
+                    ->first();
                 $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
             }
 
@@ -515,12 +515,12 @@ class QuotationsController extends BaseController
                 $data['code'] = $detail['product']['code'];
             }
 
-                $data['detail_id'] = $detail_id += 1;
-                $data['quantity'] = number_format($detail->quantity, 2, '.', '');
-                $data['total'] = number_format($detail->total, 2, '.', '');
-                $data['name'] = $detail['product']['name'];
-                $data['unitSale'] = $unit->ShortName;
-                $data['price'] = number_format($detail->price, 2, '.', '');
+            $data['detail_id'] = $detail_id += 1;
+            $data['quantity'] = number_format($detail->quantity, 2, '.', '');
+            $data['total'] = number_format($detail->total, 2, '.', '');
+            $data['name'] = $detail['product']['name'];
+            $data['unitSale'] = $unit->ShortName;
+            $data['price'] = number_format($detail->price, 2, '.', '');
 
             if ($detail->discount_method == '2') {
                 $data['DiscountNet'] = number_format($detail->discount, 2, '.', '');
@@ -559,9 +559,9 @@ class QuotationsController extends BaseController
         $arabic = new Arabic();
         $p = $arabic->arIdentify($Html);
 
-        for ($i = count($p)-1; $i >= 0; $i-=2) {
-            $utf8ar = $arabic->utf8Glyphs(substr($Html, $p[$i-1], $p[$i] - $p[$i-1]));
-            $Html = substr_replace($Html, $utf8ar, $p[$i-1], $p[$i] - $p[$i-1]);
+        for ($i = count($p) - 1; $i >= 0; $i -= 2) {
+            $utf8ar = $arabic->utf8Glyphs(substr($Html, $p[$i - 1], $p[$i] - $p[$i - 1]));
+            $Html = substr_replace($Html, $utf8ar, $p[$i - 1], $p[$i] - $p[$i - 1]);
         }
 
         $pdf = PDF::loadHTML($Html);
@@ -578,9 +578,9 @@ class QuotationsController extends BaseController
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
-        if($user_auth->is_all_warehouses){
+        if ($user_auth->is_all_warehouses) {
             $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        }else{
+        } else {
             $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
         }
@@ -645,13 +645,13 @@ class QuotationsController extends BaseController
         $detail_id = 0;
         foreach ($Quotation['details'] as $detail) {
 
-             //check if detail has sale_unit_id Or Null
-             if($detail->sale_unit_id !== null){
+            //check if detail has sale_unit_id Or Null
+            if ($detail->sale_unit_id !== null) {
                 $unit = Unit::where('id', $detail->sale_unit_id)->first();
-            }else{
+            } else {
                 $product_unit_sale_id = Product::with('unitSale')
-                ->where('id', $detail->product_id)
-                ->first();
+                    ->where('id', $detail->product_id)
+                    ->first();
                 $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
                 $data['no_unit'] = 0;
             }
@@ -740,9 +740,9 @@ class QuotationsController extends BaseController
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
-        if($user_auth->is_all_warehouses){
+        if ($user_auth->is_all_warehouses) {
             $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        }else{
+        } else {
             $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
         }
@@ -757,50 +757,50 @@ class QuotationsController extends BaseController
         ]);
     }
 
-     //-------------------Sms Notifications -----------------\\
+    //-------------------Sms Notifications -----------------\\
 
-     public function Send_SMS(Request $request)
-     {
-         $Quotation = Quotation::where('deleted_at', '=', null)->findOrFail($request->id);
-         $settings = Setting::where('deleted_at', '=', null)->first();
-         $gateway = sms_gateway::where('id' , $settings->sms_gateway)
-         ->where('deleted_at', '=', null)->first();
+    public function Send_SMS(Request $request)
+    {
+        $Quotation = Quotation::where('deleted_at', '=', null)->findOrFail($request->id);
+        $settings = Setting::where('deleted_at', '=', null)->first();
+        $gateway = sms_gateway::where('id', $settings->sms_gateway)
+            ->where('deleted_at', '=', null)->first();
 
-         $url = url('/api/quote_pdf/' . $request->id);
-         $receiverNumber = $Quotation['client']->phone;
-         $message = "Dear" .' '.$Quotation['client']->name." \n We are contacting you in regard to a Quotation #".$Quotation->Ref.' '.$url.' '. "that has been created on your account. \n We look forward to conducting future business with you.";
-         
-         //twilio
-        if($gateway->title == "twilio"){
+        $url = url('/api/quote_pdf/' . $request->id);
+        $receiverNumber = $Quotation['client']->phone;
+        $message = "Dear" . ' ' . $Quotation['client']->name . " \n We are contacting you in regard to a Quotation #" . $Quotation->Ref . ' ' . $url . ' ' . "that has been created on your account. \n We look forward to conducting future business with you.";
+
+        //twilio
+        if ($gateway->title == "twilio") {
             try {
-    
+
                 $account_sid = env("TWILIO_SID");
                 $auth_token = env("TWILIO_TOKEN");
                 $twilio_number = env("TWILIO_FROM");
-    
+
                 $client = new Client_Twilio($account_sid, $auth_token);
                 $client->messages->create($receiverNumber, [
-                    'from' => $twilio_number, 
+                    'from' => $twilio_number,
                     'body' => $message]);
-        
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
             }
 
-        //nexmo
-        }elseif($gateway->title == "nexmo"){
+            //nexmo
+        } elseif ($gateway->title == "nexmo") {
             try {
 
-                $basic  = new Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
+                $basic = new Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
                 $client = new \Nexmo\Client($basic);
                 $nexmo_from = env("NEXMO_FROM");
-        
+
                 $message = $client->message()->send([
                     'to' => $receiverNumber,
                     'from' => $nexmo_from,
                     'text' => $message
                 ]);
-                        
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
             }

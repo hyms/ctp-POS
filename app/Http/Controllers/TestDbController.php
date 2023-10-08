@@ -62,7 +62,6 @@ class TestDbController extends Controller
             ]);
         }
 
-     
 
         if (!$db_host) {
             return response()->json([

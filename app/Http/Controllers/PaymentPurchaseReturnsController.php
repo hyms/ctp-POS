@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Mail\PaymentReturn;
@@ -54,7 +55,7 @@ class PaymentPurchaseReturnsController extends BaseController
                 }
             })
 
-        // Multiple Filter
+            // Multiple Filter
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('provider_id'), function ($query) use ($request) {
                     return $query->whereHas('PurchaseReturn.provider', function ($q) use ($request) {
@@ -64,7 +65,7 @@ class PaymentPurchaseReturnsController extends BaseController
             });
         $Filtred = $helpers->filter($Payments, $columns, $param, $request)
 
-        // Search With Multiple Param
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
@@ -84,7 +85,7 @@ class PaymentPurchaseReturnsController extends BaseController
             });
 
         $totalRows = $Filtred->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $Payments = $Filtred->offset($offSet)
@@ -121,12 +122,12 @@ class PaymentPurchaseReturnsController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'create', PaymentPurchaseReturns::class);
 
-        if($request['montant'] > 0){
+        if ($request['montant'] > 0) {
             DB::transaction(function () use ($request) {
                 $role = Auth::user()->roles()->first();
                 $view_records = Role::findOrFail($role->id)->inRole('record_view');
                 $PurchaseReturn = PurchaseReturn::findOrFail($request['purchase_return_id']);
-        
+
                 // Check If User Has Permission view All Records
                 if (!$view_records) {
                     // Check If User->id === purchase return->id
@@ -168,9 +169,10 @@ class PaymentPurchaseReturnsController extends BaseController
 
     //------------ function show -----------\\
 
-    public function show($id){
+    public function show($id)
+    {
         //
-        
+
     }
 
     //----------- Update Payment Purchase Return --------------\\
@@ -183,7 +185,7 @@ class PaymentPurchaseReturnsController extends BaseController
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $payment = PaymentPurchaseReturns::findOrFail($id);
-    
+
             // Check If User Has Permission view All Records
             if (!$view_records) {
                 // Check If User->id === payment->id
@@ -202,7 +204,7 @@ class PaymentPurchaseReturnsController extends BaseController
             } else if ($due === $PurchaseReturn->GrandTotal) {
                 $payment_statut = 'unpaid';
             }
-            
+
             $payment->update([
                 'date' => $request['date'],
                 'Reglement' => $request['Reglement'],
@@ -227,12 +229,12 @@ class PaymentPurchaseReturnsController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'delete', PaymentPurchaseReturns::class);
 
-        
+
         DB::transaction(function () use ($id, $request) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $payment = PaymentPurchaseReturns::findOrFail($id);
-    
+
             // Check If User Has Permission view All Records
             if (!$view_records) {
                 // Check If User->id === payment->id
@@ -276,7 +278,7 @@ class PaymentPurchaseReturnsController extends BaseController
         $payment['Ref'] = $request->Ref;
         $settings = Setting::where('deleted_at', '=', null)->first();
         $payment['company_name'] = $settings->CompanyName;
-        
+
         $pdf = $this->payment_return($request, $payment['id']);
         $this->Set_config_mail(); // Set_config_mail => BaseController
         $mail = Mail::to($request->to)->send(new PaymentReturn($payment, $pdf));
@@ -330,49 +332,49 @@ class PaymentPurchaseReturnsController extends BaseController
         return $pdf->download('Payment_Purchase_Return.pdf');
     }
 
-     //-------------------Sms Notifications -----------------\\
-     public function Send_SMS(Request $request)
-     {
-         $payment = PaymentPurchaseReturns::with('PurchaseReturn', 'PurchaseReturn.provider')->findOrFail($request->id);
-         $settings = Setting::where('deleted_at', '=', null)->first();
-         $gateway = sms_gateway::where('id' , $settings->sms_gateway)
-         ->where('deleted_at', '=', null)->first();
+    //-------------------Sms Notifications -----------------\\
+    public function Send_SMS(Request $request)
+    {
+        $payment = PaymentPurchaseReturns::with('PurchaseReturn', 'PurchaseReturn.provider')->findOrFail($request->id);
+        $settings = Setting::where('deleted_at', '=', null)->first();
+        $gateway = sms_gateway::where('id', $settings->sms_gateway)
+            ->where('deleted_at', '=', null)->first();
 
-         $url = url('/api/payment_return_purchase_pdf/' . $request->id);
-         $receiverNumber = $payment['PurchaseReturn']['provider']->phone;
-         $message = "Dear" .' '.$payment['PurchaseReturn']['provider']->name." \n We are contacting you in regard to a Payment #".$payment['PurchaseReturn']->Ref.' '.$url.' '. "that has been created on your account. \n We look forward to conducting future business with you.";
-         
-         //twilio
-        if($gateway->title == "twilio"){
+        $url = url('/api/payment_return_purchase_pdf/' . $request->id);
+        $receiverNumber = $payment['PurchaseReturn']['provider']->phone;
+        $message = "Dear" . ' ' . $payment['PurchaseReturn']['provider']->name . " \n We are contacting you in regard to a Payment #" . $payment['PurchaseReturn']->Ref . ' ' . $url . ' ' . "that has been created on your account. \n We look forward to conducting future business with you.";
+
+        //twilio
+        if ($gateway->title == "twilio") {
             try {
-    
+
                 $account_sid = env("TWILIO_SID");
                 $auth_token = env("TWILIO_TOKEN");
                 $twilio_number = env("TWILIO_FROM");
-    
+
                 $client = new Client_Twilio($account_sid, $auth_token);
                 $client->messages->create($receiverNumber, [
-                    'from' => $twilio_number, 
+                    'from' => $twilio_number,
                     'body' => $message]);
-        
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
             }
 
-        //nexmo
-        }elseif($gateway->title == "nexmo"){
+            //nexmo
+        } elseif ($gateway->title == "nexmo") {
             try {
 
-                $basic  = new Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
+                $basic = new Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
                 $client = new Client($basic);
                 $nexmo_from = env("NEXMO_FROM");
-        
+
                 $message = $client->message()->send([
                     'to' => $receiverNumber,
                     'from' => $nexmo_from,
                     'text' => $message
                 ]);
-                        
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
             }

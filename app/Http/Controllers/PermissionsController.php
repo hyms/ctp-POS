@@ -28,7 +28,7 @@ class PermissionsController extends Controller
         $helpers = new helpers();
 
         $roles = Role::where('deleted_at', '=', null)
-        // Search With Multiple Param
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('name', 'LIKE', "%{$request->search}%")
@@ -36,7 +36,7 @@ class PermissionsController extends Controller
                 });
             });
         $totalRows = $roles->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $roles = $roles->offset($offSet)
@@ -99,10 +99,11 @@ class PermissionsController extends Controller
 
     //------------ function show -----------\\
 
-    public function show($id){
+    public function show($id)
+    {
         //
-        
-        }
+
+    }
 
     //----------- Update Role --------------\\
 
@@ -190,7 +191,7 @@ class PermissionsController extends Controller
 
         $this->authorizeForUser($request->user('api'), 'update', Role::class);
 
-        if($id != '1'){
+        if ($id != '1') {
             $Role = Role::with('permissions')->where('deleted_at', '=', null)->findOrFail($id);
             if ($Role) {
                 $item['name'] = $Role->name;
@@ -206,8 +207,8 @@ class PermissionsController extends Controller
                 'permissions' => $data,
                 'role' => $item,
             ]);
-            
-        }else{
+
+        } else {
             return response()->json([
                 'success' => false,
             ], 401);

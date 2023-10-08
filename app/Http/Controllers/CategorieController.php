@@ -18,7 +18,7 @@ class CategorieController extends Controller
 
         $categories = Category::where('deleted_at', '=', null)->get();
         Inertia::share('titlePage', 'Categorias');
-        return Inertia::render('Products/Categorie',[
+        return Inertia::render('Products/Categorie', [
             'categories' => $categories,
         ]);
     }
@@ -41,11 +41,12 @@ class CategorieController extends Controller
         return response()->json(['success' => true]);
     }
 
-     //------------ function show -----------\\
+    //------------ function show -----------\\
 
-    public function show($id){
+    public function show($id)
+    {
         //
-    
+
     }
 
     //-------------- Update Category ---------------\\

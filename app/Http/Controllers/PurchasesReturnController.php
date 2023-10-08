@@ -71,7 +71,7 @@ class PurchasesReturnController extends BaseController
         $data = array();
 
         // Check If User Has Permission View  All Records
-        $PurchaseReturn = PurchaseReturn::with('purchase','facture', 'provider', 'warehouse')
+        $PurchaseReturn = PurchaseReturn::with('purchase', 'facture', 'provider', 'warehouse')
             ->where('deleted_at', '=', null)
             ->where(function ($query) use ($view_records) {
                 if (!$view_records) {
@@ -81,7 +81,7 @@ class PurchasesReturnController extends BaseController
 
         //Multiple Filter
         $Filtred = $helpers->filter($PurchaseReturn, $columns, $param, $request)
-        // Search With Multiple Param
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
@@ -107,7 +107,7 @@ class PurchasesReturnController extends BaseController
             });
 
         $totalRows = $Filtred->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $PurchaseReturn = $Filtred->offset($offSet)
@@ -123,8 +123,8 @@ class PurchasesReturnController extends BaseController
             $item['discount'] = $Purchase_Return->discount;
             $item['shipping'] = $Purchase_Return->shipping;
             $item['statut'] = $Purchase_Return->statut;
-            $item['purchase_ref'] = $Purchase_Return['purchase']?$Purchase_Return['purchase']->Ref:'---';
-            $item['purchase_id'] = $Purchase_Return['purchase']?$Purchase_Return['purchase']->id:NULL;
+            $item['purchase_ref'] = $Purchase_Return['purchase'] ? $Purchase_Return['purchase']->Ref : '---';
+            $item['purchase_id'] = $Purchase_Return['purchase'] ? $Purchase_Return['purchase']->id : NULL;
             $item['warehouse_name'] = $Purchase_Return['warehouse']->name;
             $item['provider_id'] = $Purchase_Return['provider']->id;
             $item['provider_name'] = $Purchase_Return['provider']->name;
@@ -143,14 +143,14 @@ class PurchasesReturnController extends BaseController
         $suppliers = Provider::where('deleted_at', '=', null)->get(['id', 'name']);
         $purchases = Purchase::where('deleted_at', '=', null)->get(['id', 'Ref']);
 
-         //get warehouses assigned to user
-         $user_auth = auth()->user();
-         if($user_auth->is_all_warehouses){
-             $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-         }else{
-             $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-         } 
+        //get warehouses assigned to user
+        $user_auth = auth()->user();
+        if ($user_auth->is_all_warehouses) {
+            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
+        } else {
+            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
+            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
+        }
 
         return response()->json([
             'totalRows' => $totalRows,
@@ -195,7 +195,7 @@ class PurchasesReturnController extends BaseController
                     'purchase_return_id' => $order->id,
                     'quantity' => $value['quantity'],
                     'cost' => $value['Unit_cost'],
-                    'purchase_unit_id' =>  $value['purchase_unit_id'],
+                    'purchase_unit_id' => $value['purchase_unit_id'],
                     'TaxNet' => $value['tax_percent'],
                     'tax_method' => $value['tax_method'],
                     'discount' => $value['discount'],
@@ -206,7 +206,7 @@ class PurchasesReturnController extends BaseController
                     'imei_number' => $value['imei_number'],
                 ];
 
-            
+
                 if ($order->statut == "completed") {
                     if ($value['product_variant_id'] !== null) {
 
@@ -283,17 +283,17 @@ class PurchasesReturnController extends BaseController
             foreach ($old_Return_Details as $key => $value) {
                 $old_products_id[] = $value->id;
 
-                 //check if detail has purchase_unit_id Or Null
-                 if($value['purchase_unit_id'] !== null){
+                //check if detail has purchase_unit_id Or Null
+                if ($value['purchase_unit_id'] !== null) {
                     $unit = Unit::where('id', $value['purchase_unit_id'])->first();
-                }else{
+                } else {
                     $product_unit_purchase_id = Product::with('unitPurchase')
-                    ->where('id', $value['product_id'])
-                    ->first();
+                        ->where('id', $value['product_id'])
+                        ->first();
                     $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
                 }
 
-                if($value['purchase_unit_id'] !== null){
+                if ($value['purchase_unit_id'] !== null) {
                     if ($current_PurchaseReturn->statut == "completed") {
                         if ($value['product_variant_id'] !== null) {
 
@@ -341,7 +341,7 @@ class PurchasesReturnController extends BaseController
             // Update Data with New request
             foreach ($New_Return_Details as $key => $product_detail) {
 
-                if($product_detail['no_unit'] !== 0){
+                if ($product_detail['no_unit'] !== 0) {
                     $unit_prod = Unit::where('id', $product_detail['purchase_unit_id'])->first();
 
                     if ($request->statut == "completed") {
@@ -446,13 +446,13 @@ class PurchasesReturnController extends BaseController
 
             foreach ($old_Return_Details as $key => $value) {
 
-                 //check if detail has purchase_unit_id Or Null
-                 if($value['purchase_unit_id'] !== null){
+                //check if detail has purchase_unit_id Or Null
+                if ($value['purchase_unit_id'] !== null) {
                     $unit = Unit::where('id', $value['purchase_unit_id'])->first();
-                }else{
+                } else {
                     $product_unit_purchase_id = Product::with('unitPurchase')
-                    ->where('id', $value['product_id'])
-                    ->first();
+                        ->where('id', $value['product_id'])
+                        ->first();
                     $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
                 }
 
@@ -490,7 +490,7 @@ class PurchasesReturnController extends BaseController
                         }
                     }
                 }
-                
+
             }
             $current_PurchaseReturn->details()->delete();
             $current_PurchaseReturn->update([
@@ -531,55 +531,55 @@ class PurchasesReturnController extends BaseController
                 foreach ($old_Return_Details as $key => $value) {
 
                     //check if detail has purchase_unit_id Or Null
-                    if($value['purchase_unit_id'] !== null){
-                       $unit = Unit::where('id', $value['purchase_unit_id'])->first();
-                   }else{
-                       $product_unit_purchase_id = Product::with('unitPurchase')
-                       ->where('id', $value['product_id'])
-                       ->first();
-                       $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
-                   }
-   
-                   if ($current_PurchaseReturn->statut == "completed") {
-                       if ($value['product_variant_id'] !== null) {
-   
-                           $product_warehouse = product_warehouse::where('deleted_at', '=', null)
-                               ->where('warehouse_id', $current_PurchaseReturn->warehouse_id)
-                               ->where('product_id', $value['product_id'])
-                               ->where('product_variant_id', $value['product_variant_id'])
-                               ->first();
-   
-                           if ($unit && $product_warehouse) {
-                               if ($unit->operator == '/') {
-                                   $product_warehouse->qte += $value['quantity'] / $unit->operator_value;
-                               } else {
-                                   $product_warehouse->qte += $value['quantity'] * $unit->operator_value;
-                               }
-                               $product_warehouse->save();
-                           }
-   
-                       } else {
-                           $product_warehouse = product_warehouse::where('deleted_at', '=', null)
-                               ->where('warehouse_id', $current_PurchaseReturn->warehouse_id)
-                               ->where('product_id', $value['product_id'])
-                               ->first();
-   
-                           if ($unit && $product_warehouse) {
-                               if ($unit->operator == '/') {
-                                   $product_warehouse->qte += $value['quantity'] / $unit->operator_value;
-                               } else {
-                                   $product_warehouse->qte += $value['quantity'] * $unit->operator_value;
-                               }
-                               $product_warehouse->save();
-                           }
-                       }
-                   }
-                   
-               }
-               $current_PurchaseReturn->details()->delete();
-               $current_PurchaseReturn->update([
-                   'deleted_at' => Carbon::now(),
-               ]);
+                    if ($value['purchase_unit_id'] !== null) {
+                        $unit = Unit::where('id', $value['purchase_unit_id'])->first();
+                    } else {
+                        $product_unit_purchase_id = Product::with('unitPurchase')
+                            ->where('id', $value['product_id'])
+                            ->first();
+                        $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
+                    }
+
+                    if ($current_PurchaseReturn->statut == "completed") {
+                        if ($value['product_variant_id'] !== null) {
+
+                            $product_warehouse = product_warehouse::where('deleted_at', '=', null)
+                                ->where('warehouse_id', $current_PurchaseReturn->warehouse_id)
+                                ->where('product_id', $value['product_id'])
+                                ->where('product_variant_id', $value['product_variant_id'])
+                                ->first();
+
+                            if ($unit && $product_warehouse) {
+                                if ($unit->operator == '/') {
+                                    $product_warehouse->qte += $value['quantity'] / $unit->operator_value;
+                                } else {
+                                    $product_warehouse->qte += $value['quantity'] * $unit->operator_value;
+                                }
+                                $product_warehouse->save();
+                            }
+
+                        } else {
+                            $product_warehouse = product_warehouse::where('deleted_at', '=', null)
+                                ->where('warehouse_id', $current_PurchaseReturn->warehouse_id)
+                                ->where('product_id', $value['product_id'])
+                                ->first();
+
+                            if ($unit && $product_warehouse) {
+                                if ($unit->operator == '/') {
+                                    $product_warehouse->qte += $value['quantity'] / $unit->operator_value;
+                                } else {
+                                    $product_warehouse->qte += $value['quantity'] * $unit->operator_value;
+                                }
+                                $product_warehouse->save();
+                            }
+                        }
+                    }
+
+                }
+                $current_PurchaseReturn->details()->delete();
+                $current_PurchaseReturn->update([
+                    'deleted_at' => Carbon::now(),
+                ]);
 
                 PaymentPurchaseReturns::where('purchase_return_id', $PurchaseReturn_id)->update([
                     'deleted_at' => Carbon::now(),
@@ -597,154 +597,154 @@ class PurchasesReturnController extends BaseController
     public function create(Request $request)
     {
 
-       //
+        //
 
     }
 
-    
+
     //---------------- edit ---------------\\
 
-    public function edit(Request $request , $id)
+    public function edit(Request $request, $id)
     {
 
-       //
+        //
 
     }
 
-     //------------------- create_purchase_return -----------------\\
+    //------------------- create_purchase_return -----------------\\
 
-     public function create_purchase_return(Request $request , $id)
-     {
- 
-         $this->authorizeForUser($request->user('api'), 'create', PurchaseReturn::class);
-         $role = Auth::user()->roles()->first();
-         $view_records = Role::findOrFail($role->id)->inRole('record_view');
-         $Purchase_data = Purchase::with('details.product.unitPurchase')
-             ->where('deleted_at', '=', null)
-             ->findOrFail($id);
- 
-         $details = array();
-         
-         // Check If User Has Permission view All Records
-         if (!$view_records) {
-             // Check If User->id === Purchase->id
-             $this->authorizeForUser($request->user('api'), 'check_record', $Purchase_data);
-         }
- 
-         $Return_detail['supplier_id'] = $Purchase_data->provider_id;
-         $Return_detail['warehouse_id'] = $Purchase_data->warehouse_id;
-         $Return_detail['purchase_id'] = $Purchase_data->id;
-         $Return_detail['purchase_ref'] = $Purchase_data->Ref;
-         $Return_detail['tax_rate'] = 0;
-         $Return_detail['TaxNet'] = 0;
-         $Return_detail['discount'] = 0;
-         $Return_detail['shipping'] = 0;
-         $Return_detail['statut'] = "completed";
-         $Return_detail['notes'] = "";
- 
-         $detail_id = 0;
-         foreach ($Purchase_data['details'] as $detail) {
- 
-             //-------check if detail has purchase_unit_id Or Null
-             if($detail->purchase_unit_id !== null){
-                 $unit = Unit::where('id', $detail->purchase_unit_id)->first();
-                 $data['no_unit'] = 1;
-             }else{
-                 $product_unit_purchase_id = Product::with('unitPurchase')
-                 ->where('id', $detail->product_id)
-                 ->first();
-                 $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
-                 $data['no_unit'] = 0;
-             }
- 
-             if ($detail->product_variant_id) {
-                 $item_product = product_warehouse::where('product_id', $detail->product_id)
-                     ->where('deleted_at', '=', null)
-                     ->where('product_variant_id', $detail->product_variant_id)
-                     ->where('warehouse_id', $Purchase_data->warehouse_id)
-                     ->first();
- 
-                 $productsVariants = ProductVariant::where('product_id', $detail->product_id)
-                     ->where('id', $detail->product_variant_id)->first();
- 
-                 $item_product ? $data['del'] = 0 : $data['del'] = 1;
-                 $data['code'] = $productsVariants->name . '-' . $detail['product']['code'];
-                 $data['product_variant_id'] = $detail->product_variant_id;                
- 
-                 if ($unit && $unit->operator == '/') {
-                     $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
-                 } else if ($unit && $unit->operator == '*') {
-                     $data['stock'] = $item_product ? $item_product->qte / $unit->operator_value : 0;
-                 } else {
-                     $data['stock'] = 0;
-                 }
- 
-             } else {
-                 $item_product = product_warehouse::where('product_id', $detail->product_id)
-                     ->where('deleted_at', '=', null)->where('product_variant_id', '=', null)
-                     ->where('warehouse_id', $Purchase_data->warehouse_id)->first();
- 
-                 $item_product ? $data['del'] = 0 : $data['del'] = 1;
-                 $data['product_variant_id'] = null;
-                 $data['code'] = $detail['product']['code'];
-              
- 
-                 if ($unit && $unit->operator == '/') {
-                     $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
-                 } else if ($unit && $unit->operator == '*') {
-                     $data['stock'] = $item_product ? $item_product->qte / $unit->operator_value : 0;
-                 } else {
-                     $data['stock'] = 0;
-                 }
- 
-             }
- 
-             $data['id'] = $detail->id;
-             $data['name'] = $detail['product']['name'];
-             $data['detail_id'] = $detail_id += 1;
-             $data['quantity'] = 0;
-             $data['purchase_quantity'] = $detail->quantity;
-             $data['product_id'] = $detail->product_id;
-             $data['unitPurchase'] = $unit->ShortName;
-             $data['purchase_unit_id'] = $unit->id;
-             
-             $data['is_imei'] = $detail['product']['is_imei'];
-             $data['imei_number'] = $detail->imei_number;
- 
-             if ($detail->discount_method == '2') {
-                 $data['DiscountNet'] = $detail->discount;
-             } else {
-                 $data['DiscountNet'] = $detail->cost * $detail->discount / 100;
-             }
- 
-             $tax_cost = $detail->TaxNet * (($detail->cost - $data['DiscountNet']) / 100);
-             $data['Unit_cost'] = $detail->cost;
-             $data['tax_percent'] = $detail->TaxNet;
-             $data['tax_method'] = $detail->tax_method;
-             $data['discount'] = $detail->discount;
-             $data['discount_Method'] = $detail->discount_method;
- 
-             if ($detail->tax_method == '1') {
-                 $data['Net_cost'] = $detail->cost - $data['DiscountNet'];
-                 $data['taxe'] = $tax_cost;
-                 $data['subtotal'] = ($data['Net_cost'] * $data['quantity']) + ($tax_cost * $data['quantity']);
-             } else {
-                 $data['Net_cost'] = ($detail->cost - $data['DiscountNet']) / (($detail->TaxNet / 100) + 1);
-                 $data['taxe'] = $detail->cost - $data['Net_cost'] - $data['DiscountNet'];
-                 $data['subtotal'] = ($data['Net_cost'] * $data['quantity']) + ($tax_cost * $data['quantity']);
-             }
- 
-             $details[] = $data;
-         }
- 
-         return response()->json([
-             'details' => $details,
-             'purchase_return' => $Return_detail,
-         ]);
- 
-     }
+    public function create_purchase_return(Request $request, $id)
+    {
 
-     //------------- Show Form Edit Purchase Return-----------\\
+        $this->authorizeForUser($request->user('api'), 'create', PurchaseReturn::class);
+        $role = Auth::user()->roles()->first();
+        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+        $Purchase_data = Purchase::with('details.product.unitPurchase')
+            ->where('deleted_at', '=', null)
+            ->findOrFail($id);
+
+        $details = array();
+
+        // Check If User Has Permission view All Records
+        if (!$view_records) {
+            // Check If User->id === Purchase->id
+            $this->authorizeForUser($request->user('api'), 'check_record', $Purchase_data);
+        }
+
+        $Return_detail['supplier_id'] = $Purchase_data->provider_id;
+        $Return_detail['warehouse_id'] = $Purchase_data->warehouse_id;
+        $Return_detail['purchase_id'] = $Purchase_data->id;
+        $Return_detail['purchase_ref'] = $Purchase_data->Ref;
+        $Return_detail['tax_rate'] = 0;
+        $Return_detail['TaxNet'] = 0;
+        $Return_detail['discount'] = 0;
+        $Return_detail['shipping'] = 0;
+        $Return_detail['statut'] = "completed";
+        $Return_detail['notes'] = "";
+
+        $detail_id = 0;
+        foreach ($Purchase_data['details'] as $detail) {
+
+            //-------check if detail has purchase_unit_id Or Null
+            if ($detail->purchase_unit_id !== null) {
+                $unit = Unit::where('id', $detail->purchase_unit_id)->first();
+                $data['no_unit'] = 1;
+            } else {
+                $product_unit_purchase_id = Product::with('unitPurchase')
+                    ->where('id', $detail->product_id)
+                    ->first();
+                $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
+                $data['no_unit'] = 0;
+            }
+
+            if ($detail->product_variant_id) {
+                $item_product = product_warehouse::where('product_id', $detail->product_id)
+                    ->where('deleted_at', '=', null)
+                    ->where('product_variant_id', $detail->product_variant_id)
+                    ->where('warehouse_id', $Purchase_data->warehouse_id)
+                    ->first();
+
+                $productsVariants = ProductVariant::where('product_id', $detail->product_id)
+                    ->where('id', $detail->product_variant_id)->first();
+
+                $item_product ? $data['del'] = 0 : $data['del'] = 1;
+                $data['code'] = $productsVariants->name . '-' . $detail['product']['code'];
+                $data['product_variant_id'] = $detail->product_variant_id;
+
+                if ($unit && $unit->operator == '/') {
+                    $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
+                } else if ($unit && $unit->operator == '*') {
+                    $data['stock'] = $item_product ? $item_product->qte / $unit->operator_value : 0;
+                } else {
+                    $data['stock'] = 0;
+                }
+
+            } else {
+                $item_product = product_warehouse::where('product_id', $detail->product_id)
+                    ->where('deleted_at', '=', null)->where('product_variant_id', '=', null)
+                    ->where('warehouse_id', $Purchase_data->warehouse_id)->first();
+
+                $item_product ? $data['del'] = 0 : $data['del'] = 1;
+                $data['product_variant_id'] = null;
+                $data['code'] = $detail['product']['code'];
+
+
+                if ($unit && $unit->operator == '/') {
+                    $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
+                } else if ($unit && $unit->operator == '*') {
+                    $data['stock'] = $item_product ? $item_product->qte / $unit->operator_value : 0;
+                } else {
+                    $data['stock'] = 0;
+                }
+
+            }
+
+            $data['id'] = $detail->id;
+            $data['name'] = $detail['product']['name'];
+            $data['detail_id'] = $detail_id += 1;
+            $data['quantity'] = 0;
+            $data['purchase_quantity'] = $detail->quantity;
+            $data['product_id'] = $detail->product_id;
+            $data['unitPurchase'] = $unit->ShortName;
+            $data['purchase_unit_id'] = $unit->id;
+
+            $data['is_imei'] = $detail['product']['is_imei'];
+            $data['imei_number'] = $detail->imei_number;
+
+            if ($detail->discount_method == '2') {
+                $data['DiscountNet'] = $detail->discount;
+            } else {
+                $data['DiscountNet'] = $detail->cost * $detail->discount / 100;
+            }
+
+            $tax_cost = $detail->TaxNet * (($detail->cost - $data['DiscountNet']) / 100);
+            $data['Unit_cost'] = $detail->cost;
+            $data['tax_percent'] = $detail->TaxNet;
+            $data['tax_method'] = $detail->tax_method;
+            $data['discount'] = $detail->discount;
+            $data['discount_Method'] = $detail->discount_method;
+
+            if ($detail->tax_method == '1') {
+                $data['Net_cost'] = $detail->cost - $data['DiscountNet'];
+                $data['taxe'] = $tax_cost;
+                $data['subtotal'] = ($data['Net_cost'] * $data['quantity']) + ($tax_cost * $data['quantity']);
+            } else {
+                $data['Net_cost'] = ($detail->cost - $data['DiscountNet']) / (($detail->TaxNet / 100) + 1);
+                $data['taxe'] = $detail->cost - $data['Net_cost'] - $data['DiscountNet'];
+                $data['subtotal'] = ($data['Net_cost'] * $data['quantity']) + ($tax_cost * $data['quantity']);
+            }
+
+            $details[] = $data;
+        }
+
+        return response()->json([
+            'details' => $details,
+            'purchase_return' => $Return_detail,
+        ]);
+
+    }
+
+    //------------- Show Form Edit Purchase Return-----------\\
 
     public function edit_purchase_return(Request $request, $id, $purchase_id)
     {
@@ -765,8 +765,8 @@ class PurchasesReturnController extends BaseController
 
         $Return_detail['supplier_id'] = $Purchase_Return->provider_id;
         $Return_detail['warehouse_id'] = $Purchase_Return->warehouse_id;
-        $Return_detail['purchase_id'] = $Purchase_Return['purchase']?$Purchase_Return['purchase']->id:NULL;
-        $Return_detail['purchase_ref'] = $Purchase_Return['purchase']?$Purchase_Return['purchase']->Ref:'---';
+        $Return_detail['purchase_id'] = $Purchase_Return['purchase'] ? $Purchase_Return['purchase']->id : NULL;
+        $Return_detail['purchase_ref'] = $Purchase_Return['purchase'] ? $Purchase_Return['purchase']->Ref : '---';
 
         $Return_detail['date'] = $Purchase_Return->date;
         $Return_detail['tax_rate'] = $Purchase_Return->tax_rate;
@@ -780,13 +780,13 @@ class PurchasesReturnController extends BaseController
         foreach ($Purchase_Return['details'] as $detail) {
 
             //-------check if detail has purchase_unit_id Or Null
-            if($detail->purchase_unit_id !== null){
+            if ($detail->purchase_unit_id !== null) {
                 $unit = Unit::where('id', $detail->purchase_unit_id)->first();
                 $data['no_unit'] = 1;
-            }else{
+            } else {
                 $product_unit_purchase_id = Product::with('unitPurchase')
-                ->where('id', $detail->product_id)
-                ->first();
+                    ->where('id', $detail->product_id)
+                    ->first();
                 $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
                 $data['no_unit'] = 0;
             }
@@ -819,9 +819,9 @@ class PurchasesReturnController extends BaseController
                     ->where('deleted_at', '=', null)->where('product_variant_id', '=', null)
                     ->first();
 
-                    $item_product ? $data['del'] = 0 : $data['del'] = 1;
-                    $data['code'] = $detail['product']['code'];
-                    $data['product_variant_id'] = null;
+                $item_product ? $data['del'] = 0 : $data['del'] = 1;
+                $data['code'] = $detail['product']['code'];
+                $data['product_variant_id'] = null;
 
                 if ($unit && $unit->operator == '/') {
                     $data['current_stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
@@ -834,12 +834,12 @@ class PurchasesReturnController extends BaseController
             }
 
             $purchase_detail = PurchaseDetail::where('purchase_id', $purchase_id)
-            ->where('product_id', $detail->product_id)
-            ->where('product_variant_id', $detail->product_variant_id)
-            ->first();
+                ->where('product_id', $detail->product_id)
+                ->where('product_variant_id', $detail->product_variant_id)
+                ->first();
 
             $data['purchase_quantity'] = $purchase_detail->quantity;
-            $data['stock'] =  $data['current_stock'] + $detail->quantity;
+            $data['stock'] = $data['current_stock'] + $detail->quantity;
             $data['quantity'] = $detail->quantity;
             $data['quantity_copy'] = $detail->quantity;
 
@@ -852,7 +852,7 @@ class PurchasesReturnController extends BaseController
 
             $data['is_imei'] = $detail['product']['is_imei'];
             $data['imei_number'] = $detail->imei_number;
-            
+
             if ($detail->discount_method == '2') {
                 $data['DiscountNet'] = $detail->discount;
             } else {
@@ -879,13 +879,13 @@ class PurchasesReturnController extends BaseController
             $details[] = $data;
         }
 
-       
+
         return response()->json([
             'details' => $details,
             'purchase_return' => $Return_detail,
         ]);
 
-    } 
+    }
 
     //------------- Send Purchase Return on Email -----------\\
 
@@ -905,7 +905,7 @@ class PurchasesReturnController extends BaseController
         return $mail;
     }
 
- 
+
     //------------- GET Payments Purchase Return BY ID-----------\\
 
     public function Payment_Returns(Request $request, $id)
@@ -962,7 +962,7 @@ class PurchasesReturnController extends BaseController
         $this->authorizeForUser($request->user('api'), 'view', PurchaseReturn::class);
         $role = Auth::user()->roles()->first();
         $view_records = Role::findOrFail($role->id)->inRole('record_view');
-        $Purchase_Return = PurchaseReturn::with('purchase','details.product.unitPurchase')
+        $Purchase_Return = PurchaseReturn::with('purchase', 'details.product.unitPurchase')
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
 
@@ -974,8 +974,8 @@ class PurchasesReturnController extends BaseController
             $this->authorizeForUser($request->user('api'), 'check_record', $Purchase_Return);
         }
 
-        $return_details['purchase_ref'] = $Purchase_Return['purchase']?$Purchase_Return['purchase']->Ref:'---';
-        $return_details['purchase_id'] = $Purchase_Return['purchase']?$Purchase_Return['purchase']->id:NULL;
+        $return_details['purchase_ref'] = $Purchase_Return['purchase'] ? $Purchase_Return['purchase']->Ref : '---';
+        $return_details['purchase_id'] = $Purchase_Return['purchase'] ? $Purchase_Return['purchase']->id : NULL;
         $return_details['Ref'] = $Purchase_Return->Ref;
         $return_details['date'] = $Purchase_Return->date;
         $return_details['statut'] = $Purchase_Return->statut;
@@ -992,18 +992,18 @@ class PurchasesReturnController extends BaseController
         $return_details['warehouse'] = $Purchase_Return['warehouse']->name;
         $return_details['GrandTotal'] = number_format($Purchase_Return->GrandTotal, 2, '.', '');
         $return_details['paid_amount'] = number_format($Purchase_Return->paid_amount, 2, '.', '');
-        $return_details['due'] = number_format($return_details['GrandTotal'] - $return_details['paid_amount'] , 2, '.', '');
+        $return_details['due'] = number_format($return_details['GrandTotal'] - $return_details['paid_amount'], 2, '.', '');
         $return_details['payment_status'] = $Purchase_Return->payment_statut;
 
         foreach ($Purchase_Return['details'] as $detail) {
 
-             //-------check if detail has purchase_unit_id Or Null
-             if($detail->purchase_unit_id !== null){
+            //-------check if detail has purchase_unit_id Or Null
+            if ($detail->purchase_unit_id !== null) {
                 $unit = Unit::where('id', $detail->purchase_unit_id)->first();
-            }else{
+            } else {
                 $product_unit_purchase_id = Product::with('unitPurchase')
-                ->where('id', $detail->product_id)
-                ->first();
+                    ->where('id', $detail->product_id)
+                    ->first();
                 $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
             }
 
@@ -1016,7 +1016,7 @@ class PurchasesReturnController extends BaseController
             } else {
                 $data['code'] = $detail['product']['code'];
             }
-            
+
             $data['quantity'] = $detail->quantity;
             $data['total'] = $detail->total;
             $data['name'] = $detail['product']['name'];
@@ -1062,11 +1062,11 @@ class PurchasesReturnController extends BaseController
 
         $details = array();
         $helpers = new helpers();
-        $PurchaseReturn = PurchaseReturn::with('purchase','details.product.unitPurchase')
+        $PurchaseReturn = PurchaseReturn::with('purchase', 'details.product.unitPurchase')
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
 
-        $return_details['purchase_ref'] = $PurchaseReturn['purchase']?$PurchaseReturn['purchase']->Ref:'---';
+        $return_details['purchase_ref'] = $PurchaseReturn['purchase'] ? $PurchaseReturn['purchase']->Ref : '---';
         $return_details['supplier_name'] = $PurchaseReturn['provider']->name;
         $return_details['supplier_phone'] = $PurchaseReturn['provider']->phone;
         $return_details['supplier_adr'] = $PurchaseReturn['provider']->adresse;
@@ -1087,12 +1087,12 @@ class PurchasesReturnController extends BaseController
         foreach ($PurchaseReturn['details'] as $detail) {
 
             //-------check if detail has purchase_unit_id Or Null
-            if($detail->purchase_unit_id !== null){
+            if ($detail->purchase_unit_id !== null) {
                 $unit = Unit::where('id', $detail->purchase_unit_id)->first();
-            }else{
+            } else {
                 $product_unit_purchase_id = Product::with('unitPurchase')
-                ->where('id', $detail->product_id)
-                ->first();
+                    ->where('id', $detail->product_id)
+                    ->first();
                 $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
             }
 
@@ -1106,12 +1106,12 @@ class PurchasesReturnController extends BaseController
                 $data['code'] = $detail['product']['code'];
             }
 
-                $data['detail_id'] = $detail_id += 1;
-                $data['quantity'] = number_format($detail->quantity, 2, '.', '');
-                $data['total'] = number_format($detail->total, 2, '.', '');
-                $data['name'] = $detail['product']['name'];
-                $data['cost'] = number_format($detail->cost, 2, '.', '');
-                $data['unit_purchase'] = $unit->ShortName;
+            $data['detail_id'] = $detail_id += 1;
+            $data['quantity'] = number_format($detail->quantity, 2, '.', '');
+            $data['total'] = number_format($detail->total, 2, '.', '');
+            $data['name'] = $detail['product']['name'];
+            $data['cost'] = number_format($detail->cost, 2, '.', '');
+            $data['unit_purchase'] = $unit->ShortName;
 
             if ($detail->discount_method == '2') {
                 $data['DiscountNet'] = number_format($detail->discount, 2, '.', '');
@@ -1151,16 +1151,15 @@ class PurchasesReturnController extends BaseController
         $arabic = new Arabic();
         $p = $arabic->arIdentify($Html);
 
-        for ($i = count($p)-1; $i >= 0; $i-=2) {
-            $utf8ar = $arabic->utf8Glyphs(substr($Html, $p[$i-1], $p[$i] - $p[$i-1]));
-            $Html = substr_replace($Html, $utf8ar, $p[$i-1], $p[$i] - $p[$i-1]);
+        for ($i = count($p) - 1; $i >= 0; $i -= 2) {
+            $utf8ar = $arabic->utf8Glyphs(substr($Html, $p[$i - 1], $p[$i] - $p[$i - 1]));
+            $Html = substr_replace($Html, $utf8ar, $p[$i - 1], $p[$i] - $p[$i - 1]);
         }
 
         $pdf = PDF::loadHTML($Html);
         return $pdf->download('Purchase_Return.pdf');
     }
 
-    
 
     //------------------ Send SMS ----------------------------------\\
 
@@ -1168,44 +1167,44 @@ class PurchasesReturnController extends BaseController
     {
         $PurchaseReturn = PurchaseReturn::where('deleted_at', '=', null)->findOrFail($request->id);
         $settings = Setting::where('deleted_at', '=', null)->first();
-        $gateway = sms_gateway::where('id' , $settings->sms_gateway)
-        ->where('deleted_at', '=', null)->first();
+        $gateway = sms_gateway::where('id', $settings->sms_gateway)
+            ->where('deleted_at', '=', null)->first();
 
         $url = url('/api/return_purchase_pdf/' . $request->id);
         $receiverNumber = $PurchaseReturn['provider']->phone;
-        $message = "Dear" .' '.$PurchaseReturn['provider']->name." \n We are contacting you in regard to a purchase Return #".$PurchaseReturn->Ref.' '.$url.' '. "that has been created on your account. \n We look forward to conducting future business with you.";
-        
-         //twilio
-        if($gateway->title == "twilio"){
+        $message = "Dear" . ' ' . $PurchaseReturn['provider']->name . " \n We are contacting you in regard to a purchase Return #" . $PurchaseReturn->Ref . ' ' . $url . ' ' . "that has been created on your account. \n We look forward to conducting future business with you.";
+
+        //twilio
+        if ($gateway->title == "twilio") {
             try {
-    
+
                 $account_sid = env("TWILIO_SID");
                 $auth_token = env("TWILIO_TOKEN");
                 $twilio_number = env("TWILIO_FROM");
-    
+
                 $client = new Client_Twilio($account_sid, $auth_token);
                 $client->messages->create($receiverNumber, [
-                    'from' => $twilio_number, 
+                    'from' => $twilio_number,
                     'body' => $message]);
-        
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
             }
 
-        //nexmo
-        }elseif($gateway->title == "nexmo"){
+            //nexmo
+        } elseif ($gateway->title == "nexmo") {
             try {
 
-                $basic  = new Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
+                $basic = new Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
                 $client = new Client($basic);
                 $nexmo_from = env("NEXMO_FROM");
-        
+
                 $message = $client->message()->send([
                     'to' => $receiverNumber,
                     'from' => $nexmo_from,
                     'text' => $message
                 ]);
-                        
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
             }

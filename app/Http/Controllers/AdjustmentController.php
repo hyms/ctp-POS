@@ -34,7 +34,7 @@ class AdjustmentController extends Controller
         // Check If User Has Permission View  All Records
         $Adjustments = Adjustment::with('warehouse')
             ->where('deleted_at', '=', null)
-            ->whereIn('warehouse_id',$warehouses->pluck('value'))
+            ->whereIn('warehouse_id', $warehouses->pluck('value'))
             ->where(function ($query) {
                 return $query->where('user_id', '=', Auth::user()->id);
             });

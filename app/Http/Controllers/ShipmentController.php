@@ -29,9 +29,9 @@ class ShipmentController extends BaseController
         $helpers = new helpers();
         $data = array();
 
-        $shipments = Shipment::with('sale','sale.client','sale.warehouse')
+        $shipments = Shipment::with('sale', 'sale.client', 'sale.warehouse')
 
-        // Search With Multiple Param
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
@@ -56,7 +56,7 @@ class ShipmentController extends BaseController
                 });
             });
         $totalRows = $shipments->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $shipments_data = $shipments->offset($offSet)
@@ -77,7 +77,7 @@ class ShipmentController extends BaseController
             $item['sale_id'] = $shipment['sale']['id'];
             $item['warehouse_name'] = $shipment['sale']['warehouse']->name;
             $item['customer_name'] = $shipment['sale']['client']->name;
-            
+
             $data[] = $item;
         }
 
@@ -87,7 +87,6 @@ class ShipmentController extends BaseController
         ]);
     }
 
-   
 
     //----------- Store new Shipment -------\\
 
@@ -100,7 +99,7 @@ class ShipmentController extends BaseController
         ]);
 
         DB::transaction(function () use ($request) {
-            $shipment = Shipment::firstOrNew([ 'Ref' => $request['Ref']]);
+            $shipment = Shipment::firstOrNew(['Ref' => $request['Ref']]);
 
             $shipment->user_id = Auth::user()->id;
             $shipment->sale_id = $request['sale_id'];
@@ -116,16 +115,17 @@ class ShipmentController extends BaseController
             ]);
 
         }, 10);
-       
+
         return response()->json(['success' => true]);
 
     }
 
-    public function show($id){
+    public function show($id)
+    {
 
         $get_shipment = Shipment::where('sale_id', $id)->first();
 
-        if($get_shipment){
+        if ($get_shipment) {
 
             $shipment_data['Ref'] = $get_shipment->Ref;
             $shipment_data['sale_id'] = $get_shipment->sale_id;
@@ -134,7 +134,7 @@ class ShipmentController extends BaseController
             $shipment_data['status'] = $get_shipment->status;
             $shipment_data['shipping_details'] = $get_shipment->shipping_details;
 
-        }else{
+        } else {
 
             $shipment_data['Ref'] = $this->getNumberOrder();
             $shipment_data['sale_id'] = $id;
@@ -160,7 +160,7 @@ class ShipmentController extends BaseController
             'status' => 'required',
         ]);
 
-        DB::transaction(function () use ($request , $id) {
+        DB::transaction(function () use ($request, $id) {
 
             Shipment::whereId($id)->update($request->all());
 
@@ -181,7 +181,7 @@ class ShipmentController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'delete', Shipment::class);
 
-        DB::transaction(function () use ($request , $id) {
+        DB::transaction(function () use ($request, $id) {
 
             $shipment = Shipment::find($id);
             $shipment->delete();
@@ -197,25 +197,24 @@ class ShipmentController extends BaseController
 
     }
 
-   
-   //------------- Reference Number Order SALE -----------\\
 
-   public function getNumberOrder()
-   {
+    //------------- Reference Number Order SALE -----------\\
 
-       $last = DB::table('shipments')->latest('id')->first();
+    public function getNumberOrder()
+    {
 
-       if ($last) {
-           $item = $last->Ref;
-           $nwMsg = explode("_", $item);
-           $inMsg = $nwMsg[1] + 1;
-           $code = $nwMsg[0] . '_' . $inMsg;
-       } else {
-           $code = 'SM_1111';
-       }
-       return $code;
-   }
+        $last = DB::table('shipments')->latest('id')->first();
 
-    
+        if ($last) {
+            $item = $last->Ref;
+            $nwMsg = explode("_", $item);
+            $inMsg = $nwMsg[1] + 1;
+            $code = $nwMsg[0] . '_' . $inMsg;
+        } else {
+            $code = 'SM_1111';
+        }
+        return $code;
+    }
+
 
 }

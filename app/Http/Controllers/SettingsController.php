@@ -82,20 +82,20 @@ class SettingsController extends Controller
             'client_id' => $client,
             'warehouse_id' => $warehouse,
             'email' => $request['email'],
-            'default_language' =>  $default_language,
+            'default_language' => $default_language,
             'CompanyName' => $request['CompanyName'],
             'CompanyPhone' => $request['CompanyPhone'],
             'CompanyAdress' => $request['CompanyAdress'],
             'footer' => $request['footer'],
             'developed_by' => $request['developed_by'],
-            'is_invoice_footer' => $request['is_invoice_footer']== 'true' ? 1 : 0,
+            'is_invoice_footer' => $request['is_invoice_footer'] == 'true' ? 1 : 0,
             'invoice_footer' => $request['invoice_footer'],
             'sms_gateway' => $sms_gateway,
             'logo' => $filename,
         ]);
 
         $this->setEnvironmentValue([
-            'APP_TIMEZONE' => $request['timezone'] !== null?'"' . $request['timezone'] . '"':'"UTC"',
+            'APP_TIMEZONE' => $request['timezone'] !== null ? '"' . $request['timezone'] . '"' : '"UTC"',
         ]);
 
         Artisan::call('config:cache');
@@ -105,47 +105,47 @@ class SettingsController extends Controller
     }
 
 
-     //-------------- Get Pos Settings ---------------\\
+    //-------------- Get Pos Settings ---------------\\
 
-     public function get_pos_Settings(Request $request)
-     {
-         $this->authorizeForUser($request->user('api'), 'pos_settings', Setting::class);
- 
-         $PosSetting = PosSetting::where('deleted_at', '=', null)->first();
+    public function get_pos_Settings(Request $request)
+    {
+        $this->authorizeForUser($request->user('api'), 'pos_settings', Setting::class);
 
-         return response()->json([
-             'pos_settings' => $PosSetting
-            ], 200);
-    
+        $PosSetting = PosSetting::where('deleted_at', '=', null)->first();
+
+        return response()->json([
+            'pos_settings' => $PosSetting
+        ], 200);
+
     }
 
 
-     //-------------- Update Pos settings ---------------\\
+    //-------------- Update Pos settings ---------------\\
 
-     public function update_pos_settings(Request $request, $id)
-     {
+    public function update_pos_settings(Request $request, $id)
+    {
         $this->authorizeForUser($request->user('api'), 'pos_settings', Setting::class);
- 
+
         request()->validate([
             'note_customer' => 'required',
         ]);
 
         PosSetting::whereId($id)->update([
-             'note_customer'  => $request['note_customer'],
-             'show_note'      => $request['show_note'],
-             'show_barcode'   => $request['show_barcode'],
-             'show_discount'  => $request['show_discount'],
-             'show_customer'  => $request['show_customer'],
-             'show_email'     => $request['show_email'],
-             'show_phone'     => $request['show_phone'],
-             'show_address'   => $request['show_address'],
-             'is_printable'   => $request['is_printable']== 'true' ? 1 : 0,
-         ]);
- 
-         return response()->json(['success' => true]);
- 
-     }
-    
+            'note_customer' => $request['note_customer'],
+            'show_note' => $request['show_note'],
+            'show_barcode' => $request['show_barcode'],
+            'show_discount' => $request['show_discount'],
+            'show_customer' => $request['show_customer'],
+            'show_email' => $request['show_email'],
+            'show_phone' => $request['show_phone'],
+            'show_address' => $request['show_address'],
+            'is_printable' => $request['is_printable'] == 'true' ? 1 : 0,
+        ]);
+
+        return response()->json(['success' => true]);
+
+    }
+
 
     //-------------- Get All Settings ---------------\\
 
@@ -206,11 +206,11 @@ class SettingsController extends Controller
             $item['default_language'] = $settings->default_language;
             $item['is_invoice_footer'] = $settings->is_invoice_footer;
             $item['invoice_footer'] = $settings->invoice_footer;
-            $item['timezone'] = env('APP_TIMEZONE') == null?'UTC':env('APP_TIMEZONE');
+            $item['timezone'] = env('APP_TIMEZONE') == null ? 'UTC' : env('APP_TIMEZONE');
 
             $zones_array = array();
             $timestamp = time();
-            foreach(timezone_identifiers_list() as $key => $zone){
+            foreach (timezone_identifiers_list() as $key => $zone) {
                 date_default_timezone_set($zone);
                 $zones_array[$key]['zone'] = $zone;
                 $zones_array[$key]['diff_from_GMT'] = 'UTC/GMT ' . date('P', $timestamp);
@@ -223,17 +223,17 @@ class SettingsController extends Controller
 
             //get warehouses assigned to user
             $user_auth = auth()->user();
-            if($user_auth->is_all_warehouses){
+            if ($user_auth->is_all_warehouses) {
                 $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-            }else{
+            } else {
                 $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
                 $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
             }
 
             return response()->json([
-                'settings' => $item ,
+                'settings' => $item,
                 'currencies' => $Currencies,
-                'clients' => $clients , 
+                'clients' => $clients,
                 'warehouses' => $warehouses,
                 'sms_gateway' => $sms_gateway,
                 'zones_array' => $zones_array,
@@ -253,7 +253,7 @@ class SettingsController extends Controller
         Artisan::call('route:clear');
     }
 
-   
+
     //-------------- Set Environment Value ---------------\\
 
     public function setEnvironmentValue(array $values)
@@ -263,11 +263,11 @@ class SettingsController extends Controller
         $str .= "\r\n";
         if (count($values) > 0) {
             foreach ($values as $envKey => $envValue) {
-    
+
                 $keyPosition = strpos($str, "$envKey=");
                 $endOfLinePosition = strpos($str, "\n", $keyPosition);
                 $oldLine = substr($str, $keyPosition, $endOfLinePosition - $keyPosition);
-    
+
                 if (is_bool($keyPosition) && $keyPosition === false) {
                     // variable doesnot exist
                     $str .= "$envKey=$envValue";
@@ -275,17 +275,17 @@ class SettingsController extends Controller
                 } else {
                     // variable exist                    
                     $str = str_replace($oldLine, "$envKey=$envValue", $str);
-                }            
+                }
             }
         }
-    
+
         $str = substr($str, 0, -1);
         if (!file_put_contents($envFile, $str)) {
             return false;
         }
-    
-        app()->loadEnvironmentFrom($envFile);    
-    
+
+        app()->loadEnvironmentFrom($envFile);
+
         return true;
     }
 

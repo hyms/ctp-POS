@@ -81,7 +81,7 @@ class PurchasesController extends Controller
 
         //Multiple Filter
         $Filtred = $helpers->filter($Purchases, $columns, $param, $request)
-        // Search With Multiple Param
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
@@ -102,7 +102,7 @@ class PurchasesController extends Controller
             });
 
         $totalRows = $Filtred->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $Purchases = $Filtred->offset($offSet)
@@ -134,7 +134,7 @@ class PurchasesController extends Controller
                 $PurchaseReturn = PurchaseReturn::where('purchase_id', $Purchase['id'])->where('deleted_at', '=', null)->first();
                 $item['purchasereturn_id'] = $PurchaseReturn->id;
                 $item['purchase_has_return'] = 'yes';
-            }else{
+            } else {
                 $item['purchase_has_return'] = 'no';
             }
 
@@ -143,14 +143,14 @@ class PurchasesController extends Controller
 
         $suppliers = provider::where('deleted_at', '=', null)->get(['id', 'name']);
 
-         //get warehouses assigned to user
-         $user_auth = auth()->user();
-         if($user_auth->is_all_warehouses){
-             $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-         }else{
-             $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-         } 
+        //get warehouses assigned to user
+        $user_auth = auth()->user();
+        if ($user_auth->is_all_warehouses) {
+            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
+        } else {
+            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
+            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
+        }
 
         return response()->json([
             'totalRows' => $totalRows,
@@ -197,7 +197,7 @@ class PurchasesController extends Controller
                     'purchase_id' => $order->id,
                     'quantity' => $value['quantity'],
                     'cost' => $value['Unit_cost'],
-                    'purchase_unit_id' =>  $value['purchase_unit_id'],
+                    'purchase_unit_id' => $value['purchase_unit_id'],
                     'TaxNet' => $value['tax_percent'],
                     'tax_method' => $value['tax_method'],
                     'discount' => $value['discount'],
@@ -265,8 +265,8 @@ class PurchasesController extends Controller
             $current_Purchase = Purchase::findOrFail($id);
 
             if (PurchaseReturn::where('purchase_id', $id)->where('deleted_at', '=', null)->exists()) {
-                return response()->json(['success' => false , 'Return exist for the Transaction' => false], 403);
-            }else{
+                return response()->json(['success' => false, 'Return exist for the Transaction' => false], 403);
+            } else {
 
                 // Check If User Has Permission view All Records
                 if (!$view_records) {
@@ -288,18 +288,18 @@ class PurchasesController extends Controller
                 $old_products_id = [];
                 foreach ($old_purchase_details as $key => $value) {
                     $old_products_id[] = $value->id;
-                
+
                     //check if detail has purchase_unit_id Or Null
-                    if($value['purchase_unit_id'] !== null){
+                    if ($value['purchase_unit_id'] !== null) {
                         $unit = Unit::where('id', $value['purchase_unit_id'])->first();
-                    }else{
+                    } else {
                         $product_unit_purchase_id = Product::with('unitPurchase')
-                        ->where('id', $value['product_id'])
-                        ->first();
+                            ->where('id', $value['product_id'])
+                            ->first();
                         $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
                     }
 
-                    if($value['purchase_unit_id'] !== null){
+                    if ($value['purchase_unit_id'] !== null) {
                         if ($current_Purchase->statut == "received") {
 
                             if ($value['product_variant_id'] !== null) {
@@ -348,8 +348,8 @@ class PurchasesController extends Controller
 
                 // Update Data with New request
                 foreach ($new_purchase_details as $key => $prod_detail) {
-                    
-                    if($prod_detail['no_unit'] !== 0){
+
+                    if ($prod_detail['no_unit'] !== 0) {
                         $unit_prod = Unit::where('id', $prod_detail['purchase_unit_id'])->first();
 
                         if ($request['statut'] == "received") {
@@ -454,8 +454,8 @@ class PurchasesController extends Controller
             $old_purchase_details = PurchaseDetail::where('purchase_id', $id)->get();
 
             if (PurchaseReturn::where('purchase_id', $id)->where('deleted_at', '=', null)->exists()) {
-                return response()->json(['success' => false , 'Return exist for the Transaction' => false], 403);
-            }else{
+                return response()->json(['success' => false, 'Return exist for the Transaction' => false], 403);
+            } else {
 
                 // Check If User Has Permission view All Records
                 if (!$view_records) {
@@ -464,14 +464,14 @@ class PurchasesController extends Controller
                 }
 
                 foreach ($old_purchase_details as $key => $value) {
-                
+
                     //check if detail has purchase_unit_id Or Null
-                    if($value['purchase_unit_id'] !== null){
+                    if ($value['purchase_unit_id'] !== null) {
                         $unit = Unit::where('id', $value['purchase_unit_id'])->first();
-                    }else{
+                    } else {
                         $product_unit_purchase_id = Product::with('unitPurchase')
-                        ->where('id', $value['product_id'])
-                        ->first();
+                            ->where('id', $value['product_id'])
+                            ->first();
                         $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
                     }
 
@@ -543,8 +543,8 @@ class PurchasesController extends Controller
             foreach ($selectedIds as $purchase_id) {
 
                 if (PurchaseReturn::where('purchase_id', $purchase_id)->where('deleted_at', '=', null)->exists()) {
-                    return response()->json(['success' => false , 'Return exist for the Transaction' => false], 403);
-                }else{
+                    return response()->json(['success' => false, 'Return exist for the Transaction' => false], 403);
+                } else {
 
                     $current_Purchase = Purchase::findOrFail($purchase_id);
                     $old_purchase_details = PurchaseDetail::where('purchase_id', $purchase_id)->get();
@@ -554,55 +554,55 @@ class PurchasesController extends Controller
                         $this->authorizeForUser($request->user('api'), 'check_record', $current_Purchase);
                     }
                     foreach ($old_purchase_details as $key => $value) {
-                
+
                         //check if detail has purchase_unit_id Or Null
-                        if($value['purchase_unit_id'] !== null){
+                        if ($value['purchase_unit_id'] !== null) {
                             $unit = Unit::where('id', $value['purchase_unit_id'])->first();
-                        }else{
+                        } else {
                             $product_unit_purchase_id = Product::with('unitPurchase')
-                            ->where('id', $value['product_id'])
-                            ->first();
+                                ->where('id', $value['product_id'])
+                                ->first();
                             $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
                         }
-        
+
                         if ($current_Purchase->statut == "received") {
-        
+
                             if ($value['product_variant_id'] !== null) {
                                 $product_warehouse = product_warehouse::where('deleted_at', '=', null)
                                     ->where('warehouse_id', $current_Purchase->warehouse_id)
                                     ->where('product_id', $value['product_id'])
                                     ->where('product_variant_id', $value['product_variant_id'])
                                     ->first();
-        
+
                                 if ($unit && $product_warehouse) {
                                     if ($unit->operator == '/') {
                                         $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
                                     } else {
                                         $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
                                     }
-        
+
                                     $product_warehouse->save();
                                 }
-        
+
                             } else {
                                 $product_warehouse = product_warehouse::where('deleted_at', '=', null)
                                     ->where('warehouse_id', $current_Purchase->warehouse_id)
                                     ->where('product_id', $value['product_id'])
                                     ->first();
-        
+
                                 if ($unit && $product_warehouse) {
                                     if ($unit->operator == '/') {
                                         $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
                                     } else {
                                         $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
                                     }
-        
+
                                     $product_warehouse->save();
                                 }
                             }
                         }
                     }
-        
+
                     $current_Purchase->details()->delete();
                     $current_Purchase->update([
                         'deleted_at' => Carbon::now(),
@@ -650,7 +650,7 @@ class PurchasesController extends Controller
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
 
-        
+
         $details = array();
 
         // Check If User Has Permission view All Records
@@ -682,19 +682,19 @@ class PurchasesController extends Controller
             $PurchaseReturn = PurchaseReturn::where('purchase_id', $id)->where('deleted_at', '=', null)->first();
             $purchase_data['purchasereturn_id'] = $PurchaseReturn->id;
             $purchase_data['purchase_has_return'] = 'yes';
-        }else{
+        } else {
             $purchase_data['purchase_has_return'] = 'no';
         }
 
         foreach ($purchase['details'] as $detail) {
 
-             //-------check if detail has purchase_unit_id Or Null
-             if($detail->purchase_unit_id !== null){
+            //-------check if detail has purchase_unit_id Or Null
+            if ($detail->purchase_unit_id !== null) {
                 $unit = Unit::where('id', $detail->purchase_unit_id)->first();
-            }else{
+            } else {
                 $product_unit_purchase_id = Product::with('unitPurchase')
-                ->where('id', $detail->product_id)
-                ->first();
+                    ->where('id', $detail->product_id)
+                    ->first();
                 $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
             }
 
@@ -704,11 +704,11 @@ class PurchasesController extends Controller
                     ->where('id', $detail->product_variant_id)->first();
 
                 $data['code'] = $productsVariants->name . '-' . $detail['product']['code'];
-           
+
             } else {
                 $data['code'] = $detail['product']['code'];
             }
-            
+
             $data['quantity'] = $detail->quantity;
             $data['total'] = $detail->total;
             $data['name'] = $detail['product']['name'];
@@ -828,12 +828,12 @@ class PurchasesController extends Controller
         foreach ($Purchase_data['details'] as $detail) {
 
             //-------check if detail has purchase_unit_id Or Null
-            if($detail->purchase_unit_id !== null){
+            if ($detail->purchase_unit_id !== null) {
                 $unit = Unit::where('id', $detail->purchase_unit_id)->first();
-            }else{
+            } else {
                 $product_unit_purchase_id = Product::with('unitPurchase')
-                ->where('id', $detail->product_id)
-                ->first();
+                    ->where('id', $detail->product_id)
+                    ->first();
                 $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
             }
 
@@ -847,12 +847,12 @@ class PurchasesController extends Controller
                 $data['code'] = $detail['product']['code'];
             }
 
-                $data['detail_id'] = $detail_id += 1;
-                $data['quantity'] = number_format($detail->quantity, 2, '.', '');
-                $data['total'] = number_format($detail->total, 2, '.', '');
-                $data['name'] = $detail['product']['name'];
-                $data['unit_purchase'] = $unit->ShortName;
-                $data['cost'] = number_format($detail->cost, 2, '.', '');
+            $data['detail_id'] = $detail_id += 1;
+            $data['quantity'] = number_format($detail->quantity, 2, '.', '');
+            $data['total'] = number_format($detail->total, 2, '.', '');
+            $data['name'] = $detail['product']['name'];
+            $data['unit_purchase'] = $unit->ShortName;
+            $data['cost'] = number_format($detail->cost, 2, '.', '');
 
             if ($detail->discount_method == '2') {
                 $data['DiscountNet'] = number_format($detail->discount, 2, '.', '');
@@ -892,9 +892,9 @@ class PurchasesController extends Controller
         $arabic = new Arabic();
         $p = $arabic->arIdentify($Html);
 
-        for ($i = count($p)-1; $i >= 0; $i-=2) {
-            $utf8ar = $arabic->utf8Glyphs(substr($Html, $p[$i-1], $p[$i] - $p[$i-1]));
-            $Html = substr_replace($Html, $utf8ar, $p[$i-1], $p[$i] - $p[$i-1]);
+        for ($i = count($p) - 1; $i >= 0; $i -= 2) {
+            $utf8ar = $arabic->utf8Glyphs(substr($Html, $p[$i - 1], $p[$i] - $p[$i - 1]));
+            $Html = substr_replace($Html, $utf8ar, $p[$i - 1], $p[$i] - $p[$i - 1]);
         }
 
         $pdf = PDF::loadHTML($Html);
@@ -909,14 +909,14 @@ class PurchasesController extends Controller
 
         $this->authorizeForUser($request->user('api'), 'create', Purchase::class);
 
-         //get warehouses assigned to user
-         $user_auth = auth()->user();
-         if($user_auth->is_all_warehouses){
-             $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-         }else{
-             $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-             $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-         } 
+        //get warehouses assigned to user
+        $user_auth = auth()->user();
+        if ($user_auth->is_all_warehouses) {
+            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
+        } else {
+            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
+            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
+        }
 
         $suppliers = Provider::where('deleted_at', '=', null)->get(['id', 'name']);
 
@@ -931,8 +931,8 @@ class PurchasesController extends Controller
     public function edit(Request $request, $id)
     {
         if (PurchaseReturn::where('purchase_id', $id)->where('deleted_at', '=', null)->exists()) {
-            return response()->json(['success' => false , 'Return exist for the Transaction' => false], 403);
-        }else{
+            return response()->json(['success' => false, 'Return exist for the Transaction' => false], 403);
+        } else {
 
             $this->authorizeForUser($request->user('api'), 'update', Purchase::class);
             $role = Auth::user()->roles()->first();
@@ -979,13 +979,13 @@ class PurchasesController extends Controller
             foreach ($Purchase_data['details'] as $detail) {
 
                 //-------check if detail has purchase_unit_id Or Null
-                if($detail->purchase_unit_id !== null){
+                if ($detail->purchase_unit_id !== null) {
                     $unit = Unit::where('id', $detail->purchase_unit_id)->first();
                     $data['no_unit'] = 1;
-                }else{
+                } else {
                     $product_unit_purchase_id = Product::with('unitPurchase')
-                    ->where('id', $detail->product_id)
-                    ->first();
+                        ->where('id', $detail->product_id)
+                        ->first();
                     $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
                     $data['no_unit'] = 0;
                 }
@@ -1002,7 +1002,7 @@ class PurchasesController extends Controller
 
                     $item_product ? $data['del'] = 0 : $data['del'] = 1;
                     $data['code'] = $productsVariants->name . '-' . $detail['product']['code'];
-                    $data['product_variant_id'] = $detail->product_variant_id;                
+                    $data['product_variant_id'] = $detail->product_variant_id;
 
                     if ($unit && $unit->operator == '/') {
                         $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
@@ -1020,7 +1020,7 @@ class PurchasesController extends Controller
                     $item_product ? $data['del'] = 0 : $data['del'] = 1;
                     $data['product_variant_id'] = null;
                     $data['code'] = $detail['product']['code'];
-                
+
 
                     if ($unit && $unit->operator == '/') {
                         $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
@@ -1039,7 +1039,7 @@ class PurchasesController extends Controller
                 $data['product_id'] = $detail->product_id;
                 $data['unitPurchase'] = $unit->ShortName;
                 $data['purchase_unit_id'] = $unit->id;
-                
+
                 $data['is_imei'] = $detail['product']['is_imei'];
                 $data['imei_number'] = $detail->imei_number;
 
@@ -1071,13 +1071,13 @@ class PurchasesController extends Controller
 
             //get warehouses assigned to user
             $user_auth = auth()->user();
-            if($user_auth->is_all_warehouses){
+            if ($user_auth->is_all_warehouses) {
                 $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-            }else{
+            } else {
                 $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
                 $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
             }
-            
+
             $suppliers = Provider::where('deleted_at', '=', null)->get(['id', 'name']);
 
             return response()->json([
@@ -1095,44 +1095,44 @@ class PurchasesController extends Controller
     {
         $Purchase = Purchase::with('provider')->where('deleted_at', '=', null)->findOrFail($request->id);
         $settings = Setting::where('deleted_at', '=', null)->first();
-        $gateway = sms_gateway::where('id' , $settings->sms_gateway)
-        ->where('deleted_at', '=', null)->first();
+        $gateway = sms_gateway::where('id', $settings->sms_gateway)
+            ->where('deleted_at', '=', null)->first();
 
         $url = url('/api/purchase_pdf/' . $request->id);
         $receiverNumber = $Purchase['provider']->phone;
-        $message = "Dear" .' '.$Purchase['provider']->name." \n We are contacting you in regard to a purchase order #".$Purchase->Ref.' '.$url.' '. "that has been created on your account. \n We look forward to conducting future business with you.";
-      
+        $message = "Dear" . ' ' . $Purchase['provider']->name . " \n We are contacting you in regard to a purchase order #" . $Purchase->Ref . ' ' . $url . ' ' . "that has been created on your account. \n We look forward to conducting future business with you.";
+
         //twilio
-        if($gateway->title == "twilio"){
+        if ($gateway->title == "twilio") {
             try {
-    
+
                 $account_sid = env("TWILIO_SID");
                 $auth_token = env("TWILIO_TOKEN");
                 $twilio_number = env("TWILIO_FROM");
-    
+
                 $client = new Client_Twilio($account_sid, $auth_token);
                 $client->messages->create($receiverNumber, [
-                    'from' => $twilio_number, 
+                    'from' => $twilio_number,
                     'body' => $message]);
-        
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
             }
 
-        //nexmo
-        }elseif($gateway->title == "nexmo"){
+            //nexmo
+        } elseif ($gateway->title == "nexmo") {
             try {
 
-                $basic  = new Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
+                $basic = new Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
                 $client = new Client($basic);
                 $nexmo_from = env("NEXMO_FROM");
-        
+
                 $message = $client->message()->send([
                     'to' => $receiverNumber,
                     'from' => $nexmo_from,
                     'text' => $message
                 ]);
-                        
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
             }
@@ -1142,7 +1142,7 @@ class PurchasesController extends Controller
 
     //------------------- get_Products_by_purchase -----------------\\
 
-    public function get_Products_by_purchase(Request $request , $id)
+    public function get_Products_by_purchase(Request $request, $id)
     {
 
         $this->authorizeForUser($request->user('api'), 'create', PurchaseReturn::class);
@@ -1153,7 +1153,7 @@ class PurchasesController extends Controller
             ->findOrFail($id);
 
         $details = array();
-        
+
         // Check If User Has Permission view All Records
         if (!$view_records) {
             // Check If User->id === Purchase->id
@@ -1174,13 +1174,13 @@ class PurchasesController extends Controller
         foreach ($Purchase_data['details'] as $detail) {
 
             //-------check if detail has purchase_unit_id Or Null
-            if($detail->purchase_unit_id !== null){
+            if ($detail->purchase_unit_id !== null) {
                 $unit = Unit::where('id', $detail->purchase_unit_id)->first();
                 $data['no_unit'] = 1;
-            }else{
+            } else {
                 $product_unit_purchase_id = Product::with('unitPurchase')
-                ->where('id', $detail->product_id)
-                ->first();
+                    ->where('id', $detail->product_id)
+                    ->first();
                 $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
                 $data['no_unit'] = 0;
             }
@@ -1197,7 +1197,7 @@ class PurchasesController extends Controller
 
                 $item_product ? $data['del'] = 0 : $data['del'] = 1;
                 $data['code'] = $productsVariants->name . '-' . $detail['product']['code'];
-                $data['product_variant_id'] = $detail->product_variant_id;                
+                $data['product_variant_id'] = $detail->product_variant_id;
 
                 if ($unit && $unit->operator == '/') {
                     $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
@@ -1215,7 +1215,7 @@ class PurchasesController extends Controller
                 $item_product ? $data['del'] = 0 : $data['del'] = 1;
                 $data['product_variant_id'] = null;
                 $data['code'] = $detail['product']['code'];
-             
+
 
                 if ($unit && $unit->operator == '/') {
                     $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
@@ -1235,7 +1235,7 @@ class PurchasesController extends Controller
             $data['product_id'] = $detail->product_id;
             $data['unitPurchase'] = $unit->ShortName;
             $data['purchase_unit_id'] = $unit->id;
-            
+
             $data['is_imei'] = $detail['product']['is_imei'];
             $data['imei_number'] = $detail->imei_number;
 

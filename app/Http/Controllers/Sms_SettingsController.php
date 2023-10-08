@@ -30,7 +30,7 @@ class Sms_SettingsController extends Controller
         $nexmo['nexmo_secret'] = env('NEXMO_SECRET');
         $nexmo['nexmo_from'] = env('NEXMO_FROM');
 
-        return response()->json(['twilio' => $twilio,'nexmo' => $nexmo ], 200);
+        return response()->json(['twilio' => $twilio, 'nexmo' => $nexmo], 200);
     }
 
 
@@ -40,43 +40,41 @@ class Sms_SettingsController extends Controller
     {
         $this->authorizeForUser($request->user('api'), 'sms_settings', Setting::class);
 
-        
-            $this->setEnvironmentValue([
-                'TWILIO_SID' => $request['TWILIO_SID'] !== null?'"' . $request['TWILIO_SID'] . '"':'"' . env('TWILIO_SID') . '"',
-                'TWILIO_TOKEN' => $request['TWILIO_TOKEN'] !== null?'"' . $request['TWILIO_TOKEN'] . '"':'"' . env('TWILIO_TOKEN') . '"',
-                'TWILIO_FROM' => $request['TWILIO_FROM'] !== null?'"' . $request['TWILIO_FROM'] . '"':'"' . env('TWILIO_FROM') . '"',
-            ]);
-
-            Artisan::call('config:cache');
-            Artisan::call('config:clear');
-
-        return response()->json(['success' => true]);
-
-    }
-    
-
-
-
-     //-------------- Update nexmo_sms_config ---------------\\
-
-     public function update_nexmo_config(Request $request)
-     {
-         $this->authorizeForUser($request->user('api'), 'sms_settings', Setting::class);
 
         $this->setEnvironmentValue([
-            'NEXMO_KEY' => $request['nexmo_key'] !== null?'"' . $request['nexmo_key'] . '"':'"' . env('NEXMO_KEY') . '"',
-            'NEXMO_SECRET' => $request['nexmo_secret'] !== null?'"' . $request['nexmo_secret'] . '"':'"' . env('NEXMO_SECRET') . '"',
-            'NEXMO_FROM' => $request['nexmo_from'] !== null?'"' . $request['nexmo_from'] . '"':'"' . env('NEXMO_FROM') . '"',
+            'TWILIO_SID' => $request['TWILIO_SID'] !== null ? '"' . $request['TWILIO_SID'] . '"' : '"' . env('TWILIO_SID') . '"',
+            'TWILIO_TOKEN' => $request['TWILIO_TOKEN'] !== null ? '"' . $request['TWILIO_TOKEN'] . '"' : '"' . env('TWILIO_TOKEN') . '"',
+            'TWILIO_FROM' => $request['TWILIO_FROM'] !== null ? '"' . $request['TWILIO_FROM'] . '"' : '"' . env('TWILIO_FROM') . '"',
         ]);
 
         Artisan::call('config:cache');
         Artisan::call('config:clear');
 
-       return response()->json(['success' => true]);
+        return response()->json(['success' => true]);
 
-     }
+    }
 
-     
+
+    //-------------- Update nexmo_sms_config ---------------\\
+
+    public function update_nexmo_config(Request $request)
+    {
+        $this->authorizeForUser($request->user('api'), 'sms_settings', Setting::class);
+
+        $this->setEnvironmentValue([
+            'NEXMO_KEY' => $request['nexmo_key'] !== null ? '"' . $request['nexmo_key'] . '"' : '"' . env('NEXMO_KEY') . '"',
+            'NEXMO_SECRET' => $request['nexmo_secret'] !== null ? '"' . $request['nexmo_secret'] . '"' : '"' . env('NEXMO_SECRET') . '"',
+            'NEXMO_FROM' => $request['nexmo_from'] !== null ? '"' . $request['nexmo_from'] . '"' : '"' . env('NEXMO_FROM') . '"',
+        ]);
+
+        Artisan::call('config:cache');
+        Artisan::call('config:clear');
+
+        return response()->json(['success' => true]);
+
+    }
+
+
     //-------------- Set Environment Value ---------------\\
 
     public function setEnvironmentValue(array $values)
@@ -86,11 +84,11 @@ class Sms_SettingsController extends Controller
         $str .= "\r\n";
         if (count($values) > 0) {
             foreach ($values as $envKey => $envValue) {
-    
+
                 $keyPosition = strpos($str, "$envKey=");
                 $endOfLinePosition = strpos($str, "\n", $keyPosition);
                 $oldLine = substr($str, $keyPosition, $endOfLinePosition - $keyPosition);
-    
+
                 if (is_bool($keyPosition) && $keyPosition === false) {
                     // variable doesnot exist
                     $str .= "$envKey=$envValue";
@@ -98,17 +96,17 @@ class Sms_SettingsController extends Controller
                 } else {
                     // variable exist                    
                     $str = str_replace($oldLine, "$envKey=$envValue", $str);
-                }            
+                }
             }
         }
-    
+
         $str = substr($str, 0, -1);
         if (!file_put_contents($envFile, $str)) {
             return false;
         }
-    
-        app()->loadEnvironmentFrom($envFile);    
-    
+
+        app()->loadEnvironmentFrom($envFile);
+
         return true;
     }
 

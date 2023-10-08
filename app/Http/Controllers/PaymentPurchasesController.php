@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Mail\Payment_Purchase;
@@ -53,7 +54,7 @@ class PaymentPurchasesController extends BaseController
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             })
-        // Multiple Filter
+            // Multiple Filter
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('provider_id'), function ($query) use ($request) {
                     return $query->whereHas('purchase.provider', function ($q) use ($request) {
@@ -62,7 +63,7 @@ class PaymentPurchasesController extends BaseController
                 });
             });
         $Filtred = $helpers->filter($Payments, $columns, $param, $request)
-        // Search With Multiple Param
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
@@ -82,7 +83,7 @@ class PaymentPurchasesController extends BaseController
             });
 
         $totalRows = $Filtred->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $Payments = $Filtred->offset($offSet)
@@ -119,13 +120,13 @@ class PaymentPurchasesController extends BaseController
     public function store(Request $request)
     {
         $this->authorizeForUser($request->user('api'), 'create', PaymentPurchase::class);
-        
-        if($request['montant'] > 0){
+
+        if ($request['montant'] > 0) {
             DB::transaction(function () use ($request) {
                 $role = Auth::user()->roles()->first();
                 $view_records = Role::findOrFail($role->id)->inRole('record_view');
                 $purchase = Purchase::findOrFail($request['purchase_id']);
-        
+
                 // Check If User Has Permission view All Records
                 if (!$view_records) {
                     // Check If User->id === purchase->id
@@ -167,22 +168,23 @@ class PaymentPurchasesController extends BaseController
 
     //------------ function show -----------\\
 
-    public function show($id){
+    public function show($id)
+    {
         //
-        
-        }
+
+    }
 
     //----------- Update Payment Purchases --------------\\
 
     public function update(Request $request, $id)
     {
         $this->authorizeForUser($request->user('api'), 'update', PaymentPurchase::class);
-        
+
         DB::transaction(function () use ($id, $request) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $payment = PaymentPurchase::findOrFail($id);
-    
+
             // Check If User Has Permission view All Records
             if (!$view_records) {
                 // Check If User->id === payment->id
@@ -224,12 +226,12 @@ class PaymentPurchasesController extends BaseController
     public function destroy(Request $request, $id)
     {
         $this->authorizeForUser($request->user('api'), 'delete', PaymentPurchase::class);
-        
+
         DB::transaction(function () use ($id, $request) {
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $payment = PaymentPurchase::findOrFail($id);
-    
+
             // Check If User Has Permission view All Records
             if (!$view_records) {
                 // Check If User->id === payment->id
@@ -329,49 +331,49 @@ class PaymentPurchasesController extends BaseController
     }
 
 
-     //-------------------Sms Notifications -----------------\\
-     public function Send_SMS(Request $request)
-     {
-         $payment = PaymentPurchase::with('purchase', 'purchase.provider')->findOrFail($request->id);
-         $settings = Setting::where('deleted_at', '=', null)->first();
-         $gateway = sms_gateway::where('id' , $settings->sms_gateway)
-         ->where('deleted_at', '=', null)->first();
+    //-------------------Sms Notifications -----------------\\
+    public function Send_SMS(Request $request)
+    {
+        $payment = PaymentPurchase::with('purchase', 'purchase.provider')->findOrFail($request->id);
+        $settings = Setting::where('deleted_at', '=', null)->first();
+        $gateway = sms_gateway::where('id', $settings->sms_gateway)
+            ->where('deleted_at', '=', null)->first();
 
-         $url = url('/api/payment_purchase_pdf/' . $request->id);
-         $receiverNumber = $payment['purchase']['provider']->phone;
-         $message = "Dear" .' '.$payment['purchase']['provider']->name." \n We are contacting you in regard to a Payment #".$payment['purchase']->Ref.' '.$url.' '. "that has been created on your account. \n We look forward to conducting future business with you.";
-        
+        $url = url('/api/payment_purchase_pdf/' . $request->id);
+        $receiverNumber = $payment['purchase']['provider']->phone;
+        $message = "Dear" . ' ' . $payment['purchase']['provider']->name . " \n We are contacting you in regard to a Payment #" . $payment['purchase']->Ref . ' ' . $url . ' ' . "that has been created on your account. \n We look forward to conducting future business with you.";
+
         //twilio
-        if($gateway->title == "twilio"){
+        if ($gateway->title == "twilio") {
             try {
-    
+
                 $account_sid = env("TWILIO_SID");
                 $auth_token = env("TWILIO_TOKEN");
                 $twilio_number = env("TWILIO_FROM");
-    
+
                 $client = new Client_Twilio($account_sid, $auth_token);
                 $client->messages->create($receiverNumber, [
-                    'from' => $twilio_number, 
+                    'from' => $twilio_number,
                     'body' => $message]);
-        
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
             }
 
-        //nexmo
-        }elseif($gateway->title == "nexmo"){
+            //nexmo
+        } elseif ($gateway->title == "nexmo") {
             try {
 
-                $basic  = new Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
+                $basic = new Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
                 $client = new Client($basic);
                 $nexmo_from = env("NEXMO_FROM");
-        
+
                 $message = $client->message()->send([
                     'to' => $receiverNumber,
                     'from' => $nexmo_from,
                     'text' => $message
                 ]);
-                        
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
             }

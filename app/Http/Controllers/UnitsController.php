@@ -19,7 +19,7 @@ class UnitsController extends Controller
         $Units = Unit::where('deleted_at', '=', null)
             ->get();
 
-        $data=collect();
+        $data = collect();
         foreach ($Units as $unit) {
             $unit_data['id'] = $unit->id;
             $unit_data['name'] = $unit->name;
@@ -47,7 +47,7 @@ class UnitsController extends Controller
                 return ['value' => $item->id, 'title' => $item->name];
             });
         Inertia::share('titlePage', 'Unidades');
-        return Inertia::render('Products/Units',[
+        return Inertia::render('Products/Units', [
             'units' => $data,
             'units_base' => $Units_base,
         ]);
@@ -143,13 +143,12 @@ class UnitsController extends Controller
         $units = Unit::where(function ($query) use ($request) {
             return $query->when($request->filled('id'), function ($query) use ($request) {
                 return $query->where('id', $request->id)
-                              ->orWhere('base_unit', $request->id);
+                    ->orWhere('base_unit', $request->id);
             });
         })->get();
 
         return response()->json($units);
     }
-
 
 
     //-------------- Get Sales Units ------------------\\
@@ -164,9 +163,9 @@ class UnitsController extends Controller
         })->first();
 
         $units = Unit::where('base_unit', $product_unit_id->unit_id)
-                        ->orWhere('id', $product_unit_id->unit_id)
-                        ->get();
-        
+            ->orWhere('id', $product_unit_id->unit_id)
+            ->get();
+
         return response()->json($units);
     }
 

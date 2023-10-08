@@ -40,10 +40,10 @@ class WarehouseController extends Controller
 
             $Warehouse = new Warehouse;
             $Warehouse->name = $request['name'];
-            $Warehouse->mobile = $request['mobile']??'';
+            $Warehouse->mobile = $request['mobile'] ?? '';
 //            $Warehouse->country = $request['country'];
-            $Warehouse->city = $request['city']??'';
-            $Warehouse->email = $request['email']??'';
+            $Warehouse->city = $request['city'] ?? '';
+            $Warehouse->email = $request['email'] ?? '';
             $Warehouse->save();
 
             $products = Product::get()
@@ -84,10 +84,11 @@ class WarehouseController extends Controller
 
     //------------ function show -----------\\
 
-    public function show($id){
+    public function show($id)
+    {
         //
-        
-        }
+
+    }
 
     //-----------Update Warehouse --------------\\
 
@@ -101,10 +102,10 @@ class WarehouseController extends Controller
 
         Warehouse::whereId($id)->update([
             'name' => $request['name'],
-            'mobile' => $request['mobile']??'',
-            'country' => $request['country']??'',
-            'city' => $request['city']??'',
-            'email' => $request['email']??'',
+            'mobile' => $request['mobile'] ?? '',
+            'country' => $request['country'] ?? '',
+            'city' => $request['city'] ?? '',
+            'email' => $request['email'] ?? '',
         ]);
         return response()->json(['success' => true]);
     }
