@@ -40,9 +40,10 @@ class SalesController extends Controller
 //        $view_records = Role::findOrFail($role->id)->inRole('record_view');
 
         $filter = collect($request->get('filter'));
-
+        $warehouses = helpers::getWarehouses(auth()->user());
         $Sales = Sale::with('facture', 'client', 'warehouse', 'user', 'userpos', 'sales_type')
             ->where('deleted_at', '=', null)
+            ->whereIn('warehouse_id', $warehouses->pluck('id'))
             ->orderBy('updated_at', 'desc');
         if ($filter->count() > 0) {
             $filterData = false;
@@ -127,7 +128,7 @@ class SalesController extends Controller
         $customers = client::where('deleted_at', '=', null)->get(['id', 'company_name as name']);
 
         //get warehouses assigned to user
-        $warehouses = helpers::getWarehouses(auth()->user());
+
 
         $sales_types = SalesType::where('deleted_at', '=', null)->get(['id', 'name']);
 

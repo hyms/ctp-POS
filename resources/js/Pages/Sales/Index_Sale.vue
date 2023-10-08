@@ -1,7 +1,6 @@
 <script setup>
 import {ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import Snackbar from "@/Components/snackbar.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
 import {router} from "@inertiajs/vue3";
@@ -109,13 +108,13 @@ function Verified_paidAmount() {
   snackbar.value = false;
   if (isNaN(payment.value.montant)) {
     payment.value.montant = 0;
-  } else if (payment.value.montant > payment.value.received_amount) {
-    snackbar.value = true;
-    snackbarColor.value = "warning";
-    snackbarText.value =
-        "El monto de pago es mas alto que el a pagar";
-    payment.value.montant = 0;
-  } else if (payment.value.montant > due.value) {
+  // } else if ((payment.value.montant*1) > (payment.value.received_amount*1)) {
+  //   snackbar.value = true;
+  //   snackbarColor.value = "warning";
+  //   snackbarText.value =
+  //       "El monto de pago es mas alto que el a pagar";
+  //   payment.value.montant = 0;
+  } else if ((payment.value.montant*1) >( due.value*1)) {
     snackbar.value = true;
     snackbarColor.value = "warning";
     snackbarText.value =
@@ -267,7 +266,6 @@ function Edit_Payment(payment_item) {
   payment.value.notes = payment_item.notes;
   console.log(payment_item)
   due.value = parseFloat(sale_due.value) - payment_item.montant;
-  console.log()
   dialogAddPayment.value = true;
 }
 
@@ -474,12 +472,10 @@ function Remove_Sale(id, sale_has_return) {
 </script>
 
 <template>
-  <layout>
-    <snackbar
-        :snackbar="snackbar"
-        :snackbar-text="snackbarText"
-        :snackbar-color="snackbarColor"
-    ></snackbar>
+  <layout
+      :snackbar-view="snackbar"
+      :snackbar-text="snackbarText"
+      :snackbar-color="snackbarColor">
     <!-- Modal Remove Sale -->
     <delete-dialog
         :model="dialogDelete"
@@ -490,7 +486,7 @@ function Remove_Sale(id, sale_has_return) {
     <delete-dialog
         :model="dialogDeletePayment"
         :on-save="Remove_Payment"
-        :on-close="()=>{dialogDeletePayment.value=false}"
+        :on-close="()=>{dialogDeletePayment=false}"
     ></delete-dialog>
     <!-- Modal Show Payments-->
     <v-dialog v-model="dialogShowPayment" width="800">
@@ -573,27 +569,23 @@ function Remove_Sale(id, sale_has_return) {
           <v-form ref="form">
             <v-row>
               <!-- date -->
-              <v-col md="4" cols="12">
+              <v-col md="4" sm="6" cols="12">
                 <v-text-field
-                    :label="paymentLabel.date + ' *'"
+                    :label="labels.payment.date + ' *'"
                     v-model="payment.date"
-                    :placeholder="paymentLabel.date"
+                    :placeholder="labels.payment.date"
                     :rules="helper.required"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 >
                 </v-text-field>
               </v-col>
 
               <!-- Reference  -->
-              <v-col md="4" cols="12">
+              <v-col md="4" sm="6" cols="12">
                 <v-text-field
-                    :label="paymentLabel.Ref + ' *'"
+                    :label="labels.payment.Ref + ' *'"
                     v-model="payment.Ref"
-                    :placeholder="paymentLabel.Ref"
-                    variant="outlined"
-                    density="comfortable"
+                    :placeholder="labels.payment.Ref"
                     hide-details="auto"
                     readonly=""
                 >
@@ -601,7 +593,7 @@ function Remove_Sale(id, sale_has_return) {
               </v-col>
 
               <!-- Payment choice -->
-              <v-col md="4" cols="12">
+              <v-col md="4" sm="6" cols="12">
                 <v-select
                     v-model="payment.Reglement"
                     :items="helper.reglamentPayment()"
@@ -609,20 +601,16 @@ function Remove_Sale(id, sale_has_return) {
                     :label="labels.payment.role"
                     item-title="title"
                     item-value="value"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                 ></v-select>
               </v-col>
 
               <!-- Received  Amount  -->
-              <v-col md="4" cols="12">
+              <v-col md="4" sm="6" cols="12">
                 <v-text-field
                     label="Deuda"
                     v-model="payment.received_amount"
                     placeholder="Deuda"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                     readonly
                 >
@@ -630,14 +618,12 @@ function Remove_Sale(id, sale_has_return) {
               </v-col>
 
               <!-- Paying Amount  -->
-              <v-col md="4" cols="12">
+              <v-col md="4" sm="6" cols="12">
                 <v-text-field
-                    :label="paymentLabel.montant"
+                    :label="labels.payment.montant"
                     v-model="payment.montant"
-                    :placeholder="paymentLabel.montant"
+                    :placeholder="labels.payment.montant"
                     :rules="helper.required.concat(helper.numberWithDecimal)"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                     @keyup="Verified_paidAmount"
                 >
@@ -645,13 +631,11 @@ function Remove_Sale(id, sale_has_return) {
               </v-col>
 
               <!-- change Amount  -->
-              <v-col md="4" cols="12">
+              <v-col md="4" sm="6" cols="12">
                 <v-text-field
                     label="Saldo"
                     :model-value="parseFloat(payment.received_amount - payment.montant).toFixed(2)"
                     placeholder="Saldo"
-                    variant="outlined"
-                    density="comfortable"
                     hide-details="auto"
                     readonly
                 >
@@ -662,11 +646,9 @@ function Remove_Sale(id, sale_has_return) {
               <v-col cols="12">
                 <v-textarea
                     rows="4"
-                    :label="paymentLabel.notes"
+                    :label="labels.payment.notes"
                     v-model="payment.notes"
-                    :placeholder="paymentLabel.notes"
-                    variant="outlined"
-                    density="comfortable"
+                    :placeholder="labels.payment.notes"
                     hide-details="auto"
                 ></v-textarea>
               </v-col>
@@ -676,7 +658,6 @@ function Remove_Sale(id, sale_has_return) {
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
-              size="small"
               variant="outlined"
               color="error"
               class="ma-1"
@@ -685,7 +666,6 @@ function Remove_Sale(id, sale_has_return) {
             Cancelar
           </v-btn>
           <v-btn
-              size="small"
               color="primary"
               variant="flat"
               class="ma-1"
@@ -715,11 +695,10 @@ function Remove_Sale(id, sale_has_return) {
             name-file="Productos"
         ></ExportBtn>
         <v-btn
-            size="small"
             color="primary"
             class="ma-1"
             variant="flat"
-            prepend-icon="mdi-account-plus"
+            prepend-icon="mdi-plus"
             @click="router.visit('/sales/create')"
         >
           Añadir
@@ -732,7 +711,6 @@ function Remove_Sale(id, sale_has_return) {
           :items="sales"
           :search="search"
           hover
-
           no-data-text="No existen datos a mostrar"
           :loading="loading"
           loading-text="Cargando..."
@@ -850,8 +828,5 @@ function Remove_Sale(id, sale_has_return) {
 <style>
 .total {
   font-weight: bold;
-  /*font-size: 14px;*/
-  /* text-transform: uppercase;
-  height: 50px; */
 }
 </style>

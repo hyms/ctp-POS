@@ -339,7 +339,6 @@ function Verified_Qty(detail, id) {
       if (isNaN(detail.quantity)) {
         detailsForm.value[i].quantity = detail.stock;
       }
-
       if (detail.quantity > detail.stock) {
         snackbar.value = true;
         snackbarText.value = "bajo stock";
@@ -474,10 +473,12 @@ function Create_Sale() {
           payment: payment.value,
           amount: parseFloat(payment.value.amount).toFixed(2),
           received_amount: parseFloat(
-              payment.value.received_amount
+              // payment.value.received_amount
+              "0"
           ).toFixed(2),
           change: parseFloat(
-              payment.value.received_amount - payment.value.amount
+              "0"
+              // GrandTotal.value - payment.value.amount
           ).toFixed(2),
         })
         .then((response) => {
@@ -664,16 +665,13 @@ onMounted(() => {
 });
 </script>
 <template>
-  <Layout :loading="loading">
-    <snackbar
-        v-model="snackbar"
-        :snackbarColor="snackbarColor"
-        :snackbarText="snackbarText"
-    >
-    </snackbar>
+  <layout
+      :snackbar-view="snackbar"
+      :snackbar-text="snackbarText"
+      :snackbar-color="snackbarColor">
     <v-form ref="form">
       <v-card>
-        <v-toolbar height="10"></v-toolbar>
+        <v-toolbar height="15"></v-toolbar>
         <v-card-text>
           <v-row>
             <!-- date-->
@@ -681,8 +679,6 @@ onMounted(() => {
               <v-text-field
                   v-model="saleForm.date"
                   :label="saleLabel.date"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
                   type="date"
                   :rules="helper.required"
@@ -705,8 +701,6 @@ onMounted(() => {
                   v-model="saleForm.warehouse_id"
                   :items="warehouses"
                   :label="saleLabel.warehouse_id"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
                   clearable
                   :rules="helper.required"
@@ -723,7 +717,6 @@ onMounted(() => {
                   variant="solo-filled"
                   item-title="name"
                   item-value="id"
-                  density="comfortable"
                   hide-no-data
                   hide-details
                   label="Añadir Producto"
@@ -739,7 +732,6 @@ onMounted(() => {
               <v-table
                   hover
                   class="border rounded"
-                  density="comfortable"
               >
                 <thead>
                 <tr class="bg-secondary">
@@ -804,8 +796,7 @@ onMounted(() => {
                   </td>
                   <td>
                     <v-text-field
-                        variant="outlined"
-
+                        class="my-1"
                         hide-details="auto"
                         :rules="helper.number"
                         v-model="detail.Net_price"
@@ -829,8 +820,6 @@ onMounted(() => {
                   <td>
                     <div class="quantity">
                       <v-text-field
-                          variant="outlined"
-
                           hide-details="auto"
                           :rules="helper.number"
                           v-model="detail.quantity"
@@ -874,19 +863,16 @@ onMounted(() => {
                     }}
                   </td>
                   <td>
-                    <i @click="Modal_Updat_Detail(detail)"
-                       class="i-Edit text-25 text-success"
-                    ></i>
-                    <v-btn
-                        class="ma-1 rounded"
-                        color="success"
-                        icon="mdi-pen"
-                        size="small"
-                        density="comfortable"
-                        variant="elevated"
-                        @click="Modal_Updat_Detail(detail)"
-                    >
-                    </v-btn>
+<!--                    <v-btn-->
+<!--                        class="ma-1 rounded"-->
+<!--                        color="success"-->
+<!--                        icon="mdi-pen"-->
+<!--                        size="small"-->
+<!--                        density="comfortable"-->
+<!--                        variant="elevated"-->
+<!--                        @click="Modal_Updat_Detail(detail)"-->
+<!--                    >-->
+<!--                    </v-btn>-->
                     <v-btn
                         class="ma-1 rounded"
                         color="error"
@@ -936,8 +922,6 @@ onMounted(() => {
               <!-- Discount -->
               <v-text-field
                   :label="saleLabel.discount"
-                  variant="outlined"
-
                   hide-details="auto"
                   :rules="helper.number"
                   v-model="saleForm.discount"
@@ -948,28 +932,25 @@ onMounted(() => {
             <v-col lg="4" md="4" cols="12" v-if="editmode==false">
               <v-text-field
                   v-model="payment.amount"
-                  variant="outlined"
-
                   hide-details="auto"
                   type="text"
                   label="A pagar"
                   :rules="helper.numberWithDecimal"
-              ></v-text-field>
-            </v-col>
-            <!-- Received  Amount  -->
-            <v-col lg="4" md="4" cols="12" v-if="editmode==false">
-              <v-text-field
-                  v-model="payment.received_amount"
-                  variant="outlined"
-
-                  hide-details="auto"
-                  type="text"
-                  label="Monto Recibido"
-                  readonly
-                  :rules="helper.numberWithDecimal"
                   @keyup="change_payment_status()"
               ></v-text-field>
             </v-col>
+            <!-- Received  Amount  -->
+<!--            <v-col lg="4" md="4" cols="12" v-if="editmode==false">-->
+<!--              <v-text-field-->
+<!--                  v-model="payment.received_amount"-->
+<!--                  hide-details="auto"-->
+<!--                  type="text"-->
+<!--                  label="Monto Recibido"-->
+<!--                  readonly-->
+<!--                  :rules="helper.numberWithDecimal"-->
+<!--                  @keyup="change_payment_status()"-->
+<!--              ></v-text-field>-->
+<!--            </v-col>-->
 
             <!-- Status  -->
             <v-col lg="4" md="4" cols="12">

@@ -144,8 +144,6 @@ onMounted(() => {
                   v-model="client.name"
                   :placeholder="labels.client.name"
                   :rules="helper.required"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
               >
               </v-text-field>
@@ -158,8 +156,6 @@ onMounted(() => {
                   v-model="client.company_name"
                   :placeholder="labels.client.company_name"
                   :rules="helper.required"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
               >
               </v-text-field>
@@ -171,8 +167,6 @@ onMounted(() => {
                   :label="labels.client.email"
                   v-model="client.email"
                   :placeholder="labels.client.email"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
               >
               </v-text-field>
@@ -184,8 +178,6 @@ onMounted(() => {
                   :label="labels.client.phone"
                   v-model="client.phone"
                   :placeholder="labels.client.phone"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
               >
               </v-text-field>
@@ -197,8 +189,6 @@ onMounted(() => {
                   :label="labels.client.city"
                   v-model="client.city"
                   :placeholder="labels.client.city"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
               >
               </v-text-field>
@@ -210,8 +200,6 @@ onMounted(() => {
                   :label="labels.client.nit_ci"
                   v-model="client.nit_ci"
                   :placeholder="labels.client.nit_ci"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
               ></v-text-field>
             </v-col>
@@ -223,8 +211,6 @@ onMounted(() => {
                   :label="labels.client.adresse"
                   v-model="client.adresse"
                   :placeholder="labels.client.adresse"
-                  variant="outlined"
-                  density="comfortable"
                   hide-details="auto"
               ></v-textarea>
             </v-col>
@@ -233,7 +219,6 @@ onMounted(() => {
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
-              size="small"
               variant="outlined"
               color="error"
               class="ma-1"
@@ -242,7 +227,6 @@ onMounted(() => {
             {{ labels.cancel }}
           </v-btn>
           <v-btn
-              size="small"
               color="primary"
               variant="flat"
               class="ma-1"
@@ -263,8 +247,6 @@ onMounted(() => {
       @update:modelValue="updateValue"
       item-title="name"
       item-value="id"
-      variant="outlined"
-      density="comfortable"
       hide-details="auto"
       :rules="helper.required"
       :loading="loading"
