@@ -92,10 +92,28 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
-        Schema::table('transfers', function (Blueprint $table) {
-            $table->renameColumn('total','GrandTotal');
-        });
         Schema::drop('transfer_details');
+        Schema::drop('transfers');
+
+        Schema::create('transfers', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
+            $table->id();
+            $table->foreignId('user_id')->constrained('users');
+            $table->string('Ref');
+            $table->date('date');
+            $table->foreignId('from_warehouse_id')->constrained('warehouses');
+            $table->foreignId('to_warehouse_id')->constrained('warehouses');
+            $table->float('items', 10, 0);
+            $table->float('tax_rate', 10, 0)->nullable()->default(0);
+            $table->float('TaxNet', 10, 0)->nullable()->default(0);
+            $table->float('discount', 10, 0)->nullable()->default(0);
+            $table->float('shipping', 10, 0)->nullable()->default(0);
+            $table->float('GrandTotal', 10, 0)->default(0);
+            $table->string('statut', 192);
+            $table->text('notes')->nullable();
+            $table->timestamps(6);
+            $table->softDeletes();
+        });
         Schema::create('transfer_details', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->id();
