@@ -27,10 +27,13 @@ const form = ref({
 });
 
 const fields = ref([
-  {title: "Fecha", key: "date"},
-  {title: "Codigo", key: "Ref"},
-  {title: "Cliente", key: "client_name"},
   {title: "Agencia", key: "warehouse_name"},
+  {title: "Fecha", key: "date"},
+  {title: "Cliente", key: "client_name"},
+  {title: "Codigo", key: "Ref"},
+  {title: "Producto", key: "product"},
+  {title: "Cantidad", key: "qty"},
+  {title: "Precio", key: "price"},
   {title: "Estado", key: "statut"},
   {title: "Total", key: "GrandTotal"},
   {title: "Pagado", key: "paid_amount"},
@@ -38,10 +41,14 @@ const fields = ref([
   {title: "Estado de pago", key: "payment_status"},
 ]);
 const jsonFields = ref({
-  "Fecha": "date",
-  "Codigo": "Ref",
-  "Cliente": "client_name",
   "Agencia": "warehouse_name",
+  "Fecha": "date",
+  "Cliente": "client_name",
+  "Codigo Cliente": "client_code",
+  "Codigo": "Ref",
+  "Producto": "product",
+  "Cantidad": "qty",
+  "Precio": "price",
   "Estado": "statut",
   "Total": "GrandTotal",
   "Pagado": "paid_amount",
@@ -52,28 +59,26 @@ const jsonFields = ref({
 function sumCount(rowObj) {
 
   let sum = 0;
-  for (let i = 0; i < rowObj.length; i++) {
-    sum += rowObj[i].GrandTotal;
+  for(let val of rowObj){
+    sum+=parseFloat(val.GrandTotal);
   }
-  return sum;
+  return parseFloat(sum).toFixed(2);
 }
 
 function sumCount2(rowObj) {
   let sum = 0;
-  for (let i = 0; i < rowObj.length; i++) {
-    sum += rowObj[i].paid_amount;
+  for(let val of rowObj){
+    sum+=parseFloat(val.paid_amount);
   }
-  return sum;
-
+  return parseFloat(sum).toFixed(2);
 }
 
 function sumCount3(rowObj) {
   let sum = 0;
-  for (let i = 0; i < rowObj.length; i++) {
-    sum += rowObj[i].due;
+  for(let val of rowObj){
+    sum+=parseFloat(val.due);
   }
-  return sum;
-
+  return parseFloat(sum).toFixed(2);
 }
 
 function querySelections(v) {
@@ -105,32 +110,6 @@ function Get_Sales(page) {
 </script>
 <template>
   <layout>
-    <v-row align="center" class="mb-3">
-      <v-col sm="4" cols="12">
-        <v-card class="mb-30 text-center">
-          <v-card-text class="text-center  text-h6">
-            <p class="text-disabled mt-2 mb-1">Total ({{ currency }})</p>
-            <p class="text-primary text-24 line-height-1 mb-2">{{ sumCount(sales) }}</p>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col sm="4" cols="12">
-        <v-card class="mb-30 text-center  ">
-          <v-card-text class="text-center text-h6">
-            <p class="text-disabled mt-2 mb-1">Pagado ({{ currency }})</p>
-            <p class="text-primary text-24 line-height-1 mb-2">{{ sumCount2(sales) }}</p>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col sm="4" cols="12">
-        <v-card class="mb-30 text-center">
-          <v-card-text class="text-center  text-h6">
-            <p class="text-disabled mt-2 mb-1">Deuda ({{ currency }})</p>
-            <p class="text-primary text-24 line-height-1 mb-2">{{ sumCount3(sales) }}</p>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
     <v-row align="center" class="mb-3">
       <v-col cols="12" sm="6">
         <v-text-field
@@ -191,16 +170,6 @@ function Get_Sales(page) {
                         hide-details="auto"
                         type="text"
                         :label="labels.payment.Ref"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                        v-model="form.sale"
-                        variant="outlined"
-                        clearable
-                        hide-details="auto"
-                        type="text"
-                        :label="labels.sale.Ref"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6">
@@ -289,9 +258,9 @@ function Get_Sales(page) {
           :items="sales"
           :search="search"
           hover
-
           :no-data-text="labels.no_data_table"
           :loading="loading"
+          class="text-center"
       >
         <template v-slot:item.Reglement="{ item }">
           {{ helper.getReglamentPayment(item.Reglement)[0].title }}
@@ -312,7 +281,6 @@ function Get_Sales(page) {
           >{{ helper.statusPayment(item.payment_status) }}
           </v-chip>
         </template>
-
       </v-data-table>
     </v-card>
   </layout>

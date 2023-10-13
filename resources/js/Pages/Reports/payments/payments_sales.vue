@@ -47,10 +47,10 @@ const jsonFields = ref({
 function sumCount(rowObj) {
 
   let sum = 0;
-  for (let i = 0; i < rowObj.length; i++) {
-    sum += rowObj[i].montant;
+  for(let val of rowObj){
+    sum+=parseFloat(val.montant);
   }
-  return sum;
+  return parseFloat(sum).toFixed(2);
 }
 
 function querySelections(v) {
@@ -85,32 +85,6 @@ function Payments_Sales() {
 </script>
 <template>
   <layout>
-    <v-row align="center" class="mb-3">
-      <v-col md="3" sm="6" cols="12">
-        <v-card class="mb-30 text-center">
-          <v-card-text>
-            <v-row align="center" no-gutters>
-              <v-col cols="6" class="text-right">
-                <v-icon
-                    color="primary"
-                    icon="mdi-cart-outline"
-                    size="68"
-                ></v-icon>
-              </v-col>
-              <v-col
-                  class="text-h6"
-                  cols="6"
-              >
-                <p class="text-disabled mt-2 mb-0">{{ labels.sale.GrandTotal }} {{ currency }}</p>
-                <p class="text-primary text-24 line-height-1 mb-2">
-                  {{ sumCount(payments) }}
-                </p>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
     <v-row align="center" class="mb-3">
       <v-col cols="12" sm="6">
         <v-text-field
@@ -247,12 +221,15 @@ function Payments_Sales() {
           :items="payments"
           :search="search"
           hover
-
           :no-data-text="labels.no_data_table"
           :loading="loading"
+          class="text-center"
       >
         <template v-slot:item.Reglement="{ item }">
-          {{ helper.getReglamentPayment(itemsnackbarText.value.Reglement)[0].title }}
+          {{  helper.getReglamentPayment(item.Reglement)[0]?.title }}
+        </template>
+        <template v-slot:tfoot>
+          <tr><td colspan="4"></td><td  class="font-weight-bold">TOTAL</td><td class="text-center">{{sumCount(payments)}}</td></tr>
         </template>
 
       </v-data-table>

@@ -238,6 +238,7 @@ class ReportController extends Controller
             $item['Ref'] = $sale->Ref;
             $item['warehouse_name'] = $sale['warehouse']?->name;
             $item['client_name'] = $sale['client']?->company_name;
+            $item['client_code'] = $sale['client']?->code;
             $item['statut'] = $sale->statut;
             $item['GrandTotal'] = $sale->GrandTotal;
             $item['paid_amount'] = $sale->paid_amount;
@@ -571,8 +572,8 @@ class ReportController extends Controller
         }
 
         $Sales = Sale::select('sales.*')
-            ->with('facture', 'client', 'warehouse')
-            ->join('clients', 'sales.client_id', '=', 'clients.id')
+            ->with('facture', 'client', 'warehouse','details','details.product')
+//            ->join('clients', 'sales.client_id', '=', 'clients.id')
             ->where('sales.deleted_at', '=', null);
 //                ->whereBetween('sales.date', array($request->from, $request->to));
 
@@ -589,6 +590,7 @@ class ReportController extends Controller
         );
         $Sales = $Sales->orderByDesc('date')->get();
         foreach ($Sales as $Sale) {
+        foreach ($Sale['details'] as $datail) {
             $item['id'] = $Sale['id'];
             $item['date'] = $Sale['date'];
             $item['Ref'] = $Sale['Ref'];
@@ -601,12 +603,16 @@ class ReportController extends Controller
             $item['client_tele'] = $Sale['client']?->phone;
             $item['client_code'] = $Sale['client']?->code;
             $item['client_adr'] = $Sale['client']?->adresse;
+            $item['product'] = $datail['product']?->name;
+            $item['qty'] = $datail?->quantity;
+            $item['price'] = $datail?->price;
             $item['GrandTotal'] = $Sale['GrandTotal'];
             $item['paid_amount'] = $Sale['paid_amount'];
             $item['due'] = $Sale['GrandTotal'] - $Sale['paid_amount'];
             $item['payment_status'] = $Sale['payment_statut'];
 
             $data->add($item);
+        }
         }
 
         $customers = Client::where('deleted_at', '=', null)->get(['id', 'company_name as name']);
