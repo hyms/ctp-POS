@@ -1,5 +1,5 @@
 <script setup>
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import {router} from "@inertiajs/vue3";
 import helper from "@/helpers";
@@ -12,6 +12,13 @@ const props = defineProps({
 });
 
 const form = ref(null);
+const userForm = ref({
+  firstname: "",
+  lastname: "",
+  email: "",
+  NewPassword: "",
+  phone: "",
+});
 const username = ref("");
 const loading = ref(false);
 const snackbar = ref(false);
@@ -32,11 +39,11 @@ function Update_Profile() {
 
   axios
       .put("/update_user_profile/" + props.user.id, {
-        firstname: props.user.firstname,
-        lastname: props.user.lastname,
-        email: props.user.email,
-        NewPassword: props.user.NewPassword,
-        phone: props.user.phone,
+        firstname: userForm.value.firstname,
+        lastname: userForm.value.lastname,
+        email: userForm.value.email,
+        NewPassword: userForm.value.NewPassword,
+        phone: userForm.value.phone,
       })
       .then(({data}) => {
         snackbarColor.value = "success";
@@ -59,30 +66,35 @@ function Update_Profile() {
         }, 1000);
       });
 }
+
+onMounted(() => {
+  userForm.value = props.user;
+})
 </script>
 <template>
-  <Layout>
-    <snackbar
-        v-model="snackbar"
-        :snackbarColor="snackbarColor"
-        :snackbarText="snackbarText"
-    >
-    </snackbar>
+  <Layout
+      :snackbar-view="snackbar"
+      :snackbar-color="snackbarColor"
+      :snackbar-text="snackbarText"
+  >
 
     <v-card :loading="loading">
       <v-form @submit.prevent="Submit_Profile" ref="form">
-        <v-toolbar height="10"></v-toolbar>
-        <v-card-text v-if="loading">
-          <v-skeleton-loader type="paragraph"></v-skeleton-loader>
-        </v-card-text>
-        <v-card-text v-else>
+        <v-toolbar height="15"></v-toolbar>
+
+        <v-card-text >
+          <v-overlay
+              :model-value="loading"
+              contained
+              class="align-center justify-center"
+          ></v-overlay>
           <!--  Profile -->
           <v-row>
             <!-- First name -->
             <v-col md="6" cols="12">
               <v-text-field
                   :label="labels.user.firstname + ' *'"
-                  v-model="user.firstname"
+                  v-model="userForm.firstname"
                   :placeholder="labels.user.firstname"
                   :rules="helper.required
                                         .concat(helper.max(20))
@@ -96,7 +108,7 @@ function Update_Profile() {
             <v-col md="6" cols="12">
               <v-text-field
                   :label="labels.user.lastname + ' *'"
-                  v-model="user.lastname"
+                  v-model="userForm.lastname"
                   :placeholder="labels.user.lastname"
                   :rules="helper.required
                                         .concat(helper.max(20))
@@ -110,7 +122,7 @@ function Update_Profile() {
             <v-col md="6" cols="12">
               <v-text-field
                   :label="labels.user.phone + ' *'"
-                  v-model="user.phone"
+                  v-model="userForm.phone"
                   :placeholder="labels.user.phone"
                   :rules="helper.required"
                   hide-details="auto"
@@ -122,7 +134,7 @@ function Update_Profile() {
             <v-col md="6" cols="12">
               <v-text-field
                   :label="labels.user.email + ' *'"
-                  v-model="user.email"
+                  v-model="userForm.email"
                   :placeholder="labels.user.email"
                   :rules="helper.required"
                   hide-details="auto"
@@ -135,7 +147,7 @@ function Update_Profile() {
             <v-col md="6" cols="12">
               <v-text-field
                   :label="labels.user.NewPassword + ' *'"
-                  v-model="user.NewPassword"
+                  v-model="userForm.NewPassword"
                   :placeholder="labels.user.NewPassword"
                   :rules="helper.min(6).concat(helper.max(14))"
                   hide-details="auto"
