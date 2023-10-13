@@ -6,6 +6,7 @@ import helper from "@/helpers";
 import {router} from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
 import NewBtn from "@/Components/buttons/NewBtn.vue";
+import labels from "@/labels";
 
 const props = defineProps({
   units: Array,
@@ -25,12 +26,12 @@ const editmode = ref(false);
 const show_operator = ref(false);
 
 const fields = ref([
-  {title: "Nombre", key: "name"},
-  {title: "Nombre corto", key: "ShortName"},
-  {title: "Unidad base", key: "base_unit_name"},
-  {title: "Operador", key: "operator"},
-  {title: "Valor de Operacion", key: "operator_value"},
-  {title: "Acciones", key: "actions"},
+  {title: labels.unit.name, key: "name"},
+  {title: labels.unit.ShortName, key: "ShortName"},
+  {title: labels.unit.base_unit_name, key: "base_unit_name"},
+  {title: labels.unit.operator, key: "operator"},
+  {title: labels.unit.operator_value, key: "operator_value"},
+  {title: labels.actions, key: "actions"},
 ]);
 const unit = ref({
   id: "",

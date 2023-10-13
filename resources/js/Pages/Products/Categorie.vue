@@ -5,6 +5,7 @@ import Snackbar from "@/Components/snackbar.vue";
 import helper from "@/helpers";
 import {router} from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
+import labels from "@/labels";
 
 const props = defineProps({
   categories: Array,
@@ -23,18 +24,14 @@ const dialogDelete = ref(false);
 const editmode = ref(false);
 
 const fields = ref([
-  {title: "Nombre", key: "name"},
-  {title: "Codigo", key: "code"},
-  {title: "Acciones", key: "actions"},
+  {title: labels.category.name, key: "name"},
+  {title: labels.category.code, key: "code"},
+  {title: labels.actions, key: "actions"},
 ]);
 const category = ref({
   id: "",
   name: "",
   code: "",
-});
-const categoryLabels = ref({
-  name: "Nombre",
-  code: "Codigo",
 });
 
 //------------- Submit Validation Create & Edit Category
@@ -80,7 +77,7 @@ function Create_Category() {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Proceso exitoso";
+        snackbarText.value = labels.success_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
@@ -113,7 +110,7 @@ function Update_Category() {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Proceso exitoso";
+        snackbarText.value = labels.success_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
@@ -165,7 +162,7 @@ function Remove_Category() {
       .then(({data}) => {
         snackbar.value = true;
         snackbarColor.value = "success";
-        snackbarText.value = "Borrado exitoso";
+        snackbarText.value = labels.delete_message;
         router.reload({
           preserveState: true,
           preserveScroll: true,
@@ -217,9 +214,9 @@ function Remove_Category() {
               <!-- Code category -->
               <v-col cols="12">
                 <v-text-field
-                    :label="categoryLabels.code + ' *'"
+                    :label="labels.category.code + ' *'"
                     v-model="category.code"
-                    :placeholder="categoryLabels.code"
+                    :placeholder="labels.category.code"
                     :rules="helper.required"
                     hide-details="auto"
                 >
@@ -229,9 +226,9 @@ function Remove_Category() {
               <!-- Name category -->
               <v-col cols="12">
                 <v-text-field
-                    :label="categoryLabels.name + ' *'"
+                    :label="labels.category.name + ' *'"
                     v-model="category.name"
-                    :placeholder="categoryLabels.name"
+                    :placeholder="labels.category.name"
                     :rules="helper.required"
                     hide-details="auto"
                 >
@@ -248,7 +245,7 @@ function Remove_Category() {
                 class="ma-1"
                 @click="onClose"
             >
-              Cancelar
+                {{ labels.cancel }}
             </v-btn>
             <v-btn
                 color="primary"
@@ -258,7 +255,7 @@ function Remove_Category() {
                 :loading="loading"
                 :disabled="loading"
             >
-              Guardar
+                {{ labels.submit }}
             </v-btn>
           </v-card-actions>
         </v-form>
@@ -271,7 +268,7 @@ function Remove_Category() {
             v-model="search"
             prepend-icon="mdi-magnify"
             hide-details
-            label="Buscar"
+            :label="labels.search"
             single-line
             variant="underlined"
         ></v-text-field>
@@ -283,7 +280,7 @@ function Remove_Category() {
             prepend-icon="mdi-plus"
             @click="New_category"
         >
-          Añadir
+          {{labels.add}}
         </v-btn>
       </v-col>
     </v-row>
@@ -295,7 +292,7 @@ function Remove_Category() {
             :search="search"
             hover
             class="elevation-2"
-            no-data-text="No existen datos a mostrar"
+            :no-data-text="labels.no_data_table"
             :loading="loading"
             loading-text="Cargando..."
         >

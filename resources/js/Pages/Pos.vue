@@ -1246,7 +1246,7 @@ onMounted(() => {
                         <v-table>
                           <tbody>
                           <tr>
-                            <td>{{ labels.total_products }}</td>
+                            <td>{{ labels.product.total }}</td>
                             <td class="text-right">
                               <v-chip size="small" color="primary">{{ details.length }}</v-chip>
                             </td>

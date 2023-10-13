@@ -60,14 +60,14 @@ const columns_sales = ref([
   {title: labels.sale.payment_status, key: "payment_status"},
 ]);
 const columns_stock = ref([
-  {title: labels.product_code, key: "code"},
-  {title: labels.product_name, key: "name"},
+  {title: labels.product.code, key: "code"},
+  {title: labels.product.name, key: "name"},
   {title: labels.warehouse_text, key: "warehouse"},
   {title: labels.quantity, key: "quantity"},
   {title: labels.alert_quantity, key: "stock_alert"},
 ]);
 const columns_products = ref([
-  {title: labels.product_name, key: "name"},
+  {title: labels.product.name, key: "name"},
   {title: labels.total_sales, key: "total_sales"},
   {title: labels.total_amount, key: "total"},
 ]);

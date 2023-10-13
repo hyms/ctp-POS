@@ -229,5 +229,10 @@ export default {
             {title: 'Multiplicar (*)', value: '*',},
             {title: 'Dividir (/)', value: '/'},
         ];
+    },
+    toExport(fields)
+    {
+        const res = fields.reduce((acc, curr) => (acc[curr].title = acc[curr].key, acc), {});
+        return Object.assign({}, ...res);
     }
 };

@@ -124,9 +124,9 @@ onMounted(() => {
 </script>
 <template>
   <Layout :loading="loading"
-          v-model="snackbar"
-          :snackbarColor="snackbarColor"
-          :snackbarText="snackbarText">
+          :snackbar-view="snackbar"
+          :snackbar-color="snackbarColor"
+          :snackbar-text="snackbarText">
 
     <v-card :loading="loading">
       <v-toolbar height="15"></v-toolbar>
