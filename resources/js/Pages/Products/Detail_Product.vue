@@ -1,9 +1,10 @@
 <script setup>
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import printJS from "print-js";
 import helper from "@/helpers";
 import labels from "@/labels";
+import {usePage} from "@inertiajs/vue3";
 
 defineProps({
   product: Object,
