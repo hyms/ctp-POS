@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\role_user;
-use App\Models\Sucursal;
 use App\Models\User;
 use App\Models\UserWarehouse;
 use App\Models\Warehouse;
@@ -35,7 +34,7 @@ class UserController extends Controller
                 ]);
             }
             $user = User::find(Auth::id());
-            $user->tokenpush = $request['token'];
+            $user->tokenpush = $request->get('token');
             $user->save();
             return response()->json([
                 'status' => 0,
@@ -62,12 +61,8 @@ class UserController extends Controller
             }
         });
         $users = $users->get();
-        $warehouses = Warehouse::get(['id', 'name'])->map(function ($item, $key) {
-            return ['value' => $item->id, 'title' => $item->name];
-        });
-        $roles = Role::get(['id', 'name'])->map(function ($item, $key) {
-            return ['value' => $item->id, 'title' => $item->name];
-        });
+        $warehouses = Warehouse::get(['id', 'name']);
+        $roles = Role::get(['id', 'name']);
         Inertia::share('titlePage', 'Usuarios');
         return Inertia::render('People/Users',
             ['users' => $users, 'warehouses' => $warehouses, 'roles' => $roles]);
@@ -122,32 +117,32 @@ class UserController extends Controller
     public function store(Request $request)
     {
 //        $this->authorizeForUser($request->user('api'), 'create', User::class);
-//        $this->validate($request, [
-//            'email' => 'required|unique:users',
-//        ], [
-//            'email.unique' => 'This Email already taken.',
-//        ]);
+        $this->validate($request, [
+            'username' => 'required|unique:users',
+        ], [
+            'username.unique' => 'Este Usuario ya existe.',
+        ]);
         DB::transaction(function () use ($request) {
             $User = new User;
-            $User->firstname = $request['firstname'];
-            $User->lastname = $request['lastname'];
-            $User->username = $request['username'];
-            $User->email = $request['email'];
-            $User->phone = $request['phone'];
-            $User->password = Hash::make($request['password']);
-            $User->role = $request['role'];
-            $User->ci = $request['ci'];
-            $User->is_all_warehouses = $request['is_all_warehouses'] ? 1 : 0;
+            $User->firstname = $request->get('firstname');
+            $User->lastname = $request->get('lastname');
+            $User->username = $request->get('username');
+            $User->email = $request->get('email');
+            $User->phone = $request->get('phone');
+            $User->password = Hash::make($request->get('password'));
+            $User->role = $request->get('role');
+            $User->ci = $request->get('ci')??0;
+            $User->is_all_warehouses = $request->get('is_all_warehouses') ? 1 : 0;
             $User->statut = 1;
             $User->save();
 
             $role_user = new role_user;
             $role_user->user_id = $User->id;
-            $role_user->role_id = $request['role'];
+            $role_user->role_id = $request->get('role');
             $role_user->save();
 
-            if (!$User->is_all_warehouses) {
-                $User->assignedWarehouses()->sync($request['assigned_to']);
+            if ($User->is_all_warehouses==0) {
+                $User->assignedWarehouses()->sync($request->get('assigned_to'));
             }
 
         }, 10);
@@ -200,26 +195,26 @@ class UserController extends Controller
             }
 
             User::whereId($id)->update([
-                'firstname' => $request['firstname'],
-                'lastname' => $request['lastname'],
-                'username' => $request['username'],
-                'email' => $request['email'],
-                'phone' => $request['phone'],
-                'ci' => $request['ci'] ?? '',
+                'firstname' => $request->get('firstname'),
+                'lastname' => $request->get('lastname'),
+                'username' => $request->get('username'),
+                'email' => $request->get('email'),
+                'phone' => $request->get('phone'),
+                'ci' => $request->get('ci') ?? '',
                 'password' => $pass,
-                'statut' => $request['statut'],
-                'is_all_warehouses' => ($request['is_all_warehouses'] == "true") ? 1 : 0,
-                'role' => $request['role'],
+                'statut' => $request->get('statut'),
+                'is_all_warehouses' => ($request->get('is_all_warehouses') == "true") ? 1 : 0,
+                'role' => $request->get('role'),
 
             ]);
 
             role_user::where('user_id', $id)->update([
                 'user_id' => $id,
-                'role_id' => $request['role'],
+                'role_id' => $request->get('role'),
             ]);
 
             $user_saved = User::findOrFail($id);
-            $user_saved->assignedWarehouses()->sync($request['assigned_to']);
+            $user_saved->assignedWarehouses()->sync($request->get('assigned_to'));
 
         }, 10);
 
@@ -244,15 +239,15 @@ class UserController extends Controller
         }
 
         User::whereId($id)->update([
-            'firstname' => $request['firstname'],
-            'lastname' => $request['lastname'],
-//            'username' => $request['username'],
-            'email' => $request['email'],
-            'phone' => $request['phone'],
+            'firstname' => $request->get('firstname'),
+            'lastname' => $request->get('lastname'),
+//            'username' => $request->get('username'),
+            'email' => $request->get('email'),
+            'phone' => $request->get('phone'),
             'password' => $pass,
         ]);
 
-        return response()->json(['user' => $request['username']]);
+        return response()->json(['user' => $request->get('username')]);
 
     }
 
@@ -261,9 +256,9 @@ class UserController extends Controller
     public function IsActivated(request $request, $id)
     {
         $user = Auth::user();
-        if ($request['id'] !== $user->id) {
+        if ($request->get('id') !== $user->id) {
             User::whereId($id)->update([
-                'statut' => $request['statut'],
+                'statut' => $request->get('statut'),
             ]);
             return response()->json([
                 'success' => true,

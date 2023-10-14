@@ -47,8 +47,8 @@ const jsonFields = ref({
 function sumCount(rowObj) {
 
   let sum = 0;
-  for(let val of rowObj){
-    sum+=parseFloat(val.montant);
+  for (let val of rowObj) {
+    sum += parseFloat(val.montant);
   }
   return parseFloat(sum).toFixed(2);
 }
@@ -226,10 +226,14 @@ function Payments_Sales() {
           class="text-center"
       >
         <template v-slot:item.Reglement="{ item }">
-          {{  helper.getReglamentPayment(item.Reglement)[0]?.title }}
+          {{ helper.getReglamentPayment(item.Reglement)[0]?.title }}
         </template>
         <template v-slot:tfoot>
-          <tr><td colspan="4"></td><td  class="font-weight-bold">TOTAL</td><td class="text-center">{{sumCount(payments)}}</td></tr>
+          <tr>
+            <td colspan="4"></td>
+            <td class="font-weight-bold">TOTAL</td>
+            <td class="text-center">{{ sumCount(payments) }}</td>
+          </tr>
         </template>
 
       </v-data-table>

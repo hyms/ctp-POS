@@ -59,24 +59,24 @@ const jsonFields = ref({
 function sumCount(rowObj) {
 
   let sum = 0;
-  for(let val of rowObj){
-    sum+=parseFloat(val.GrandTotal);
+  for (let val of rowObj) {
+    sum += parseFloat(val.GrandTotal);
   }
   return parseFloat(sum).toFixed(2);
 }
 
 function sumCount2(rowObj) {
   let sum = 0;
-  for(let val of rowObj){
-    sum+=parseFloat(val.paid_amount);
+  for (let val of rowObj) {
+    sum += parseFloat(val.paid_amount);
   }
   return parseFloat(sum).toFixed(2);
 }
 
 function sumCount3(rowObj) {
   let sum = 0;
-  for(let val of rowObj){
-    sum+=parseFloat(val.due);
+  for (let val of rowObj) {
+    sum += parseFloat(val.due);
   }
   return parseFloat(sum).toFixed(2);
 }

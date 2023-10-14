@@ -863,16 +863,16 @@ onMounted(() => {
                     }}
                   </td>
                   <td>
-<!--                    <v-btn-->
-<!--                        class="ma-1 rounded"-->
-<!--                        color="success"-->
-<!--                        icon="mdi-pen"-->
-<!--                        size="small"-->
-<!--                        density="comfortable"-->
-<!--                        variant="elevated"-->
-<!--                        @click="Modal_Updat_Detail(detail)"-->
-<!--                    >-->
-<!--                    </v-btn>-->
+                    <!--                    <v-btn-->
+                    <!--                        class="ma-1 rounded"-->
+                    <!--                        color="success"-->
+                    <!--                        icon="mdi-pen"-->
+                    <!--                        size="small"-->
+                    <!--                        density="comfortable"-->
+                    <!--                        variant="elevated"-->
+                    <!--                        @click="Modal_Updat_Detail(detail)"-->
+                    <!--                    >-->
+                    <!--                    </v-btn>-->
                     <v-btn
                         class="ma-1 rounded"
                         color="error"
@@ -940,17 +940,17 @@ onMounted(() => {
               ></v-text-field>
             </v-col>
             <!-- Received  Amount  -->
-<!--            <v-col lg="4" md="4" cols="12" v-if="editmode==false">-->
-<!--              <v-text-field-->
-<!--                  v-model="payment.received_amount"-->
-<!--                  hide-details="auto"-->
-<!--                  type="text"-->
-<!--                  label="Monto Recibido"-->
-<!--                  readonly-->
-<!--                  :rules="helper.numberWithDecimal"-->
-<!--                  @keyup="change_payment_status()"-->
-<!--              ></v-text-field>-->
-<!--            </v-col>-->
+            <!--            <v-col lg="4" md="4" cols="12" v-if="editmode==false">-->
+            <!--              <v-text-field-->
+            <!--                  v-model="payment.received_amount"-->
+            <!--                  hide-details="auto"-->
+            <!--                  type="text"-->
+            <!--                  label="Monto Recibido"-->
+            <!--                  readonly-->
+            <!--                  :rules="helper.numberWithDecimal"-->
+            <!--                  @keyup="change_payment_status()"-->
+            <!--              ></v-text-field>-->
+            <!--            </v-col>-->
 
             <!-- Status  -->
             <v-col lg="4" md="4" cols="12">

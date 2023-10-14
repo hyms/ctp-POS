@@ -4,7 +4,6 @@ import Layout from "@/Layouts/Authenticated.vue";
 import {router} from "@inertiajs/vue3";
 import helper from "@/helpers";
 import labels from "@/labels";
-import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
   user: Object,
@@ -82,7 +81,7 @@ onMounted(() => {
       <v-form @submit.prevent="Submit_Profile" ref="form">
         <v-toolbar height="15"></v-toolbar>
 
-        <v-card-text >
+        <v-card-text>
           <v-overlay
               :model-value="loading"
               contained

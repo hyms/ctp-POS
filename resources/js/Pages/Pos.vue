@@ -807,7 +807,7 @@ onMounted(() => {
                           <span>{{ detail_item.code }}</span>
                           <br>
                           <span class="badge badge-success">{{ detail_item.name }}</span>
-<!--                          <v-icon @click="Modal_Updat_Detail(detail_item)" icon="mdi-pencil-box-outline"></v-icon>-->
+                          <!--                          <v-icon @click="Modal_Updat_Detail(detail_item)" icon="mdi-pencil-box-outline"></v-icon>-->
                         </td>
                         <td>{{ currency }} {{ helper.formatNumber(detail_item.Total_price, 2) }}</td>
                         <td style="min-width: 140px">
@@ -1204,21 +1204,21 @@ onMounted(() => {
                    @click="dialogAddPayment=false"></v-btn>
           </v-toolbar>
           <v-form @submit.prevent="Submit_Payment" ref="formAddPayment">
-          <v-card-text>
+            <v-card-text>
               <v-row>
                 <v-col sm="6" cols="12">
                   <v-row>
                     <!-- Received  Amount  -->
-<!--                    <v-col cols="12" v-if="false">-->
-<!--                      <v-text-field-->
-<!--                          @keyup="Verified_Received_Amount(payment.received_amount)"-->
-<!--                          :label="labels.payment.received_amount"-->
-<!--                          v-model="payment.received_amount"-->
-<!--                          :placeholder="labels.payment.received_amount"-->
-<!--                          hide-details="auto"-->
-<!--                      >-->
-<!--                      </v-text-field>-->
-<!--                    </v-col>-->
+                    <!--                    <v-col cols="12" v-if="false">-->
+                    <!--                      <v-text-field-->
+                    <!--                          @keyup="Verified_Received_Amount(payment.received_amount)"-->
+                    <!--                          :label="labels.payment.received_amount"-->
+                    <!--                          v-model="payment.received_amount"-->
+                    <!--                          :placeholder="labels.payment.received_amount"-->
+                    <!--                          hide-details="auto"-->
+                    <!--                      >-->
+                    <!--                      </v-text-field>-->
+                    <!--                    </v-col>-->
                     <!-- Paying  Amount  -->
                     <v-col cols="12">
                       <v-text-field
@@ -1323,12 +1323,12 @@ onMounted(() => {
                   ></v-textarea>
                 </v-col>
               </v-row>
-          </v-card-text>
+            </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-                <v-btn color="primary" variant="elevated" type="submit" :disabled="loading">
-                  {{ labels.submit }}
-                </v-btn>
+              <v-btn color="primary" variant="elevated" type="submit" :disabled="loading">
+                {{ labels.submit }}
+              </v-btn>
             </v-card-actions>
           </v-form>
         </v-card>

@@ -245,7 +245,7 @@ function Remove_Category() {
                 class="ma-1"
                 @click="onClose"
             >
-                {{ labels.cancel }}
+              {{ labels.cancel }}
             </v-btn>
             <v-btn
                 color="primary"
@@ -255,7 +255,7 @@ function Remove_Category() {
                 :loading="loading"
                 :disabled="loading"
             >
-                {{ labels.submit }}
+              {{ labels.submit }}
             </v-btn>
           </v-card-actions>
         </v-form>
@@ -280,7 +280,7 @@ function Remove_Category() {
             prepend-icon="mdi-plus"
             @click="New_category"
         >
-          {{labels.add}}
+          {{ labels.add }}
         </v-btn>
       </v-col>
     </v-row>
