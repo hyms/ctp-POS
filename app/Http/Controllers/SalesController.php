@@ -19,7 +19,6 @@ use App\Models\Unit;
 use App\Models\UserWarehouse;
 use App\Models\Warehouse;
 use App\utils\helpers;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -121,7 +120,7 @@ class SalesController extends Controller
             } else {
                 $item['sale_has_return'] = 'no';
             }
-
+            $item['updated_at'] = Carbon::parse($Sale->updated_at)->format('Y-m-d');
             $data->add($item);
         }
 

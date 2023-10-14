@@ -44,12 +44,12 @@ return new class extends Migration {
         DB::table('pos_settings')->insert(
             array(
                 'id' => 1,
-                'show_barcode' => 1,
-                'show_discount' => 1,
+                'show_barcode' => 0,
+                'show_discount' => 0,
                 'show_customer' => 1,
-                'show_email' => 1,
+                'show_email' => 0,
                 'show_phone' => 1,
-                'show_address' => 1,
+                'show_address' => 0,
                 'sale_type_default'=>null
             )
 

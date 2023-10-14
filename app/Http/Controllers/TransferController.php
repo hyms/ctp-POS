@@ -56,7 +56,7 @@ class TransferController extends Controller
 //})
         ;
 
-        $transfers = $transfers->orderBy('updated_at', 'desc')
+        $transfers = $transfers->orderByDesc('updated_at')
             ->get();
 
         foreach ($transfers as $transfer) {
@@ -68,6 +68,7 @@ class TransferController extends Controller
             $item['GrandTotal'] = $transfer->GrandTotal;
             $item['items'] = $transfer->items;
             $item['statut'] = $transfer->statut;
+            $item['updated_at'] = Carbon::parse($transfer->updated_at)->format('Y-m-d');
             $data->add($item);
         }
 

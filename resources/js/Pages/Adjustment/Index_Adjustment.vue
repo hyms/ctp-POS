@@ -1,9 +1,9 @@
 <script setup>
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import helper from "@/helpers";
 import labels from "@/labels";
 
@@ -12,6 +12,7 @@ const props = defineProps({
   adjustments: Array,
   errors: Object,
 });
+const enableDays = computed(() => usePage().props.day);
 
 const search = ref("");
 const loading = ref(false);
@@ -256,7 +257,7 @@ function Remove_Adjustment() {
                 icon="mdi-pencil"
                 size="x-small"
                 variant="outlined"
-                :disabled="helper.enableDay(item.updated_at)"
+                :disabled="helper.maxEnableButtons(item.updated_at,enableDays)"
                 @click="router.visit('/adjustments/edit/' + item.id)"
             >
             </v-btn>
@@ -266,7 +267,7 @@ function Remove_Adjustment() {
                 icon="mdi-delete"
                 size="x-small"
                 variant="outlined"
-                :disabled="helper.enableDay(item.updated_at)"
+                :disabled="helper.maxEnableButtons(item.updated_at,enableDays)"
                 @click="Delete_Item(item)"
             >
             </v-btn>

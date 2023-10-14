@@ -1,11 +1,12 @@
 <script setup>
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import FilterForm from "./filter_form.vue";
 import labels from "@/labels";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
+import helper from "@/helpers";
 
 const props = defineProps({
   expenses: Object,
@@ -14,6 +15,8 @@ const props = defineProps({
   filter_form: Object,
   errors: Object,
 });
+
+const enableDays = computed(() => usePage().props.day);
 //declare variable
 const form = ref(null);
 const search = ref("");
@@ -143,6 +146,7 @@ function Delete_Expense(id) {
                 icon="mdi-pencil"
                 size="x-small"
                 variant="outlined"
+                :disabled="helper.maxEnableButtons(item.updated_at,enableDays)"
                 @click="router.visit('/expenses/edit/' + item.id)"
             >
             </v-btn>
@@ -152,6 +156,7 @@ function Delete_Expense(id) {
                 icon="mdi-delete"
                 size="x-small"
                 variant="outlined"
+                :disabled="helper.maxEnableButtons(item.updated_at,enableDays)"
                 @click="Delete_Expense(item.id)"
             >
             </v-btn>

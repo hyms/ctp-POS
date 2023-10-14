@@ -20,7 +20,7 @@ class HandleInertiaRequests extends Middleware
      * Determines the current asset version.
      *
      * @see https://inertiajs.com/asset-versioning
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return string|null
      */
     public function version(Request $request): ?string
@@ -32,7 +32,7 @@ class HandleInertiaRequests extends Middleware
      * Defines the props that are shared by default.
      *
      * @see https://inertiajs.com/shared-data
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return array
      */
     public function share(Request $request): array
@@ -53,7 +53,8 @@ class HandleInertiaRequests extends Middleware
                 'desing' => [0, 1, 2, 3, 4, 5],
                 'all' => [0, 1, 2, 3, 4, 5],
             ],
-            'currency'=> $helpers->Get_Currency_Code()
+            'currency' => $helpers->Get_Currency_Code(),
+            'day' => 1,
         ]);
     }
 }

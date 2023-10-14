@@ -37,9 +37,10 @@ class AdjustmentController extends Controller
             ->whereIn('warehouse_id', $warehouses->pluck('value'))
             ->where(function ($query) {
                 return $query->where('user_id', '=', Auth::user()->id);
-            });
+            })
+            ;
 
-        $Adjustments = $Adjustments->get();
+        $Adjustments = $Adjustments->orderByDesc('updated_at')->get();
         $data = collect();
         foreach ($Adjustments as $Adjustment) {
             $item['id'] = $Adjustment->id;

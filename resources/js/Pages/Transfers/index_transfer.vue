@@ -8,6 +8,7 @@ import helper from "@/helpers";
 import labels from "@/labels";
 
 const currency = computed(() => usePage().props.currency);
+const enableDays = computed(() => usePage().props.day);
 
 const props = defineProps({
   warehouses: Array,
@@ -285,7 +286,7 @@ function Remove_Transfer(id) {
                 icon="mdi-pencil"
                 size="x-small"
                 variant="outlined"
-                :disabled="helper.enableDay(item.updated_at)"
+                :disabled="helper.maxEnableButtons(item.updated_at,enableDays)"
                 @click="router.visit('/transfers/edit/' + item.id)"
             >
             </v-btn>
@@ -295,7 +296,7 @@ function Remove_Transfer(id) {
                 icon="mdi-delete"
                 size="x-small"
                 variant="outlined"
-                :disabled="helper.enableDay(item.updated_at)"
+                :disabled="helper.maxEnableButtons(item.updated_at,enableDays)"
                 @click="Delete_Item(item)"
             >
             </v-btn>

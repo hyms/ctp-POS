@@ -1,5 +1,6 @@
 import moment from "moment";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
+import {computed} from "vue";
 // import pos_css from "@/../css/pos_print.css";
 
 let debug = true;
@@ -72,8 +73,6 @@ const print_pdf = (element_id, title) => {
     let url = "/pdf?body=" + divContents;
     let win = window.open(url, '_blank');
     win.focus();
-
-    // router.post('/pdf',{'title':title,'body':divContents});
 };
 //------------------------------Get Month -------------------------\\
 const GetMonth = () => {
@@ -102,6 +101,16 @@ const linkVisit = (url, type = "get") => {
 }
 const newLine = (value) => {
     return value.toString().replaceAll(' ', "<br>");
+}
+
+const verifyPermisions = () =>{
+    const roles = computed(() => usePage().props.rolesP);
+    const user = computed(() => usePage().props.user);
+}
+const maxEnableButtons = (timeSale,enableDays) =>{
+    let time = moment(timeSale,"YYYY-MM-DD").add(moment.duration(enableDays,'d'));
+    const rest = moment().isAfter(time);
+    return rest;
 }
 export default {
     required: [(v) => !!v || "Requerido"],
@@ -215,6 +224,7 @@ export default {
     toggleFullScreen,
     linkVisit,
     GetMonth,
+    maxEnableButtons,
     getObjectValue: (value, object) => {
         return object.find(item => item.id == value)
     },
@@ -234,5 +244,6 @@ export default {
     {
         const res = fields.reduce((acc, curr) => (acc[curr].title = acc[curr].key, acc), {});
         return Object.assign({}, ...res);
-    }
+    },
+
 };

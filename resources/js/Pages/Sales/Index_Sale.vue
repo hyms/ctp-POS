@@ -1,9 +1,9 @@
 <script setup>
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import helper from "@/helpers";
 import labels from "@/labels";
 import Filter_form from "@/Pages/Sales/filter_form.vue";
@@ -17,7 +17,7 @@ const props = defineProps({
   filter_form: Object,
   errors: Object,
 });
-
+const enableDays = computed(() => usePage().props.day);
 const search = ref("");
 const loading = ref(false);
 const snackbar = ref(false);
@@ -538,6 +538,7 @@ function Remove_Sale(id, sale_has_return) {
                         density="comfortable"
                         color="success"
                         @click="Edit_Payment(payment)"
+                        :disabled="helper.maxEnableButtons(payment.updated_at,enableDays)"
                         icon="mdi-pencil"
                         class="mx-1 rounded"
                     >
@@ -548,6 +549,7 @@ function Remove_Sale(id, sale_has_return) {
                         density="comfortable"
                         color="error"
                         @click="Delete_Payment(payment)"
+                        :disabled="helper.maxEnableButtons(payment.updated_at,enableDays)"
                         icon="mdi-close"
                         class="mx-1 rounded"
                     >
@@ -765,6 +767,7 @@ function Remove_Sale(id, sale_has_return) {
               <v-list-item
                   @click="router.visit('/sales/edit/' + item.id)"
                   prepend-icon="mdi-pen"
+                  :disabled="helper.maxEnableButtons(item.updated_at,enableDays)"
               >
                 <v-list-item-title>
                   Editar Orden
@@ -813,6 +816,7 @@ function Remove_Sale(id, sale_has_return) {
               <v-list-item
                   @click="Delete_Item(item)"
                   prepend-icon="mdi-delete"
+                  :disabled="helper.maxEnableButtons(item.updated_at,enableDays)"
               >
                 <v-list-item-title>
                   Eliminar

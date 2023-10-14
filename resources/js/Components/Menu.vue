@@ -40,6 +40,25 @@ const menuItems = ref([
     subItems: [],
   },
   {
+    label: "Gastos",
+    url: "",
+    role: "vendor",
+    icon: "",
+    subItems: [
+      {
+        label: "Añadir Gastos",
+        url: "/expenses/create",
+        role: "vendor",
+      },
+      {
+        label: "Listar Gastos",
+        url: "/expenses",
+        role: "vendor",
+      },
+
+    ],
+  },
+  {
     label: "Transferencias de Stock",
     url: "",
     role: "vendor",
@@ -103,25 +122,7 @@ const menuItems = ref([
       },
     ],
   },
-  {
-    label: "Gastos",
-    url: "",
-    role: "vendor",
-    icon: "",
-    subItems: [
-      {
-        label: "Añadir Gastos",
-        url: "/expenses/create",
-        role: "vendor",
-      },
-      {
-        label: "Listar Gastos",
-        url: "/expenses",
-        role: "vendor",
-      },
 
-    ],
-  },
   {
     label: "Informes",
     url: "",

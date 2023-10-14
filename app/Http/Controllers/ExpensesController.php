@@ -61,7 +61,7 @@ class ExpensesController extends Controller
         } else {
             $Expenses = $Expenses->limit(500);
         }
-        $Expenses = $Expenses->get();
+        $Expenses = $Expenses->orderByDesc('updated_at')->get();
         $data = collect();
         foreach ($Expenses as $Expense) {
 
@@ -72,6 +72,7 @@ class ExpensesController extends Controller
             $item['amount'] = $Expense->amount;
             $item['warehouse_name'] = $Expense['warehouse']->name;
             $item['category_name'] = $Expense['expense_category']->name;
+            $item['updated_at'] = Carbon::parse($Expense->updated_at)->format('Y-m-d');
             $data->add($item);
         }
 

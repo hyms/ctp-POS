@@ -19,9 +19,7 @@ const props = defineProps({
             <v-col cols="12">
               <p>
                 <span>Fecha : {{ invoice_pos.sale.date }} <br></span>
-                <span v-if="invoice_pos.pos_settings.show_address">Direccion : {{
-                    invoice_pos.setting.CompanyAdress ?? ''
-                  }} <br></span>
+                <span v-if="invoice_pos.pos_settings.show_address">Direccion : {{ invoice_pos.setting.CompanyAdress ?? '' }} <br></span>
                 <span v-if="invoice_pos.pos_settings.show_email">Correo : {{ invoice_pos.setting?.email }} <br></span>
                 <span v-if="invoice_pos.pos_settings.show_phone">Telefono : {{ invoice_pos.setting?.CompanyPhone }} <br></span>
                 <span v-if="invoice_pos.pos_settings.show_customer">Cliente : {{ invoice_pos.sale.client_name }} <br></span>

@@ -464,10 +464,10 @@ function Create_Sale() {
           warehouse_id: saleForm.value.warehouse_id,
           statut: saleForm.value.statut,
           notes: saleForm.value.notes,
-          tax_rate: saleForm.value.tax_rate ? saleForm.value.tax_rate : 0,
-          TaxNet: saleForm.value.TaxNet ? saleForm.value.TaxNet : 0,
-          discount: saleForm.value.discount ? saleForm.value.discount : 0,
-          shipping: saleForm.value.shipping ? saleForm.value.shipping : 0,
+          tax_rate: saleForm.value.tax_rate ?? 0,
+          TaxNet: saleForm.value.TaxNet ?? 0,
+          discount: saleForm.value.discount ?? 0,
+          shipping: saleForm.value.shipping ?? 0,
           GrandTotal: GrandTotal.value,
           details: detailsForm.value,
           payment: payment.value,
@@ -704,6 +704,7 @@ onMounted(() => {
                   hide-details="auto"
                   clearable
                   :rules="helper.required"
+                  :disabled="detailsForm.length>0"
               ></v-select>
             </v-col>
 
@@ -1023,156 +1024,5 @@ onMounted(() => {
         </v-card-text>
       </v-card>
     </v-form>
-
-    <!--    &lt;!&ndash; Modal Update detail Product &ndash;&gt;-->
-    <!--    <validation-observer ref="Update_Detail">-->
-    <!--      <v-modal hide-footer size="lg" id="form_Update_Detail" :title="detail.name">-->
-    <!--        <v-form @submit.prevent="submit_Update_Detail">-->
-    <!--          <v-row>-->
-    <!--            &lt;!&ndash; Unit Price &ndash;&gt;-->
-    <!--            <v-col lg="6" md="6" sm="12">-->
-    <!--              <validation-provider-->
-    <!--                name="Product Price"-->
-    <!--                :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
-    <!--                v-slot="validationContext"-->
-    <!--              >-->
-    <!--                <v-form-group :label="$t('ProductPrice') + ' ' + '*'" id="Price-input">-->
-    <!--                  <v-form-input-->
-    <!--                    label="Product Price"-->
-    <!--                    v-model="detail.Unit_price"-->
-    <!--                    :state="getValidationState(validationContext)"-->
-    <!--                    aria-describedby="Price-feedback"-->
-    <!--                  ></v-form-input>-->
-    <!--                  <v-form-invalid-feedback id="Price-feedback">{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-    <!--                </v-form-group>-->
-    <!--              </validation-provider>-->
-    <!--            </v-col>-->
-
-    <!--            &lt;!&ndash; Tax Method &ndash;&gt;-->
-    <!--            <v-col lg="6" md="6" sm="12">-->
-    <!--              <validation-provider name="Tax Method" :rules="{ required: true}">-->
-    <!--                <v-form-group slot-scope="{ valid, errors }" :label="$t('TaxMethod') + ' ' + '*'">-->
-    <!--                  <v-select-->
-    <!--                    :class="{'is-invalid': !!errors.length}"-->
-    <!--                    :state="errors[0] ? false : (valid ? true : null)"-->
-    <!--                    v-model="detail.tax_method"-->
-    <!--                    :reduce="label => label.value"-->
-    <!--                    :placeholder="$t('Choose_Method')"-->
-    <!--                    :options="-->
-    <!--                           [-->
-    <!--                            {label: 'Exclusive', value: '1'},-->
-    <!--                            {label: 'Inclusive', value: '2'}-->
-    <!--                           ]"-->
-    <!--                  ></v-select>-->
-    <!--                  <v-form-invalid-feedback>{{ errors[0] }}</v-form-invalid-feedback>-->
-    <!--                </v-form-group>-->
-    <!--              </validation-provider>-->
-    <!--            </v-col>-->
-
-    <!--            &lt;!&ndash; Tax Rate &ndash;&gt;-->
-    <!--            <v-col lg="6" md="6" sm="12">-->
-    <!--              <validation-provider-->
-    <!--                name="Order Tax"-->
-    <!--                :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
-    <!--                v-slot="validationContext"-->
-    <!--              >-->
-    <!--                <v-form-group :label="$t('OrderTax') + ' ' + '*'">-->
-    <!--                  <v-input-group append="%">-->
-    <!--                    <v-form-input-->
-    <!--                      label="Order Tax"-->
-    <!--                      v-model="detail.tax_percent"-->
-    <!--                      :state="getValidationState(validationContext)"-->
-    <!--                      aria-describedby="OrderTax-feedback"-->
-    <!--                    ></v-form-input>-->
-    <!--                  </v-input-group>-->
-    <!--                  <v-form-invalid-feedback id="OrderTax-feedback">{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-    <!--                </v-form-group>-->
-    <!--              </validation-provider>-->
-    <!--            </v-col>-->
-
-    <!--            &lt;!&ndash; Discount Method &ndash;&gt;-->
-    <!--             <v-col lg="6" md="6" sm="12">-->
-    <!--              <validation-provider name="Discount Method" :rules="{ required: true}">-->
-    <!--                <v-form-group slot-scope="{ valid, errors }" :label="$t('Discount_Method') + ' ' + '*'">-->
-    <!--                  <v-select-->
-    <!--                    v-model="detail.discount_Method"-->
-    <!--                    :reduce="label => label.value"-->
-    <!--                    :placeholder="$t('Choose_Method')"-->
-    <!--                    :class="{'is-invalid': !!errors.length}"-->
-    <!--                    :state="errors[0] ? false : (valid ? true : null)"-->
-    <!--                    :options="-->
-    <!--                           [-->
-    <!--                            {label: 'Percent %', value: '1'},-->
-    <!--                            {label: 'Fixed', value: '2'}-->
-    <!--                           ]"-->
-    <!--                  ></v-select>-->
-    <!--                  <v-form-invalid-feedback>{{ errors[0] }}</v-form-invalid-feedback>-->
-    <!--                </v-form-group>-->
-    <!--              </validation-provider>-->
-    <!--            </v-col>-->
-
-    <!--            &lt;!&ndash; Discount Rate &ndash;&gt;-->
-    <!--           <v-col lg="6" md="6" sm="12">-->
-    <!--              <validation-provider-->
-    <!--                name="Discount Rate"-->
-    <!--                :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
-    <!--                v-slot="validationContext"-->
-    <!--              >-->
-    <!--                <v-form-group :label="$t('Discount') + ' ' + '*'">-->
-    <!--                  <v-form-input-->
-    <!--                    label="Discount"-->
-    <!--                    v-model.number="detail.discount"-->
-    <!--                    :state="getValidationState(validationContext)"-->
-    <!--                    aria-describedby="Discount-feedback"-->
-    <!--                  ></v-form-input>-->
-    <!--                  <v-form-invalid-feedback id="Discount-feedback">{{ validationContext.errors[0] }}</v-form-invalid-feedback>-->
-    <!--                </v-form-group>-->
-    <!--              </validation-provider>-->
-    <!--            </v-col>-->
-
-    <!--            &lt;!&ndash; Unit Sale &ndash;&gt;-->
-    <!--            <v-col lg="6" md="6" sm="12">-->
-    <!--              <validation-provider name="Unit Sale" :rules="{ required: true}">-->
-    <!--                <v-form-group slot-scope="{ valid, errors }" :label="$t('UnitSale') + ' ' + '*'">-->
-    <!--                  <v-select-->
-    <!--                    :class="{'is-invalid': !!errors.length}"-->
-    <!--                    :state="errors[0] ? false : (valid ? true : null)"-->
-    <!--                    v-model="detail.sale_unit_id"-->
-    <!--                    :placeholder="$t('Choose_Unit_Sale')"-->
-    <!--                    :reduce="label => label.value"-->
-    <!--                    :options="units.map(units => ({label: units.name, value: units.id}))"-->
-    <!--                  />-->
-    <!--                  <v-form-invalid-feedback>{{ errors[0] }}</v-form-invalid-feedback>-->
-    <!--                </v-form-group>-->
-    <!--              </validation-provider>-->
-    <!--            </v-col>-->
-
-    <!--             &lt;!&ndash; Imei or serial numbers &ndash;&gt;-->
-    <!--              <v-col lg="12" md="12" sm="12" v-show="detail.is_imei">-->
-    <!--                <v-form-group :label="$t('Add_product_IMEI_Serial_number')">-->
-    <!--                  <v-form-input-->
-    <!--                    label="Add_product_IMEI_Serial_number"-->
-    <!--                    v-model="detail.imei_number"-->
-    <!--                    :placeholder="$t('Add_product_IMEI_Serial_number')"-->
-    <!--                  ></v-form-input>-->
-    <!--                </v-form-group>-->
-    <!--            </v-col>-->
-
-    <!--            <v-col md="12">-->
-    <!--              <v-form-group>-->
-    <!--                <v-button-->
-    <!--                  variant="primary"-->
-    <!--                  type="submit"-->
-    <!--                  :disabled="Submit_Processing_detail"-->
-    <!--                >{{$t('submit')}}</v-button>-->
-    <!--                <div v-once class="typo__p" v-if="Submit_Processing_detail">-->
-    <!--                  <div class="spinner sm spinner-primary mt-3"></div>-->
-    <!--                </div>-->
-    <!--              </v-form-group>-->
-    <!--            </v-col>-->
-    <!--          </v-row>-->
-    <!--        </v-form>-->
-    <!--      </v-modal>-->
-    <!--    </validation-observer>-->
   </Layout>
 </template>
