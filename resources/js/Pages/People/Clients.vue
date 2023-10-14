@@ -299,7 +299,7 @@ function Remove_Client() {
         console.log(error);
         snackbar.value = true;
         snackbarColor.value = "error";
-        snackbarText.value = error.response.data.message;
+        snackbarText.value = error.response.data.message??error.message;
       })
       .finally(() => {
         setTimeout(() => {
@@ -1240,6 +1240,16 @@ function Submit_Pay_due() {
             </tr>
             </tbody>
           </v-table>
+          <table class="change mt-2" style=" font-size: 12px;">
+            <thead>
+            <tr class="total"><th>Notas</th></tr>
+            </thead>
+            <tbody>
+            <tr><td>
+              {{payment.notes}}
+            </td></tr>
+            </tbody>
+          </table>
         </div>
       </v-card-text>
       <v-card-actions>
