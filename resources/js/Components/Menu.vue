@@ -142,6 +142,37 @@ const menuItems = ref([
         url: "/report/client",
         role: "admin",
       },
+      // {
+      //   label: "Alerta de Productos",
+      //   url: "/report/quantity_alerts",
+      //   role: "admin",
+      // },
+      {
+        label: "Reporte de Agencias",
+        url: "/report/warehouse_report",
+        role: "admin",
+      },
+      {
+        label: "Reporte de Stock",
+        url: "/report/stock_report",
+        role: "admin",
+      },
+      {
+        label: "Reporte de Usuarios",
+        url: "/report/users_report",
+        role: "admin",
+      },
+      {
+        label: "Top productos vendidos",
+        url: "/report/top_products",
+        role: "admin",
+      },
+      {
+        label: "Top Clientes",
+        url: "/report/top_customers",
+        role: "admin",
+      },
+
     ],
   },
   {

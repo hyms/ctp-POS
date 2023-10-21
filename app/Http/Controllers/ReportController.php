@@ -170,7 +170,7 @@ class ReportController extends Controller
     public function Provider_Report_detail(request $request, $id)
     {
 
-        $this->authorizeForUser($request->user('api'), 'Reports_suppliers', Provider::class);
+//        $this->authorizeForUser($request->user('api'), 'Reports_suppliers', Provider::class);
 
         $provider = Provider::where('deleted_at', '=', null)->findOrFail($id);
 
@@ -300,25 +300,25 @@ class ReportController extends Controller
     public function Quotations_Client(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
+//        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
+//        $offSet = ($pageStart * $perPage) - $perPage;
 
         $Role = Auth::user()->roles()->first();
-        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
-        $data = array();
+//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+        $data = collect();
 
         $Quotations = Quotation::with('client', 'warehouse')
             ->where('deleted_at', '=', null)
             ->where('client_id', $request->id)
-            ->where(function ($query) use ($ShowRecord) {
-                if (!$ShowRecord) {
-                    return $query->where('user_id', '=', Auth::user()->id);
-                }
-            })
+//            ->where(function ($query) use ($ShowRecord) {
+//                if (!$ShowRecord) {
+//                    return $query->where('user_id', '=', Auth::user()->id);
+//                }
+//            })
             //Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
@@ -338,11 +338,12 @@ class ReportController extends Controller
             });
 
         $totalRows = $Quotations->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $Quotations = $Quotations->offset($offSet)
-            ->limit($perPage)
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
+        $Quotations = $Quotations
+//            ->offset($offSet)
+//            ->limit($perPage)
             ->orderBy('id', 'desc')
             ->get();
 
@@ -356,7 +357,7 @@ class ReportController extends Controller
             $item['client_name'] = $Quotation['client']->name;
             $item['GrandTotal'] = $Quotation->GrandTotal;
 
-            $data[] = $item;
+            $data->add($item);
         }
 
         return response()->json([
@@ -370,25 +371,25 @@ class ReportController extends Controller
     public function Returns_Client(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
+//        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-        $data = array();
+//        $offSet = ($pageStart * $perPage) - $perPage;
+        $data = collect();
 
         //  Check If User Has Permission Show All Records
         $Role = Auth::user()->roles()->first();
-        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $SaleReturn = SaleReturn::where('deleted_at', '=', null)->with('sale', 'client', 'warehouse')
             ->where('client_id', $request->id)
-            ->where(function ($query) use ($ShowRecord) {
-                if (!$ShowRecord) {
-                    return $query->where('user_id', '=', Auth::user()->id);
-                }
-            })
+//            ->where(function ($query) use ($ShowRecord) {
+//                if (!$ShowRecord) {
+//                    return $query->where('user_id', '=', Auth::user()->id);
+//                }
+//            })
             // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
@@ -414,11 +415,12 @@ class ReportController extends Controller
             });
 
         $totalRows = $SaleReturn->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $SaleReturn = $SaleReturn->offset($offSet)
-            ->limit($perPage)
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
+        $SaleReturn = $SaleReturn
+//            ->offset($offSet)
+//            ->limit($perPage)
             ->orderBy('id', 'desc')
             ->get();
 
@@ -435,7 +437,7 @@ class ReportController extends Controller
             $item['due'] = $Sale_Return->GrandTotal - $Sale_Return->paid_amount;
             $item['payment_status'] = $Sale_Return->payment_statut;
 
-            $data[] = $item;
+            $data->add($item);
         }
 
         return response()->json([
@@ -449,14 +451,14 @@ class ReportController extends Controller
 
     public function Report_Purchases(request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'ReportPurchases', Purchase::class);
+//        $this->authorizeForUser($request->user('api'), 'ReportPurchases', Purchase::class);
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-        $order = $request->SortField;
-        $dir = $request->SortType;
+//        $offSet = ($pageStart * $perPage) - $perPage;
+//        $order = $request->SortField;
+//        $dir = $request->SortType;
         $helpers = new helpers();
         // Filter fields With Params to retrieve
         $param = array(
@@ -473,7 +475,7 @@ class ReportController extends Controller
             3 => 'payment_statut',
             4 => 'warehouse_id',
         );
-        $data = array();
+        $data = collect();
         $total = 0;
 
         $Purchases = Purchase::select('purchases.*')
@@ -483,7 +485,7 @@ class ReportController extends Controller
             ->whereBetween('purchases.date', array($request->from, $request->to));
 
         //  Check If User Has Permission Show All Records
-        $Purchases = $helpers->Show_Records($Purchases);
+//        $Purchases = $helpers->Show_Records($Purchases);
         //Multiple Filter
         $Filtred = $helpers->filter($Purchases, $columns, $param, $request)
             // Search With Multiple Param
@@ -507,12 +509,13 @@ class ReportController extends Controller
             });
 
         $totalRows = $Filtred->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $Purchases = $Filtred->offset($offSet)
-            ->limit($perPage)
-            ->orderBy('purchases.' . $order, $dir)
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
+        $Purchases = $Filtred
+//            ->offset($offSet)
+//            ->limit($perPage)
+//            ->orderBy('purchases.' . $order, $dir)
             ->get();
 
         foreach ($Purchases as $Purchase) {
@@ -534,19 +537,14 @@ class ReportController extends Controller
             $item['due'] = $Purchase['GrandTotal'] - $Purchase['paid_amount'];
             $item['payment_status'] = $Purchase['payment_statut'];
 
-            $data[] = $item;
+            $data->add($item);
         }
 
         $suppliers = provider::where('deleted_at', '=', null)->get(['id', 'name']);
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
-        if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        } else {
-            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-        }
+        $warehouses = helpers::getWarehouses($user_auth);
 
         return response()->json([
             'totalRows' => $totalRows,
@@ -572,7 +570,7 @@ class ReportController extends Controller
         }
 
         $Sales = Sale::select('sales.*')
-            ->with('facture', 'client', 'warehouse','details','details.product')
+            ->with('facture', 'client', 'warehouse', 'details', 'details.product')
 //            ->join('clients', 'sales.client_id', '=', 'clients.id')
             ->where('sales.deleted_at', '=', null);
 //                ->whereBetween('sales.date', array($request->from, $request->to));
@@ -590,29 +588,29 @@ class ReportController extends Controller
         );
         $Sales = $Sales->orderByDesc('date')->get();
         foreach ($Sales as $Sale) {
-        foreach ($Sale['details'] as $datail) {
-            $item['id'] = $Sale['id'];
-            $item['date'] = $Sale['date'];
-            $item['Ref'] = $Sale['Ref'];
-            $item['statut'] = $Sale['statut'];
-            $item['discount'] = $Sale['discount'];
-            $item['shipping'] = $Sale['shipping'];
-            $item['warehouse_name'] = $Sale['warehouse']['name'];
-            $item['client_name'] = $Sale['client']?->company_name;
-            $item['client_email'] = $Sale['client']?->email;
-            $item['client_tele'] = $Sale['client']?->phone;
-            $item['client_code'] = $Sale['client']?->code;
-            $item['client_adr'] = $Sale['client']?->adresse;
-            $item['product'] = $datail['product']?->name;
-            $item['qty'] = $datail?->quantity;
-            $item['price'] = $datail?->price;
-            $item['GrandTotal'] = $Sale['GrandTotal'];
-            $item['paid_amount'] = $Sale['paid_amount'];
-            $item['due'] = $Sale['GrandTotal'] - $Sale['paid_amount'];
-            $item['payment_status'] = $Sale['payment_statut'];
+            foreach ($Sale['details'] as $datail) {
+                $item['id'] = $Sale['id'];
+                $item['date'] = $Sale['date'];
+                $item['Ref'] = $Sale['Ref'];
+                $item['statut'] = $Sale['statut'];
+                $item['discount'] = $Sale['discount'];
+                $item['shipping'] = $Sale['shipping'];
+                $item['warehouse_name'] = $Sale['warehouse']['name'];
+                $item['client_name'] = $Sale['client']?->company_name;
+                $item['client_email'] = $Sale['client']?->email;
+                $item['client_tele'] = $Sale['client']?->phone;
+                $item['client_code'] = $Sale['client']?->code;
+                $item['client_adr'] = $Sale['client']?->adresse;
+                $item['product'] = $datail['product']?->name;
+                $item['qty'] = $datail?->quantity;
+                $item['price'] = $datail?->price;
+                $item['GrandTotal'] = $Sale['GrandTotal'];
+                $item['paid_amount'] = $Sale['paid_amount'];
+                $item['due'] = $Sale['GrandTotal'] - $Sale['paid_amount'];
+                $item['payment_status'] = $Sale['payment_statut'];
 
-            $data->add($item);
-        }
+                $data->add($item);
+            }
         }
 
         $customers = Client::where('deleted_at', '=', null)->get(['id', 'company_name as name']);
@@ -636,7 +634,7 @@ class ReportController extends Controller
     public function Providers_Report(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'Reports_suppliers', Provider::class);
+//        $this->authorizeForUser($request->user('api'), 'Reports_suppliers', Provider::class);
         // How many items do you want to display.
         $perPage = $request->limit;
         $pageStart = \Request::get('page', 1);
@@ -948,7 +946,7 @@ class ReportController extends Controller
     public function Warehouse_Report(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
+//        $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
 
         $data['sales'] = Sale::where('deleted_at', '=', null)
             ->where(function ($query) use ($request) {
@@ -980,12 +978,7 @@ class ReportController extends Controller
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
-        if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        } else {
-            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-        }
+        $warehouses = helpers::getWarehouses($user_auth);
 
         return response()->json([
             'data' => $data,
@@ -999,23 +992,23 @@ class ReportController extends Controller
     public function Sales_Warehouse(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
+//        $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-        $data = [];
+//        $offSet = ($pageStart * $perPage) - $perPage;
+        $data = collect();
 
         $Role = Auth::user()->roles()->first();
-        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $sales = Sale::where('deleted_at', '=', null)->with('client', 'warehouse')
-            ->where(function ($query) use ($ShowRecord) {
-                if (!$ShowRecord) {
-                    return $query->where('user_id', '=', Auth::user()->id);
-                }
-            })
+//            ->where(function ($query) use ($ShowRecord) {
+//                if (!$ShowRecord) {
+//                    return $query->where('user_id', '=', Auth::user()->id);
+//                }
+//            })
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('warehouse_id'), function ($query) use ($request) {
                     return $query->where('warehouse_id', $request->warehouse_id);
@@ -1037,11 +1030,12 @@ class ReportController extends Controller
             });
 
         $totalRows = $sales->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $sales = $sales->offset($offSet)
-            ->limit($perPage)
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
+        $sales = $sales
+//            ->offset($offSet)
+//            ->limit($perPage)
             ->orderBy('id', 'desc')
             ->get();
 
@@ -1058,7 +1052,7 @@ class ReportController extends Controller
             $item['payment_status'] = $sale->payment_statut;
             $item['shipping_status'] = $sale->shipping_status;
 
-            $data[] = $item;
+            $data->add($item);
         }
         return response()->json([
             'totalRows' => $totalRows,
@@ -1300,25 +1294,25 @@ class ReportController extends Controller
     public function Expenses_Warehouse(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
+//        $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-        $data = array();
+//        $offSet = ($pageStart * $perPage) - $perPage;
+        $data = collect();
 
         //  Check If User Has Permission Show All Records
         $Role = Auth::user()->roles()->first();
-        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $Expenses = Expense::where('deleted_at', '=', null)
             ->with('expense_category', 'warehouse')
-            ->where(function ($query) use ($ShowRecord) {
-                if (!$ShowRecord) {
-                    return $query->where('user_id', '=', Auth::user()->id);
-                }
-            })
+//            ->where(function ($query) use ($ShowRecord) {
+//                if (!$ShowRecord) {
+//                    return $query->where('user_id', '=', Auth::user()->id);
+//                }
+//            })
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('warehouse_id'), function ($query) use ($request) {
                     return $query->where('warehouse_id', $request->warehouse_id);
@@ -1339,11 +1333,12 @@ class ReportController extends Controller
             });
 
         $totalRows = $Expenses->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $Expenses = $Expenses->offset($offSet)
-            ->limit($perPage)
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
+        $Expenses = $Expenses
+//            ->offset($offSet)
+//            ->limit($perPage)
             ->orderBy('id', 'desc')
             ->get();
 
@@ -1355,7 +1350,7 @@ class ReportController extends Controller
             $item['amount'] = $Expense->amount;
             $item['warehouse_name'] = $Expense['warehouse']->name;
             $item['category_name'] = $Expense['expense_category']->name;
-            $data[] = $item;
+            $data->add($item);
         }
 
         return response()->json([
@@ -1368,7 +1363,7 @@ class ReportController extends Controller
 
     public function Warhouse_Count_Stock(Request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
+//        $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
 
         $stock_count = product_warehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
             ->join('warehouses', 'product_warehouse.warehouse_id', '=', 'warehouses.id')
@@ -1394,22 +1389,16 @@ class ReportController extends Controller
             ->groupBy('warehouses.name')
             ->get();
 
-        $data = [];
+        $data = collect();
         foreach ($stock_value as $key => $value) {
             $item['name'] = $value->name;
             $item['value'] = $value->price;
             $item['value1'] = $value->cost;
-            $data[] = $item;
+            $data->add($item);
         }
 
         //get warehouses assigned to user
-        $user_auth = auth()->user();
-        if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        } else {
-            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-        }
+        $warehouses = helpers::getWarehouses(auth()->user());
 
         return response()->json([
             'stock_count' => $stock_count,
@@ -1436,12 +1425,12 @@ class ReportController extends Controller
     public function ProfitAndLoss(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'Reports_profit', Client::class);
+//        $this->authorizeForUser($request->user('api'), 'Reports_profit', Client::class);
 
         $role = Auth::user()->roles()->first();
-        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
 
-        $data = [];
+        $data = collect();
 
         $item['sales'] = Sale::where('deleted_at', '=', null)->whereBetween('date', array($request->from, $request->to))
             ->select(
@@ -1496,22 +1485,22 @@ class ReportController extends Controller
 
         $item['return_sales'] = SaleReturn::where('deleted_at', '=', null)
             ->whereBetween('date', array($request->from, $request->to))
-            ->where(function ($query) use ($view_records) {
-                if (!$view_records) {
-                    return $query->where('user_id', '=', Auth::user()->id);
-                }
-            })
+//            ->where(function ($query) use ($view_records) {
+//                if (!$view_records) {
+//                    return $query->where('user_id', '=', Auth::user()->id);
+//                }
+//            })
             ->get(DB::raw('SUM(GrandTotal)  As sum'))
             ->first()->sum;
 
 
         $item['purchases_return'] = PurchaseReturn::where('deleted_at', '=', null)
             ->whereBetween('date', array($request->from, $request->to))
-            ->where(function ($query) use ($view_records) {
-                if (!$view_records) {
-                    return $query->where('user_id', '=', Auth::user()->id);
-                }
-            })
+//            ->where(function ($query) use ($view_records) {
+//                if (!$view_records) {
+//                    return $query->where('user_id', '=', Auth::user()->id);
+//                }
+//            })
             ->get(DB::raw('SUM(GrandTotal)  As sum'))
             ->first()->sum;
 
@@ -1743,23 +1732,27 @@ class ReportController extends Controller
     public function report_top_products(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'Top_products', Product::class);
+//        $this->authorizeForUser($request->user('api'), 'Top_products', Product::class);
 
         $Role = Auth::user()->roles()->first();
-        $view_records = Role::findOrFail($Role->id)->inRole('record_view');
+//        $view_records = Role::findOrFail($Role->id)->inRole('record_view');
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
+//        $offSet = ($pageStart * $perPage) - $perPage;
+        if (!$request->has(['from', 'to'])) {
+            $request['from'] = Carbon::now();
+            $request['to'] = Carbon::now();
+        }
 
         $products_data = SaleDetail::join('sales', 'sale_details.sale_id', '=', 'sales.id')
             ->join('products', 'sale_details.product_id', '=', 'products.id')
-            ->where(function ($query) use ($view_records) {
-                if (!$view_records) {
-                    return $query->where('sales.user_id', '=', Auth::user()->id);
-                }
-            })
+//            ->where(function ($query) use ($view_records) {
+//                if (!$view_records) {
+//                    return $query->where('sales.user_id', '=', Auth::user()->id);
+//                }
+//            })
             ->whereBetween('sale_details.date', array($request->from, $request->to))
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
@@ -1773,25 +1766,21 @@ class ReportController extends Controller
                 DB::raw('count(*) as total_sales'),
                 DB::raw('sum(total) as total'),
             )
-            ->groupBy('products.name');
+            ->groupBy(['products.name', 'products.code']);
 
         $totalRows = $products_data->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
 
 
-        $products = $products_data->offset($offSet)
-            ->limit($perPage)
+        $products = $products_data
+//            ->offset($offSet)
+//            ->limit($perPage)
             ->orderBy('total_sales', 'desc')
             ->get();
-
-
-        return response()->json([
-            'products' => $products,
-            'totalRows' => $totalRows,
-        ]);
-
+        Inertia::share('titlePage', 'Top Productos Vendidos');
+        return Inertia::render('Reports/top_selling_products', ['products' => $products,]);
     }
 
 
@@ -1859,16 +1848,16 @@ class ReportController extends Controller
     public function users_Report(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
+//        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
 
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-        $order = $request->SortField;
-        $dir = $request->SortType;
-        $data = array();
+//        $offSet = ($pageStart * $perPage) - $perPage;
+//        $order = $request->SortField;
+//        $dir = $request->SortType;
+        $data = collect();
 
         $users = User::where(function ($query) use ($request) {
             return $query->when($request->filled('search'), function ($query) use ($request) {
@@ -1877,12 +1866,13 @@ class ReportController extends Controller
         });
 
         $totalRows = $users->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $users = $users->offset($offSet)
-            ->limit($perPage)
-            ->orderBy($order, $dir)
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
+        $users = $users
+//            ->offset($offSet)
+//            ->limit($perPage)
+//            ->orderBy($order, $dir)
             ->get();
 
         foreach ($users as $user) {
@@ -1923,7 +1913,7 @@ class ReportController extends Controller
 
             $item['id'] = $user->id;
             $item['username'] = $user->username;
-            $data[] = $item;
+            $data->add($item);
         }
 
         return response()->json([
@@ -1939,22 +1929,22 @@ class ReportController extends Controller
     public function get_sales_by_user(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
+//        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
+//        $offSet = ($pageStart * $perPage) - $perPage;
 
         $Role = Auth::user()->roles()->first();
-        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $sales = Sale::where('deleted_at', '=', null)->with('user', 'client', 'warehouse')
-            ->where(function ($query) use ($ShowRecord) {
-                if (!$ShowRecord) {
-                    return $query->where('user_id', '=', Auth::user()->id);
-                }
-            })
+//            ->where(function ($query) use ($ShowRecord) {
+//                if (!$ShowRecord) {
+//                    return $query->where('user_id', '=', Auth::user()->id);
+//                }
+//            })
             ->where('user_id', $request->id)
             // Search With Multiple Param
             ->where(function ($query) use ($request) {
@@ -1976,15 +1966,16 @@ class ReportController extends Controller
             });
 
         $totalRows = $sales->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $sales = $sales->offset($offSet)
-            ->limit($perPage)
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
+        $sales = $sales
+//            ->offset($offSet)
+//            ->limit($perPage)
             ->orderBy('id', 'desc')
             ->get();
 
-        $data = [];
+        $data = collect();
         foreach ($sales as $sale) {
             $item['username'] = $sale['user']->username;
             $item['client_name'] = $sale['client']->name;
@@ -1999,7 +1990,7 @@ class ReportController extends Controller
             $item['payment_status'] = $sale->payment_statut;
             $item['shipping_status'] = $sale->shipping_status;
 
-            $data[] = $item;
+            $data->add($item);
         }
         return response()->json([
             'totalRows' => $totalRows,
@@ -2306,26 +2297,26 @@ class ReportController extends Controller
     public function get_transfer_by_user(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
+//        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
 
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
-        // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-        $data = array();
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
+//         Start displaying items from this number;
+//        $offSet = ($pageStart * $perPage) - $perPage;
+        $data = collect();
 
         $Role = Auth::user()->roles()->first();
-        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $transfers = Transfer::with('from_warehouse', 'to_warehouse')
             ->with('user')
             ->where('user_id', $request->id)
-            ->where(function ($query) use ($ShowRecord) {
-                if (!$ShowRecord) {
-                    return $query->where('user_id', '=', Auth::user()->id);
-                }
-            })
+//            ->where(function ($query) use ($ShowRecord) {
+//                if (!$ShowRecord) {
+//                    return $query->where('user_id', '=', Auth::user()->id);
+//                }
+//            })
             // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
@@ -2345,11 +2336,12 @@ class ReportController extends Controller
             });
 
         $totalRows = $transfers->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $transfers = $transfers->offset($offSet)
-            ->limit($perPage)
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
+        $transfers = $transfers
+//            ->offset($offSet)
+//            ->limit($perPage)
             ->orderBy('id', 'desc')
             ->get();
 
@@ -2364,7 +2356,7 @@ class ReportController extends Controller
             $item['items'] = $transfer->items;
             $item['statut'] = $transfer->statut;
 
-            $data[] = $item;
+            $data->add($item);
         }
         return response()->json([
             'totalRows' => $totalRows,
@@ -2378,26 +2370,26 @@ class ReportController extends Controller
     public function get_adjustment_by_user(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
+//        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
 
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-        $data = array();
+//        $offSet = ($pageStart * $perPage) - $perPage;
+        $data = collect();
 
         $Role = Auth::user()->roles()->first();
-        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $Adjustments = Adjustment::with('warehouse')
             ->with('user')
             ->where('user_id', $request->id)
-            ->where(function ($query) use ($ShowRecord) {
-                if (!$ShowRecord) {
-                    return $query->where('user_id', '=', Auth::user()->id);
-                }
-            })
+//            ->where(function ($query) use ($ShowRecord) {
+//                if (!$ShowRecord) {
+//                    return $query->where('user_id', '=', Auth::user()->id);
+//                }
+//            })
             // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
@@ -2411,11 +2403,12 @@ class ReportController extends Controller
             });
 
         $totalRows = $Adjustments->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $Adjustments = $Adjustments->offset($offSet)
-            ->limit($perPage)
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
+        $Adjustments = $Adjustments
+//            ->offset($offSet)
+//            ->limit($perPage)
             ->orderBy('id', 'desc')
             ->get();
 
@@ -2426,7 +2419,7 @@ class ReportController extends Controller
             $item['Ref'] = $Adjustment->Ref;
             $item['warehouse_name'] = $Adjustment['warehouse']->name;
             $item['items'] = $Adjustment->items;
-            $data[] = $item;
+            $data->add($item);
         }
 
         return response()->json([
@@ -2455,14 +2448,7 @@ class ReportController extends Controller
 
 
         //get warehouses assigned to user
-        $user_auth = auth()->user();
-        if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-            $warehouses_id = Warehouse::where('deleted_at', '=', null)->pluck('id')->toArray();
-        } else {
-            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-        }
+        $warehouses = helpers::getWarehouses(auth()->user());
 
         $products_data = Product::with('unit', 'category', 'brand')
             ->where('deleted_at', '=', null)
@@ -2480,11 +2466,12 @@ class ReportController extends Controller
             });
 
         $totalRows = $products_data->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $products = $products_data->offset($offSet)
-            ->limit($perPage)
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
+        $products = $products_data
+//            ->offset($offSet)
+//            ->limit($perPage)
             ->orderBy($order, $dir)
             ->get();
 
@@ -2497,7 +2484,7 @@ class ReportController extends Controller
 
             $product_warehouse_data = product_warehouse::where('product_id', $product->id)
                 ->where('deleted_at', '=', null)
-                ->whereIn('warehouse_id', $warehouses_id)
+                ->whereIn('warehouse_id', $warehouses->pluck('id'))
                 ->where(function ($query) use ($request) {
                     return $query->when($request->filled('warehouse_id'), function ($query) use ($request) {
                         return $query->where('warehouse_id', $request->warehouse_id);
@@ -2510,7 +2497,7 @@ class ReportController extends Controller
                 $item['quantity'] = $total_qty . ' ' . $product['unit']->ShortName;
             }
 
-            $data[] = $item;
+            $data->add($item);
         }
 
 
@@ -2527,24 +2514,24 @@ class ReportController extends Controller
     public function get_sales_by_product(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
+//        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
+//        $offSet = ($pageStart * $perPage) - $perPage;
 
         $Role = Auth::user()->roles()->first();
-        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $sale_details_data = SaleDetail::with('product', 'sale', 'sale.client', 'sale.warehouse')
-            ->where(function ($query) use ($ShowRecord) {
-                if (!$ShowRecord) {
-                    return $query->whereHas('sale', function ($q) use ($request) {
-                        $q->where('user_id', '=', Auth::user()->id);
-                    });
-                }
-            })
+//            ->where(function ($query) use ($ShowRecord) {
+//                if (!$ShowRecord) {
+//                    return $query->whereHas('sale', function ($q) use ($request) {
+//                        $q->where('user_id', '=', Auth::user()->id);
+//                    });
+//                }
+//            })
             ->where('product_id', $request->id)
             // Search With Multiple Param
             ->where(function ($query) use ($request) {
@@ -2573,15 +2560,16 @@ class ReportController extends Controller
             });
 
         $totalRows = $sale_details_data->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $sale_details = $sale_details_data->offset($offSet)
-            ->limit($perPage)
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
+        $sale_details = $sale_details_data
+//            ->offset($offSet)
+//            ->limit($perPage)
             ->orderBy('id', 'desc')
             ->get();
 
-        $data = [];
+        $data = collect();
         foreach ($sale_details as $detail) {
 
             //check if detail has sale_unit_id Or Null
@@ -2614,7 +2602,7 @@ class ReportController extends Controller
             $item['product_name'] = $product_name;
             $item['unit_sale'] = $unit->ShortName;
 
-            $data[] = $item;
+            $data->add($item);
         }
         return response()->json([
             'totalRows' => $totalRows,
@@ -3032,24 +3020,24 @@ class ReportController extends Controller
     public function get_transfer_by_product(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
+//        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
+//        $offSet = ($pageStart * $perPage) - $perPage;
 
         $Role = Auth::user()->roles()->first();
-        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $transfer_details_data = TransferDetail::with('product', 'transfer', 'transfer.from_warehouse', 'transfer.to_warehouse')
-            ->where(function ($query) use ($ShowRecord) {
-                if (!$ShowRecord) {
-                    return $query->whereHas('transfer', function ($q) use ($request) {
-                        $q->where('user_id', '=', Auth::user()->id);
-                    });
-                }
-            })
+//            ->where(function ($query) use ($ShowRecord) {
+//                if (!$ShowRecord) {
+//                    return $query->whereHas('transfer', function ($q) use ($request) {
+//                        $q->where('user_id', '=', Auth::user()->id);
+//                    });
+//                }
+//            })
             ->where('product_id', $request->id)
             // Search With Multiple Param
             ->where(function ($query) use ($request) {
@@ -3078,11 +3066,12 @@ class ReportController extends Controller
             });
 
         $totalRows = $transfer_details_data->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $transfer_details = $transfer_details_data->offset($offSet)
-            ->limit($perPage)
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
+        $transfer_details = $transfer_details_data
+//            ->offset($offSet)
+//            ->limit($perPage)
             ->orderBy('id', 'desc')
             ->get();
 
@@ -3105,7 +3094,7 @@ class ReportController extends Controller
             $item['to_warehouse'] = $detail['transfer']['to_warehouse']->name;
             $item['product_name'] = $product_name;
 
-            $data[] = $item;
+            $data->add($item);
         }
         return response()->json([
             'totalRows' => $totalRows,
@@ -3119,24 +3108,24 @@ class ReportController extends Controller
     public function get_adjustment_by_product(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
+//        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
+//        $offSet = ($pageStart * $perPage) - $perPage;
 
         $Role = Auth::user()->roles()->first();
-        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $adjustment_details_data = AdjustmentDetail::with('product', 'adjustment', 'adjustment.warehouse')
-            ->where(function ($query) use ($ShowRecord) {
-                if (!$ShowRecord) {
-                    return $query->whereHas('adjustment', function ($q) use ($request) {
-                        $q->where('user_id', '=', Auth::user()->id);
-                    });
-                }
-            })
+//            ->where(function ($query) use ($ShowRecord) {
+//                if (!$ShowRecord) {
+//                    return $query->whereHas('adjustment', function ($q) use ($request) {
+//                        $q->where('user_id', '=', Auth::user()->id);
+//                    });
+//                }
+//            })
             ->where('product_id', $request->id)
             // Search With Multiple Param
             ->where(function ($query) use ($request) {
@@ -3160,15 +3149,16 @@ class ReportController extends Controller
             });
 
         $totalRows = $adjustment_details_data->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $adjustment_details = $adjustment_details_data->offset($offSet)
-            ->limit($perPage)
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
+        $adjustment_details = $adjustment_details_data
+//            ->offset($offSet)
+//            ->limit($perPage)
             ->orderBy('id', 'desc')
             ->get();
 
-        $data = [];
+        $data = collect();
         foreach ($adjustment_details as $detail) {
 
             if ($detail->product_variant_id) {
@@ -3186,7 +3176,7 @@ class ReportController extends Controller
             $item['warehouse_name'] = $detail['adjustment']['warehouse']->name;
             $item['product_name'] = $product_name;
 
-            $data[] = $item;
+            $data->add($item);
         }
         return response()->json([
             'totalRows' => $totalRows,
@@ -3343,26 +3333,19 @@ class ReportController extends Controller
 
     public function product_report(request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'product_report', Product::class);
+//        $this->authorizeForUser($request->user('api'), 'product_report', Product::class);
 
         $Role = Auth::user()->roles()->first();
-        $view_records = Role::findOrFail($Role->id)->inRole('record_view');
+//        $view_records = Role::findOrFail($Role->id)->inRole('record_view');
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
+//        $offSet = ($pageStart * $perPage) - $perPage;
 
         //get warehouses assigned to user
-        $user_auth = auth()->user();
-        if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-            $array_warehouses_id = Warehouse::where('deleted_at', '=', null)->pluck('id')->toArray();
-        } else {
-            $array_warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $array_warehouses_id)->get(['id', 'name']);
-        }
-
+        $warehouses = helpers::getWarehouses(auth()->user());
+        $array_warehouses_id = $warehouses->pluck('id');
 
         $products_data = Product::select('id', 'name', 'code', 'is_variant', 'unit_id')
             ->where(function ($query) use ($request) {
@@ -3373,17 +3356,18 @@ class ReportController extends Controller
             });
 
         $totalRows = $products_data->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
 
 
-        $products = $products_data->offset($offSet)
-            ->limit($perPage)
+        $products = $products_data
+//            ->offset($offSet)
+//            ->limit($perPage)
             ->get();
 
 
-        $product_details = [];
+        $product_details = collect();
         $total_sales = 0;
         foreach ($products as $product) {
 
@@ -3397,17 +3381,19 @@ class ReportController extends Controller
                     $nestedData['name'] = ' [' . $variant_data->name . ']' . $product->name;
                     $nestedData['code'] = $product->code;
 
-                    $nestedData['sold_amount'] = SaleDetail::with('sale')->where([
-                        ['product_id', $product->id],
-                        ['product_variant_id', $variant_id]
-                    ])->where(function ($query) use ($view_records) {
-                        if (!$view_records) {
-                            return $query->whereHas('sale', function ($q) use ($request) {
-                                $q->where('user_id', '=', Auth::user()->id);
-                            });
-
-                        }
-                    })
+                    $nestedData['sold_amount'] = SaleDetail::with('sale')
+                        ->where([
+                            ['product_id', $product->id],
+                            ['product_variant_id', $variant_id]
+                        ])
+//                        ->where(function ($query) use ($view_records) {
+//                            if (!$view_records) {
+//                                return $query->whereHas('sale', function ($q) use ($request) {
+//                                    $q->where('user_id', '=', Auth::user()->id);
+//                                });
+//
+//                            }
+//                        })
                         ->where(function ($query) use ($request, $array_warehouses_id) {
                             if ($request->warehouse_id) {
                                 return $query->whereHas('sale', function ($q) use ($request, $array_warehouses_id) {
@@ -3424,14 +3410,15 @@ class ReportController extends Controller
                         ->sum('total');
 
                     $lims_product_sale_data = SaleDetail::select('sale_unit_id', 'quantity')->with('sale')
-                        ->where(function ($query) use ($view_records) {
-                            if (!$view_records) {
-                                return $query->whereHas('sale', function ($q) use ($request) {
-                                    $q->where('user_id', '=', Auth::user()->id);
-                                });
-
-                            }
-                        })->where([
+//                        ->where(function ($query) use ($view_records) {
+//                            if (!$view_records) {
+//                                return $query->whereHas('sale', function ($q) use ($request) {
+//                                    $q->where('user_id', '=', Auth::user()->id);
+//                                });
+//
+//                            }
+//                        })
+                        ->where([
                             ['product_id', $product->id],
                             ['product_variant_id', $variant_id]
                         ])
@@ -3447,7 +3434,8 @@ class ReportController extends Controller
 
                             }
                         })
-                        ->whereBetween('date', array($request->from, $request->to))->get();
+                        ->whereBetween('date', array($request->from, $request->to))
+                        ->get();
 
                     $sold_qty = 0;
                     if (count($lims_product_sale_data)) {
@@ -3463,7 +3451,7 @@ class ReportController extends Controller
                     $unit_shortname = Unit::where('id', $product->unit_id)->first();
                     $nestedData['sold_qty'] = $sold_qty . ' ' . $unit_shortname->ShortName;
 
-                    $product_details[] = $nestedData;
+                    $product_details->add($nestedData);
 
                 }
 
@@ -3473,14 +3461,14 @@ class ReportController extends Controller
                 $nestedData['code'] = $product->code;
 
                 $nestedData['sold_amount'] = SaleDetail::with('sale')->where('product_id', $product->id)
-                    ->where(function ($query) use ($view_records) {
-                        if (!$view_records) {
-                            return $query->whereHas('sale', function ($q) use ($request) {
-                                $q->where('user_id', '=', Auth::user()->id);
-                            });
-
-                        }
-                    })
+//                    ->where(function ($query) use ($view_records) {
+//                        if (!$view_records) {
+//                            return $query->whereHas('sale', function ($q) use ($request) {
+//                                $q->where('user_id', '=', Auth::user()->id);
+//                            });
+//
+//                        }
+//                    })
                     ->where(function ($query) use ($request, $array_warehouses_id) {
                         if ($request->warehouse_id) {
                             return $query->whereHas('sale', function ($q) use ($request, $array_warehouses_id) {
@@ -3496,15 +3484,16 @@ class ReportController extends Controller
                     ->whereBetween('date', array($request->from, $request->to))
                     ->sum('total');
 
-                $lims_product_sale_data = SaleDetail::select('sale_unit_id', 'quantity')->with('sale')->where('product_id', $product->id)
-                    ->where(function ($query) use ($view_records) {
-                        if (!$view_records) {
-                            return $query->whereHas('sale', function ($q) use ($request) {
-                                $q->where('user_id', '=', Auth::user()->id);
-                            });
-
-                        }
-                    })
+                $lims_product_sale_data = SaleDetail::select('sale_unit_id', 'quantity')
+                    ->with('sale')->where('product_id', $product->id)
+//                    ->where(function ($query) use ($view_records) {
+//                        if (!$view_records) {
+//                            return $query->whereHas('sale', function ($q) use ($request) {
+//                                $q->where('user_id', '=', Auth::user()->id);
+//                            });
+//
+//                        }
+//                    })
                     ->where(function ($query) use ($request, $array_warehouses_id) {
                         if ($request->warehouse_id) {
                             return $query->whereHas('sale', function ($q) use ($request, $array_warehouses_id) {
@@ -3538,7 +3527,7 @@ class ReportController extends Controller
 
                 $nestedData['sold_qty'] = $sold_qty . ' ' . $unit_shortname->ShortName;
 
-                $product_details[] = $nestedData;
+                $product_details->add($nestedData);
             }
 
 
@@ -3559,24 +3548,24 @@ class ReportController extends Controller
     public function sale_products_details(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'product_report', Product::class);
+//        $this->authorizeForUser($request->user('api'), 'product_report', Product::class);
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
+//        $offSet = ($pageStart * $perPage) - $perPage;
 
         $Role = Auth::user()->roles()->first();
-        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $sale_details_data = SaleDetail::with('product', 'sale', 'sale.client', 'sale.warehouse', 'sale.user')
-            ->where(function ($query) use ($ShowRecord) {
-                if (!$ShowRecord) {
-                    return $query->whereHas('sale', function ($q) use ($request) {
-                        $q->where('user_id', '=', Auth::user()->id);
-                    });
-                }
-            })
+//            ->where(function ($query) use ($ShowRecord) {
+//                if (!$ShowRecord) {
+//                    return $query->whereHas('sale', function ($q) use ($request) {
+//                        $q->where('user_id', '=', Auth::user()->id);
+//                    });
+//                }
+//            })
             ->whereBetween('date', array($request->from, $request->to))
             ->where('product_id', $request->id)
 
@@ -3645,15 +3634,16 @@ class ReportController extends Controller
             });
 
         $totalRows = $sale_details_data->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $sale_details = $sale_details_data->offset($offSet)
-            ->limit($perPage)
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
+        $sale_details = $sale_details_data
+//            ->offset($offSet)
+//            ->limit($perPage)
             ->orderBy('id', 'desc')
             ->get();
 
-        $data = [];
+        $data = collect();
         foreach ($sale_details as $detail) {
 
             //check if detail has sale_unit_id Or Null
@@ -3665,7 +3655,6 @@ class ReportController extends Controller
                     ->first();
                 $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
             }
-
 
             if ($detail->product_variant_id) {
                 $productsVariants = ProductVariant::where('product_id', $detail->product_id)
@@ -3687,20 +3676,14 @@ class ReportController extends Controller
             $item['product_name'] = $product_name;
             $item['unit_sale'] = $unit->ShortName;
 
-            $data[] = $item;
+            $data->add($item);
         }
 
         $customers = client::where('deleted_at', '=', null)->get(['id', 'name']);
         $users = User::get(['id', 'username']);
 
         //get warehouses assigned to user
-        $user_auth = auth()->user();
-        if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        } else {
-            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-        }
+        $warehouses = helpers::getWarehouses(auth()->user());
 
         return response()->json([
             'totalRows' => $totalRows,
@@ -3718,37 +3701,37 @@ class ReportController extends Controller
     public function product_sales_report(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'product_sales_report', Sale::class);
+//        $this->authorizeForUser($request->user('api'), 'product_sales_report', Sale::class);
         $role = Auth::user()->roles()->first();
-        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
         // How many items do you want to display.
-        $perPage = $request->limit;
+//        $perPage = $request->limit;
 
-        $pageStart = \Request::get('page', 1);
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-        $order = $request->SortField;
-        $dir = $request->SortType;
-        $helpers = new helpers();
+//        $offSet = ($pageStart * $perPage) - $perPage;
+//        $order = $request->SortField;
+//        $dir = $request->SortType;
+//        $helpers = new helpers();
         // Filter fields With Params to retrieve
-        $param = array(
-            0 => '=',
-            1 => '=',
-        );
-        $columns = array(
-            0 => 'client_id',
-            1 => 'warehouse_id',
-        );
-        $data = array();
+//        $param = array(
+//            0 => '=',
+//            1 => '=',
+//        );
+//        $columns = array(
+//            0 => 'client_id',
+//            1 => 'warehouse_id',
+//        );
+        $data = collect();
 
         $sale_details_data = SaleDetail::with('product', 'sale', 'sale.client', 'sale.warehouse')
-            ->where(function ($query) use ($view_records) {
-                if (!$view_records) {
-                    return $query->whereHas('sale', function ($q) use ($request) {
-                        $q->where('user_id', '=', Auth::user()->id);
-                    });
-                }
-            })
+//            ->where(function ($query) use ($view_records) {
+//                if (!$view_records) {
+//                    return $query->whereHas('sale', function ($q) use ($request) {
+//                        $q->where('user_id', '=', Auth::user()->id);
+//                    });
+//                }
+//            })
             ->whereBetween('date', array($request->from, $request->to));
 
         // Filter
@@ -3795,14 +3778,14 @@ class ReportController extends Controller
 
 
         $totalRows = $sale_details_Filtred->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
 
         $sale_details = $sale_details_Filtred
-            ->offset($offSet)
-            ->limit($perPage)
-            ->orderBy($order, $dir)
+//            ->offset($offSet)
+//            ->limit($perPage)
+//            ->orderBy($order, $dir)
             ->get();
 
         foreach ($sale_details as $detail) {
@@ -3837,18 +3820,12 @@ class ReportController extends Controller
             $item['product_name'] = $product_name;
             $item['unit_sale'] = $unit->ShortName;
 
-            $data[] = $item;
+            $data->add($item);
         }
 
 
         //get warehouses assigned to user
-        $user_auth = auth()->user();
-        if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        } else {
-            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-        }
+        $warehouses = helpers::getWarehouses(auth()->user());
 
         $customers = client::where('deleted_at', '=', null)->get(['id', 'name']);
 
@@ -3994,12 +3971,7 @@ class ReportController extends Controller
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
-        if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-        } else {
-            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-        }
+        $warehouses = helpers::getWarehouses($user_auth);
 
         $suppliers = Provider::where('deleted_at', '=', null)->get(['id', 'name']);
 
