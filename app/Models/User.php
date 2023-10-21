@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -35,6 +36,9 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'role_id' => 'integer',
+        'statut' => 'integer',
+        'is_all_warehouses' => 'integer',
     ];
 
     public function getNameAttribute(): string
@@ -42,7 +46,7 @@ class User extends Authenticatable
         return $this->nombre . ' ' . $this->apellido;
     }
 
-    public function Sucursales(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function Sucursales(): HasOne
     {
         return $this->hasOne(Sucursal::class,'id','sucursal');
     }
@@ -62,5 +66,28 @@ class User extends Authenticatable
 
         $first = $roles->firstWhere('value', '=', $id);
         return $first['text']??'';
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+
+    public function assignRole(Role $role)
+    {
+        return $this->roles()->save($role);
+    }
+
+    public function hasRole($role)
+    {
+        if (is_string($role)) {
+            return $this->roles->contains('name', $role);
+        }
+        return !!$role->intersect($this->roles)->count();
+    }
+
+    public function assignedWarehouses()
+    {
+        return $this->belongsToMany('App\Models\Warehouse');
     }
 }

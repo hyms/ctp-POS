@@ -10,6 +10,7 @@ use App\Models\ProductoStock;
 use App\Models\Recibo;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
@@ -23,45 +24,22 @@ class PDFController extends Controller
 {
     protected $mpdf;
 
-    public function getOrdenVenta($id)
-    {
-        $this->getOrden($id, true);
-    }
-
-    public function getOrdenDiseño($id)
-    {
-        $this->getOrden($id, false);
-    }
-
-    private function getOrden($id, bool $isVenta)
+    public function printHtml(Request $request)
     {
         try {
-            $orden = OrdenesTrabajo::find($id);
-            if (empty($orden)) {
-                throw new UnexpectedValueException("pdf: no data for {$id}");
-            }
-            $detalle = DetallesOrden::where('ordenTrabajo', $id)->get();
-            $productos = ProductoStock::getProducts(Auth::user()['sucursal']);
-            $detalle = $this->normalizeDetalle($detalle, $productos);
+            request()->validate([
+                'body' => 'required',
+            ]);
 
-            $mytime = Carbon::parse($orden->updated_at);
-
-            $data = [
-                'orden' => $orden,
-                'detalle' => $detalle,
-                'fechaOrden' => $mytime->format("d/m/Y H:i"),
-                'isVenta' => $isVenta
-            ];
-
-            $this->mpdf = new Mpdf(['tempDir' =>storage_path('app/tmp')]);
-            $view = View::make('pdfOrden', $data);
+            $this->mpdf = new Mpdf(['tempDir' => storage_path('app/tmp')]);
+            $view = View::make('pdfClean', $request->all());
             $html = $view->render();
             $this->mpdf->WriteHTML($html);
             $this->mpdf->page = 0;
             $this->mpdf->state = 0;
             unset($this->mpdf->pages[0]);
-            $mpdfView = PDF::loadView('pdfOrden', $data, [], [
-                'title' => 'Orden ' . $orden->codigoServicio,
+            $mpdfView = PDF::loadView('pdfClean', $request->all(), [], [
+                'title' => $request->title,
                 'margin_top' => 5,
                 'margin_bottom' => 5,
                 'margin_left' => 5,
@@ -69,69 +47,11 @@ class PDFController extends Controller
                 'format' => array(72.1, $this->mpdf->y + 15),
                 'orientation' => 'P'
             ]);
-            return $mpdfView->stream($orden->codigoServicio . '.pdf');
-        } catch (Exception $error) {
-            Log::error($error->getMessage());
-            abort(404);
-        }
-    }
-
-    function getProduct($id,$products)
-    {
-        $item = [];
-        foreach ($products as $product) {
-            if ($product->id == $id) {
-                $item = $product;
-                break;
-            }
-        }
-        if ($item) {
-            return "{$item->formato} ({$item->dimension})";
-        }
-        return "";
-    }
-
-    function normalizeDetalle($detalle, $productos)
-    {
-        foreach ($detalle as $key => $item) {
-            $detalle[$key]->stock = $this->getProduct($item->stock, $productos);
-        }
-        return $detalle;
-    }
-
-    public function getRecibo($id){
-        try {
-            $recibo = Recibo::find($id);
-            if (empty($recibo)) {
-                throw new UnexpectedValueException("pdf: no data for {$id}");
-            }
-            $mytime = Carbon::parse($recibo->updated_at);
-
-            $data = [
-                'recibo' => $recibo,
-                'fechaOrden' => $mytime->format("d/m/Y H:i"),
-            ];
-
-            $this->mpdf = new Mpdf(['tempDir' =>storage_path('app/tmp')]);
-            $view = View::make('pdfRecibo', $data);
-            $html = $view->render();
-            $this->mpdf->WriteHTML($html);
-            $this->mpdf->page = 0;
-            $this->mpdf->state = 0;
-            unset($this->mpdf->pages[0]);
-            $mpdfView = PDF::loadView('pdfRecibo', $data, [], [
-                'title' => 'Recibo ' . $recibo->secuencia,
-                'margin_top' => 5,
-                'margin_bottom' => 5,
-                'margin_left' => 5,
-                'margin_right' => 5,
-                'format' => array(72.1, $this->mpdf->y + 15),
-                'orientation' => 'P'
-            ]);
-            return $mpdfView->stream($recibo->secuencia . '.pdf');
+            return $mpdfView->stream($request->title . '.pdf');
         } catch (Exception $error) {
             Log::error($error->getMessage());
             abort(404);
         }
     }
 }
+

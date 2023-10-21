@@ -1,40 +1,42 @@
-<template>
-    <v-app>
-        <Menu>
-        </Menu>
-        <v-main>
-            <v-container fluid>
-                <slot></slot>
-            </v-container>
-        </v-main>
+<script setup>
+import Menu from "@/Components/Menu.vue";
+import Snackbar from "@/Components/snackbar.vue";
 
-        <v-footer
-            app
-            inset
-            color="transparent"
-            absolute
-            height="56"
-            class="px-0"
-        >
-            <div class="boxed-container w-full">
-                <div class="mx-6 d-flex justify-space-between">
-          <span>
-            &copy; 2022
-              <a class="text-decoration-none">copito</a>
-          </span>
-                </div>
-            </div>
-        </v-footer>
-    </v-app>
-</template>
+import moment from "moment";
 
-<script>
-import Menu from './components/Menu.vue'
-
-export default {
-    components: {
-        Menu,
-    },
-
-}
+const props = defineProps({
+  loading: {type: Boolean, default: false},
+  snackbarView: Boolean,
+  snackbarColor: String,
+  snackbarText: String,
+});
 </script>
+<template>
+  <v-overlay
+      :model-value="loading"
+      class="align-center justify-center"
+  ></v-overlay>
+  <Snackbar
+      :snackbar-view="snackbarView"
+      :snackbar-color="snackbarColor"
+      :snackbar-text="snackbarText"
+  ></Snackbar>
+  <v-layout full-height>
+    <Menu></Menu>
+
+    <v-main>
+      <v-container fluid>
+        <slot></slot>
+      </v-container>
+    </v-main>
+
+    <v-footer app border>
+      <v-container fluid class="py-1">
+                    <span>
+                        &copy; {{ moment().year() }}
+                        <v-chip size="small" variant="text" color="primary" class="text-uppercase">copito</v-chip>
+                    </span>
+      </v-container>
+    </v-footer>
+  </v-layout>
+</template>

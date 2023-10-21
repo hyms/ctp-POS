@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -35,16 +36,17 @@ class LoginController extends Controller
      *
      * @return Response
      */
-    public function showLoginForm()
+    public function showLoginForm(): Response
     {
-        return Inertia::render('Auth/Login');
+        return Inertia::render('Login');
     }
-    public function username()
+
+    public function username(): string
     {
         return 'username';
     }
 
-    public function login(Request $request)
+    public function login(Request $request): RedirectResponse
     {
         $this->validate($request, [
             'username' => 'required',

@@ -1,48 +1,88 @@
-import './bootstrap';
-import '../css/app.css';
+import "./bootstrap";
 
-import '@mdi/font/css/materialdesignicons.css'
-import Vue from 'vue';
-import Vuetify from 'vuetify'
-import es from 'vuetify/lib/locale/es'
-import vueMoment from 'vue-moment'
-import moment from 'moment'
-import * as momentLocale from 'moment/locale/es'
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import "@mdi/font/css/materialdesignicons.css";
+import {createApp, h} from "vue";
+// import "vuetify/styles";
+import {createVuetify} from "vuetify";
+import * as components from "vuetify/components";
+import * as directives from "vuetify/directives";
+import * as labs from "vuetify/labs/components";
+import {es} from "vuetify/locale";
+import moment from "moment";
+import 'typeface-roboto/index.css';
+
+import "@/../css/main.scss";
+// import "@/../css/app.css";
+
+import {resolvePageComponent} from "laravel-vite-plugin/inertia-helpers";
 // import 'vuetify/dist/vuetify.min.css'
-import { createInertiaApp } from '@inertiajs/inertia-vue'
-import {InertiaProgress} from '@inertiajs/progress';
+
+moment.locale("es");
+
+import {createInertiaApp} from "@inertiajs/vue3";
+
+const customLight = {
+    colors: {
+        // background: "rgba(0, 0, 21, 0.2)",
+        // surface: "#f7f7f7",
+        surface: "rgba(245,245,245,0)",
+        primary: "#3c858d",
+        secondary: "#5e8592",
+        error: "#e75f5f",
+        info: "#3d71a5",
+        success: "#4fbb73",
+        warning: "#ffc340",
+    },
+};
+const vuetify = createVuetify({
+    components: {
+        ...components,
+        ...labs,
+    },
+    directives,
+    locale: {
+        locale: "es",
+        fallback: "es",
+        messages: {es},
+    },
+    icons: {
+        defaultSet: "mdi",
+    },
+    theme: {
+        defaultTheme: "customLight",
+        themes: {
+            customLight,
+        },
+    },
+    defaults: {
+        VBtn: {size: 'small'},
+        VCard: {density: 'compact'},
+        VTable: {density: 'compact'},
+        VTextarea: {density: 'compact', variant: 'outlined', color: 'primary'},
+        VTextField: {density: 'compact', variant: 'outlined', color: 'primary'},
+        VCheckbox: {density: 'compact', color: 'primary'},
+        VSelect: {density: 'compact', variant: 'outlined', color: 'primary'},
+        VAutocomplete: {density: 'compact', variant: 'outlined', color: 'primary'},
+        VDataTable: {density: 'compact'},
+        VSwitch: {density: 'compact', color: 'primary'},
+        VToolbar: {density: 'comfortable'},
+    },
+});
+
 
 createInertiaApp({
-    resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
+    resolve: (name) =>
+        resolvePageComponent(
+            `./Pages/${name}.vue`,
+            import.meta.glob("./Pages/**/*.vue")
+        ),
     setup({el, App, props, plugin}) {
-        Vue.use(plugin)
-        Vue.use(vueMoment, {moment});
-        Vue.use(Vuetify)
-        // Vue.mixin({methods: {route}})
-        new Vue({
-            render: h => h(App, props),
-            vuetify: new Vuetify({
-                icons: {
-                    iconfont: 'mdi',
-                },
-                lang: {locales: {es}, current: 'es'},
-                theme: {
-                    themes: {
-                        light: {
-                            primary: '#007b89',
-                            secondary: '#5e8592',
-                            accent: '#2C384A',
-                            error: '#e55353',
-                            info: '#39f',
-                            success: '#2eb85c',
-                            warning: '#f9b115',
-                        },
-                    },
-                },
-            }),
-        }).$mount(el)
+        createApp({render: () => h(App, props)})
+            .use(plugin)
+            .use(vuetify)
+            .mount(el);
     },
-})
-
-InertiaProgress.init({color: '#007b89'});
+    progress: {
+        color: "#007b89",
+    },
+});
