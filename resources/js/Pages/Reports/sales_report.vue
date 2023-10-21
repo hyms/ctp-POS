@@ -250,39 +250,39 @@ function Get_Sales(page) {
             name-file="Ventas"
         ></ExportBtn>
       </v-col>
-    </v-row>
+      <v-col cols="12">
+    <v-data-table
+        :headers="fields"
+        :items="sales"
+        :search="search"
+        hover
+        :no-data-text="labels.no_data_table"
+        :loading="loading"
+        class="text-center elevation-2"
 
-    <v-card>
-      <v-data-table
-          :headers="fields"
-          :items="sales"
-          :search="search"
-          hover
-          :no-data-text="labels.no_data_table"
-          :loading="loading"
-          class="text-center"
-      >
-        <template v-slot:item.Reglement="{ item }">
-          {{ helper.getReglamentPayment(item.Reglement)[0].title }}
-        </template>
-        <template v-slot:item.statut="{ item }">
-          <v-chip
-              :color="helper.statutSaleColor(item.statut)"
-              variant="tonal"
-              size="x-small"
-          >{{ helper.statutSale(item.statut) }}
-          </v-chip>
-        </template>
-        <template v-slot:item.payment_status="{ item }">
-          <v-chip
-              :color="helper.statusPaymentColor(item.payment_status)"
-              variant="tonal"
-              size="x-small"
-          >{{ helper.statusPayment(item.payment_status) }}
-          </v-chip>
-        </template>
-      </v-data-table>
-    </v-card>
+    >
+      <template v-slot:item.Reglement="{ item }">
+        {{ helper.getReglamentPayment(item.Reglement)[0].title }}
+      </template>
+      <template v-slot:item.statut="{ item }">
+        <v-chip
+            :color="helper.statutSaleColor(item.statut)"
+            variant="tonal"
+            size="x-small"
+        >{{ helper.statutSale(item.statut) }}
+        </v-chip>
+      </template>
+      <template v-slot:item.payment_status="{ item }">
+        <v-chip
+            :color="helper.statusPaymentColor(item.payment_status)"
+            variant="tonal"
+            size="x-small"
+        >{{ helper.statusPayment(item.payment_status) }}
+        </v-chip>
+      </template>
+    </v-data-table>
+      </v-col>
+    </v-row>
   </layout>
 
 </template>
