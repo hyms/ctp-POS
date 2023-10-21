@@ -1789,37 +1789,37 @@ class ReportController extends Controller
     public function report_top_customers(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'Top_customers', Client::class);
+//        $this->authorizeForUser($request->user('api'), 'Top_customers', Client::class);
 
         $role = Auth::user()->roles()->first();
-        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
+//        $offSet = ($pageStart * $perPage) - $perPage;
 
         $customers_count = Sale::where('sales.deleted_at', '=', null)
-            ->where(function ($query) use ($view_records) {
-                if (!$view_records) {
-                    return $query->where('sales.user_id', '=', Auth::user()->id);
-                }
-            })
+//            ->where(function ($query) use ($view_records) {
+//                if (!$view_records) {
+//                    return $query->where('sales.user_id', '=', Auth::user()->id);
+//                }
+//            })
             ->join('clients', 'sales.client_id', '=', 'clients.id')
             ->select(DB::raw('clients.name'), DB::raw("count(*) as total_sales"))
             ->groupBy('clients.name')->get();
 
         $totalRows = $customers_count->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
+//        if ($perPage == "-1") {
+//            $perPage = $totalRows;
+//        }
 
         $customers_data = Sale::where('sales.deleted_at', '=', null)
-            ->where(function ($query) use ($view_records) {
-                if (!$view_records) {
-                    return $query->where('sales.user_id', '=', Auth::user()->id);
-                }
-            })
+//            ->where(function ($query) use ($view_records) {
+//                if (!$view_records) {
+//                    return $query->where('sales.user_id', '=', Auth::user()->id);
+//                }
+//            })
             ->join('clients', 'sales.client_id', '=', 'clients.id')
             ->select(
                 DB::raw('clients.name as name'),
@@ -1828,17 +1828,16 @@ class ReportController extends Controller
                 DB::raw("count(*) as total_sales"),
                 DB::raw('sum(GrandTotal) as total'),
             )
-            ->groupBy('clients.name');
+            ->groupBy(['clients.name','clients.phone','clients.email']);
 
-        $customers = $customers_data->offset($offSet)
-            ->limit($perPage)
+        $customers = $customers_data
+//            ->offset($offSet)
+//            ->limit($perPage)
             ->orderBy('total_sales', 'desc')
             ->get();
 
-        return response()->json([
-            'customers' => $customers,
-            'totalRows' => $totalRows,
-        ]);
+        Inertia::share('titlePage', 'Top Clientes');
+        return Inertia::render('Reports/top_customers', ['customers' => $customers,]);
 
     }
 

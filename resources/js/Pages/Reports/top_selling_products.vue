@@ -3,7 +3,6 @@ import {computed, ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import {router, usePage} from "@inertiajs/vue3";
-import helper from "@/helpers";
 import labels from "@/labels";
 
 const props = defineProps({
