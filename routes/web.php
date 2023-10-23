@@ -26,8 +26,9 @@ use App\Http\Controllers\UnitsController;
 use App\Http\Controllers\UpgradeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use Inertia\Inertia;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -258,6 +259,10 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
 
         Route::get("/users", [ReportController::class, "users_Report"]);
         Route::get("/stock", [ReportController::class, "stock_Report"]);
+        Route::get("/stock_detail/{id}", function (request $request){
+            Inertia::share('titlePage','Detalle Producto');
+            return Inertia::render('Reports/detail_stock_report',['id',$request->get('id')]);
+        });
         Route::get("/get_sales_by_user", [ReportController::class, "get_sales_by_user"]);
         Route::get("/get_quotations_by_user", [ReportController::class, "get_quotations_by_user"]);
         Route::get("/get_sales_return_by_user", [ReportController::class, "get_sales_return_by_user"]);

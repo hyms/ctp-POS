@@ -58,6 +58,7 @@ export default {
         statut: "Estado de Trabajo",
         due: "Deuda",
         payment_status: "Estado de pago",
+        date: defaults.date
     },
     user: {
         firstname: defaults.name,

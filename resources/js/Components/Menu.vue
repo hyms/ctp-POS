@@ -147,21 +147,21 @@ const menuItems = ref([
       //   url: "/report/quantity_alerts",
       //   role: "admin",
       // },
-      {
-        label: "Reporte de Agencias",
-        url: "/report/warehouse_report",
-        role: "admin",
-      },
+      // {
+      //   label: "Reporte de Agencias",
+      //   url: "/report/warehouse_report",
+      //   role: "admin",
+      // },
       {
         label: "Reporte de Stock",
-        url: "/report/stock_report",
-        role: "admin",
+        url: "/report/stock",
+        role: "vendor",
       },
-      {
-        label: "Reporte de Usuarios",
-        url: "/report/users_report",
-        role: "admin",
-      },
+      // {
+      //   label: "Reporte de Usuarios",
+      //   url: "/report/users_report",
+      //   role: "admin",
+      // },
       {
         label: "Top productos vendidos",
         url: "/report/top_products",
@@ -217,13 +217,6 @@ const user = computed(() => usePage().props.user);
 const open = ref([]);
 
 // const url = computed(() => usePage().url);
-
-function linkVisit(url, type = "get") {
-  router.visit(url, {
-    method: type,
-    preserveState: true,
-  });
-}
 
 function getPermission(role) {
   for (const key in roles.value) {
@@ -302,7 +295,7 @@ onMounted(() => {
                 <v-list-item
                     :key="key + '' + subKey"
                     @click="helpers.linkVisit(subLink.url)"
-                    :active="$page.url === subLink.url"
+                    :active="$page.url.includes(subLink.url)"
                     :value="subLink.label"
                 >
                   <v-list-item-title class="text-capitalize">
@@ -317,7 +310,7 @@ onMounted(() => {
           <v-list-item
               v-if="getPermission(link.role)"
               @click="helpers.linkVisit(link.url)"
-              :active="$page.url === link.url"
+              :active="$page.url.includes(link.url)"
               :key="key"
               :value="link.label"
           >

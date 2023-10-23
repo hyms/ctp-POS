@@ -1,57 +1,47 @@
-<script>
-// import { mapActions, mapGetters } from "vuex";
-// import jsPDF from "jspdf";
-// import "jspdf-autotable";
-//
-// export default {
-//   data() {
-//     return {
+<script setup>
+import {computed, ref} from "vue";
+import Layout from "@/Layouts/Authenticated.vue";
+import ExportBtn from "@/Components/buttons/ExportBtn.vue";
+import {router, usePage} from "@inertiajs/vue3";
+import helper from "@/helpers";
+import labels from "@/labels";
+
+const tab = ref(null);
+
+const totalRows_sales = ref("");
+const totalRows_transfers = ref("");
+const totalRows_adjustments = ref("");
+
 //       totalRows_quotations: "",
-//       totalRows_sales: "",
 //       totalRows_sales_return: "",
 //       totalRows_purchases_return: "",
 //       totalRows_purchases: "",
-//       totalRows_transfers: "",
-//       totalRows_adjustments: "",
-//
-//       limit_quotations: "10",
-//       limit_sales_return: "10",
-//       limit_purchases_return: "10",
-//       limit_sales: "10",
-//       limit_purchases: "10",
-//       limit_transfers: "10",
-//       limit_adjustments: "10",
-//
-//       sales_page: 1,
-//       quotations_page: 1,
-//       Return_sale_page: 1,
-//       Return_purchase_page: 1,
-//       purchases_page: 1,
-//       transfers_page: 1,
-//       adjustments_page: 1,
-//
-//       search_sales:"",
+
+const search_sales = ref("");
+const search_transfers = ref("");
+const search_adjustments = ref("");
 //       search_purchases:"",
 //       search_quotations:"",
 //       search_return_sales:"",
 //       search_return_purchases:"",
-//       search_transfers:"",
-//       search_adjustments:"",
-//
-//       isLoading: true,
-//       product:{},
+
+const props = defineProps({
+  id: Number,
+})
+const loading = ref(false);
+const menu = ref(false);
+const formFilter = ref({
+  warehouse_id: ""
+});
+const product = ref({});
+const sales = ref([]);
+const transfers = ref([]);
+const adjustments = ref([]);
 //       purchases: [],
-//       sales: [],
 //       quotations: [],
 //       sales_return: [],
 //       purchases_return: [],
-//       transfers: [],
-//       adjustments: [],
-//     };
-//   },
-//
-//   computed: {
-//     ...mapGetters(["currentUser"]),
+
 //     columns_quotations() {
 //       return [
 //          {
@@ -103,58 +93,16 @@
 //         },
 //       ];
 //     },
-//     columns_sales() {
-//       return [
-//         {
-//           label: this.$t("date"),
-//           field: "date",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Reference"),
-//           field: "Ref",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("product_name"),
-//           field: "product_name",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("Customer"),
-//           field: "client_name",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("warehouse"),
-//           field: "warehouse_name",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("Quantity"),
-//           field: "quantity",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("SubTotal"),
-//           field: "total",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//
-//       ];
-//     },
+const fields_sales = ref([
+  {title: labels.sale.date, key: "date"},
+  {title: labels.sale.sales_type_id, key: "sale_type"},
+  {title: labels.sale.Ref, key: "Ref"},
+  {title: labels.sale.details.product, key: "product_name"},
+  {title: labels.sale.client_id, key: "client_name"},
+  {title: labels.sale.warehouse_id, key: "warehouse_name"},
+  {title: labels.sale.details.qty, key: "quantity"},
+  {title: labels.sale.details.sub_total, key: "total"},
+]);
 //     columns_sales_return() {
 //       return [
 //         {
@@ -308,292 +256,52 @@
 //         },
 //       ];
 //     },
-//     columns_transfers() {
-//       return [
-//         {
-//           label: this.$t("date"),
-//           field: "date",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Reference"),
-//           field: "Ref",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("product_name"),
-//           field: "product_name",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("FromWarehouse"),
-//           field: "from_warehouse",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("ToWarehouse"),
-//           field: "to_warehouse",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//
-//       ];
-//     },
-//     columns_adjustments() {
-//       return [
-//         {
-//           label: this.$t("date"),
-//           field: "date",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("Reference"),
-//           field: "Ref",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//         {
-//           label: this.$t("product_name"),
-//           field: "product_name",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("warehouse"),
-//           field: "warehouse_name",
-//           tdClass: "text-left",
-//           thClass: "text-left"
-//         },
-//
-//       ];
-//     }
-//   },
-//
-//   methods: {
-//
-//      //----------------------------------- Sales PDF ------------------------------\\
-//     Sales_PDF() {
-//       var self = this;
-//       let pdf = new jsPDF("p", "pt");
-//       let columns = [
-//         { title: "Date", dataKey: "date" },
-//         { title: "Ref", dataKey: "Ref" },
-//         { title: "Product Name", dataKey: "product_name" },
-//         { title: "Client", dataKey: "client_name" },
-//         { title: "Warehouse", dataKey: "warehouse_name" },
-//         { title: "Quantity", dataKey: "quantity" },
-//         { title: "SubTotal", dataKey: "total" },
-//       ];
-//       pdf.autoTable(columns, self.sales);
-//       pdf.text("Sale List", 40, 25);
-//       pdf.save("Sale_List.pdf");
-//     },
-//
-//       //------------------------------------- Quotations PDF -------------------------\\
-//     Quotation_PDF() {
-//       var self = this;
-//
-//       let pdf = new jsPDF("p", "pt");
-//       let columns = [
-//         { title: "Date", dataKey: "date" },
-//         { title: "Ref", dataKey: "Ref" },
-//         { title: "Product Name", dataKey: "product_name" },
-//         { title: "Client", dataKey: "client_name" },
-//         { title: "Warehouse", dataKey: "warehouse_name" },
-//         { title: "Quantity", dataKey: "quantity" },
-//         { title: "SubTotal", dataKey: "total" },
-//       ];
-//       pdf.autoTable(columns, self.quotations);
-//       pdf.text("Quotation List", 40, 25);
-//       pdf.save("Quotation_List.pdf");
-//     },
-//
-//      //---------------------- Purchases PDF -------------------------------\\
-//     Purchase_PDF() {
-//       var self = this;
-//
-//       let pdf = new jsPDF("p", "pt");
-//       let columns = [
-//         { title: "Date", dataKey: "date" },
-//         { title: "Ref", dataKey: "Ref" },
-//         { title: "Product Name", dataKey: "product_name" },
-//         { title: "Supplier", dataKey: "provider_name" },
-//         { title: "Warehouse", dataKey: "warehouse_name" },
-//         { title: "Quantity", dataKey: "quantity" },
-//         { title: "SubTotal", dataKey: "total" },
-//       ];
-//       pdf.autoTable(columns, self.purchases);
-//       pdf.text("Purchase List", 40, 25);
-//       pdf.save("Purchase_List.pdf");
-//     },
-//
-//      //----------------------------------------- Sales Return PDF -----------------------\\
-//     Sale_Return_PDF() {
-//       var self = this;
-//
-//       let pdf = new jsPDF("p", "pt");
-//       let columns = [
-//         { title: "Date", dataKey: "date" },
-//         { title: "Ref", dataKey: "Ref" },
-//         { title: "Product Name", dataKey: "product_name" },
-//         { title: "Client", dataKey: "client_name" },
-//         { title: "Warehouse", dataKey: "warehouse_name" },
-//         { title: "Quantity", dataKey: "quantity" },
-//         { title: "SubTotal", dataKey: "total" },
-//       ];
-//       pdf.autoTable(columns, self.sales_return);
-//       pdf.text("Sales Return List", 40, 25);
-//       pdf.save("Sales Return.pdf");
-//     },
-//
-//       //----------------------------------------- Returns Purchase PDF -----------------------\\
-//     Returns_Purchase_PDF() {
-//       var self = this;
-//
-//       let pdf = new jsPDF("p", "pt");
-//       let columns = [
-//         { title: "Date", dataKey: "date" },
-//         { title: "Ref", dataKey: "Ref" },
-//         { title: "Product Name", dataKey: "product_name" },
-//         { title: "Supplier", dataKey: "provider_name" },
-//         { title: "Warehouse", dataKey: "warehouse_name" },
-//         { title: "Quantity", dataKey: "quantity" },
-//         { title: "SubTotal", dataKey: "total" },
-//       ];
-//       pdf.autoTable(columns, self.purchases_return);
-//       pdf.text("Purchase Returns", 40, 25);
-//       pdf.save("purchase_returns.pdf");
-//     },
-//
-//      //-------------------------------------- Transfer PDF ------------------------------\\
-//     Transfer_PDF() {
-//       var self = this;
-//
-//       let pdf = new jsPDF("p", "pt");
-//       let columns = [
-//         { title: "Date", dataKey: "date" },
-//         { title: "Ref", dataKey: "Ref" },
-//         { title: "Product Name", dataKey: "product_name" },
-//         { title: "From warehouse", dataKey: "from_warehouse" },
-//         { title: "To warehouse", dataKey: "to_warehouse" },
-//       ];
-//       pdf.autoTable(columns, self.transfers);
-//       pdf.text("Transfer List", 40, 25);
-//       pdf.save("Transfer_List.pdf");
-//     },
-//
-//      //-------------------------------------- Adjustement PDF ------------------------------\\
-//     Adjustment_PDF() {
-//       var self = this;
-//
-//       let pdf = new jsPDF("p", "pt");
-//       let columns = [
-//         { title: "Date", dataKey: "date" },
-//         { title: "Ref", dataKey: "Ref" },
-//         { title: "Product Name", dataKey: "product_name" },
-//         { title: "Warehouse", dataKey: "warehouse_name" },
-//       ];
-//       pdf.autoTable(columns, self.adjustments);
-//       pdf.text("Adjustment List", 40, 25);
-//       pdf.save("Adjustment_List.pdf");
-//     },
-//
-//       //----------------------------------- Get Details Product ------------------------------\\
-//     showDetails() {
-//       let id = this.$route.params.id;
-//       axios
-//         .get(`get_product_detail/${id}`)
-//         .then(response => {
-//           this.product = response.data;
-//         })
-//         .catch(response => {
-//
-//         });
-//     },
-//
-//
-//     //------------------------------Formetted Numbers -------------------------\\
-//     formatNumber(number, dec) {
-//       const value = (typeof number === "string"
-//         ? number
-//         : number.toString()
-//       ).split(".");
-//       if (dec <= 0) return value[0];
-//       let formated = value[1] || "";
-//       if (formated.length > dec)
-//         return `${value[0]}.${formated.substr(0, dec)}`;
-//       while (formated.length < dec) formated += "0";
-//       return `${value[0]}.${formated}`;
-//     },
-//
-//
-//     //--------------------------- Event Page Change -------------\\
-//     PageChangeSales({ currentPage }) {
-//       if (this.sales_page !== currentPage) {
-//         this.Get_Sales(currentPage);
-//       }
-//     },
-//
-//     //--------------------------- Limit Page Sales -------------\\
-//     onPerPageChangeSales({ currentPerPage }) {
-//       if (this.limit_sales !== currentPerPage) {
-//         this.limit_sales = currentPerPage;
-//         this.Get_Sales(1);
-//       }
-//     },
-//
-//     onSearch_sales(value) {
-//       this.search_sales = value.searchTerm;
-//       this.Get_Sales(1);
-//     },
-//
-//     //--------------------------- get_sales_by_product -------------\\
-//     Get_Sales(page) {
-//       axios
-//         .get(
-//           "/report/get_sales_by_product?page=" +
-//             page +
-//             "&limit=" +
-//             this.limit_sales +
-//             "&search=" +
-//             this.search_sales +
-//             "&id=" +
-//             this.$route.params.id
-//         )
-//         .then(response => {
-//           this.sales = response.data.sales;
-//           this.totalRows_sales = response.data.totalRows;
-//         })
-//         .catch(response => {});
-//     },
-//
-//     //--------------------------- Event Page Change -------------\\
-//     PageChangePurchases({ currentPage }) {
-//       if (this.purchases_page !== currentPage) {
-//         this.Get_Sales(currentPage);
-//       }
-//     },
-//
-//     //--------------------------- Limit Page Purchases -------------\\
-//     onPerPageChangePurchases({ currentPerPage }) {
-//       if (this.limit_purchases !== currentPerPage) {
-//         this.limit_purchases = currentPerPage;
-//         this.Get_Purchases(1);
-//       }
-//     },
-//
-//     onSearch_purchases(value) {
-//       this.search_purchases = value.searchTerm;
-//       this.Get_Purchases(1);
-//     },
-//
+const fields_transfers = ref([
+  {title: labels.transfer.date, key: "date"},
+  {title: labels.transfer.Ref, key: "Ref"},
+  {title: labels.transfer_detail.product, key: "product_name"},
+  {title: labels.transfer.from_warehouse, key: "from_warehouse"},
+  {title: labels.transfer.to_warehouse, key: "to_warehouse"},
+  {title: labels.sale.details.qty, key: "quantity"},
+  {title: labels.sale.details.sub_total, key: "total"},
+]);
+const fields_adjustments = ref([
+  {title: labels.adjustment.date, key: "date"},
+  {title: labels.adjustment.Ref, key: "Ref"},
+  {title: labels.adjustment.product, key: "product_name"},
+  {title: labels.warehouse.name, key: "warehouse_name"},
+]);
+
+//----------------------------------- Get Details Product ------------------------------\\
+function showDetails() {
+  axios
+      .get(`/get_product_detail/${props.id}`)
+      .then(response => {
+        product.value = response.data;
+      })
+      .catch(response => {
+      });
+}
+
+
+//--------------------------- get_sales_by_product -------------\\
+function Get_Sales(page = 1) {
+  loading.value = true;
+  axios.get("/report/get_sales_by_product?page=" +
+      page +
+      "&limit=" +
+      "&search=" +
+      "&id=" +
+      props.id
+  )
+      .then(({data}) => {
+        sales.value = data.sales;
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+}
+
 //     //--------------------------- Get Purchases By product -------------\\
 //     Get_Purchases(page) {
 //       axios
@@ -619,26 +327,6 @@
 //         });
 //     },
 //
-//     //--------------------------- Event Page Change -------------\\
-//     PageChangeQuotation({ currentPage }) {
-//       if (this.quotations_page !== currentPage) {
-//         this.Get_Quotations(currentPage);
-//       }
-//     },
-//
-//     //--------------------------- Limit Page Quotations -------------\\
-//     onPerPageChangeQuotation({ currentPerPage }) {
-//       if (this.limit_quotations !== currentPerPage) {
-//         this.limit_quotations = currentPerPage;
-//         this.Get_Quotations(1);
-//       }
-//     },
-//
-//     onSearch_quotations(value) {
-//       this.search_quotations = value.searchTerm;
-//       this.Get_Quotations(1);
-//     },
-//
 //     //--------------------------- Get Quotations By product -------------\\
 //     Get_Quotations(page) {
 //       axios
@@ -662,111 +350,46 @@
 //         });
 //     },
 //
-//      //--------------------------- Event Page Change -------------\\
-//     PageChangeTransfer({ currentPage }) {
-//       if (this.transfers_page !== currentPage) {
-//         this.Get_Transfers(currentPage);
-//       }
 //     },
 //
-//     //--------------------------- Limit Page transfers -------------\\
-//     onPerPageChangeTransfer({ currentPerPage }) {
-//       if (this.limit_transfers !== currentPerPage) {
-//         this.limit_transfers = currentPerPage;
-//         this.Get_Transfers(1);
-//       }
-//     },
-//
-//     onSearch_transfers(value) {
-//       this.search_transfers = value.searchTerm;
-//       this.Get_Transfers(1);
-//     },
-//
-//     //--------------------------- Get Transfers By product -------------\\
-//     Get_Transfers(page) {
-//       axios
-//         .get(
-//           "report/get_transfer_by_product?page=" +
-//             page +
-//             "&limit=" +
-//             this.limit_transfers +
-//              "&search=" +
-//             this.search_transfers +
-//             "&id=" +
-//             this.$route.params.id
-//         )
-//         .then(response => {
-//           this.transfers = response.data.transfers;
-//           this.totalRows_transfers = response.data.totalRows;
-//
-//         })
-//         .catch(response => {
-//
-//         });
-//     },
-//
-//       //--------------------------- Event Page Change -------------\\
-//     PageChangeAdjustment({ currentPage }) {
-//       if (this.adjustments_page !== currentPage) {
-//         this.Get_adjustments(currentPage);
-//       }
-//     },
-//
-//     //--------------------------- Limit Page adjustments -------------\\
-//     onPerPageChangeAdjustment({ currentPerPage }) {
-//       if (this.limit_adjustments !== currentPerPage) {
-//         this.limit_adjustments = currentPerPage;
-//         this.Get_adjustments(1);
-//       }
-//     },
-//
-//     onSearch_adjustments(value) {
-//       this.search_adjustments = value.searchTerm;
-//       this.Get_adjustments(1);
-//     },
-//
-//     //--------------------------- Get adjustment By product -------------\\
-//     Get_adjustments(page) {
-//       axios
-//         .get(
-//           "report/get_adjustment_by_product?page=" +
-//             page +
-//             "&limit=" +
-//             this.limit_adjustments +
-//             "&search=" +
-//             this.search_adjustments +
-//             "&id=" +
-//             this.$route.params.id
-//         )
-//         .then(response => {
-//           this.adjustments = response.data.adjustments;
-//           this.totalRows_adjustments = response.data.totalRows;
-//
-//         })
-//         .catch(response => {
-//
-//         });
-//     },
-//
-//     //--------------------------- Event Page Change -------------\\
-//     Page_Change_sales_Return({ currentPage }) {
-//       if (this.Return_sale_page !== currentPage) {
-//         this.Get_Sales_Return(currentPage);
-//       }
-//     },
-//
-//     //--------------------------- Limit Page sales Returns -------------\\
-//     onPerPage_Change_sales_Return({ currentPerPage }) {
-//       if (this.limit_sales_return !== currentPerPage) {
-//         this.limit_sales_return = currentPerPage;
-//         this.Get_Sales_Return(1);
-//       }
-//     },
-//
-//     onSearch_return_sales(value) {
-//       this.search_return_sales = value.searchTerm;
-//       this.Get_Sales_Return(1);
-//     },
+//--------------------------- Get Transfers By product -------------\\
+function Get_Transfers(page = 1) {
+  axios
+      .get(
+          "/report/get_transfer_by_product?page=" +
+          page +
+          "&limit=" +
+          "&search=" +
+          "&id=" +
+          props.id
+      )
+      .then(({data}) => {
+        transfers.value = data.transfers;
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+}
+
+//--------------------------- Get adjustment By product -------------\\
+function Get_adjustments(page = 1) {
+  axios
+      .get(
+          "/report/get_adjustment_by_product?page=" +
+          page +
+          "&limit=" +
+          "&search=" +
+          "&id=" +
+          props.id
+      )
+      .then(({data}) => {
+        adjustments.value = data.adjustments;
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+}
+
 //
 //     //--------------------------- Get sales Returns By product -------------\\
 //     Get_Sales_Return(page) {
@@ -786,26 +409,6 @@
 //           this.totalRows_sales_return = response.data.totalRows;
 //         })
 //         .catch(response => {});
-//     },
-//
-//     //--------------------------- Event Page Change -------------\\
-//     Page_Change_purchases_Return({ currentPage }) {
-//       if (this.Return_purchase_page !== currentPage) {
-//         this.Get_Purchases_Return(currentPage);
-//       }
-//     },
-//
-//     //--------------------------- Limit Page sales Returns -------------\\
-//     onPerPage_Change_purchases_Return({ currentPerPage }) {
-//       if (this.limit_purchases_return !== currentPerPage) {
-//         this.limit_purchases_return = currentPerPage;
-//         this.Get_Purchases_Return(1);
-//       }
-//     },
-//
-//      onSearch_return_purchases(value) {
-//       this.search_return_purchases = value.searchTerm;
-//       this.Get_Purchases_Return(1);
 //     },
 //
 //     //--------------------------- Get purchases Returns By product -------------\\
@@ -829,24 +432,164 @@
 //     }
 //   }, //end Methods
 //
-//   //----------------------------- Created function------------------- \\
-//
-//   created: function() {
-//     this.showDetails();
-//     this.Get_Sales(1);
-//     this.Get_Purchases(1);
-//     this.Get_Quotations(1);
-//     this.Get_Sales_Return(1);
-//     this.Get_Purchases_Return(1);
-//     this.Get_Transfers(1);
-//     this.Get_adjustments(1);
-//   }
-// };
+const tabVal = computed({
+  get() {
+    switch (tab.value) {
+      case 'sales':
+        Get_Sales();
+        break;
+      case 'transfer':
+        Get_Transfers();
+        break;
+      case 'adjustment':
+        Get_adjustments();
+        break;
+        // case 'quotations':
+        //   Get_Quotations();
+        // break;
+        // case 'returns':
+        //   Get_Returns();
+        // break;
+    }
+    return tab.value;
+  },
+  set(val) {
+    tab.value = val;
+  }
+});
 </script>
 <template>
-  <!--  <div class="main-content">-->
-  <!--    <breadcumb :page="$t('stock_report')" :folder="$t('Reports')"/>-->
-  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+  <layout>
+    <v-card>
+      <v-tabs v-model="tabVal" color="primary">
+        <v-tab value="sales">Ventas</v-tab>
+        <v-tab value="transfer">Transferencias</v-tab>
+        <v-tab value="adjustment">Ajustes</v-tab>
+      </v-tabs>
+      <v-card-text>
+        <v-window v-model="tabVal">
+          <v-window-item value="sales">
+            <v-row align="center" class="mb-1">
+              <v-col cols="12" sm="6">
+                <v-text-field
+                    v-model="search_sales"
+                    prepend-icon="mdi-magnify"
+                    hide-details
+                    :label="labels.search"
+                    single-line
+                    variant="underlined"
+                ></v-text-field>
+              </v-col>
+              <v-spacer></v-spacer>
+              <v-col cols="auto" class="text-right">
+                <!--                <ExportBtn-->
+                <!--                    :data="sales"-->
+                <!--                    :fields="fields_sales_export"-->
+                <!--                    name-file="Ventas"-->
+                <!--                ></ExportBtn>-->
+              </v-col>
+            </v-row>
+            <v-data-table
+                :headers="fields_sales"
+                :items="sales"
+                :search="search_sales"
+                hover
+                :no-data-text="labels.no_data_table"
+                :loading="loading"
+            >
+              <template v-slot:item.statut="{ item }">
+                <v-chip
+                    :color="helper.statutSaleColor(item.statut)"
+                    variant="tonal"
+                    size="x-small"
+                >{{ helper.statutSale(item.statut) }}
+                </v-chip>
+              </template>
+              <template v-slot:item.payment_status="{ item }">
+                <v-chip
+                    :color="helper.statusPaymentColor(item.payment_status)"
+                    variant="tonal"
+                    size="x-small"
+                >{{ helper.statusPayment(item.payment_status) }}
+                </v-chip>
+              </template>
+              <template v-slot:item.Ref="{ item }">
+                <v-btn
+                    variant="tonal"
+                    size="x-small"
+                    color="default"
+                    :text="item.Ref"
+                    @click="router.visit('/sales/detail/'+item.id)"
+                ></v-btn>
+              </template>
+            </v-data-table>
+          </v-window-item>
+          <v-window-item value="transfer">
+            <v-row align="center" class="mb-1">
+              <v-col cols="12" sm="6">
+                <v-text-field
+                    v-model="search_transfers"
+                    prepend-icon="mdi-magnify"
+                    hide-details
+                    :label="labels.search"
+                    single-line
+                    variant="underlined"
+                ></v-text-field>
+              </v-col>
+              <v-spacer></v-spacer>
+              <v-col cols="auto" class="text-right">
+                <!--                <ExportBtn-->
+                <!--                    :data="sales"-->
+                <!--                    :fields="fields_sales_export"-->
+                <!--                    name-file="Ventas"-->
+                <!--                ></ExportBtn>-->
+              </v-col>
+            </v-row>
+            <v-data-table
+                :headers="fields_transfers"
+                :items="transfers"
+                :search="search_transfers"
+                hover
+                :no-data-text="labels.no_data_table"
+                :loading="loading"
+            >
+            </v-data-table>
+          </v-window-item>
+          <v-window-item value="adjustment">
+            <v-row align="center" class="mb-1">
+              <v-col cols="12" sm="6">
+                <v-text-field
+                    v-model="search_sales"
+                    prepend-icon="mdi-magnify"
+                    hide-details
+                    :label="labels.search"
+                    single-line
+                    variant="underlined"
+                ></v-text-field>
+              </v-col>
+              <v-spacer></v-spacer>
+              <v-col cols="auto" class="text-right">
+                <!--                <ExportBtn-->
+                <!--                    :data="sales"-->
+                <!--                    :fields="fields_sales_export"-->
+                <!--                    name-file="Ventas"-->
+                <!--                ></ExportBtn>-->
+              </v-col>
+            </v-row>
+            <v-data-table
+                :headers="fields_adjustments"
+                :items="adjustments"
+                :search="search_adjustments"
+                hover
+                :no-data-text="labels.no_data_table"
+                :loading="loading"
+            >
+            </v-data-table>
+          </v-window-item>
+        </v-window>
+      </v-card-text>
+    </v-card>
+  </layout>
 
   <!--    <b-row v-if="!isLoading">-->
   <!--        <b-col lg="12">-->
@@ -890,50 +633,7 @@
   <!--            </table>-->
   <!--          </b-col>-->
 
-  <!--      <b-col md="12">-->
-  <!--        <b-card class="card mb-30" header-bg-variant="transparent ">-->
-  <!--          <b-tabs active-nav-item-class="nav nav-tabs" content-class="mt-3">-->
-  <!--           -->
 
-  <!--            &lt;!&ndash; Sales Table &ndash;&gt;-->
-  <!--            <b-tab :title="$t('Sales')">-->
-  <!--              <vue-good-table-->
-  <!--                mode="remote"-->
-  <!--                :columns="columns_sales"-->
-  <!--                :totalRows="totalRows_sales"-->
-  <!--                :rows="sales"-->
-  <!--                @on-page-change="PageChangeSales"-->
-  <!--                @on-per-page-change="onPerPageChangeSales"-->
-  <!--                @on-search="onSearch_sales"-->
-  <!--                :search-options="{-->
-  <!--                  placeholder: $t('Search_this_table'),-->
-  <!--                  enabled: true,-->
-  <!--                }"-->
-  <!--                :pagination-options="{-->
-  <!--                  enabled: true,-->
-  <!--                  mode: 'records',-->
-  <!--                  nextLabel: 'next',-->
-  <!--                  prevLabel: 'prev',-->
-  <!--                }"-->
-  <!--                styleClass="tableOne table-hover vgt-table"-->
-  <!--              >-->
-  <!--              <div slot="table-actions" class="mt-2 mb-3">-->
-  <!--                <b-button @click="Sales_PDF()" size="sm" variant="outline-success ripple m-1">-->
-  <!--                  <i class="i-File-Copy"></i> PDF-->
-  <!--                </b-button>-->
-
-  <!--                <vue-excel-xlsx-->
-  <!--                    class="btn btn-sm btn-outline-danger ripple m-1"-->
-  <!--                    :data="sales"-->
-  <!--                    :columns="columns_sales"-->
-  <!--                    :file-name="'sales_report'"-->
-  <!--                    :file-type="'xlsx'"-->
-  <!--                    :sheet-name="'sales_report'"-->
-  <!--                    >-->
-  <!--                    <i class="i-File-Excel"></i> EXCEL-->
-  <!--                </vue-excel-xlsx>-->
-
-  <!--              </div>-->
   <!--                <template slot="table-row" slot-scope="props">-->
   <!--                  <div v-if="props.column.field == 'Ref'">-->
   <!--                    <router-link-->

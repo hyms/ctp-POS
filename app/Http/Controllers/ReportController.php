@@ -130,7 +130,7 @@ class ReportController extends Controller
             $data->add($item);
         }
 
-        Inertia::share('titlePage', 'Pagos de Clientes');
+        Inertia::share('titlePage', 'Reporte de Clientes');
         return Inertia::render('Reports/customers_report', [
             'report' => $data,
         ]);
@@ -619,7 +619,7 @@ class ReportController extends Controller
         $user_auth = auth()->user();
         $warehouses = helpers::getWarehouses($user_auth);
 
-        Inertia::share('titlePage', 'Pagos de Ventas');
+        Inertia::share('titlePage', 'Reporte de Ventas');
         return Inertia::render('Reports/sales_report',
             [
                 'sales' => $data,
@@ -1828,7 +1828,7 @@ class ReportController extends Controller
                 DB::raw("count(*) as total_sales"),
                 DB::raw('sum(GrandTotal) as total'),
             )
-            ->groupBy(['clients.name','clients.phone','clients.email']);
+            ->groupBy(['clients.name', 'clients.phone', 'clients.email']);
 
         $customers = $customers_data
 //            ->offset($offSet)
@@ -2434,16 +2434,16 @@ class ReportController extends Controller
     public function stock_Report(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
+//        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
 
         // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+//        $perPage = $request->limit;
+//        $pageStart = \Request::get('page', 1);
         // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-        $order = $request->SortField;
-        $dir = $request->SortType;
-        $data = array();
+//        $offSet = ($pageStart * $perPage) - $perPage;
+//        $order = $request->SortField;
+//        $dir = $request->SortType;
+        $data = collect();
 
 
         //get warehouses assigned to user
@@ -2471,7 +2471,7 @@ class ReportController extends Controller
         $products = $products_data
 //            ->offset($offSet)
 //            ->limit($perPage)
-            ->orderBy($order, $dir)
+//            ->orderBy($order, $dir)
             ->get();
 
         foreach ($products as $product) {
@@ -2498,13 +2498,13 @@ class ReportController extends Controller
 
             $data->add($item);
         }
-
-
-        return response()->json([
-            'report' => $data,
-            'totalRows' => $totalRows,
-            'warehouses' => $warehouses,
-        ]);
+        Inertia::share('titlePage', 'Reporte de Stock');
+        return Inertia::render("Reports/stock_report",
+            [
+                'report' => $data,
+                'totalRows' => $totalRows,
+                'warehouses' => $warehouses,
+            ]);
 
     }
 
@@ -2523,7 +2523,7 @@ class ReportController extends Controller
         $Role = Auth::user()->roles()->first();
 //        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $sale_details_data = SaleDetail::with('product', 'sale', 'sale.client', 'sale.warehouse')
+        $sale_details_data = SaleDetail::with('product', 'sale', 'sale.client', 'sale.warehouse','sale.sales_type')
 //            ->where(function ($query) use ($ShowRecord) {
 //                if (!$ShowRecord) {
 //                    return $query->whereHas('sale', function ($q) use ($request) {
@@ -2592,6 +2592,7 @@ class ReportController extends Controller
             }
 
             $item['date'] = $detail->date;
+            $item['sale_type'] = $detail['sale']['sale_type']->name;
             $item['Ref'] = $detail['sale']->Ref;
             $item['sale_id'] = $detail['sale']->id;
             $item['client_name'] = $detail['sale']['client']->name;
