@@ -48,13 +48,15 @@ const global = (
             }
         })
         .finally(() => {
-            loading.value = false;
-            if (snackbar.value.text !== '') {
-                snackbar.value.view = true;
-            }
-            if (localFinally != undefined) {
-                localFinally();
-            }
+            setTimeout(() => {
+                loading.value = false;
+                if (snackbar.value.text !== '') {
+                    snackbar.value.view = true;
+                }
+                if (localFinally != undefined) {
+                    localFinally();
+                }
+            }, 1000);
         });
 }
 
