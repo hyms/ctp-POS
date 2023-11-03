@@ -38,7 +38,7 @@ class SalesTypeController extends Controller
             'code' => $request['code'],
             'name' => $request['name'],
         ]);
-        return response()->json(['success' => true]);
+        return response()->json(['redirect' => '']);
     }
 
     //------------ function show -----------\\
@@ -64,7 +64,7 @@ class SalesTypeController extends Controller
             'code' => $request['code'],
             'name' => $request['name'],
         ]);
-        return response()->json(['success' => true]);
+        return response()->json(['redirect' => '']);
 
     }
 
@@ -77,7 +77,7 @@ class SalesTypeController extends Controller
         SalesType::whereId($id)->update([
             'deleted_at' => Carbon::now(),
         ]);
-        return response()->json(['success' => true]);
+        return response()->json(['redirect' => '']);
     }
 
 }

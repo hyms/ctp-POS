@@ -47,4 +47,19 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    public function render($request, Throwable $e)
+    {
+        $response = parent::render($request, $e);
+        $status = $response->status();
+
+        return match ($status) {
+            404 => Inertia::render('404')->toResponse($request)->setStatusCode($status),
+//                500, 503 => Inertia::render('errors/500')->toResponse($request)->setStatusCode($status),
+//                403 => Inertia::render('errors/403')->toResponse($request)->setStatusCode($status),
+//                401 => Inertia::render('errors/401')->toResponse($request)->setStatusCode($status),
+            419 => redirect()->back()->withErrors(['status' => __('Session Expirada, Intente de nuevo.')]),
+            default => $response
+        };
+    }
 }

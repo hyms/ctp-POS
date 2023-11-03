@@ -131,7 +131,7 @@ class UserController extends Controller
             $User->phone = $request->get('phone');
             $User->password = Hash::make($request->get('password'));
             $User->role = $request->get('role');
-            $User->ci = $request->get('ci')??0;
+            $User->ci = $request->get('ci') ?? 0;
             $User->is_all_warehouses = $request->get('is_all_warehouses') ? 1 : 0;
             $User->statut = 1;
             $User->save();
@@ -141,13 +141,13 @@ class UserController extends Controller
             $role_user->role_id = $request->get('role');
             $role_user->save();
 
-            if ($User->is_all_warehouses==0) {
+            if ($User->is_all_warehouses == 0) {
                 $User->assignedWarehouses()->sync($request->get('assigned_to'));
             }
 
         }, 10);
 
-        return response()->json(['success' => true]);
+        return response()->json(['redirect' => '']);
     }
 
     //------------ function show -----------\\
@@ -247,7 +247,7 @@ class UserController extends Controller
             'password' => $pass,
         ]);
 
-        return response()->json(['user' => $request->get('username')]);
+        return response()->json(['redirect' => '']);
 
     }
 

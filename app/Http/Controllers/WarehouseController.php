@@ -79,7 +79,7 @@ class WarehouseController extends Controller
 
         }, 10);
 
-        return response()->json(['success' => true]);
+        return response()->json(['redirect' => '']);
     }
 
     //------------ function show -----------\\
@@ -107,7 +107,7 @@ class WarehouseController extends Controller
             'city' => $request['city'] ?? '',
             'email' => $request['email'] ?? '',
         ]);
-        return response()->json(['success' => true]);
+        return response()->json(['redirect' => '']);
     }
 
     //----------- Delete  Warehouse --------------\\
@@ -128,31 +128,7 @@ class WarehouseController extends Controller
 
         }, 10);
 
-        return response()->json(['success' => true]);
-    }
-
-    //-------------- Delete by selection  ---------------\\
-
-    public function delete_by_selection(Request $request)
-    {
-
-        $this->authorizeForUser($request->user('api'), 'delete', Warehouse::class);
-
-        \DB::transaction(function () use ($request) {
-            $selectedIds = $request->selectedIds;
-            foreach ($selectedIds as $warehouse_id) {
-                Warehouse::whereId($warehouse_id)->update([
-                    'deleted_at' => Carbon::now(),
-                ]);
-
-                product_warehouse::where('warehouse_id', $warehouse_id)->update([
-                    'deleted_at' => Carbon::now(),
-                ]);
-            }
-
-        }, 10);
-
-        return response()->json(['success' => true]);
+        return response()->json(['redirect' => '']);
     }
 
 }
