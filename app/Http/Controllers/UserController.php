@@ -21,31 +21,6 @@ use Inertia\Inertia;
 class UserController extends Controller
 {
 
-    public function savePush(Request $request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'token' => 'required',
-            ]);
-            if ($validator->fails()) {
-                return response()->json([
-                    'status' => -1,
-                    'errors' => $validator->errors()
-                ]);
-            }
-            $user = User::find(Auth::id());
-            $user->tokenpush = $request->get('token');
-            $user->save();
-            return response()->json([
-                'status' => 0,
-                'errors' => []
-            ]);
-        } catch (Exception $error) {
-            Log::error($error->getMessage());
-            return response()->json(["status" => -1,
-                'error' => $error,], 500);
-        }
-    }
 
     //------------- GET ALL USERS---------\\
 
@@ -218,7 +193,7 @@ class UserController extends Controller
 
         }, 10);
 
-        return response()->json(['success' => true]);
+        return response()->json(['redirect' => '']);
 
     }
 

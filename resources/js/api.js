@@ -22,7 +22,7 @@ const global = (
         .then(({data}) => {
             snackbar.value.color = 'success';
             if (data['redirect'] != undefined) {
-                snackbar.value.text = labels.message.success;
+                snackbar.value.text = labels.success_message;
                 if (data['redirect'] != '') {
                     router.get(data['redirect'], {}, {});
                 } else {
@@ -40,7 +40,7 @@ const global = (
                 snackbar.value.text = response.data.message;
             }
             if (response.status >= 500 && response.status <= 599) {
-                snackbar.value.text = labels.message.error;
+                snackbar.value.text = labels.error_message;
                 console.log(response);
             }
             if (localError != undefined) {

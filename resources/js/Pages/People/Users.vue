@@ -2,6 +2,7 @@
 import {ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
+import Snackbar from "@/Components/Snackbar2.vue";
 
 import helper from "@/helpers";
 import labels from "@/labels";
@@ -64,7 +65,7 @@ function isChecked(user) {
     api.post({
         url: "/users_switch_activated/" + user.id,
         params: {
-            statut: !!!user.statut,
+            statut: user.statut===1,
             id: user.id,
         },
         loadingItem: loading,
@@ -72,7 +73,7 @@ function isChecked(user) {
         Success: (data) => {
             if (data.success) {
                 snackbar.value.color = "success";
-                if (!!!user.statut) {
+                if (user.statut===0) {
                     user.statut = 1;
                     snackbar.value.text = "Usuario activado";
                 } else {
@@ -217,10 +218,8 @@ function onClose() {
 
 <template>
     <Layout
-        :snackbar-color="snackbar.color"
-        :snackbar-text="snackbar.text"
-        :snackbar-view="snackbar.view"
     >
+      <snackbar :text="snackbar.text" v-model="snackbar.view" :color="snackbar.color"></snackbar>
         <v-dialog
             v-model="dialog"
             max-width="600px"

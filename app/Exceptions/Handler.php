@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Inertia\Inertia;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -54,7 +55,7 @@ class Handler extends ExceptionHandler
         $status = $response->status();
 
         return match ($status) {
-            404 => Inertia::render('404')->toResponse($request)->setStatusCode($status),
+//            404 => Inertia::render('404')->toResponse($request)->setStatusCode($status),
 //                500, 503 => Inertia::render('errors/500')->toResponse($request)->setStatusCode($status),
 //                403 => Inertia::render('errors/403')->toResponse($request)->setStatusCode($status),
 //                401 => Inertia::render('errors/401')->toResponse($request)->setStatusCode($status),

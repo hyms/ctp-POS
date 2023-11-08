@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\utils\helpers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -37,24 +38,27 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        $helpers = new helpers();
-        return array_merge(parent::share($request), [
-            'appName' => config('app.name'),
+        if (Auth::user()) {
+            $helpers = new helpers();
+            return array_merge(parent::share($request), [
+                'appName' => config('app.name'),
 //            'auth' => [
-            'user' => $request->user(),
+                'user' => $request->user(),
 //                    ->only('id', 'firstname', 'lastname', 'role', 'telefono', 'sucursal'),
 //            ],
 //            'ziggy' => function () {
 //                return (new Ziggy)->toArray();
 //            },
-            'rolesP' => [
-                'admin' => [0, 1],
-                'vendor' => [0, 1, 2, 5],
-                'desing' => [0, 1, 2, 3, 4, 5],
-                'all' => [0, 1, 2, 3, 4, 5],
-            ],
-            'currency' => $helpers->Get_Currency_Code(),
-            'day' => 1,
-        ]);
+                'rolesP' => [
+                    'admin' => [0, 1],
+                    'vendor' => [0, 1, 2, 5],
+                    'desing' => [0, 1, 2, 3, 4, 5],
+                    'all' => [0, 1, 2, 3, 4, 5],
+                ],
+                'currency' => $helpers->Get_Currency_Code(),
+                'day' => 1,
+            ]);
+        }
+        return parent::share($request);
     }
 }
