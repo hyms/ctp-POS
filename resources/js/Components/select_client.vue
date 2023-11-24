@@ -2,6 +2,7 @@
 import {onMounted, ref} from "vue";
 import labels from "@/labels";
 import helper from "@/helpers";
+import api from "@/api";
 import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
@@ -50,35 +51,25 @@ async function Submit_Customer() {
 
 //---------------------------------------- Create new Customer -------------------------------\\
 function Create_Client() {
-  loading.value = true;
-  snackbar.value = false;
-  axios
-      .post("/clients", {
-        name: client.value.name,
-        company_name: client.value.company_name,
-        email: client.value.email,
-        phone: client.value.phone,
-        nit_ci: client.value.nit_ci,
-        country: client.value.country,
-        city: client.value.city,
-        adresse: client.value.adresse,
-      })
-      .then(response => {
-        snackbar.value = true;
-        snackbarColor.value = "success";
-        snackbarText.value = labels.success_message;
-        Get_Client_Without_Paginate();
-        dialogCustomer.value = false;
-      })
-      .catch(error => {
-        snackbar.value = true;
-        snackbarColor.value = "error";
-        snackbarText.value = labels.error_message;
-        console.log(error)
-      })
-      .finally(() => {
-        loading.value = false;
-      });
+    api.post({
+        url: "/clients",
+        params:{ name: client.value.name,
+            company_name: client.value.company_name,
+            email: client.value.email,
+            phone: client.value.phone,
+            nit_ci: client.value.nit_ci,
+            country: client.value.country,
+            city: client.value.city,
+            adresse: client.value.adresse,
+        },
+        loadingItem:loading,
+        snackbar:snackbar,
+        Success:()=>{
+            snackbarText.value = labels.success_message;
+            Get_Client_Without_Paginate();
+            dialogCustomer.value = false;
+        }
+    });
 }
 
 //------------------------------ New Model (create Customer) -------------------------------\\
@@ -104,15 +95,13 @@ function reset_Form_client() {
 
 //------------------------------------ Get Clients Without Paginate -------------------------\\
 function Get_Client_Without_Paginate() {
-  loading.value = true;
-  axios
-      .get("/get_clients_without_paginate")
-      .then(({data}) => {
-        clients.value = data;
-      })
-      .finally(() => {
-        loading.value = false;
-      });
+    api.get({
+        url: "/get_clients_without_paginate",
+        loadingItem:loading,
+        Success:(data)=>{
+            clients.value = data;
+        }
+    });
 }
 
 onMounted(() => {

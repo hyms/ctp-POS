@@ -26,7 +26,6 @@ function updateValue(value) {
         @update:modelValue="updateValue"
         elevation="5"
     >
-
         <div v-html="text"></div>
         <template v-slot:actions>
             <v-btn icon="mdi-close" size="x-small" variant="tonal" @click="updateValue(false)"></v-btn>

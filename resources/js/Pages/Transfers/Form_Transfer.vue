@@ -4,6 +4,8 @@ import Layout from "@/Layouts/Authenticated.vue";
 import {router, usePage} from "@inertiajs/vue3";
 import helper from "@/helpers";
 import labels from "@/labels";
+import api from "@/api";
+import DeleteBtn from "@/Components/buttons/DeleteBtn.vue";
 
 const props = defineProps({
   details: Object,
@@ -17,9 +19,11 @@ const form = ref(null);
 const loading = ref(false);
 const loadingFilter = ref(false);
 const dialogUpdateDetail = ref(false);
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("info");
+const snackbar = ref({
+    view: false,
+    color: '',
+    text: ''
+});
 const search_input = ref("");
 const products = ref([]);
 const units = ref([]);
@@ -111,13 +115,13 @@ function querySelections(val) {
 
 //---------------- Submit Search Product-----------------\\
 function SearchProduct(result) {
-  snackbar.value = false;
+  snackbar.value.view = false;
   product.value = {};
   if (
       detailsForm.value.length > 0 &&
       detailsForm.value.some((detail) => detail.name === result.name)
   ) {
-    snackbar.value = true;
+      snackbar.value.view = true;
     snackbarText.value = "Ya esta añadido";
     snackbarColor.value = "warning";
   } else {
@@ -235,16 +239,16 @@ function delete_Product_Detail(id) {
 //-----------------------------------Verified Form ------------------------------\\
 
 function verifiedForm() {
-  snackbar.value = false;
+    snackbar.value.view = false;
   if (detailsForm.value.length <= 0) {
-    snackbar.value = true;
-    snackbarColor.value = "warning";
-    snackbarText.value = labels.no_add_product;
+      snackbar.value.view = true;
+      snackbar.value.view.color = "warning";
+      snackbar.value.text = labels.no_add_product;
     return false;
   } else if (transferForm.value.from_warehouse === transferForm.value.to_warehouse) {
-    snackbar.value = true;
-    snackbarColor.value = "warning";
-    snackbarText.value = labels.same_warehouse;
+      snackbar.value.view = true;
+      snackbar.value.color = "warning";
+      snackbar.value.text = labels.same_warehouse;
     return false;
   } else {
     let count = 0;
@@ -258,9 +262,9 @@ function verifiedForm() {
     }
 
     if (count > 0) {
-      snackbar.value = true;
-      snackbarColor.value = "warning";
-      snackbarText.value = labels.no_add_qty;
+        snackbar.value.view = true;
+        snackbar.value.color = "warning";
+        snackbar.value.text = labels.no_add_qty;
       return false;
     } else {
       return true;
@@ -271,65 +275,39 @@ function verifiedForm() {
 //-------------------------------- Create Transfer ----------------------\\
 function Create_Transfer() {
   if (verifiedForm()) {
-    loading.value = true;
-    snackbar.value = false;
-    axios
-        .post("/transfers", {
-          transfer: transferForm.value,
-          details: detailsForm.value,
-          GrandTotal: GrandTotal.value
-        })
-        .then(({data}) => {
-          snackbar.value = true;
-          snackbarColor.value = "success";
-          snackbarText.value = "Actualizacion exitosa";
-          router.visit("/transfers/");
-        })
-        .catch((error) => {
-          console.log(error);
-          snackbar.value = true;
-          snackbarColor.value = "error";
-          snackbarText.value = error.response.data.message;
-        })
-        .finally(() => {
-          setTimeout(() => {
-            loading.value = false;
-          }, 1000);
-        });
-    ;
+      api.post({
+          url:"/transfers",
+          params:{
+              transfer: transferForm.value,
+              details: detailsForm.value,
+              GrandTotal: GrandTotal.value
+          },
+          snackbar,
+          Success:()=>{
+              snackbar.value.text = "Actualizacion exitosa";
+              router.visit("/transfers/");
+          }
+      });
   }
 }
 
 //-------------------------------- Update Transfer ----------------------\\
 function Update_Transfer() {
   if (verifiedForm()) {
-    loading.value = true;
-    snackbar.value = false;
-    console.log(props.transfer)
-    let id = props.transfer.id;
-    axios
-        .put(`/transfers/${id}`, {
+      let id = props.transfer.id;
+      api.put({
+          url:`/transfers/${id}`,
+          params:{
           transfer: transferForm.value,
           details: detailsForm.value,
           GrandTotal: GrandTotal.value
-        })
-        .then(response => {
-          snackbar.value = true;
-          snackbarColor.value = "success";
-          snackbarText.value = "Actualizacion exitosa";
-          router.visit("/transfers/");
-        })
-        .catch(error => {
-          console.log(error);
-          snackbar.value = true;
-          snackbarColor.value = "error";
-          snackbarText.value = error.response.data.message;
-        })
-        .finally(() => {
-          setTimeout(() => {
-            loading.value = false;
-          }, 1000);
-        });
+        },
+          snackbar,
+          Success:()=>{
+              snackbar.value.text = "Actualizacion exitosa";
+              router.visit("/transfers/");
+          }
+      });
   }
 }
 
@@ -353,7 +331,7 @@ function add_Detail() {
 
 //-----------------------------------Verified QTY ------------------------------\\
 function Verified_Qty(detail, id) {
-  snackbar.value = false;
+    snackbar.value.view = false;
   for (let i = 0; i < detailsForm.value.length; i++) {
     if (detailsForm.value[i].detail_id === id) {
       if (isNaN(detail.quantity)) {
@@ -361,9 +339,9 @@ function Verified_Qty(detail, id) {
       }
 
       if (parseFloat(detail.quantity) > parseFloat(detail.stock)) {
-        snackbar.value = true;
-        snackbarColor.value = "warning";
-        snackbarText.value = labels.low_qty;
+          snackbar.value.view = true;
+          snackbar.value.color = "warning";
+          snackbar.value.text = labels.low_qty;
         detailsForm.value[i].quantity = detail.stock;
       } else {
         detailsForm.value[i].quantity = detail.quantity;
@@ -379,9 +357,9 @@ function increment(detail, id) {
   for (let i = 0; i < detailsForm.value.length; i++) {
     if (detailsForm.value[i].detail_id == id) {
       if (parseFloat(detail.quantity) + 1 > parseFloat(detail.stock)) {
-        snackbar.value = true;
-        snackbarColor.value = "warning";
-        snackbarText.value = labels.low_qty;
+          snackbar.value.view = true;
+          snackbar.value.color = "warning";
+          snackbar.value.text = labels.low_qty;
       } else {
         helper.formatNumber(detailsForm.value[i].quantity++, 2);
       }
@@ -397,9 +375,9 @@ function decrement(detail, id) {
     if (detailsForm.value[i].detail_id === id) {
       if (parseFloat(detail.quantity) - 1 >= 1) {
         if (parseFloat(detail.quantity) - 1 > parseFloat(detail.stock)) {
-          snackbar.value = true;
-          snackbarColor.value = "warning";
-          snackbarText.value = labels.low_qty;
+            snackbar.value.view = true;
+            snackbar.value.color = "warning";
+            snackbar.value.text = labels.low_qty;
         } else {
           helper.formatNumber(detailsForm.value[i].quantity--, 2);
         }
@@ -473,10 +451,11 @@ onMounted(() => {
 </script>
 <template>
   <layout :loading="loading"
-          :snackbar-view="snackbar"
-          :snackbar-text="snackbarText"
-          :snackbar-color="snackbarColor">
-    <v-form ref="form" @submit.prevent="Submit_Transfer">
+          :snackbar-view="snackbar.view"
+          :snackbar-text="snackbar.text"
+          :snackbar-color="snackbar.color">
+
+    <v-form ref="form" @submit.prevent="Submit_Transfer" :disabled="loading">
       <v-card>
         <v-toolbar height="15"></v-toolbar>
         <v-card-text>
@@ -606,15 +585,9 @@ onMounted(() => {
                   <!--                  <td>{{ currentUser.currency }} {{ formatNumber(detail.taxe * detail.quantity, 2) }}</td>-->
                   <td>{{ currency }} {{ helper.formatNumber(detail.subtotal, 2) }}</td>
                   <td>
-                    <v-btn
-                        class="ma-1"
-                        color="error"
-                        icon="mdi-delete"
-                        size="x-small"
-                        variant="elevated"
-                        @click="delete_Product_Detail(detail.detail_id)"
-                    >
-                    </v-btn>
+                  <delete-btn
+                   @click="()=>{delete_Product_Detail(detail.detail_id)}"
+                  ></delete-btn>
                   </td>
                 </tr>
                 </tbody>

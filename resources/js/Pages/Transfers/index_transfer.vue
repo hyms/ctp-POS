@@ -6,6 +6,7 @@ import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
 import {router, usePage} from "@inertiajs/vue3";
 import helper from "@/helpers";
 import labels from "@/labels";
+import api from "@/api";
 
 const currency = computed(() => usePage().props.currency);
 const enableDays = computed(() => usePage().props.day);
@@ -17,9 +18,11 @@ const props = defineProps({
 });
 const search = ref("");
 const loading = ref(false);
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("info");
+const snackbar = ref({
+    view: false,
+    color: '',
+    text: ''
+});
 const dialogDelete = ref(false);
 const dialogDetail = ref(false);
 const details = ref([]);
@@ -58,23 +61,21 @@ const jsonFields = ref({
 
 //----------------------------------- Get Details Transfer ------------------------------\\
 function showDetails(id) {
-  loading.value = true;
-  dialogDetail.value = false;
-  axios
-      .get("/transfer/" + id)
-      .then(response => {
-        transfer.value = response.data.transfer;
-        details.value = response.data.details;
-        console.log(transfer.value)
-        console.log(details.value)
-        dialogDetail.value = true;
-      })
-      .catch(response => {
-        dialogDetail.value = true;
-      })
-      .finally(() => {
-        loading.value = false;
-      });
+    dialogDetail.value = false;
+    api.get({
+       url: "/transfer/" + id,
+        loadingItem:loading,
+        Success:(data)=>{
+            transfer.value = data.transfer;
+            details.value = data.details;
+//            console.log(transfer.value)
+//            console.log(details.value)
+            dialogDetail.value = true;
+        },
+        Error:()=>{
+            dialogDetail.value = true;
+        }
+    });
 }
 
 //-------------------------------- Reset Form -------------------------------\\
@@ -95,37 +96,25 @@ function Delete_Item(item) {
 }
 
 function Remove_Transfer(id) {
-  snackbar.value = false;
-  axios
-      .delete("/transfers/" + transfer.value.id)
-      .then(() => {
-        snackbar.value = true;
-        snackbarColor.value = "success";
-        snackbarText.value = "Borrado exitoso";
-        router.reload({
-          preserveState: true,
-          preserveScroll: true,
-        });
-        dialogDelete.value = false;
-      })
-      .catch((error) => {
-        console.log(error);
-        snackbar.value = true;
-        snackbarColor.value = "error";
-        snackbarText.value = error.response.data.message;
-      })
-      .finally(() => {
-        setTimeout(() => {
-          loading.value = false;
-        }, 1000);
-      });
+    api.delete({
+        url:"/transfers/" + transfer.value.id,
+        snackbar,
+        Success:()=>{
+            snackbar.value.text = "Borrado exitoso";
+            router.reload({
+                preserveState: true,
+                preserveScroll: true,
+            });
+            dialogDelete.value = false;
+        }
+    });
 }
 </script>
 <template>
   <layout :loading="loading"
-          :snackbar-view="snackbar"
-          :snackbar-text="snackbarText"
-          :snackbar-color="snackbarColor">
+          :snackbar-view="snackbar.view"
+          :snackbar-text="snackbar.text"
+          :snackbar-color="snackbar.color">
     <!-- Modal Remove Adjustment -->
     <delete-dialog
         :model="dialogDelete"

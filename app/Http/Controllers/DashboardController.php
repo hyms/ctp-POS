@@ -57,8 +57,8 @@ class DashboardController extends Controller
         $Top_Products_Year = $this->Top_Products_Year($warehouse_id, $array_warehouses_id);
         $report_dashboard = $this->report_dashboard($warehouse_id, $array_warehouses_id);
 
-        return Inertia::render('Dashboard', [
-//        return response()->json([
+//        return Inertia::render('Dashboard', [
+        return response()->json([
             'warehouses' => $warehouses,
             'sales_report' => $dataSales,
 //            'purchases' => $datapurchases,

@@ -118,10 +118,6 @@ function submit() {
 </template>
 
 <style lang="scss">
-::-webkit-scrollbar {
-  width: 0px;
-  background: transparent; /* make scrollbar transparent */
-}
 
 .auth-wrapper {
   display: flex;

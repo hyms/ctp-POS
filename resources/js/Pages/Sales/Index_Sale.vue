@@ -8,6 +8,7 @@ import helper from "@/helpers";
 import labels from "@/labels";
 import Filter_form from "@/Pages/Sales/filter_form.vue";
 import InvoiceDialog from "@/Components/InvoiceDialog.vue";
+import api from "@/api";
 
 const props = defineProps({
   sales: Object,
@@ -20,9 +21,11 @@ const props = defineProps({
 const enableDays = computed(() => usePage().props.day);
 const search = ref("");
 const loading = ref(false);
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("info");
+const snackbar = ref({
+    view: false,
+    color: '',
+    text: ''
+});
 const dialogDelete = ref(false);
 const dialogInvoice = ref(false);
 const dialogAddPayment = ref(false);
@@ -105,7 +108,7 @@ function print_it() {
 
 //---------- keyup paid Amount
 function Verified_paidAmount() {
-  snackbar.value = false;
+  snackbar.value.view = false;
   if (isNaN(payment.value.montant)) {
     payment.value.montant = 0;
     // } else if ((payment.value.montant*1) > (payment.value.received_amount*1)) {
@@ -115,9 +118,9 @@ function Verified_paidAmount() {
     //       "El monto de pago es mas alto que el a pagar";
     //   payment.value.montant = 0;
   } else if ((payment.value.montant * 1) > (due.value * 1)) {
-    snackbar.value = true;
-    snackbarColor.value = "warning";
-    snackbarText.value =
+    snackbar.value.view = true;
+    snackbar.value.color = "warning";
+    snackbar.value.text =
         "El monto de pago es mal alto que el Total de venta";
     payment.value.montant = 0;
   }
@@ -133,15 +136,15 @@ function Verified_Received_Amount() {
 
 //------ Validate Form Submit_Payment
 async function Submit_Payment() {
-  snackbar.value = false;
+  snackbar.value.view = false;
   const validate = await form.value.validate();
   if (payment.value.montant > payment.value.received_amount) {
     payment.value.montant = payment.value.received_amount;
   }
   if (!validate.valid) {
-    snackbar.value = true;
-    snackbarColor.value = "error";
-    snackbarText.value = "Llena los campos correctamente";
+    snackbar.value.view = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "Llena los campos correctamente";
   } else if (EditPaymentMode.value) {
     Update_Payment();
   } else {
@@ -153,7 +156,7 @@ async function Submit_Payment() {
 function Invoice_POS(id) {
   loading.value = true;
   dialogInvoice.value = false;
-  snackbar.value = false;
+  snackbar.value.view = false;
   axios
       .get("/sales_print_invoice/" + id)
       .then(({data}) => {
@@ -231,11 +234,11 @@ function Number_Order_Payment() {
 //----------------------------------- New Payment Sale ------------------------------\\
 function New_Payment(saleItem) {
   dialogAddPayment.value = false;
-  snackbar.value = false;
+  snackbar.value.view = false;
   if (saleItem.payment_status == "paid") {
-    snackbar.value = true;
-    snackbarColor.value = "error";
-    snackbarText.value = "Pago ya realizado";
+    snackbar.value.view = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "Pago ya realizado";
   } else {
     reset_form_payment();
     EditPaymentMode.value = false;
@@ -280,51 +283,40 @@ function Show_Payments(id, itemSale) {
 
 //----------------------------------Create Payment sale ------------------------------\\
 function Create_Payment() {
-  loading.value = true;
-  snackbar.value = false;
-  axios
-      .post("/payment_sale", {
-        sale_id: sale.value.id,
-        date: payment.value.date,
-        montant: parseFloat(payment.value.montant).toFixed(2),
-        received_amount: parseFloat(payment.value.received_amount).toFixed(
-            2
-        ),
-        change: parseFloat(
-            payment.value.received_amount - payment.value.montant
-        ).toFixed(2),
-        Reglement: payment.value.Reglement,
-        notes: payment.value.notes,
-      })
-      .then((response) => {
-        snackbar.value = true;
-        snackbarColor.value = "success";
-        snackbarText.value = "Transaccion realizada con exito";
-        router.reload({
-          preserveState: true,
-          preserveScroll: true,
-        });
-        dialogAddPayment.value = false;
-      })
-      .catch((error) => {
-        console.log(error);
-        snackbar.value = true;
-        snackbarColor.value = "error";
-        snackbarText.value = error;
-      })
-      .finally(() => {
-        loading.value = false;
-      });
+    api.post({
+        url:"/payment_sale",
+        params:{
+            sale_id: sale.value.id,
+            date: payment.value.date,
+            montant: parseFloat(payment.value.montant).toFixed(2),
+            received_amount: parseFloat(payment.value.received_amount).toFixed(
+                2
+            ),
+            change: parseFloat(
+                payment.value.received_amount - payment.value.montant
+            ).toFixed(2),
+            Reglement: payment.value.Reglement,
+            notes: payment.value.notes,
+        },
+        loadingItem:loading,
+        snackbar,
+        Success:()=>{
+            snackbar.value.text = "Transaccion realizada con exito";
+            router.reload({
+                preserveState: true,
+                preserveScroll: true,
+            });
+            dialogAddPayment.value = false;
+        }
+    });
 }
 
 //---------------------------------------- Update Payment ------------------------------\\
 function Update_Payment() {
-  loading.value = true;
-  snackbar.value = false;
-
-  axios
-      .put("/payment_sale/" + payment.value.id, {
-        sale_id: sale.value.id,
+    api.put({
+        url:"/payment_sale/" + payment.value.id,
+        params:{
+            sale_id: sale.value.id,
         date: payment.value.date,
         montant: parseFloat(payment.value.montant).toFixed(2),
         received_amount: parseFloat(payment.value.received_amount).toFixed(
@@ -335,27 +327,19 @@ function Update_Payment() {
         ).toFixed(2),
         Reglement: payment.value.Reglement,
         notes: payment.value.notes,
-      })
-      .then((response) => {
-        snackbar.value = true;
-        snackbarColor.value = "success";
-        snackbarText.value = "Transaccion realizada con exito";
-        router.reload({
-          preserveState: true,
-          preserveScroll: true,
-        });
-        dialogAddPayment.value = false;
-        dialogShowPayment.value = false;
-      })
-      .catch((error) => {
-        console.log(error);
-        snackbar.value = true;
-        snackbarColor.value = "error";
-        snackbarText.value = error.response.data.message;
-      })
-      .finally(() => {
-        loading.value = false;
-      });
+      },
+        loadingItem:loading,
+        snackbar,
+        Success:()=>{
+            snackbarText.value = "Transaccion realizada con exito";
+            router.reload({
+                preserveState: true,
+                preserveScroll: true,
+            });
+            dialogAddPayment.value = false;
+            dialogShowPayment.value = false;
+        }
+    });
 }
 
 //----------------------------------------- Remove Payment ------------------------------\\
@@ -376,32 +360,18 @@ function Delete_Payment(item) {
 }
 
 function Remove_Payment() {
-  snackbar.value = false;
-  loading.value = false;
-  axios
-      .delete("/payment_sale/" + sale.value.id)
-      .then(({data}) => {
-        snackbar.value = true;
-        snackbarColor.value = "success";
-        snackbarText.value = "Borrado exitoso";
-        router.reload({
-          preserveState: true,
-          preserveScroll: true,
-        });
-        dialogDeletePayment.value = false;
-        dialogShowPayment.value = false;
-      })
-      .catch((error) => {
-        console.log(error);
-        snackbar.value = true;
-        snackbarColor.value = "error";
-        snackbarText.value = error.response.data.message;
-      })
-      .finally(() => {
-        setTimeout(() => {
-          loading.value = false;
-        }, 1000);
-      });
+    api.delete({
+        url:"/payment_sale/" + sale.value.id,
+        Success:()=>{
+            snackbar.value.text = "Borrado exitoso";
+            router.reload({
+                preserveState: true,
+                preserveScroll: true,
+            });
+            dialogDeletePayment.value = false;
+            dialogShowPayment.value = false;
+        }
+    });
 }
 
 //----------------------------------------- Get Payments  -------------------------------\\
@@ -438,44 +408,35 @@ function reset_form_payment() {
 
 //------------------------------------------ Remove Sale ------------------------------\\
 function Remove_Sale(id, sale_has_return) {
-  snackbar.value = false;
+
+  snackbar.value.view = false;
   if (sale_has_return == "yes") {
-    snackbar.value = true;
-    snackbarColor.value = "error";
-    snackbarText.value = "Existe una devolucion en la transaccion";
+    snackbar.value.view = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "Existe una devolucion en la transaccion";
   } else {
-    axios
-        .delete("/sales/" + id)
-        .then(({data}) => {
-          snackbar.value = true;
-          snackbarColor.value = "success";
-          snackbarText.value = "Borrado exitoso";
-          router.reload({
-            preserveState: true,
-            preserveScroll: true,
-          });
-          dialogDelete.value = false;
-        })
-        .catch((error) => {
-          console.log(error);
-          snackbar.value = true;
-          snackbarColor.value = "error";
-          snackbarText.value = error.response.data.message;
-        })
-        .finally(() => {
-          setTimeout(() => {
-            loading.value = false;
-          }, 1000);
-        });
+      api.delete({
+          url:"/sales/" + id,
+          loadingItem:loading,
+          snackbar,
+          Success:()=>{
+              snackbar.value.text = "Borrado exitoso";
+              router.reload({
+                  preserveState: true,
+                  preserveScroll: true,
+              });
+              dialogDelete.value = false;
+          }
+      });
   }
 }
 </script>
 
 <template>
   <layout
-      :snackbar-view="snackbar"
-      :snackbar-text="snackbarText"
-      :snackbar-color="snackbarColor">
+      :snackbar-view="snackbar.view"
+      :snackbar-text="snackbar.text"
+      :snackbar-color="snackbar.color">
     <!-- Modal Remove Sale -->
     <delete-dialog
         :model="dialogDelete"

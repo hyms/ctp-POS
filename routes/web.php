@@ -43,9 +43,10 @@ use Inertia\Inertia;
 //Route::get('/upgrade', [UpgradeController::class, 'index'])->name('upgrade');
 //Route::post('/upgrade', [UpgradeController::class, 'upgrade'])->name('upgrade');
 
-Route::get('/', [DashboardController::class, 'dashboard_data']
+Route::get('/', [DashboardController::class, 'index']
 )->middleware(['auth', 'verified','auth.session'])->name('dashboard');
-
+Route::get('/dashboard_data', [DashboardController::class, 'dashboard_data']
+)->middleware(['auth', 'verified','auth.session'])->name('dashboard');
 require __DIR__ . '/auth.php';
 
 

@@ -23,13 +23,14 @@ use([
 
 
 const props = defineProps({
-  warehouses: Array,
-  customers: Object,
-  product_report: Object,
-  report_dashboard: Object,
-  sales_report: Object,
   errors: Object,
 });
+
+const warehouses = ref([]);
+const customers = ref({});
+const product_report = ref({});
+const report_dashboard = ref({});
+const sales_report = ref({});
 
 const warehouse_id = ref("");
 const stock_alerts = ref([]);
@@ -75,38 +76,35 @@ const columns_products = ref([
 //---------------------- Event Select Warehouse ------------------------------\\
 function Selected_Warehouse(value) {
   // warehouse_id.value = value;
-  // all_dashboard_data();
-  router.get("/", {warehouse_id: value}, {
-    preserveState: false,
-    preserveScroll: false,
-    only: [
-      'warehouses',
-      'customers',
-      'product_report',
-      'report_dashboard',
-      'sales_report',
-      'errors',],
-  });
+
 }
 
 //---------------------------------- Report Dashboard With Echart
-function all_dashboard_data() {
-  loading.value = true;
+function all_dashboard_data(warehouseId==null) {
+    loading.value = true;
+    axios.get("/dashboard_data", {params:{warehouse_id: warehouseId}}).
+    then(({data})=>{
+        warehouses.value=data['warehouses'];
+        customers.value=data['customers'];
+        product_report.value=data['product_report'];
+        report_dashboard.value=data['report_dashboard'];
+        sales_report.value=data['sales_report'];
+        // all_dashboard_data();
 
-  router.on("success", (event) => {
-    let url = event.detail.page.url.split('?');
-    if (url.length > 1) {
-      let url_query = url[1].split('=');
-      if (url_query.length > 1) {
-        warehouse_id.value = props.warehouses.find(value => value.id == url_query[1] && url_query[1] != "");
-      }
-    }
-  });
-  setTimeout(() => {
-    report_today.value = props.report_dashboard.original.report;
-    stock_alerts.value = props.report_dashboard.original.stock_alert;
-    products.value = props.report_dashboard.original.products;
-    sales.value = props.report_dashboard.original.last_sales;
+//  router.on("success", (event) => {
+//    let url = event.detail.page.url.split('?');
+//    if (url.length > 1) {
+//      let url_query = url[1].split('=');
+//      if (url_query.length > 1) {
+//        warehouse_id.value = warehouses.find(value => value.id == url_query[1] && url_query[1] != "");
+//      }
+//    }
+//  });
+
+    report_today.value = report_dashboard.original.report;
+    stock_alerts.value = report_dashboard.original.stock_alert;
+    products.value = report_dashboard.original.products;
+    sales.value = report_dashboard.original.last_sales;
     const dark_heading = "#c2c6dc";
 
     echartCustomer.value = {
@@ -129,7 +127,7 @@ function all_dashboard_data() {
           radius: "50%",
           center: "50%",
 
-          data: props.customers.original,
+          data: customers.original,
           itemStyle: {
             emphasis: {
               shadowBlur: 10,
@@ -196,7 +194,7 @@ function all_dashboard_data() {
           radius: "50%",
           center: "50%",
 
-          data: props.product_report.original,
+          data: product_report.original,
           itemStyle: {
             emphasis: {
               shadowBlur: 10,
@@ -229,7 +227,7 @@ function all_dashboard_data() {
       xAxis: [
         {
           type: "category",
-          data: props.sales_report.original.days,
+          data: sales_report.original.days,
           axisTick: {
             alignWithLabel: true
           },
@@ -278,7 +276,7 @@ function all_dashboard_data() {
       series: [
         {
           name: labels.sales,
-          data: props.sales_report.original.data,
+          data: sales_report.original.data,
           label: {show: true, color: "#5e8592"},
           type: "bar",
           color: "#3c858d",
@@ -313,12 +311,13 @@ function all_dashboard_data() {
       ]
     };
 
-    loading.value = false;
-  }, 1000)
-
+    }).finally(()=>{
+        loading.value = false;
+    });
 }
 
 onMounted(() => {
+
   all_dashboard_data();
   CurrentMonth.value = helper.GetMonth();
 })
