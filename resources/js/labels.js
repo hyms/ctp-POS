@@ -58,7 +58,7 @@ export default {
         statut: "Estado de Trabajo",
         due: "Deuda",
         payment_status: "Estado de pago",
-        date: defaults.date
+        date: defaults.date,
     },
     user: {
         firstname: defaults.name,
@@ -88,7 +88,7 @@ export default {
         category_id: "Categoria",
         details: "Detalle",
         amount: "Monto",
-        ref: defaults.code + " de Gasto"
+        ref: defaults.code + " de Gasto",
     },
     product: {
         name: defaults.name + " de Producto",
@@ -107,7 +107,7 @@ export default {
         not_selling: "Este Producto no es para la venta",
         add: "Añadir Producto",
         total: "Total de productos",
-        qty: "Cantidad"
+        qty: "Cantidad",
     },
     transfer: {
         date: defaults.date,
@@ -196,5 +196,4 @@ export default {
     add_exist_item: "Ya esta agregado",
     no_add_item: "Agregue un producto a la lista",
     no_qty_add_item: "Agregue una cantidad a los productos",
-
-}
+};

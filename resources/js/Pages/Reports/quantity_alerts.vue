@@ -158,62 +158,62 @@
 // };
 </script>
 <template>
-  <!--  <div class="main-content">-->
-  <!--    <breadcumb :page="$t('ProductQuantityAlerts')" :folder="$t('Reports')"/>-->
-  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+    <!--  <div class="main-content">-->
+    <!--    <breadcumb :page="$t('ProductQuantityAlerts')" :folder="$t('Reports')"/>-->
+    <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
 
-  <!--    <vue-good-table-->
-  <!--      v-if="!isLoading"-->
-  <!--      mode="remote"-->
-  <!--      :columns="columns"-->
-  <!--      :totalRows="totalRows"-->
-  <!--      :rows="products"-->
-  <!--      @on-page-change="onPageChange"-->
-  <!--      @on-per-page-change="onPerPageChange"-->
-  <!--      :pagination-options="{-->
-  <!--        enabled: true,-->
-  <!--        mode: 'records',-->
-  <!--        nextLabel: 'next',-->
-  <!--        prevLabel: 'prev',-->
-  <!--      }"-->
-  <!--      styleClass="table-hover tableOne vgt-table"-->
-  <!--    >-->
-  <!--      <div slot="table-actions" class="mt-2 mb-3 quantity_alert_warehouse">-->
-  <!--        &lt;!&ndash; warehouse &ndash;&gt;-->
-  <!--        <b-form-group :label="$t('warehouse')">-->
-  <!--          <v-select-->
-  <!--            @input="Selected_Warehouse"-->
-  <!--            v-model="warehouse_id"-->
-  <!--            :reduce="label => label.value"-->
-  <!--            :placeholder="$t('Choose_Warehouse')"-->
-  <!--            :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
-  <!--          />-->
-  <!--        </b-form-group>-->
-  <!--      </div>-->
+    <!--    <vue-good-table-->
+    <!--      v-if="!isLoading"-->
+    <!--      mode="remote"-->
+    <!--      :columns="columns"-->
+    <!--      :totalRows="totalRows"-->
+    <!--      :rows="products"-->
+    <!--      @on-page-change="onPageChange"-->
+    <!--      @on-per-page-change="onPerPageChange"-->
+    <!--      :pagination-options="{-->
+    <!--        enabled: true,-->
+    <!--        mode: 'records',-->
+    <!--        nextLabel: 'next',-->
+    <!--        prevLabel: 'prev',-->
+    <!--      }"-->
+    <!--      styleClass="table-hover tableOne vgt-table"-->
+    <!--    >-->
+    <!--      <div slot="table-actions" class="mt-2 mb-3 quantity_alert_warehouse">-->
+    <!--        &lt;!&ndash; warehouse &ndash;&gt;-->
+    <!--        <b-form-group :label="$t('warehouse')">-->
+    <!--          <v-select-->
+    <!--            @input="Selected_Warehouse"-->
+    <!--            v-model="warehouse_id"-->
+    <!--            :reduce="label => label.value"-->
+    <!--            :placeholder="$t('Choose_Warehouse')"-->
+    <!--            :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
+    <!--          />-->
+    <!--        </b-form-group>-->
+    <!--      </div>-->
 
-  <!--      <div slot="table-actions" class="mt-2 mb-3">-->
-  <!--        -->
-  <!--          <b-button @click="stock_alert_PDF()" size="sm" variant="outline-success ripple m-1">-->
-  <!--            <i class="i-File-Copy"></i> PDF-->
-  <!--          </b-button>-->
-  <!--           <vue-excel-xlsx-->
-  <!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
-  <!--              :data="products"-->
-  <!--              :columns="columns"-->
-  <!--              :file-name="'Alerts_report'"-->
-  <!--              :file-type="'xlsx'"-->
-  <!--              :sheet-name="'Alerts_report'"-->
-  <!--              >-->
-  <!--              <i class="i-File-Excel"></i> EXCEL-->
-  <!--          </vue-excel-xlsx>-->
-  <!--        </div>-->
+    <!--      <div slot="table-actions" class="mt-2 mb-3">-->
+    <!--        -->
+    <!--          <b-button @click="stock_alert_PDF()" size="sm" variant="outline-success ripple m-1">-->
+    <!--            <i class="i-File-Copy"></i> PDF-->
+    <!--          </b-button>-->
+    <!--           <vue-excel-xlsx-->
+    <!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
+    <!--              :data="products"-->
+    <!--              :columns="columns"-->
+    <!--              :file-name="'Alerts_report'"-->
+    <!--              :file-type="'xlsx'"-->
+    <!--              :sheet-name="'Alerts_report'"-->
+    <!--              >-->
+    <!--              <i class="i-File-Excel"></i> EXCEL-->
+    <!--          </vue-excel-xlsx>-->
+    <!--        </div>-->
 
-  <!--      <template slot="table-row" slot-scope="props">-->
-  <!--        <div v-if="props.column.field == 'stock_alert'">-->
-  <!--          <span class="badge badge-outline-danger">{{props.row.stock_alert}}</span>-->
-  <!--        </div>-->
-  <!--      </template>-->
-  <!--    </vue-good-table>-->
-  <!--    &lt;!&ndash; </b-card> &ndash;&gt;-->
-  <!--  </div>-->
+    <!--      <template slot="table-row" slot-scope="props">-->
+    <!--        <div v-if="props.column.field == 'stock_alert'">-->
+    <!--          <span class="badge badge-outline-danger">{{props.row.stock_alert}}</span>-->
+    <!--        </div>-->
+    <!--      </template>-->
+    <!--    </vue-good-table>-->
+    <!--    &lt;!&ndash; </b-card> &ndash;&gt;-->
+    <!--  </div>-->
 </template>

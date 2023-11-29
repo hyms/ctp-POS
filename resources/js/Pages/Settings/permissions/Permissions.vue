@@ -1,67 +1,67 @@
 <template>
-  <!--  <div class="main-content">-->
-  <!--    <breadcumb :page="$t('GroupPermissions')" :folder="$t('Settings')"/>-->
+    <!--  <div class="main-content">-->
+    <!--    <breadcumb :page="$t('GroupPermissions')" :folder="$t('Settings')"/>-->
 
-  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
-  <!--    <b-card class="wrapper" v-if="!isLoading">-->
-  <!--      <vue-good-table-->
-  <!--        mode="remote"-->
-  <!--        :columns="columns"-->
-  <!--        :totalRows="totalRows"-->
-  <!--        :rows="roles"-->
-  <!--        @on-page-change="onPageChange"-->
-  <!--        @on-per-page-change="onPerPageChange"-->
-  <!--        @on-sort-change="onSortChange"-->
-  <!--        @on-search="onSearch"-->
-  <!--        :search-options="{-->
-  <!--        enabled: true,-->
-  <!--        placeholder: $t('Search_this_table'),  -->
-  <!--      }"-->
-  <!--        :pagination-options="{-->
-  <!--        enabled: true,-->
-  <!--        mode: 'records',-->
-  <!--        nextLabel: 'next',-->
-  <!--        prevLabel: 'prev',-->
-  <!--      }"-->
-  <!--        styleClass="table-hover tableOne vgt-table"-->
-  <!--      >-->
-  <!--        <div slot="table-actions" class="mt-2 mb-3">-->
-  <!--          <router-link-->
-  <!--            class="btn-rounded btn btn-primary ripple btn-icon m-1"-->
-  <!--            v-if="currentUserPermissions && currentUserPermissions.includes('permissions_add')"-->
-  <!--            to="/app/Settings/Permissions/store"-->
-  <!--          >-->
-  <!--            <span class="ul-btn__icon">-->
-  <!--              <i class="i-Add"></i>-->
-  <!--            </span>-->
-  <!--            <span class="ul-btn__text ml-1">{{$t('Add')}}</span>-->
-  <!--          </router-link>-->
-  <!--        </div>-->
+    <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+    <!--    <b-card class="wrapper" v-if="!isLoading">-->
+    <!--      <vue-good-table-->
+    <!--        mode="remote"-->
+    <!--        :columns="columns"-->
+    <!--        :totalRows="totalRows"-->
+    <!--        :rows="roles"-->
+    <!--        @on-page-change="onPageChange"-->
+    <!--        @on-per-page-change="onPerPageChange"-->
+    <!--        @on-sort-change="onSortChange"-->
+    <!--        @on-search="onSearch"-->
+    <!--        :search-options="{-->
+    <!--        enabled: true,-->
+    <!--        placeholder: $t('Search_this_table'),  -->
+    <!--      }"-->
+    <!--        :pagination-options="{-->
+    <!--        enabled: true,-->
+    <!--        mode: 'records',-->
+    <!--        nextLabel: 'next',-->
+    <!--        prevLabel: 'prev',-->
+    <!--      }"-->
+    <!--        styleClass="table-hover tableOne vgt-table"-->
+    <!--      >-->
+    <!--        <div slot="table-actions" class="mt-2 mb-3">-->
+    <!--          <router-link-->
+    <!--            class="btn-rounded btn btn-primary ripple btn-icon m-1"-->
+    <!--            v-if="currentUserPermissions && currentUserPermissions.includes('permissions_add')"-->
+    <!--            to="/app/Settings/Permissions/store"-->
+    <!--          >-->
+    <!--            <span class="ul-btn__icon">-->
+    <!--              <i class="i-Add"></i>-->
+    <!--            </span>-->
+    <!--            <span class="ul-btn__text ml-1">{{$t('Add')}}</span>-->
+    <!--          </router-link>-->
+    <!--        </div>-->
 
-  <!--        <template slot="table-row" slot-scope="props" v-if="props.row.id !==1">-->
-  <!--          <span v-if="props.column.field == 'actions'">-->
-  <!--            <router-link -->
-  <!--              v-if="currentUserPermissions && currentUserPermissions.includes('permissions_edit')"-->
-  <!--              title="Edit"-->
-  <!--              v-b-tooltip.hover-->
-  <!--              :to="'/app/Settings/Permissions/edit/'+props.row.id"-->
-  <!--            >-->
-  <!--              <i class="i-Edit text-25 text-success"></i>-->
-  <!--            </router-link>-->
-  <!--            <a-->
-  <!--              title="Delete"-->
-  <!--              v-b-tooltip.hover-->
-  <!--              v-if="currentUserPermissions && currentUserPermissions.includes('permissions_delete')"-->
-  <!--              @click="Delete_Role(props.row.id)"-->
-  <!--            >-->
-  <!--              <i class="i-Close-Window text-25 text-danger"></i>-->
-  <!--            </a>-->
-  <!--          </span>-->
-  <!--        </template>-->
-  <!--        -->
-  <!--      </vue-good-table>-->
-  <!--    </b-card>-->
-  <!--  </div>-->
+    <!--        <template slot="table-row" slot-scope="props" v-if="props.row.id !==1">-->
+    <!--          <span v-if="props.column.field == 'actions'">-->
+    <!--            <router-link -->
+    <!--              v-if="currentUserPermissions && currentUserPermissions.includes('permissions_edit')"-->
+    <!--              title="Edit"-->
+    <!--              v-b-tooltip.hover-->
+    <!--              :to="'/app/Settings/Permissions/edit/'+props.row.id"-->
+    <!--            >-->
+    <!--              <i class="i-Edit text-25 text-success"></i>-->
+    <!--            </router-link>-->
+    <!--            <a-->
+    <!--              title="Delete"-->
+    <!--              v-b-tooltip.hover-->
+    <!--              v-if="currentUserPermissions && currentUserPermissions.includes('permissions_delete')"-->
+    <!--              @click="Delete_Role(props.row.id)"-->
+    <!--            >-->
+    <!--              <i class="i-Close-Window text-25 text-danger"></i>-->
+    <!--            </a>-->
+    <!--          </span>-->
+    <!--        </template>-->
+    <!--        -->
+    <!--      </vue-good-table>-->
+    <!--    </b-card>-->
+    <!--  </div>-->
 </template>
 
 <script>

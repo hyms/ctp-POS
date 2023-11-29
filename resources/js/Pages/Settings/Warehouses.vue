@@ -1,11 +1,11 @@
 <script setup>
-import {ref} from "vue";
+import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import Snackbar from "@/Components/snackbar.vue";
+import Snackbar from "@/Components/Snackbar2.vue";
 import helper from "@/helpers";
 import labels from "@/labels";
-import {router} from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
+import api from "@/api";
 
 const props = defineProps({
     warehouses: Array,
@@ -18,19 +18,19 @@ const search = ref("");
 const loading = ref(false);
 const snackbar = ref({
     view: false,
-    color: '',
-    text: ''
+    color: "",
+    text: "",
 });
 const dialog = ref(false);
 const dialogDelete = ref(false);
 const editmode = ref(false);
 
 const fields = ref([
-    {title: labels.warehouse.name, key: "name"},
-    {title: labels.warehouse.mobile, key: "mobile"},
-    {title: labels.warehouse.city, key: "city"},
-    {title: labels.warehouse.email, key: "email"},
-    {title: labels.actions, key: "actions"},
+    { title: labels.warehouse.name, key: "name" },
+    { title: labels.warehouse.mobile, key: "mobile" },
+    { title: labels.warehouse.city, key: "city" },
+    { title: labels.warehouse.email, key: "email" },
+    { title: labels.actions, key: "actions" },
 ]);
 
 //form
@@ -42,7 +42,6 @@ const warehouse = ref({
     country: "",
     city: "",
 });
-
 
 //------------------------------ Modal (create Warehouse) -------------------------------\\
 function New_Warehouse() {
@@ -70,8 +69,8 @@ function Create_Warehouse() {
             city: warehouse.value.city,
         },
         loadingItem: loading,
-        snackbar
-    })
+        snackbar,
+    });
 }
 
 //------------------------------- Update Warehouse ------------------------\\
@@ -88,8 +87,8 @@ function Update_Warehouse() {
         snackbar,
         Success: () => {
             dialog.value = false;
-        }
-    })
+        },
+    });
 }
 
 //------------------------------- reset Form ------------------------\\
@@ -135,8 +134,8 @@ function Remove_Warehouse() {
         snackbar,
         Success: () => {
             dialog.value = false;
-        }
-    })
+        },
+    });
 }
 
 function onCloseDelete() {
@@ -146,10 +145,12 @@ function onCloseDelete() {
 </script>
 
 <template>
-    <Layout
-        :snackbar-view="snackbar.view"
-        :snackbar-color="snackbar.color"
-        :snackbar-text="snackbar.text">
+    <Layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <delete-dialog
             :model="dialogDelete"
             :on-save="Remove_Warehouse"
@@ -272,7 +273,6 @@ function onCloseDelete() {
                         :items="warehouses"
                         :search="search"
                         hover
-
                         :no-data-text="labels.no_data_table"
                         :loading="loading"
                     >

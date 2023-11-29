@@ -1,30 +1,30 @@
 import moment from "moment";
-import {router, usePage} from "@inertiajs/vue3";
-import {computed} from "vue";
+import { router, usePage } from "@inertiajs/vue3";
+import { computed } from "vue";
 // import pos_css from "@/../css/pos_print.css";
 
 let debug = true;
 const reglaments = [
-    {title: "Efectivo", value: "cash"},
-    {title: "Cheque", value: "cheque"},
-    {title: "Transferencia Bancaria", value: "bank_transfer"},
-    {title: "QR", value: "qr"},
-    {title: "Otros", value: "other"},
+    { title: "Efectivo", value: "cash" },
+    { title: "Cheque", value: "cheque" },
+    { title: "Transferencia Bancaria", value: "bank_transfer" },
+    { title: "QR", value: "qr" },
+    { title: "Otros", value: "other" },
 ];
 const salesStatus = [
-    {title: "Completado", value: "completed", color: "primary"},
-    {title: "Pendiente", value: "pending", color: "secondary"},
-    {title: "Ordenado", value: "ordered", color: "info"},
+    { title: "Completado", value: "completed", color: "primary" },
+    { title: "Pendiente", value: "pending", color: "secondary" },
+    { title: "Ordenado", value: "ordered", color: "info" },
 ];
 const paymentStatus = [
-    {title: "Pagado", value: "paid", color: "success"},
-    {title: "Deuda", value: "unpaid", color: "error"},
-    {title: "Parcial", value: "partial", color: "warning"},
+    { title: "Pagado", value: "paid", color: "success" },
+    { title: "Deuda", value: "unpaid", color: "error" },
+    { title: "Parcial", value: "partial", color: "warning" },
 ];
 const transferStatus = [
-    {title: "Completado", value: "completed", color: "success"},
-    {title: "Enviado", value: "sent", color: "warning"},
-    {title: "Pendiente", value: "pending", color: "error"},
+    { title: "Completado", value: "completed", color: "success" },
+    { title: "Enviado", value: "sent", color: "warning" },
+    { title: "Pendiente", value: "pending", color: "error" },
 ];
 
 const toggleFullScreen = () => {
@@ -54,7 +54,7 @@ const toggleFullScreen = () => {
     }
 };
 const print_pos = (element_id) => {
-    const pos_css = new URL('@/../css/pos_print.css', import.meta.url).href
+    const pos_css = new URL("@/../css/pos_print.css", import.meta.url).href;
     let divContents = document.getElementById(element_id).innerHTML;
     let a = window.open("", "", "height=500, width=500");
     a.document.write('<html><link rel="stylesheet" href="' + pos_css + '">');
@@ -71,7 +71,7 @@ const print_pdf = (element_id, title) => {
     event.preventDefault();
     let divContents = document.getElementById(element_id).innerHTML;
     let url = "/pdf?body=" + divContents;
-    let win = window.open(url, '_blank');
+    let win = window.open(url, "_blank");
     win.focus();
 };
 //------------------------------Get Month -------------------------\\
@@ -88,30 +88,32 @@ const GetMonth = () => {
         "Septiembre",
         "Octubre",
         "Noviembre",
-        "Diciembre"
+        "Diciembre",
     ];
     const now = new Date();
     return months[now.getMonth()];
-}
+};
 const linkVisit = (url, type = "get") => {
     router.visit(url, {
         method: type,
         preserveState: true,
     });
-}
+};
 const newLine = (value) => {
-    return value.toString().replaceAll(' ', "<br>");
-}
+    return value.toString().replaceAll(" ", "<br>");
+};
 
-const verifyPermisions = () =>{
+const verifyPermisions = () => {
     const roles = computed(() => usePage().props.rolesP);
     const user = computed(() => usePage().props.user);
-}
-const maxEnableButtons = (timeSale,enableDays) =>{
-    let time = moment(timeSale,"YYYY-MM-DD").add(moment.duration(enableDays,'d'));
+};
+const maxEnableButtons = (timeSale, enableDays) => {
+    let time = moment(timeSale, "YYYY-MM-DD").add(
+        moment.duration(enableDays, "d")
+    );
     const rest = moment().isAfter(time);
     return rest;
-}
+};
 export default {
     required: [(v) => !!v || "Requerido"],
     max: (max) => [
@@ -186,33 +188,35 @@ export default {
         if (value == null) {
             return transferStatus;
         }
-        return transferStatus.find(item => item.value == value).title
+        return transferStatus.find((item) => item.value == value).title;
     },
     statutTransferColor: (value) => {
-        return transferStatus.find(item => item.value == value).color;
+        return transferStatus.find((item) => item.value == value).color;
     },
     statutSale: (value = null) => {
         if (value == null) {
             return salesStatus;
         }
-        return salesStatus.find(item => item.value == value).title
+        return salesStatus.find((item) => item.value == value).title;
     },
     statutSaleColor: (value) => {
-        return salesStatus.find(item => item.value == value).color;
+        return salesStatus.find((item) => item.value == value).color;
     },
     statusPayment: (value = null) => {
         if (value == null) {
             return paymentStatus;
         }
-        return paymentStatus.find(item => item.value == value).title
+        return paymentStatus.find((item) => item.value == value).title;
     },
     statusPaymentColor: (value) => {
-        return paymentStatus.find(item => item.value == value).color;
+        return paymentStatus.find((item) => item.value == value).color;
     },
     getReglamentPayment: (v) => {
-        let result = reglaments.filter((i) => i.value.toLowerCase() == v.toLowerCase());
+        let result = reglaments.filter(
+            (i) => i.value.toLowerCase() == v.toLowerCase()
+        );
         if (result == null || result.length == 0) {
-            result = [{title: "", value: ""}];
+            result = [{ title: "", value: "" }];
         }
         return result;
     },
@@ -226,24 +230,24 @@ export default {
     GetMonth,
     maxEnableButtons,
     getObjectValue: (value, object) => {
-        return object.find(item => item.id == value)
+        return object.find((item) => item.id == value);
     },
     getValueObject: (object) => {
-        if (typeof object === 'object' && object !== null)
-            return object.id
+        if (typeof object === "object" && object !== null) return object.id;
         return object;
     },
     newLine,
     getOperatorUnit() {
         return [
-            {title: 'Multiplicar (*)', value: '*',},
-            {title: 'Dividir (/)', value: '/'},
+            { title: "Multiplicar (*)", value: "*" },
+            { title: "Dividir (/)", value: "/" },
         ];
     },
-    toExport(fields)
-    {
-        const res = fields.reduce((acc, curr) => (acc[curr].title = acc[curr].key, acc), {});
+    toExport(fields) {
+        const res = fields.reduce(
+            (acc, curr) => ((acc[curr].title = acc[curr].key), acc),
+            {}
+        );
         return Object.assign({}, ...res);
     },
-
 };

@@ -2,7 +2,7 @@
 import helpers from "@/helpers";
 
 function handleFullScreen() {
-  helpers.toggleFullScreen();
+    helpers.toggleFullScreen();
 }
 </script>
 
@@ -13,7 +13,7 @@ function handleFullScreen() {
         icon="mdi-arrow-expand-all"
         size="small"
         class="mr-3 rounded"
-           @click="handleFullScreen">
-
+        @click="handleFullScreen"
+    >
     </v-btn>
 </template>

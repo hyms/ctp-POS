@@ -1,5 +1,5 @@
 <script setup>
-import {ref} from "vue";
+import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import Snackbar from "@/Components/Snackbar2.vue";
@@ -22,19 +22,19 @@ const loading = ref(false);
 const alert = ref(false);
 const snackbar = ref({
     view: false,
-    color: '',
-    text: '',
+    color: "",
+    text: "",
 });
 const dialog = ref(false);
 const editmode = ref(false);
 
 const fields = ref([
-    {title: labels.user.username, key: "username"},
-    {title: labels.user.lastname, key: "lastname"},
-    {title: labels.user.firstname, key: "firstname"},
-    {title: labels.user.phone, key: "phone"},
-    {title: labels.user.statut, key: "statut"},
-    {title: labels.actions, key: "actions"},
+    { title: labels.user.username, key: "username" },
+    { title: labels.user.lastname, key: "lastname" },
+    { title: labels.user.firstname, key: "firstname" },
+    { title: labels.user.phone, key: "phone" },
+    { title: labels.user.statut, key: "statut" },
+    { title: labels.actions, key: "actions" },
 ]);
 const jsonFields = ref({
     Usuario: "username",
@@ -59,13 +59,12 @@ const user = ref({
 });
 const assigned_warehouses = ref([]);
 
-
 //------ Checked Status User
 function isChecked(user) {
     api.post({
         url: "/users_switch_activated/" + user.id,
         params: {
-            statut: user.statut===1,
+            statut: user.statut === 1,
             id: user.id,
         },
         loadingItem: loading,
@@ -73,7 +72,7 @@ function isChecked(user) {
         Success: (data) => {
             if (data.success) {
                 snackbar.value.color = "success";
-                if (user.statut===0) {
+                if (user.statut === 0) {
                     user.statut = 1;
                     snackbar.value.text = "Usuario activado";
                 } else {
@@ -85,13 +84,13 @@ function isChecked(user) {
                 snackbar.value.color = "warning";
                 snackbar.value.text = labels.warning_message;
             }
-        }
+        },
     });
 }
 
 //------------------------ Create User ---------------------------\\
 function Create_User() {
-    let assignedWarehouses = []
+    let assignedWarehouses = [];
     // append array assigned_warehouses
     if (assigned_warehouses.value.length) {
         for (let i = 0; i < assigned_warehouses.value.length; i++) {
@@ -101,28 +100,28 @@ function Create_User() {
     api.post({
         url: "/users",
         params: {
-            "firstname": user.value.firstname,
-            "lastname": user.value.lastname,
-            "username": user.value.username,
-            "email": user.value.email,
-            "password": user.value.password,
-            "phone": user.value.phone,
-            "role": user.value.role,
-            "ci": user.value.ci,
-            "is_all_warehouses": user.value.is_all_warehouses ? 1 : 0,
-            "assigned_to": assignedWarehouses,
+            firstname: user.value.firstname,
+            lastname: user.value.lastname,
+            username: user.value.username,
+            email: user.value.email,
+            password: user.value.password,
+            phone: user.value.phone,
+            role: user.value.role,
+            ci: user.value.ci,
+            is_all_warehouses: user.value.is_all_warehouses ? 1 : 0,
+            assigned_to: assignedWarehouses,
         },
         loadingItem: loading,
         snackbar,
         Success: () => {
             dialog.value = false;
-        }
+        },
     });
 }
 
 //----------------------- Update User ---------------------------\\
 function Update_User() {
-    let assignedWarehouses = []
+    let assignedWarehouses = [];
     // append array assigned_warehouses
     if (assigned_warehouses.value.length) {
         for (let i = 0; i < assigned_warehouses.value.length; i++) {
@@ -132,23 +131,23 @@ function Update_User() {
     api.put({
         url: "/users/" + user.value.id,
         params: {
-            "firstname": user.value.firstname,
-            "lastname": user.value.lastname,
-            "username": user.value.username,
-            "email": user.value.email,
-            "NewPassword": user.value.NewPassword,
-            "phone": user.value.phone,
-            "role": user.value.role,
-            "ci": user.value.ci,
-            "statut": user.value.statut,
-            "is_all_warehouses": user.value.is_all_warehouses,
-            "assigned_to": assignedWarehouses,
+            firstname: user.value.firstname,
+            lastname: user.value.lastname,
+            username: user.value.username,
+            email: user.value.email,
+            NewPassword: user.value.NewPassword,
+            phone: user.value.phone,
+            role: user.value.role,
+            ci: user.value.ci,
+            statut: user.value.statut,
+            is_all_warehouses: user.value.is_all_warehouses,
+            assigned_to: assignedWarehouses,
         },
         loadingItem: loading,
         snackbar,
         Success: () => {
             dialog.value = false;
-        }
+        },
     });
 }
 
@@ -192,11 +191,10 @@ function Edit_User(item) {
 function Get_Data_Warehouses(id) {
     axios
         .get("/users/" + id + "/edit")
-        .then(({data}) => {
+        .then(({ data }) => {
             assigned_warehouses.value = data.assigned_warehouses;
         })
-        .catch((error) => {
-        });
+        .catch((error) => {});
 }
 
 //---------------------- modal  ------------------------------\\
@@ -217,9 +215,12 @@ function onClose() {
 </script>
 
 <template>
-    <Layout
-    >
-      <snackbar :text="snackbar.text" v-model="snackbar.view" :color="snackbar.color"></snackbar>
+    <Layout>
+        <snackbar
+            :text="snackbar.text"
+            v-model="snackbar.view"
+            :color="snackbar.color"
+        ></snackbar>
         <v-dialog
             v-model="dialog"
             max-width="600px"
@@ -241,7 +242,11 @@ function onClose() {
                                     :label="labels.user.firstname + ' *'"
                                     v-model="user.firstname"
                                     :placeholder="labels.user.firstname"
-                                    :rules="helper.required.concat(helper.min(3)).concat(helper.max(30))"
+                                    :rules="
+                                        helper.required
+                                            .concat(helper.min(3))
+                                            .concat(helper.max(30))
+                                    "
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -253,7 +258,11 @@ function onClose() {
                                     :label="labels.user.lastname + ' *'"
                                     v-model="user.lastname"
                                     :placeholder="labels.user.lastname"
-                                    :rules="helper.required.concat(helper.min(3)).concat(helper.max(30))"
+                                    :rules="
+                                        helper.required
+                                            .concat(helper.min(3))
+                                            .concat(helper.max(30))
+                                    "
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -265,7 +274,11 @@ function onClose() {
                                     :label="labels.user.username + ' *'"
                                     v-model="user.username"
                                     :placeholder="labels.user.username"
-                                    :rules="helper.required.concat(helper.min(3)).concat(helper.max(30))"
+                                    :rules="
+                                        helper.required
+                                            .concat(helper.min(3))
+                                            .concat(helper.max(30))
+                                    "
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -277,7 +290,9 @@ function onClose() {
                                     :label="labels.user.phone + ' *'"
                                     v-model="user.phone"
                                     :placeholder="labels.user.phone"
-                                    :rules="helper.required.concat(helper.number)"
+                                    :rules="
+                                        helper.required.concat(helper.number)
+                                    "
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -302,7 +317,11 @@ function onClose() {
                                     :label="labels.user.password + ' *'"
                                     v-model="user.password"
                                     :placeholder="labels.user.password"
-                                    :rules="helper.required.concat(helper.min(6)).concat(helper.max(14))"
+                                    :rules="
+                                        helper.required
+                                            .concat(helper.min(6))
+                                            .concat(helper.max(14))
+                                    "
                                     hide-details="auto"
                                     type="password"
                                 >
@@ -328,7 +347,9 @@ function onClose() {
                                     :label="labels.user.NewPassword + ' *'"
                                     v-model="user.NewPassword"
                                     :placeholder="labels.user.NewPassword"
-                                    :rules="helper.min(6).concat(helper.max(14))"
+                                    :rules="
+                                        helper.min(6).concat(helper.max(14))
+                                    "
                                     hide-details="auto"
                                     type="password"
                                 >

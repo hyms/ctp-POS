@@ -143,42 +143,42 @@
 // };
 </script>
 <template>
-  <!--  <div class="main-content">-->
-  <!--    <breadcumb :page="$t('BackupDatabase')" :folder="$t('Settings')"/>-->
+    <!--  <div class="main-content">-->
+    <!--    <breadcumb :page="$t('BackupDatabase')" :folder="$t('Settings')"/>-->
 
-  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
-  <!--    <b-card class="wrapper" v-if="!isLoading">-->
-  <!--      <span class="alert alert-danger">{{$t('You_will_find_your_backup_on')}} <strong>/storage/app/public/backup</strong> {{$t('and_save_it_to_your_pc')}}</span>-->
-  <!--      <vue-good-table-->
-  <!--        mode="remote"-->
-  <!--        :columns="columns"-->
-  <!--        :totalRows="totalRows"-->
-  <!--        :rows="backups"-->
-  <!--        styleClass="table-hover tableOne vgt-table"-->
-  <!--      >-->
-  <!--        <div slot="table-actions" class="mt-2 mb-3">-->
-  <!--          <b-button-->
-  <!--            @click="GenerateBackup()"-->
-  <!--            size="sm"-->
-  <!--            class="btn-rounded"-->
-  <!--            variant="btn btn-primary btn-icon m-1"-->
-  <!--          >-->
-  <!--            <i class="i-Add"></i>-->
-  <!--            {{$t('GenerateBackup')}}-->
-  <!--          </b-button>-->
-  <!--        </div>-->
+    <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+    <!--    <b-card class="wrapper" v-if="!isLoading">-->
+    <!--      <span class="alert alert-danger">{{$t('You_will_find_your_backup_on')}} <strong>/storage/app/public/backup</strong> {{$t('and_save_it_to_your_pc')}}</span>-->
+    <!--      <vue-good-table-->
+    <!--        mode="remote"-->
+    <!--        :columns="columns"-->
+    <!--        :totalRows="totalRows"-->
+    <!--        :rows="backups"-->
+    <!--        styleClass="table-hover tableOne vgt-table"-->
+    <!--      >-->
+    <!--        <div slot="table-actions" class="mt-2 mb-3">-->
+    <!--          <b-button-->
+    <!--            @click="GenerateBackup()"-->
+    <!--            size="sm"-->
+    <!--            class="btn-rounded"-->
+    <!--            variant="btn btn-primary btn-icon m-1"-->
+    <!--          >-->
+    <!--            <i class="i-Add"></i>-->
+    <!--            {{$t('GenerateBackup')}}-->
+    <!--          </b-button>-->
+    <!--        </div>-->
 
-  <!--        <template slot="table-row" slot-scope="props">-->
-  <!--          <span v-if="props.column.field == 'actions'">-->
-  <!--            &lt;!&ndash; <a v-b-tooltip.hover @click="DownloadBackup(props.row.date)" title="Download">-->
-  <!--              <i class="i-Download text-25 text-success"></i>-->
-  <!--            </a> &ndash;&gt;-->
-  <!--            <a title="Delete" v-b-tooltip.hover @click="DeleteBackup(props.row.date)">-->
-  <!--              <i class="i-Close-Window text-25 text-danger"></i>-->
-  <!--            </a>-->
-  <!--          </span>-->
-  <!--        </template>-->
-  <!--      </vue-good-table>-->
-  <!--    </b-card>-->
-  <!--  </div>-->
+    <!--        <template slot="table-row" slot-scope="props">-->
+    <!--          <span v-if="props.column.field == 'actions'">-->
+    <!--            &lt;!&ndash; <a v-b-tooltip.hover @click="DownloadBackup(props.row.date)" title="Download">-->
+    <!--              <i class="i-Download text-25 text-success"></i>-->
+    <!--            </a> &ndash;&gt;-->
+    <!--            <a title="Delete" v-b-tooltip.hover @click="DeleteBackup(props.row.date)">-->
+    <!--              <i class="i-Close-Window text-25 text-danger"></i>-->
+    <!--            </a>-->
+    <!--          </span>-->
+    <!--        </template>-->
+    <!--      </vue-good-table>-->
+    <!--    </b-card>-->
+    <!--  </div>-->
 </template>

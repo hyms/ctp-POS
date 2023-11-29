@@ -1,4 +1,4 @@
-import {router} from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 import labels from "@/labels";
 
 const global = (
@@ -12,30 +12,32 @@ const global = (
     localFinally
 ) => {
     loading.value = true;
-    if(params==undefined)
-    {
-        params={};
+    if (params === undefined) {
+        params = {};
     }
     axios({
-        method, url, data: params, params: (method == 'get' ? params : {}),
+        method,
+        url,
+        data: params,
+        params: method == "get" ? params : {},
     })
-        .then(({data}) => {
-            snackbar.value.color = 'success';
-            if (data['redirect'] != undefined) {
+        .then(({ data }) => {
+            snackbar.value.color = "success";
+            if (data["redirect"] !== undefined) {
                 snackbar.value.text = labels.success_message;
-                if (data['redirect'] != '') {
-                    router.get(data['redirect'], {}, {});
+                if (data["redirect"] !== "") {
+                    router.get(data["redirect"]);
                 } else {
-                    router.reload({});
+                    router.reload();
                 }
             }
-            if (localSuccess != undefined) {
+            if (localSuccess !== undefined) {
                 localSuccess(data);
             }
         })
-        .catch(({response}) => {
-            snackbar.value.color = 'error';
-            snackbar.value.text = '';
+        .catch(({ response }) => {
+            snackbar.value.color = "error";
+            snackbar.value.text = "";
             if (response.status >= 400 && response.status <= 499) {
                 snackbar.value.text = response.data.message;
             }
@@ -43,30 +45,27 @@ const global = (
                 snackbar.value.text = labels.error_message;
                 console.log(response);
             }
-            if (localError != undefined) {
+            if (localError !== undefined) {
                 localError(response.data);
             }
         })
         .finally(() => {
             setTimeout(() => {
                 loading.value = false;
-                if (snackbar.value.text !== '') {
+                if (snackbar.value.text !== "") {
                     snackbar.value.view = true;
                 }
-                if (localFinally != undefined) {
+                if (localFinally !== undefined) {
                     localFinally();
                 }
             }, 1000);
         });
-}
-
+};
 
 export default {
-    put: ({
-              url, params, loadingItem, snackbar, Success, Error, Finally
-          }) => {
+    put: ({ url, params, loadingItem, snackbar, Success, Error, Finally }) => {
         global(
-            'put',
+            "put",
             url,
             params,
             loadingItem,
@@ -74,46 +73,50 @@ export default {
             Success,
             Error,
             Finally
-        )
-    }, post: ({
-                  url, params, loadingItem, snackbar, Success, Error, Finally
-              }) => {
-        global(
-            'post',
-            url,
-            params,
-            loadingItem,
-            snackbar,
-            Success,
-            Error,
-            Finally
-        )
-    }, get: ({
-                 url, params, loadingItem, snackbar, Success, Error, Finally
-             }) => {
-        global(
-            'get',
-            url,
-            params,
-            loadingItem,
-            snackbar,
-            Success,
-            Error,
-            Finally
-        )
-    }, delete: ({
-                    url, params, loadingItem, snackbar, Success, Error, Finally
-                }) => {
-        global(
-            'delete',
-            url,
-            params,
-            loadingItem,
-            snackbar,
-            Success,
-            Error,
-            Finally
-        )
+        );
     },
-
-}
+    post: ({ url, params, loadingItem, snackbar, Success, Error, Finally }) => {
+        global(
+            "post",
+            url,
+            params,
+            loadingItem,
+            snackbar,
+            Success,
+            Error,
+            Finally
+        );
+    },
+    get: ({ url, params, loadingItem, snackbar, Success, Error, Finally }) => {
+        global(
+            "get",
+            url,
+            params,
+            loadingItem,
+            snackbar,
+            Success,
+            Error,
+            Finally
+        );
+    },
+    delete: ({
+        url,
+        params,
+        loadingItem,
+        snackbar,
+        Success,
+        Error,
+        Finally,
+    }) => {
+        global(
+            "delete",
+            url,
+            params,
+            loadingItem,
+            snackbar,
+            Success,
+            Error,
+            Finally
+        );
+    },
+};

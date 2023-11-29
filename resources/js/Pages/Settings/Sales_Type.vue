@@ -1,10 +1,9 @@
 <script setup>
-import {ref} from "vue";
+import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import Snackbar from "@/Components/snackbar.vue";
+import Snackbar from "@/Components/Snackbar2.vue";
 import helper from "@/helpers";
 import labels from "@/labels";
-import {router} from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
 import DeleteBtn from "@/Components/buttons/DeleteBtn.vue";
 import ModifyBtn from "@/Components/buttons/ModifyBtn.vue";
@@ -22,24 +21,23 @@ const search = ref("");
 const loading = ref(false);
 const snackbar = ref({
     view: false,
-    color: '',
-    text: ''
+    color: "",
+    text: "",
 });
 const dialog = ref(false);
 const dialogDelete = ref(false);
 const editmode = ref(false);
 
 const fields = ref([
-    {title: labels.sales_type.name, key: "name"},
-    {title: labels.sales_type.code, key: "code"},
-    {title: labels.actions, key: "actions"},
+    { title: labels.sales_type.name, key: "name" },
+    { title: labels.sales_type.code, key: "code" },
+    { title: labels.actions, key: "actions" },
 ]);
 const sales_type = ref({
     id: "",
     name: "",
     code: "",
 });
-
 
 //------------- Submit Validation Create & Edit SalesType
 async function Submit_SalesType() {
@@ -84,8 +82,8 @@ function Create_SalesType() {
         snackbar,
         Success: () => {
             dialog.value = false;
-        }
-    })
+        },
+    });
 }
 
 //---------------------------------- Update SalesType ----------------\\
@@ -100,8 +98,8 @@ function Update_SalesType() {
         snackbar,
         Success: () => {
             dialog.value = false;
-        }
-    })
+        },
+    });
 }
 
 //--------------------------- reset Form ----------------\\
@@ -116,7 +114,7 @@ function reset_Form() {
 
 //---------------------- delete modal  ------------------------------\\
 function Delete_SalesType(item) {
-    console.log(item)
+    console.log(item);
     reset_Form();
     sales_type.value = item;
     dialogDelete.value = true;
@@ -139,15 +137,17 @@ function Remove_SalesType() {
         snackbar,
         Success: () => {
             dialogDelete.value = false;
-        }
-    })
+        },
+    });
 }
 </script>
 <template>
-    <Layout
-        :snackbar-view="snackbar.view"
-        :snackbar-color="snackbar.color"
-        :snackbar-text="snackbar.text">
+    <Layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <delete-dialog
             :model="dialogDelete"
             :on-close="onCloseDelete"
@@ -164,7 +164,10 @@ function Remove_SalesType() {
                 <v-form ref="form" @submit.prevent="Submit_SalesType">
                     <v-toolbar
                         border
-                        :title="(editmode ? 'Modificar' : 'Nuevo') + ' Tipo de Venta'"
+                        :title="
+                            (editmode ? 'Modificar' : 'Nuevo') +
+                            ' Tipo de Venta'
+                        "
                     >
                     </v-toolbar>
 
@@ -233,7 +236,10 @@ function Remove_SalesType() {
                 ></v-text-field>
             </v-col>
             <v-col cols="12" sm="6" class="text-right">
-                <new-btn :label="labels.add" :on-click="New_SalesType"></new-btn>
+                <new-btn
+                    :label="labels.add"
+                    :on-click="New_SalesType"
+                ></new-btn>
             </v-col>
         </v-row>
         <v-row>
@@ -248,8 +254,20 @@ function Remove_SalesType() {
                         :loading="loading"
                     >
                         <template v-slot:item.actions="{ item }">
-                            <modify-btn :on-click="()=>{Edit_SalesType(item)}"></modify-btn>
-                            <delete-btn :on-click="()=>{Delete_SalesType(item)}"></delete-btn>
+                            <modify-btn
+                                :on-click="
+                                    () => {
+                                        Edit_SalesType(item);
+                                    }
+                                "
+                            ></modify-btn>
+                            <delete-btn
+                                :on-click="
+                                    () => {
+                                        Delete_SalesType(item);
+                                    }
+                                "
+                            ></delete-btn>
                         </template>
                     </v-data-table>
                 </v-card>

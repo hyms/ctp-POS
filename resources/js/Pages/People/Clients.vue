@@ -1,10 +1,10 @@
 <script setup>
-import {computed, ref} from "vue";
+import { computed, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import helper from "@/helpers";
 import labels from "@/labels";
-import {router, usePage} from "@inertiajs/vue3";
+import { usePage } from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
 import api from "@/api";
 
@@ -22,8 +22,8 @@ const search = ref("");
 const loading = ref(false);
 const snackbar = ref({
     view: false,
-    color: '',
-    text: ''
+    color: "",
+    text: "",
 });
 const editmode = ref(false);
 const dialog = ref(false);
@@ -72,16 +72,15 @@ const client = ref({
     nit_ci: "",
 });
 
-
 const fields = ref([
-    {title: labels.client.code, key: "code"},
-    {title: labels.client.company_name, key: "company_name"},
-    {title: labels.client.phone, key: "phone"},
-    {title: labels.client.name, key: "name"},
-    {title: labels.client.nit_ci, key: "nit_ci"},
-    {title: "Deuda Total", key: "due"},
+    { title: labels.client.code, key: "code" },
+    { title: labels.client.company_name, key: "company_name" },
+    { title: labels.client.phone, key: "phone" },
+    { title: labels.client.name, key: "name" },
+    { title: labels.client.nit_ci, key: "nit_ci" },
+    { title: "Deuda Total", key: "due" },
     // { title: "Deuda Total Devolucion", key: "return_Due" },
-    {title: "Acciones", key: "actions"},
+    { title: "Acciones", key: "actions" },
 ]);
 const jsonFields = ref({
     Codigo: "code",
@@ -136,7 +135,6 @@ function onFileSelected(e) {
     }
 }
 
-
 //----------------------------------- Show Details Client -------------------------------\\
 function showDetails(item) {
     client.value = item;
@@ -177,8 +175,8 @@ function Create_Client() {
         snackbar,
         Success: () => {
             dialog.value = false;
-        }
-    })
+        },
+    });
 }
 
 //----------------------------------- Update Client -------------------------------\\
@@ -199,8 +197,8 @@ function Update_Client() {
         snackbar,
         Success: () => {
             dialog.value = false;
-        }
-    })
+        },
+    });
 }
 
 //-------------------------------- Reset Form -------------------------------\\
@@ -226,8 +224,8 @@ function Remove_Client() {
         snackbar,
         Success: () => {
             dialogDelete.value = false;
-        }
-    })
+        },
+    });
 }
 
 function onCloseDelete() {
@@ -310,7 +308,7 @@ function Submit_Pay_due() {
             payment_codes.value = data.payment_codes;
             dialogPayDue.value = false;
             dialogInvoice.value = true;
-        }
+        },
     });
 }
 
@@ -424,203 +422,201 @@ function Submit_Pay_due() {
     <layout
         :snackbar-view="snackbar.view"
         :snackbar-text="snackbar.text"
-        :snackbar-color="snackbar.color">
+        :snackbar-color="snackbar.color"
+    >
         <!-- Modal Show Import Clients -->
         <!--        <v-dialog v-model="dialogImport" max-width="600px" scrollable>
-                    <v-card>
-                        <v-toolbar border  title="Importar Clientes">
-                        </v-toolbar>
-                        <v-card-text>
-                            <v-form
-                                @submit.prevent="Submit_import"
-                                enctype="multipart/form-data"
-                            >
-                                <v-row>
-                                    &lt;!&ndash; File &ndash;&gt;
-                                    <v-col md="12" sm="12" class="mb-3">
-                                        <v-file-input
-                                            accept="csv/*"
-                                            label="Elige el archivo"
-                                            variant="solo"
-                                            density="comfortable"
-                                            hide-details="auto"
-                                            @change="onFileSelected"
-                                        ></v-file-input>
-                                    </v-col>
+                <v-card>
+                    <v-toolbar border  title="Importar Clientes">
+                    </v-toolbar>
+                    <v-card-text>
+                        <v-form
+                            @submit.prevent="Submit_import"
+                            enctype="multipart/form-data"
+                        >
+                            <v-row>
+                                &lt;!&ndash; File &ndash;&gt;
+                                <v-col md="12" sm="12" class="mb-3">
+                                    <v-file-input
+                                        accept="csv/*"
+                                        label="Elige el archivo"
+                                        variant="solo"
+                                        density="comfortable"
+                                        hide-details="auto"
+                                        @change="onFileSelected"
+                                    ></v-file-input>
+                                </v-col>
 
-                                    <v-col cols="12" md="6">
-                                        <v-btn
-                                            type="submit"
-                                            color="primary"
-                                            variant="elevated"
-                                            :disabled="ImportProcessing"
-                                            size="small"
-                                            block
-                                            >Enviar
-                                        </v-btn>
+                                <v-col cols="12" md="6">
+                                    <v-btn
+                                        type="submit"
+                                        color="primary"
+                                        variant="elevated"
+                                        :disabled="ImportProcessing"
+                                        size="small"
+                                        block
+                                        >Enviar
+                                    </v-btn>
+                                    <div
+                                        v-once
+                                        class="typo__p"
+                                        v-if="ImportProcessing"
+                                    >
                                         <div
-                                            v-once
-                                            class="typo__p"
-                                            v-if="ImportProcessing"
-                                        >
-                                            <div
-                                                class="spinner sm spinner-primary mt-3"
-                                            ></div>
-                                        </div>
-                                    </v-col>
+                                            class="spinner sm spinner-primary mt-3"
+                                        ></div>
+                                    </div>
+                                </v-col>
 
-                                    <v-col cols="12" md="6">
-                                        <v-btn
-                                            :href="'/import/exemples/import_clients.csv'"
-                                            color="info"
-                                            variant="elevated"
-                                            size="small"
-                                            block
-                                            >Decargar Ejemplo
-                                        </v-btn>
-                                    </v-col>
+                                <v-col cols="12" md="6">
+                                    <v-btn
+                                        :href="'/import/exemples/import_clients.csv'"
+                                        color="info"
+                                        variant="elevated"
+                                        size="small"
+                                        block
+                                        >Decargar Ejemplo
+                                    </v-btn>
+                                </v-col>
 
-                                    <v-col md="12" sm="12">
-                                        <v-table >
-                                            <tbody>
-                                                <tr>
-                                                    <td>Nombre</td>
-                                                    <th>
-                                                        <v-btn
-                                                            variant="outlined"
+                                <v-col md="12" sm="12">
+                                    <v-table >
+                                        <tbody>
+                                            <tr>
+                                                <td>Nombre</td>
+                                                <th>
+                                                    <v-btn
+                                                        variant="outlined"
 
-                                                            size="small"
-                                                            color="success"
-                                                            >campo requerido
-                                                        </v-btn>
-                                                    </th>
-                                                </tr>
-                                                <tr>
-                                                    <td>telefono</td>
-                                                </tr>
+                                                        size="small"
+                                                        color="success"
+                                                        >campo requerido
+                                                    </v-btn>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <td>telefono</td>
+                                            </tr>
 
-                                                <tr>
-                                                    <td>correo</td>
-                                                </tr>
+                                            <tr>
+                                                <td>correo</td>
+                                            </tr>
 
-                                                <tr>
-                                                    <td>pais</td>
-                                                </tr>
+                                            <tr>
+                                                <td>pais</td>
+                                            </tr>
 
-                                                <tr>
-                                                    <td>ciudad</td>
-                                                </tr>
+                                            <tr>
+                                                <td>ciudad</td>
+                                            </tr>
 
-                                                <tr>
-                                                    <td>direccion</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>numero de impuesto</td>
-                                                </tr>
-                                            </tbody>
-                                        </v-table>
-                                    </v-col>
-                                </v-row>
-                            </v-form>
-                        </v-card-text>
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn
-                                size="small"
-                                variant="elevated"
-                                color="primary"
-                                class="ma-1"
-                                @click="dialogImport = false"
-                            >
-                                Cerrar
-                            </v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </v-dialog>-->
+                                            <tr>
+                                                <td>direccion</td>
+                                            </tr>
+                                            <tr>
+                                                <td>numero de impuesto</td>
+                                            </tr>
+                                        </tbody>
+                                    </v-table>
+                                </v-col>
+                            </v-row>
+                        </v-form>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                            size="small"
+                            variant="elevated"
+                            color="primary"
+                            class="ma-1"
+                            @click="dialogImport = false"
+                        >
+                            Cerrar
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>-->
         <!-- Modal Show Customer Details -->
         <v-dialog v-model="dialogDetail" max-width="600px" scrollable>
             <v-card>
-                <v-toolbar
-                    border
-                    :title=labels.client.detail
-                ></v-toolbar>
+                <v-toolbar border :title="labels.client.detail"></v-toolbar>
                 <v-card-text>
                     <v-table hover>
                         <tbody>
-                        <tr>
-                            <!-- Customer Code -->
-                            <td>{{ labels.client.code }}</td>
-                            <td class="font-weight-bold">
-                                {{ client.code }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <!-- Customer Company Name -->
-                            <td>{{ labels.client.company_name }}</td>
-                            <td class="font-weight-bold">
-                                {{ client.company_name }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <!-- Customer Name -->
-                            <td>{{ labels.client.name }}</td>
-                            <td class="font-weight-bold">
-                                {{ client.name }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <!-- Customer Phone -->
-                            <td>{{ labels.client.phone }}</td>
-                            <td class="font-weight-bold">
-                                {{ client.phone }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <!-- Customer Email -->
-                            <td>{{ labels.client.email }}</td>
-                            <td class="font-weight-bold">
-                                {{ client.email }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <!-- Customer City -->
-                            <td>{{ labels.client.city }}</td>
-                            <td class="font-weight-bold">
-                                {{ client.city }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <!-- Customer Adress -->
-                            <td>{{ labels.client.adresse }}</td>
-                            <td class="font-weight-bold">
-                                {{ client.adresse }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <!-- Tax Number -->
-                            <td>{{ labels.client.nit_ci }}</td>
-                            <td class="font-weight-bold">
-                                {{ client.nit_ci }}
-                            </td>
-                        </tr>
+                            <tr>
+                                <!-- Customer Code -->
+                                <td>{{ labels.client.code }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.code }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <!-- Customer Company Name -->
+                                <td>{{ labels.client.company_name }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.company_name }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <!-- Customer Name -->
+                                <td>{{ labels.client.name }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.name }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <!-- Customer Phone -->
+                                <td>{{ labels.client.phone }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.phone }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <!-- Customer Email -->
+                                <td>{{ labels.client.email }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.email }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <!-- Customer City -->
+                                <td>{{ labels.client.city }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.city }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <!-- Customer Adress -->
+                                <td>{{ labels.client.adresse }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.adresse }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <!-- Tax Number -->
+                                <td>{{ labels.client.nit_ci }}</td>
+                                <td class="font-weight-bold">
+                                    {{ client.nit_ci }}
+                                </td>
+                            </tr>
 
-                        <tr>
-                            <!-- Total_Sale_Due -->
-                            <td>{{ labels.total_sale_due }}</td>
-                            <td class="font-weight-bold">
-                                {{ currency }}
-                                {{ client.due }}
-                            </td>
-                        </tr>
+                            <tr>
+                                <!-- Total_Sale_Due -->
+                                <td>{{ labels.total_sale_due }}</td>
+                                <td class="font-weight-bold">
+                                    {{ currency }}
+                                    {{ client.due }}
+                                </td>
+                            </tr>
 
-                        <!--                            <tr>-->
-                        <!--                                &lt;!&ndash; Total_Sell_Return_Due &ndash;&gt;-->
-                        <!--                                <td>Total Deuda de Devolucion</td>-->
-                        <!--                                <td>-->
-                        <!--                                    {{ currency }}-->
-                        <!--                                    {{ client.return_Due }}-->
-                        <!--                                </td>-->
-                        <!--                            </tr>-->
+                            <!--                            <tr>-->
+                            <!--                                &lt;!&ndash; Total_Sell_Return_Due &ndash;&gt;-->
+                            <!--                                <td>Total Deuda de Devolucion</td>-->
+                            <!--                                <td>-->
+                            <!--                                    {{ currency }}-->
+                            <!--                                    {{ client.return_Due }}-->
+                            <!--                                </td>-->
+                            <!--                            </tr>-->
                         </tbody>
                     </v-table>
                 </v-card-text>
@@ -807,7 +803,7 @@ function Submit_Pay_due() {
                     :search="search"
                     hover
                     class="elevation-2"
-                    :no-data-text=labels.no_data_table
+                    :no-data-text="labels.no_data_table"
                     :loading="loading"
                 >
                     <template v-slot:item.actions="{ item }">
@@ -884,13 +880,12 @@ function Submit_Pay_due() {
         v-model="dialogPayDue"
         max-width="600px"
         scrollable
-        @update:modelValue="dialogPayDue === false ? reset_Form_payment() : dialogPayDue"
+        @update:modelValue="
+            dialogPayDue === false ? reset_Form_payment() : dialogPayDue
+        "
     >
         <v-card>
-            <v-toolbar
-                border
-                title="Pagar Deuda"
-            ></v-toolbar>
+            <v-toolbar border title="Pagar Deuda"></v-toolbar>
             <v-form @submit.prevent="Submit_Payment_sell_due" ref="formPayDue">
                 <v-card-text>
                     <v-row>
@@ -900,7 +895,11 @@ function Submit_Pay_due() {
                                 :label="labels.payment.amount + ' *'"
                                 v-model="payment.amount"
                                 :placeholder="labels.payment.amount"
-                                :rules="helper.required.concat(helper.numberWithDecimal)"
+                                :rules="
+                                    helper.required.concat(
+                                        helper.numberWithDecimal
+                                    )
+                                "
                                 hide-details="auto"
                             >
                             </v-text-field>
@@ -945,13 +944,12 @@ function Submit_Pay_due() {
                         variant="elevated"
                         type="submit"
                         :disabled="paymentProcessing"
-                    >{{ labels.submit }}
+                        >{{ labels.submit }}
                     </v-btn>
                 </v-card-actions>
             </v-form>
         </v-card>
     </v-dialog>
-
 
     <!--        &lt;!&ndash; Modal Pay_return_Due&ndash;&gt;-->
     <!--        <validation-o{{ currency }}erver ref="ref_pay_return_due">-->
@@ -1105,71 +1103,88 @@ function Submit_Pay_due() {
                         </h2>
 
                         <p>
-                            <span>Fecha : {{ payment.date }} <br/></span>
-                            <span>Cliente : {{ payment.client_name }} <br/></span>
+                            <span>Fecha : {{ payment.date }} <br /></span>
+                            <span
+                                >Cliente : {{ payment.client_name }} <br
+                            /></span>
                         </p>
                     </div>
 
                     <v-table hover>
                         <thead>
-                        <tr style="background: #eee">
-                            <th style="text-align: left" colspan="1">
-                                Pago de:
-                            </th>
-                            <th style="text-align: left" colspan="1">
-                                Pago en:
-                            </th>
-                            <th style="text-align: center" colspan="1">
-                                {{ labels.sale.paid_amount }}:
-                            </th>
-                            <th style="text-align: right" colspan="1">
-                                {{ labels.sale.due }}:
-                            </th>
-                        </tr>
+                            <tr style="background: #eee">
+                                <th style="text-align: left" colspan="1">
+                                    Pago de:
+                                </th>
+                                <th style="text-align: left" colspan="1">
+                                    Pago en:
+                                </th>
+                                <th style="text-align: center" colspan="1">
+                                    {{ labels.sale.paid_amount }}:
+                                </th>
+                                <th style="text-align: right" colspan="1">
+                                    {{ labels.sale.due }}:
+                                </th>
+                            </tr>
                         </thead>
 
                         <tbody>
-                        <tr>
-                            <td style="text-align: left" colspan="1">
-                                <div v-html="helper.newLine(payment_codes)">
-                                </div>
-                            </td>
-                            <td style="text-align: left" colspan="1">
-                                {{ helper.getReglamentPayment(payment.Reglement)[0].title }}
-                            </td>
-                            <td style="text-align: center" colspan="1">
-                                {{ helper.formatNumber(payment.amount, 2) }}
-                            </td>
-                            <td style="text-align: right" colspan="1">
-                                {{ helper.formatNumber(payment.due, 2) }}
-                            </td>
-                        </tr>
+                            <tr>
+                                <td style="text-align: left" colspan="1">
+                                    <div
+                                        v-html="helper.newLine(payment_codes)"
+                                    ></div>
+                                </td>
+                                <td style="text-align: left" colspan="1">
+                                    {{
+                                        helper.getReglamentPayment(
+                                            payment.Reglement
+                                        )[0].title
+                                    }}
+                                </td>
+                                <td style="text-align: center" colspan="1">
+                                    {{ helper.formatNumber(payment.amount, 2) }}
+                                </td>
+                                <td style="text-align: right" colspan="1">
+                                    {{ helper.formatNumber(payment.due, 2) }}
+                                </td>
+                            </tr>
                         </tbody>
                     </v-table>
-                    <table class="change mt-2" style=" font-size: 12px;">
+                    <table class="change mt-2" style="font-size: 12px">
                         <thead>
-                        <tr class="total">
-                            <th>Notas</th>
-                        </tr>
+                            <tr class="total">
+                                <th>Notas</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>
-                                {{ payment.notes }}
-                            </td>
-                        </tr>
+                            <tr>
+                                <td>
+                                    {{ payment.notes }}
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn prepend-icon="mdi-printer" @click="helper.print_pdf('invoice-POS',payment.client_name)"
-                       color="primary" variant="outlined">
+                <v-btn
+                    prepend-icon="mdi-printer"
+                    @click="
+                        helper.print_pdf('invoice-POS', payment.client_name)
+                    "
+                    color="primary"
+                    variant="outlined"
+                >
                     {{ labels.print }} PDF
                 </v-btn>
-                <v-btn prepend-icon="mdi-printer" @click="helper.print_pos('invoice-POS')" color="primary"
-                       variant="outlined">
+                <v-btn
+                    prepend-icon="mdi-printer"
+                    @click="helper.print_pos('invoice-POS')"
+                    color="primary"
+                    variant="outlined"
+                >
                     {{ labels.print }}
                 </v-btn>
                 <v-spacer></v-spacer>
@@ -1253,5 +1268,4 @@ function Submit_Pay_due() {
     <!--                <i class="i-Billing"></i>-->
     <!--                {{ $t("print") }}-->
     <!--            </button>-->
-
 </template>

@@ -1,20 +1,19 @@
 <script setup>
-
 const props = defineProps({
     modelValue: Boolean,
     color: {
         type: String,
-        default: ''
+        default: "",
     },
     text: {
         type: String,
-        default: ''
+        default: "",
     },
-})
-const emit = defineEmits(['update:modelValue'])
+});
+const emit = defineEmits(["update:modelValue"]);
 
 function updateValue(value) {
-    emit('update:modelValue', value)
+    emit("update:modelValue", value);
 }
 </script>
 <template>
@@ -28,7 +27,12 @@ function updateValue(value) {
     >
         <div v-html="text"></div>
         <template v-slot:actions>
-            <v-btn icon="mdi-close" size="x-small" variant="tonal" @click="updateValue(false)"></v-btn>
+            <v-btn
+                icon="mdi-close"
+                size="x-small"
+                variant="tonal"
+                @click="updateValue(false)"
+            ></v-btn>
         </template>
     </v-snackbar>
 </template>

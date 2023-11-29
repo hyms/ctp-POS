@@ -1,7 +1,6 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import {router} from "@inertiajs/vue3";
 import helper from "@/helpers";
 import labels from "@/labels";
 import api from "@/api";
@@ -23,10 +22,9 @@ const username = ref("");
 const loading = ref(false);
 const snackbar = ref({
     view: false,
-    color: '',
-    text: '',
+    color: "",
+    text: "",
 });
-
 
 //------------- Submit Update Profile
 async function Submit_Profile() {
@@ -52,7 +50,7 @@ function Update_Profile() {
 
 onMounted(() => {
     userForm.value = props.user;
-})
+});
 </script>
 <template>
     <Layout
@@ -78,9 +76,11 @@ onMounted(() => {
                                 :label="labels.user.firstname + ' *'"
                                 v-model="userForm.firstname"
                                 :placeholder="labels.user.firstname"
-                                :rules="helper.required
+                                :rules="
+                                    helper.required
                                         .concat(helper.max(20))
-                                        .concat(helper.min(4))"
+                                        .concat(helper.min(4))
+                                "
                                 hide-details="auto"
                             >
                             </v-text-field>
@@ -92,9 +92,11 @@ onMounted(() => {
                                 :label="labels.user.lastname + ' *'"
                                 v-model="userForm.lastname"
                                 :placeholder="labels.user.lastname"
-                                :rules="helper.required
+                                :rules="
+                                    helper.required
                                         .concat(helper.max(20))
-                                        .concat(helper.min(4))"
+                                        .concat(helper.min(4))
+                                "
                                 hide-details="auto"
                             >
                             </v-text-field>
@@ -148,7 +150,7 @@ onMounted(() => {
                                 color="primary"
                                 :loading="loading"
                                 :disabled="loading"
-                            >{{ labels.submit }}
+                                >{{ labels.submit }}
                             </v-btn>
                         </v-col>
                     </v-row>
