@@ -111,7 +111,7 @@ function Create_Unit() {
         .then(({ data }) => {
             snackbar.value = true;
             snackbarColor.value = "success";
-            snackbarText.value = "Proceso exitoso";
+            snackbar.value.text = "Proceso exitoso";
             router.reload({
                 preserveState: true,
                 preserveScroll: true,
@@ -123,7 +123,7 @@ function Create_Unit() {
             console.log(error);
             snackbar.value = true;
             snackbarColor.value = "error";
-            snackbarText.value = error.response.data.message;
+            snackbar.value.text = error.response.data.message;
         })
         .finally(() => {
             setTimeout(() => {
@@ -148,7 +148,7 @@ function Update_Unit() {
         .then(({ data }) => {
             snackbar.value = true;
             snackbarColor.value = "success";
-            snackbarText.value = "Proceso exitoso";
+            snackbar.value.text = "Proceso exitoso";
             router.reload({
                 preserveState: true,
                 preserveScroll: true,
@@ -160,7 +160,7 @@ function Update_Unit() {
             console.log(error);
             snackbar.value = true;
             snackbarColor.value = "error";
-            snackbarText.value = error.response.data.message;
+            snackbar.value.text = error.response.data.message;
         })
         .finally(() => {
             setTimeout(() => {
@@ -201,7 +201,7 @@ function Remove_Unit() {
         .then(({ data }) => {
             snackbar.value = true;
             snackbarColor.value = "success";
-            snackbarText.value = "Borrado exitoso";
+            snackbar.value.text = "Borrado exitoso";
             router.reload({
                 preserveState: true,
                 preserveScroll: true,
@@ -213,7 +213,7 @@ function Remove_Unit() {
             console.log(error);
             snackbar.value = true;
             snackbarColor.value = "error";
-            snackbarText.value = error.response.data.message;
+            snackbar.value.text = error.response.data.message;
         })
         .finally(() => {
             setTimeout(() => {

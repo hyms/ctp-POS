@@ -49,14 +49,14 @@ function Create_Expense() {
         .then(({ data }) => {
             snackbar.value = true;
             snackbarColor.value = "success";
-            snackbarText.value = labels.success_message;
+            snackbar.value.text = labels.success_message;
             router.visit("/expenses");
         })
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
             snackbarColor.value = "error";
-            snackbarText.value = error.response.data.message;
+            snackbar.value.text = error.response.data.message;
         })
         .finally(() => {
             setTimeout(() => {
@@ -77,14 +77,14 @@ function Update_Expense() {
         .then(({ data }) => {
             snackbar.value = true;
             snackbarColor.value = "success";
-            snackbarText.value = labels.success_message;
+            snackbar.value.text = labels.success_message;
             router.visit("/expenses");
         })
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
             snackbarColor.value = "error";
-            snackbarText.value = error.response.data.message;
+            snackbar.value.text = error.response.data.message;
         })
         .finally(() => {
             setTimeout(() => {

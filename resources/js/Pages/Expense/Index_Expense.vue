@@ -57,7 +57,7 @@ function Remove_Expense() {
         .then(({ data }) => {
             snackbar.value = true;
             snackbarColor.value = "success";
-            snackbarText.value = labels.delete_message;
+            snackbar.value.text = labels.delete_message;
             router.reload({
                 preserveState: true,
                 preserveScroll: true,
@@ -69,7 +69,7 @@ function Remove_Expense() {
             console.log(error);
             snackbar.value = true;
             snackbarColor.value = "error";
-            snackbarText.value = error.response.data.message;
+            snackbar.value.text = error.response.data.message;
         })
         .finally(() => {
             setTimeout(() => {

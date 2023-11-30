@@ -73,14 +73,14 @@ function Remove_Sale() {
     if (props.sale.sale_has_return == "yes") {
         snackbar.value = true;
         snackbarColor.value = "error";
-        snackbarText.value = "Existe una devolucion en la transaccion";
+        snackbar.value.text = "Existe una devolucion en la transaccion";
     } else {
         axios
             .delete("/sales/" + props.sale.id)
             .then(({ data }) => {
                 snackbar.value = true;
                 snackbarColor.value = "success";
-                snackbarText.value = "Borrado exitoso";
+                snackbar.value.text = "Borrado exitoso";
                 router.visit("/sales/");
                 dialogDelete.value = false;
             })
@@ -88,7 +88,7 @@ function Remove_Sale() {
                 console.log(error);
                 snackbar.value = true;
                 snackbarColor.value = "error";
-                snackbarText.value = error.response.data.message;
+                snackbar.value.text = error.response.data.message;
             })
             .finally(() => {
                 setTimeout(() => {

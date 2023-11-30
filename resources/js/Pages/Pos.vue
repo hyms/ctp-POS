@@ -128,18 +128,18 @@ async function Submit_Pos() {
         if (sale.value.client_id == "" || sale.value.client_id === null) {
             snackbar.value = true;
             snackbarColor.value = "error";
-            snackbarText.value = labels.no_select_client;
+            snackbar.value.text = labels.no_select_client;
         } else if (
             sale.value.warehouse_id == "" ||
             sale.value.warehouse_id === null
         ) {
             snackbar.value = true;
             snackbarColor.value = "error";
-            snackbarText.value = labels.no_select_warehouse;
+            snackbar.value.text = labels.no_select_warehouse;
         } else {
             snackbar.value = true;
             snackbarColor.value = "error";
-            snackbarText.value = labels.no_fill_data;
+            snackbar.value.text = labels.no_fill_data;
         }
     } else {
         if (verifiedForm()) {
@@ -331,7 +331,7 @@ function verifiedForm() {
     snackbar.value = false;
     if (details.value.length <= 0) {
         snackbar.value = true;
-        snackbarText.value = labels.no_add_product;
+        snackbar.value.text = labels.no_add_product;
         snackbarColor.value = "warning";
         return false;
     } else {
@@ -346,7 +346,7 @@ function verifiedForm() {
         }
         if (count > 0) {
             snackbar.value = true;
-            snackbarText.value = labels.no_add_qty;
+            snackbar.value.text = labels.no_add_qty;
             snackbarColor.value = "warning";
             return false;
         } else {
@@ -411,7 +411,7 @@ function CreatePOS() {
         })
         .catch((error) => {
             snackbar.value = true;
-            snackbarText.value = labels.error_message;
+            snackbar.value.text = labels.error_message;
             snackbarColor.value = "error";
             console.log(error);
         })
@@ -477,7 +477,7 @@ function Verified_Qty(detail, id) {
             }
             if (detail.quantity > detail.current) {
                 snackbar.value = true;
-                snackbarText.value = labels.low_qty;
+                snackbar.value.text = labels.low_qty;
                 snackbarColor.value = "error";
                 details.value[i].quantity = detail.current;
             } else {
@@ -495,7 +495,7 @@ function increment_qty_scanner(code) {
         if (details.value[i].code === code) {
             if (details.value[i].quantity + 1 > details.value[i].current) {
                 snackbar.value = true;
-                snackbarText.value = labels.low_qty;
+                snackbar.value.text = labels.low_qty;
                 snackbarColor.value = "error";
             } else {
                 details.value[i].quantity++;
@@ -512,7 +512,7 @@ function increment(detail_item, id) {
         if (details.value[i].detail_id == id) {
             if (detail_item.quantity + 1 > detail_item.current) {
                 snackbar.value = true;
-                snackbarText.value = labels.low_qty;
+                snackbar.value.text = labels.low_qty;
                 snackbarColor.value = "error";
             } else {
                 details.value[i].quantity++;
@@ -532,7 +532,7 @@ function decrement(detail_item, id) {
                 detail_item.quantity - 1 < 1
             ) {
                 snackbar.value = true;
-                snackbarText.value = labels.low_qty;
+                snackbar.value.text = labels.low_qty;
                 snackbarColor.value = "error";
             } else {
                 details.value[i].quantity--;
@@ -677,7 +677,7 @@ function SearchProduct(result) {
 //     }
 //   } else {
 //     snackbar.value = true;
-//     snackbarText.value = labels.no_select_warehouse;
+//     snackbar.value.text = labels.no_select_warehouse;
 //     snackbarColor.value = "warning";
 //   }
 // }

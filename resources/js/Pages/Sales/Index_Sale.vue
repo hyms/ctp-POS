@@ -114,7 +114,7 @@ function Verified_paidAmount() {
         // } else if ((payment.value.montant*1) > (payment.value.received_amount*1)) {
         //   snackbar.value = true;
         //   snackbarColor.value = "warning";
-        //   snackbarText.value =
+        //   snackbar.value.text =
         //       "El monto de pago es mas alto que el a pagar";
         //   payment.value.montant = 0;
     } else if (payment.value.montant * 1 > due.value * 1) {
@@ -328,7 +328,7 @@ function Update_Payment() {
         loadingItem: loading,
         snackbar,
         Success: () => {
-            snackbarText.value = "Transaccion realizada con exito";
+            snackbar.value.text = "Transaccion realizada con exito";
             router.reload({
                 preserveState: true,
                 preserveScroll: true,

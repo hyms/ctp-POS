@@ -1,8 +1,6 @@
 <script setup>
 import { onMounted, ref } from "vue";
-import labels from "@/labels";
-import helper from "@/helpers";
-import api from "@/api";
+import {helpers,labels,labelsNew,api} from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
@@ -25,9 +23,11 @@ const client = ref({
     city: "",
     adresse: "",
 });
-const snackbar = ref(false);
-const snackbarColor = ref("");
-const snackbarText = ref("");
+const snackbar = ref({
+    color: "",
+    view: false,
+    text: "",
+});
 
 function updateValue(value) {
     emit("update:modelValue", value);
@@ -37,13 +37,12 @@ const form = ref(null);
 
 //------------- Submit Validation Create & Edit Customer
 async function Submit_Customer() {
-    snackbar.value = false;
+    snackbar.value.view = false;
     const validate = await form.value.validate();
-    console.log(validate);
     if (!validate.valid) {
-        snackbar.value = true;
-        snackbarColor.value = "error";
-        snackbarText.value = labels.no_fill_data;
+        snackbar.value.view = true;
+        snackbar.value.color = "error";
+        snackbar.value.text = labels.no_fill_data;
     } else {
         Create_Client();
     }
@@ -66,7 +65,7 @@ function Create_Client() {
         loadingItem: loading,
         snackbar: snackbar,
         Success: () => {
-            snackbarText.value = labels.success_message;
+            snackbar.value.text = labels.success_message;
             Get_Client_Without_Paginate();
             dialogCustomer.value = false;
         },
@@ -112,14 +111,14 @@ onMounted(() => {
 
 <template>
     <snackbar
-        :snackbar="snackbar"
-        :snackbar-text="snackbarText"
-        :snackbar-color="snackbarColor"
+        v-model="snackbar.view"
+        :text="snackbar.text"
+        :color="snackbar.color"
     ></snackbar>
     <v-dialog v-model="dialogCustomer" width="800" v-if="props.enableForm">
         <v-card>
             <v-toolbar>
-                <v-toolbar-title>Añadir cliente</v-toolbar-title>
+                <v-toolbar-title>{{labelsNew.AddCustomer}}</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn
                     icon="mdi-close"
@@ -138,7 +137,7 @@ onMounted(() => {
                                 :label="labels.client.name + ' *'"
                                 v-model="client.name"
                                 :placeholder="labels.client.name"
-                                :rules="helper.required"
+                                :rules="helpers.required"
                                 hide-details="auto"
                             >
                             </v-text-field>
@@ -150,7 +149,7 @@ onMounted(() => {
                                 :label="labels.client.company_name + ' *'"
                                 v-model="client.company_name"
                                 :placeholder="labels.client.company_name"
-                                :rules="helper.required"
+                                :rules="helpers.required"
                                 hide-details="auto"
                             >
                             </v-text-field>
@@ -243,7 +242,7 @@ onMounted(() => {
         item-title="name"
         item-value="id"
         hide-details="auto"
-        :rules="helper.required"
+        :rules="helpers.required"
         :loading="loading"
         :no-data-text="labels.no_data_table"
     >

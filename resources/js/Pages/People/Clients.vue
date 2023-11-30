@@ -321,11 +321,11 @@ function Submit_Pay_due() {
 //     if (!validate.valid) {
 //         snackbar.value = true;
 //         snackbarColor.value = "error";
-//         snackbarText.value = "Por favor llene correctamente los campos";
+//         snackbar.value.text = "Por favor llene correctamente los campos";
 //     } else if (payment.value.amount > payment.value.due) {
 //         snackbar.value = true;
 //         snackbarColor.value = "error";
-//         snackbarText.value = "el monto es mayor a la deuda";
+//         snackbar.value.text = "el monto es mayor a la deuda";
 //         payment.value.amount = 0;
 //     } else {
 //         Submit_Pay_return_due();
@@ -399,7 +399,7 @@ function Submit_Pay_due() {
 //         .then(({ data }) => {
 //             snackbar.value = true;
 //             snackbarColor.value = "success";
-//             snackbarText.value = labels.success_message;
+//             snackbar.value.text = labels.success_message;
 //             router.reload({
 //           preserveState: true,
 //           preserveScroll: true,
@@ -410,7 +410,7 @@ function Submit_Pay_due() {
 //             console.log(error);
 //             snackbar.value = true;
 //             snackbarColor.value = "error";
-//             snackbarText.value = error;
+//             snackbar.value.text = error;
 //         })
 //         .finally(() => {
 //             loading.value = false;

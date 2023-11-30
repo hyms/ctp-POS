@@ -114,14 +114,14 @@ function Create_Product() {
         .then(({ data }) => {
             snackbar.value = true;
             snackbarColor.value = "success";
-            snackbarText.value = "Actualizacion exitosa";
+            snackbar.value.text = "Actualizacion exitosa";
             router.visit("/products/list");
         })
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
             snackbarColor.value = "error";
-            snackbarText.value = error.response.data.message;
+            snackbar.value.text = error.response.data.message;
         })
         .finally(() => {
             setTimeout(() => {
@@ -153,14 +153,14 @@ function Edit_Product() {
         .then(({ data }) => {
             snackbar.value = true;
             snackbarColor.value = "success";
-            snackbarText.value = "Actualizacion exitosa";
+            snackbar.value.text = "Actualizacion exitosa";
             router.visit("/products/list");
         })
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
             snackbarColor.value = "error";
-            snackbarText.value = error.response.data.message;
+            snackbar.value.text = error.response.data.message;
         })
         .finally(() => {
             setTimeout(() => {

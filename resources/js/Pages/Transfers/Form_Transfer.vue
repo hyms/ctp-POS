@@ -121,7 +121,7 @@ function SearchProduct(result) {
         detailsForm.value.some((detail) => detail.name === result.name)
     ) {
         snackbar.value.view = true;
-        snackbarText.value = "Ya esta añadido";
+        snackbar.value.text = "Ya esta añadido";
         snackbarColor.value = "warning";
     } else {
         product.value.code = result.code;

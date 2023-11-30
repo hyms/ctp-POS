@@ -82,7 +82,7 @@ function SearchProduct(result) {
         detailsForm.value.some((detail) => detail.name === result.name)
     ) {
         snackbar.value = true;
-        snackbarText.value = labels.add_exist_item;
+        snackbar.value.text = labels.add_exist_item;
         snackbarColor.value = "warning";
     } else {
         product.value.code = result.code;
@@ -150,7 +150,7 @@ function Verified_Qty(detail, id) {
 
             if (detail.type == "sub" && detail.quantity > detail.current) {
                 snackbar.value = true;
-                snackbarText.value = labels.low_qty;
+                snackbar.value.text = labels.low_qty;
                 snackbarColor.value = "warning";
                 detailsForm.value[i].quantity = detail.current;
             } else {
@@ -168,7 +168,7 @@ function increment(detail, id) {
             if (detail.type === "sub") {
                 if (detail.quantity + 1 > detail.current) {
                     snackbar.value = true;
-                    snackbarText.value = labels.low_qty;
+                    snackbar.value.text = labels.low_qty;
                     snackbarColor.value = "warning";
                 } else {
                     helper.formatNumber(detailsForm.value[i].quantity++, 2);
@@ -191,7 +191,7 @@ function decrement(detail, id) {
                     detail.quantity - 1 > detail.current
                 ) {
                     snackbar.value = true;
-                    snackbarText.value = labels.low_qty;
+                    snackbar.value.text = labels.low_qty;
                     snackbarColor.value = "warning";
                 } else {
                     helper.formatNumber(detailsForm.value[i].quantity--, 2);
@@ -215,7 +215,7 @@ function verifiedForm() {
     snackbar.value = false;
     if (detailsForm.value.length <= 0) {
         snackbar.value = true;
-        snackbarText.value = labels.no_add_item;
+        snackbar.value.text = labels.no_add_item;
         snackbarColor.value = "warning";
         return false;
     }
@@ -231,7 +231,7 @@ function verifiedForm() {
 
     if (count > 0) {
         snackbar.value = true;
-        snackbarText.value = labels.no_qty_add_item;
+        snackbar.value.text = labels.no_qty_add_item;
         snackbarColor.value = "warning";
         return false;
     }
@@ -253,14 +253,14 @@ function Create_Adjustment() {
             .then(({ data }) => {
                 snackbar.value = true;
                 snackbarColor.value = "success";
-                snackbarText.value = labels.success_message;
+                snackbar.value.text = labels.success_message;
                 router.visit("/adjustments/list");
             })
             .catch((error) => {
                 console.log(error);
                 snackbar.value = true;
                 snackbarColor.value = labels.error_message;
-                snackbarText.value = error.response.data.message;
+                snackbar.value.text = error.response.data.message;
             })
             .finally(() => {
                 setTimeout(() => {
@@ -286,14 +286,14 @@ function Update_Adjustment() {
             .then(({ data }) => {
                 snackbar.value = true;
                 snackbarColor.value = "success";
-                snackbarText.value = labels.success_message;
+                snackbar.value.text = labels.success_message;
                 router.visit("/adjustments/list");
             })
             .catch((error) => {
                 console.log(error);
                 snackbar.value = true;
                 snackbarColor.value = labels.error_message;
-                snackbarText.value = error.response.data.message;
+                snackbar.value.text = error.response.data.message;
             })
             .finally(() => {
                 setTimeout(() => {
