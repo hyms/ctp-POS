@@ -1,9 +1,7 @@
 <script setup>
 import { computed, inject, onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import { helpers } from "@/helpers";
-import labels from "@/labels";
-import { usePage } from "@inertiajs/vue3";
+import { helpers,labels } from "@/helpers";
 import VChart from "vue-echarts";
 
 import { use } from "echarts/core";
@@ -320,24 +318,8 @@ function all_dashboard_data(warehouseId = null) {
 
 onMounted(() => {
     all_dashboard_data();
-    CurrentMonth.value = moment().format("MMMM");
+    CurrentMonth.value = moment.format("MMMM");
 });
-const roles = computed(() => usePage().props.rolesP);
-const user = computed(() => usePage().props.user);
-
-function getPermission(role) {
-    // console.log(user.value);
-    for (const key in roles.value) {
-        for (const [key, item] of Object.entries(roles.value)) {
-            if (key === role) {
-                if (item.includes(user.value.role)) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
 </script>
 
 <template>
@@ -349,7 +331,7 @@ function getPermission(role) {
         <!--                    <v-card-subtitle></v-card-subtitle>-->
         <!--                </v-card>-->
         <!-- warehouse -->
-        <v-row v-if="getPermission('admin')">
+        <v-row v-if="global.rolePermision('admin')">
             <v-col sm="4" cols="12">
                 <v-select
                     @update:modelValue="Selected_Warehouse"
@@ -363,7 +345,7 @@ function getPermission(role) {
                 ></v-select>
             </v-col>
         </v-row>
-        <v-row v-if="getPermission('admin')">
+        <v-row v-if="global.rolePermision('admin')">
             <v-col md="8" cols="12">
                 <v-card :loading="loading">
                     <v-card-title>
@@ -398,7 +380,7 @@ function getPermission(role) {
                 </v-card>
             </v-col>
         </v-row>
-        <v-row v-if="getPermission('admin')">
+        <v-row v-if="global.rolePermision('admin')">
             <!-- Stock Alert -->
             <v-col cols="12" md="8">
                 <v-card :loading="loading">

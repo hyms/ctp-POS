@@ -1,7 +1,6 @@
 <script setup>
-import { globals, helpers } from "@/helpers";
+import { globals, helpers,labelsNew } from "@/helpers";
 
-const roles = globals.rolesP();
 const fullName = globals.fullName();
 </script>
 
@@ -20,10 +19,10 @@ const fullName = globals.fullName();
                     @click="helpers.linkVisit('/profile')"
                     :active="$page.url === '/profile'"
                 >
-                    <v-list-item-title>Perfil</v-list-item-title>
+                    <v-list-item-title>{{labelsNew.profil}}</v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="helpers.linkVisit('/logout', 'post')">
-                    <v-list-item-title>Salir</v-list-item-title>
+                    <v-list-item-title>{{labelsNew.logout}}</v-list-item-title>
                 </v-list-item>
             </v-list>
         </v-menu>

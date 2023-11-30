@@ -1,33 +1,43 @@
 <script setup>
+import { inject } from "vue";
 import Menu from "@/Components/Menu.vue";
 import Snackbar from "@/Components/snackbar.vue";
 
-import moment from "moment";
-
+const moment = inject("moment");
 const props = defineProps({
     loading: { type: Boolean, default: false },
-    snackbarView: { type: Boolean, default: false },
-    snackbarColor: { type: String, default: "" },
-    snackbarText: { type: String, default: "" },
 });
 </script>
 <template>
-    <v-overlay
-        :model-value="loading"
-        class="align-center justify-center"
-    ></v-overlay>
-
-    <Snackbar
-        :snackbarView="snackbarView"
-        :snackbarColor="snackbarColor"
-        :snackbarText="snackbarText"
-    ></Snackbar>
     <v-layout full-height>
         <Menu></Menu>
 
         <v-main>
+
             <v-container fluid>
-                <slot></slot>
+
+                <v-row
+                v-if="loading"
+        class="fill-height"
+        align-content="center"
+        justify="center"
+      >
+        <v-col
+          class="text-subtitle-1 text-center"
+          cols="12"
+        >
+          Cargando...
+        </v-col>
+        <v-col cols="6">
+          <v-progress-linear
+            color="deep-purple-accent-4"
+            indeterminate
+            rounded
+            height="6"
+          ></v-progress-linear>
+        </v-col>
+      </v-row>
+      <slot v-else></slot>
             </v-container>
         </v-main>
 

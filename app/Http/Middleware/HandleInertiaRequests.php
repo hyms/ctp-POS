@@ -53,8 +53,8 @@ class HandleInertiaRequests extends Middleware
                     'desing' => [0, 1, 2, 3, 4, 5],
                     'all' => [0, 1, 2, 3, 4, 5],
                 ],
-                'roles' => $roles,
-                'permissions' => $permissions,
+                'userRoles' => $roles,
+                'userPermisions' => $permissions,
                 'currency' => $helpers->Get_Currency_Code(),
                 'day' => 1,
             ]);

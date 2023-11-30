@@ -1,6 +1,5 @@
 <script setup>
-import helper from "@/helpers";
-import labels from "@/labels";
+import {helpers,labels} from "@/helpers";
 
 const props = defineProps({
     model: Boolean,
@@ -61,22 +60,11 @@ const props = defineProps({
                                 <td colspan="3">
                                     {{ detail_invoice.name }}
                                     <br />
-                                    <span
-                                        >{{
-                                            helper.formatNumber(
-                                                detail_invoice.quantity,
-                                                2
-                                            )
-                                        }}
+                                    <span>
+                                    {{ helpers.formatNumber(detail_invoice.quantity,2) }}
                                         {{ detail_invoice.unit_sale }} x
-                                        {{
-                                            helper.formatNumber(
-                                                detail_invoice.total /
-                                                    detail_invoice.quantity,
-                                                2
-                                            )
-                                        }}</span
-                                    >
+                                        {{ helpers.formatNumber(detail_invoice.total / detail_invoice.quantity, 2) }}
+                                    </span>
                                 </td>
                                 <td
                                     style="
@@ -84,12 +72,7 @@ const props = defineProps({
                                         vertical-align: bottom;
                                     "
                                 >
-                                    {{
-                                        helper.formatNumber(
-                                            detail_invoice.total,
-                                            2
-                                        )
-                                    }}
+                                    {{helpers.formatNumber(detail_invoice.total,2)}}
                                 </td>
                             </tr>
 
@@ -100,19 +83,8 @@ const props = defineProps({
                                 <td colspan="3" class="total">Impuesto</td>
                                 <td style="text-align: right" class="total">
                                     {{ invoice_pos.symbol }}
-                                    {{
-                                        helper.formatNumber(
-                                            invoice_pos.sale.taxe,
-                                            2
-                                        )
-                                    }}
-                                    ({{
-                                        helper.formatNumber(
-                                            invoice_pos.sale.tax_rate,
-                                            2
-                                        )
-                                    }}
-                                    %)
+                                    {{helpers.formatNumber(invoice_pos.sale.taxe,2)}}
+                                    ({{helpers.formatNumber(invoice_pos.sale.tax_rate,2)}}%)
                                 </td>
                             </tr>
 
@@ -123,11 +95,7 @@ const props = defineProps({
                                 <td colspan="3" class="total">Descuento</td>
                                 <td style="text-align: right" class="total">
                                     {{ invoice_pos.symbol }}
-                                    {{
-                                        helper.formatNumber(
-                                            invoice_pos.sale.discount,
-                                            2
-                                        )
+                                    {{ helpers.formatNumber(invoice_pos.sale.discount,2)
                                     }}
                                 </td>
                             </tr>
@@ -136,12 +104,7 @@ const props = defineProps({
                                 <td colspan="3" class="total">Total</td>
                                 <td style="text-align: right" class="total">
                                     {{ invoice_pos.symbol }}
-                                    {{
-                                        helper.formatNumber(
-                                            invoice_pos.sale.GrandTotal,
-                                            2
-                                        )
-                                    }}
+                                    {{helpers.formatNumber(invoice_pos.sale.GrandTotal,2)}}
                                 </td>
                             </tr>
 
@@ -154,12 +117,7 @@ const props = defineProps({
                                 <td colspan="3" class="total">Pagado</td>
                                 <td style="text-align: right" class="total">
                                     {{ invoice_pos.symbol }}
-                                    {{
-                                        helper.formatNumber(
-                                            invoice_pos.sale.paid_amount,
-                                            2
-                                        )
-                                    }}
+                                    {{helpers.formatNumber(invoice_pos.sale.paid_amount,2)}}
                                 </td>
                             </tr>
 
