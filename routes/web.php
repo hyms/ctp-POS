@@ -11,6 +11,7 @@ use App\Http\Controllers\PaymentPurchaseReturnsController;
 use App\Http\Controllers\PaymentPurchasesController;
 use App\Http\Controllers\PaymentSaleReturnsController;
 use App\Http\Controllers\PaymentSalesController;
+use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\PurchasesController;
@@ -23,12 +24,12 @@ use App\Http\Controllers\SalesTypeController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TransferController;
 use App\Http\Controllers\UnitsController;
-use App\Http\Controllers\UpgradeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -294,7 +295,8 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
 
     //------------------------------- Permission Groups user -----------\\
 //    Route::resource('roles', 'PermissionsController');
-//    Route::resource('roles/check/create_page', 'PermissionsController@Check_Create_Page');
+    Route::get('roles', [PermissionsController::class,'index']);
+//    Route::resource('roles/check/create_page', [PermissionsController::class,'Check_Create_Page']);
 //    Route::post('roles/delete/by_selection', 'PermissionsController@delete_by_selection');
     //------------------------------------------------------------------\\
 });

@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import Layout from "@/Layouts/Guest.vue";
 import { router } from "@inertiajs/vue3";
-import helpers from "@/helpers";
+import { rules } from "@/helpers";
 
 defineProps({
     canResetPassword: Boolean,
@@ -72,7 +72,7 @@ function submit() {
                                     v-model="form.username"
                                     type="text"
                                     hide-details="auto"
-                                    :rules="helpers.required"
+                                    :rules="rules.required"
                                 ></v-text-field>
                             </div>
                             <div class="mt-3">
@@ -82,7 +82,7 @@ function submit() {
                                     color="primary"
                                     type="password"
                                     hide-details="auto"
-                                    :rules="helpers.required"
+                                    :rules="rules.required"
                                 ></v-text-field>
                             </div>
 

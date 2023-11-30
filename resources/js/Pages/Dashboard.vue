@@ -1,7 +1,7 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, inject, onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import helper from "@/helpers";
+import { helpers } from "@/helpers";
 import labels from "@/labels";
 import { usePage } from "@inertiajs/vue3";
 import VChart from "vue-echarts";
@@ -28,6 +28,8 @@ use([
 const props = defineProps({
     errors: Object,
 });
+
+const moment = inject("moment");
 
 const warehouses = ref([]);
 const customers = ref({});
@@ -318,7 +320,7 @@ function all_dashboard_data(warehouseId = null) {
 
 onMounted(() => {
     all_dashboard_data();
-    CurrentMonth.value = helper.GetMonth();
+    CurrentMonth.value = moment().format("MMMM");
 });
 const roles = computed(() => usePage().props.rolesP);
 const user = computed(() => usePage().props.user);
@@ -448,22 +450,24 @@ function getPermission(role) {
                     >
                         <template v-slot:item.statut="{ item }">
                             <v-chip
-                                :color="helper.statutSaleColor(item.statut)"
+                                :color="helpers.statutSaleColor(item.statut)"
                                 variant="tonal"
                                 size="x-small"
-                                >{{ helper.statutSale(item.statut) }}
+                                >{{ helpers.statutSale(item.statut) }}
                             </v-chip>
                         </template>
                         <template v-slot:item.payment_status="{ item }">
                             <v-chip
                                 :color="
-                                    helper.statusPaymentColor(
+                                    helpers.statusPaymentColor(
                                         item.payment_status
                                     )
                                 "
                                 variant="tonal"
                                 size="x-small"
-                                >{{ helper.statusPayment(item.payment_status) }}
+                                >{{
+                                    helpers.statusPayment(item.payment_status)
+                                }}
                             </v-chip>
                         </template>
                     </v-data-table>

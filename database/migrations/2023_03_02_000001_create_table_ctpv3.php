@@ -22,6 +22,7 @@ return new class extends Migration {
             $table->string('CompanyAdress')->nullable();
             $table->string('logo')->nullable();
             $table->string('version')->default('2.0.0');
+            $table->integer('days');
             $table->timestamps(6);
             $table->softDeletes();
         });

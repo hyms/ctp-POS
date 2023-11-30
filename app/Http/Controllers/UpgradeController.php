@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
-use Carbon\Carbon;
-use Exception;
 use Inertia\Response;
 
 class UpgradeController extends Controller
@@ -46,6 +46,7 @@ class UpgradeController extends Controller
                     'email' => "",
                     'CompanyPhone' => "",
                     'CompanyAdress' => "",
+                    'days' => 1,
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                     'deleted_at' => null,

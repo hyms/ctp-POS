@@ -1,5 +1,5 @@
 <script setup>
-import helpers from "@/helpers";
+import { helpers } from "@/helpers";
 
 function handleFullScreen() {
     helpers.toggleFullScreen();

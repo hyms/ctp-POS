@@ -1,10 +1,8 @@
 <script setup>
-import { usePage } from "@inertiajs/vue3";
-import { computed } from "vue";
-import helpers from "@/helpers";
+import { globals, helpers } from "@/helpers";
 
-const roles = computed(() => usePage().props.rolesP);
-const user = computed(() => usePage().props.user);
+const roles = globals.rolesP();
+const fullName = globals.fullName();
 </script>
 
 <template>
@@ -14,7 +12,7 @@ const user = computed(() => usePage().props.user);
         prepend-icon="mdi-account"
         class="elevation-2"
     >
-        {{ $page.props.user.firstname + " " + $page.props.user.lastname }}
+        {{ fullName }}
 
         <v-menu activator="parent">
             <v-list density="compact">

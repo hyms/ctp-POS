@@ -3,7 +3,7 @@ import { router, usePage } from "@inertiajs/vue3";
 import { computed, onMounted, ref } from "vue";
 import MenuUser from "@/Components/Menu_user.vue";
 import Full_screen from "@/Components/buttons/full_screen.vue";
-import helpers from "@/helpers";
+import { helpers } from "@/helpers";
 
 const isDrawerOpen = ref(null);
 const menuItems = ref([

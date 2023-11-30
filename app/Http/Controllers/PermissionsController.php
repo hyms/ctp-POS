@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Permission;
 use App\Models\Role;
-use App\Models\User;
 use App\utils\helpers;
 use Carbon\Carbon;
 use DB;
@@ -15,7 +14,8 @@ class PermissionsController extends Controller
 
     //----------- GET ALL Roles --------------\\
 
-    public function index(Request $request)
+    public function index(Request $request){}
+    public function getTable(Request $request)
     {
         $this->authorizeForUser($request->user('api'), 'view', Role::class);
         // How many items do you want to display.
