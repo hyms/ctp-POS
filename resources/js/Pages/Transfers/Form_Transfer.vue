@@ -122,7 +122,7 @@ function SearchProduct(result) {
     ) {
         snackbar.value.view = true;
         snackbar.value.text = "Ya esta añadido";
-        snackbarColor.value = "warning";
+        snackbar.value.color = "warning";
     } else {
         product.value.code = result.code;
         product.value.stock = result.qte_purchase;

@@ -113,7 +113,7 @@ function Verified_paidAmount() {
         payment.value.montant = 0;
         // } else if ((payment.value.montant*1) > (payment.value.received_amount*1)) {
         //   snackbar.value = true;
-        //   snackbarColor.value = "warning";
+        //   snackbar.value.color = "warning";
         //   snackbar.value.text =
         //       "El monto de pago es mas alto que el a pagar";
         //   payment.value.montant = 0;

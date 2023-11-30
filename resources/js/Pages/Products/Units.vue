@@ -110,7 +110,7 @@ function Create_Unit() {
         })
         .then(({ data }) => {
             snackbar.value = true;
-            snackbarColor.value = "success";
+            snackbar.value.color = "success";
             snackbar.value.text = "Proceso exitoso";
             router.reload({
                 preserveState: true,
@@ -122,7 +122,7 @@ function Create_Unit() {
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
-            snackbarColor.value = "error";
+            snackbar.value.color = "error";
             snackbar.value.text = error.response.data.message;
         })
         .finally(() => {
@@ -147,7 +147,7 @@ function Update_Unit() {
         })
         .then(({ data }) => {
             snackbar.value = true;
-            snackbarColor.value = "success";
+            snackbar.value.color = "success";
             snackbar.value.text = "Proceso exitoso";
             router.reload({
                 preserveState: true,
@@ -159,7 +159,7 @@ function Update_Unit() {
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
-            snackbarColor.value = "error";
+            snackbar.value.color = "error";
             snackbar.value.text = error.response.data.message;
         })
         .finally(() => {
@@ -200,7 +200,7 @@ function Remove_Unit() {
         .delete("units/" + unit.value.id)
         .then(({ data }) => {
             snackbar.value = true;
-            snackbarColor.value = "success";
+            snackbar.value.color = "success";
             snackbar.value.text = "Borrado exitoso";
             router.reload({
                 preserveState: true,
@@ -212,7 +212,7 @@ function Remove_Unit() {
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
-            snackbarColor.value = "error";
+            snackbar.value.color = "error";
             snackbar.value.text = error.response.data.message;
         })
         .finally(() => {

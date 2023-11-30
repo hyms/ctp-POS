@@ -48,14 +48,14 @@ function Create_Expense() {
         })
         .then(({ data }) => {
             snackbar.value = true;
-            snackbarColor.value = "success";
+            snackbar.value.color = "success";
             snackbar.value.text = labels.success_message;
             router.visit("/expenses");
         })
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
-            snackbarColor.value = "error";
+            snackbar.value.color = "error";
             snackbar.value.text = error.response.data.message;
         })
         .finally(() => {
@@ -76,14 +76,14 @@ function Update_Expense() {
         })
         .then(({ data }) => {
             snackbar.value = true;
-            snackbarColor.value = "success";
+            snackbar.value.color = "success";
             snackbar.value.text = labels.success_message;
             router.visit("/expenses");
         })
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
-            snackbarColor.value = "error";
+            snackbar.value.color = "error";
             snackbar.value.text = error.response.data.message;
         })
         .finally(() => {

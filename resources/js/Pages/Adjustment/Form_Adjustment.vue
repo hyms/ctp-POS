@@ -83,7 +83,7 @@ function SearchProduct(result) {
     ) {
         snackbar.value = true;
         snackbar.value.text = labels.add_exist_item;
-        snackbarColor.value = "warning";
+        snackbar.value.color = "warning";
     } else {
         product.value.code = result.code;
         product.value.current = result.qty ?? 0;
@@ -151,7 +151,7 @@ function Verified_Qty(detail, id) {
             if (detail.type == "sub" && detail.quantity > detail.current) {
                 snackbar.value = true;
                 snackbar.value.text = labels.low_qty;
-                snackbarColor.value = "warning";
+                snackbar.value.color = "warning";
                 detailsForm.value[i].quantity = detail.current;
             } else {
                 detailsForm.value[i].quantity = detail.quantity;
@@ -169,7 +169,7 @@ function increment(detail, id) {
                 if (detail.quantity + 1 > detail.current) {
                     snackbar.value = true;
                     snackbar.value.text = labels.low_qty;
-                    snackbarColor.value = "warning";
+                    snackbar.value.color = "warning";
                 } else {
                     helper.formatNumber(detailsForm.value[i].quantity++, 2);
                 }
@@ -192,7 +192,7 @@ function decrement(detail, id) {
                 ) {
                     snackbar.value = true;
                     snackbar.value.text = labels.low_qty;
-                    snackbarColor.value = "warning";
+                    snackbar.value.color = "warning";
                 } else {
                     helper.formatNumber(detailsForm.value[i].quantity--, 2);
                 }
@@ -216,7 +216,7 @@ function verifiedForm() {
     if (detailsForm.value.length <= 0) {
         snackbar.value = true;
         snackbar.value.text = labels.no_add_item;
-        snackbarColor.value = "warning";
+        snackbar.value.color = "warning";
         return false;
     }
     let count = 0;
@@ -232,7 +232,7 @@ function verifiedForm() {
     if (count > 0) {
         snackbar.value = true;
         snackbar.value.text = labels.no_qty_add_item;
-        snackbarColor.value = "warning";
+        snackbar.value.color = "warning";
         return false;
     }
     return true;
@@ -252,14 +252,14 @@ function Create_Adjustment() {
             })
             .then(({ data }) => {
                 snackbar.value = true;
-                snackbarColor.value = "success";
+                snackbar.value.color = "success";
                 snackbar.value.text = labels.success_message;
                 router.visit("/adjustments/list");
             })
             .catch((error) => {
                 console.log(error);
                 snackbar.value = true;
-                snackbarColor.value = labels.error_message;
+                snackbar.value.color = labels.error_message;
                 snackbar.value.text = error.response.data.message;
             })
             .finally(() => {
@@ -285,14 +285,14 @@ function Update_Adjustment() {
             })
             .then(({ data }) => {
                 snackbar.value = true;
-                snackbarColor.value = "success";
+                snackbar.value.color = "success";
                 snackbar.value.text = labels.success_message;
                 router.visit("/adjustments/list");
             })
             .catch((error) => {
                 console.log(error);
                 snackbar.value = true;
-                snackbarColor.value = labels.error_message;
+                snackbar.value.color = labels.error_message;
                 snackbar.value.text = error.response.data.message;
             })
             .finally(() => {

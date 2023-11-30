@@ -1,16 +1,14 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import Layout from "@/Layouts/Pos.vue";
-import { usePage } from "@inertiajs/vue3";
-import helper from "@/helpers";
-import labels from "@/labels";
+import {helpers,rules,labels,global} from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
 import MenuUser from "@/Components/Menu_user.vue";
-import Full_screen from "@/Components/buttons/full_screen.vue";
+import FullScreen from "@/Components/buttons/Full_screen.vue";
 import InvoiceDialog from "@/Components/InvoiceDialog.vue";
 import SelectClient from "@/Components/select_client.vue";
 
-const currency = computed(() => usePage().props.currency);
+const currency = global.currency();
 
 const props = defineProps({
     defaultWarehouse: Object,
@@ -25,9 +23,11 @@ const form = ref(null);
 const formAddPayment = ref(null);
 const formUpdateDetail = ref(null);
 const loading = ref(false);
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("info");
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
 
 const dialogUpdateDetail = ref(false);
 const dialogAddPayment = ref(false);
@@ -43,7 +43,6 @@ const timer = ref(null);
 const searchProducts = ref("");
 const search_input = ref("");
 const product_filter = ref([]);
-// const clientFilter = ref([]);
 const GrandTotal = ref(0);
 const total = ref(0);
 const Ref = ref("");
@@ -122,23 +121,19 @@ const audio = ref(new Audio("/audio/Beep.wav"));
 
 //--- Submit Validate Create Sale
 async function Submit_Pos() {
-    snackbar.value = false;
+    snackbar.value.view = false;
     const validate = await form.value.validate();
     if (!validate.valid) {
+        snackbar.value = true;
+        snackbar.value.color = "error";
         if (sale.value.client_id == "" || sale.value.client_id === null) {
-            snackbar.value = true;
-            snackbarColor.value = "error";
             snackbar.value.text = labels.no_select_client;
         } else if (
             sale.value.warehouse_id == "" ||
             sale.value.warehouse_id === null
         ) {
-            snackbar.value = true;
-            snackbarColor.value = "error";
             snackbar.value.text = labels.no_select_warehouse;
         } else {
-            snackbar.value = true;
-            snackbarColor.value = "error";
             snackbar.value.text = labels.no_fill_data;
         }
     } else {
@@ -328,30 +323,26 @@ function Update_Detail() {
 
 //-- check Qty of  details order if Null or zero
 function verifiedForm() {
-    snackbar.value = false;
+    snackbar.value.view = false;
     if (details.value.length <= 0) {
-        snackbar.value = true;
+        snackbar.value.view = true;
         snackbar.value.text = labels.no_add_product;
-        snackbarColor.value = "warning";
+        snackbar.value.color = "warning";
         return false;
-    } else {
-        let count = 0;
+    }
+
         for (let i = 0; i < details.value.length; i++) {
             if (
                 details.value[i].quantity == "" ||
-                details.value[i].quantity * 1 === 0
+                parseFloat(details.value[i].quantity) === 0
             ) {
-                count += 1;
+                snackbar.value.view = true;
+                snackbar.value.text = labels.no_add_qty;
+                snackbar.value.color = "warning";
+                return false;
             }
-        }
-        if (count > 0) {
-            snackbar.value = true;
-            snackbar.value.text = labels.no_add_qty;
-            snackbarColor.value = "warning";
-            return false;
-        } else {
+
             return true;
-        }
     }
 }
 
@@ -359,7 +350,7 @@ function verifiedForm() {
 function Invoice_POS(id) {
     loading.value = true;
     dialogInvoice.value = false;
-    snackbar.value = false;
+    snackbar.value.view = false;
     axios
         .get("/sales_print_invoice/" + id)
         .then(({ data }) => {
@@ -412,7 +403,7 @@ function CreatePOS() {
         .catch((error) => {
             snackbar.value = true;
             snackbar.value.text = labels.error_message;
-            snackbarColor.value = "error";
+            snackbar.value.color = "error";
             console.log(error);
         })
         .finally(() => {
@@ -469,7 +460,7 @@ function CalculTotal() {
 
 //-------Verified QTY
 function Verified_Qty(detail, id) {
-    snackbar.value = false;
+    snackbar.value.view = false;
     for (let i = 0; i < details.value.length; i++) {
         if (details.value[i].detail_id === id) {
             if (isNaN(detail.quantity)) {
@@ -478,7 +469,7 @@ function Verified_Qty(detail, id) {
             if (detail.quantity > detail.current) {
                 snackbar.value = true;
                 snackbar.value.text = labels.low_qty;
-                snackbarColor.value = "error";
+                snackbar.value.color = "error";
                 details.value[i].quantity = detail.current;
             } else {
                 details.value[i].quantity = detail.quantity;
@@ -496,7 +487,7 @@ function increment_qty_scanner(code) {
             if (details.value[i].quantity + 1 > details.value[i].current) {
                 snackbar.value = true;
                 snackbar.value.text = labels.low_qty;
-                snackbarColor.value = "error";
+                snackbar.value.color = "error";
             } else {
                 details.value[i].quantity++;
             }
@@ -513,7 +504,7 @@ function increment(detail_item, id) {
             if (detail_item.quantity + 1 > detail_item.current) {
                 snackbar.value = true;
                 snackbar.value.text = labels.low_qty;
-                snackbarColor.value = "error";
+                snackbar.value.color = "error";
             } else {
                 details.value[i].quantity++;
             }
@@ -533,7 +524,7 @@ function decrement(detail_item, id) {
             ) {
                 snackbar.value = true;
                 snackbar.value.text = labels.low_qty;
-                snackbarColor.value = "error";
+                snackbar.value.color = "error";
             } else {
                 details.value[i].quantity--;
             }
@@ -678,7 +669,7 @@ function SearchProduct(result) {
 //   } else {
 //     snackbar.value = true;
 //     snackbar.value.text = labels.no_select_warehouse;
-//     snackbarColor.value = "warning";
+//     snackbar.value.color = "warning";
 //   }
 // }
 

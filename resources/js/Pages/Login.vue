@@ -46,7 +46,7 @@ function submit() {
                         Por favor ingresa tu usuario y contraseña
                     </v-card-subtitle>
                     <!-- login form -->
-                    <form @submit.prevent="submit">
+                    <form @submit.prevent="submit" :disabled="processing">
                         <v-card-text>
                             <v-alert
                                 closable
@@ -85,7 +85,6 @@ function submit() {
                                     :rules="rules.required"
                                 ></v-text-field>
                             </div>
-
                             <div
                                 class="d-flex align-center justify-space-between flex-wrap"
                             >
@@ -104,7 +103,6 @@ function submit() {
                                 color="primary"
                                 type="submit"
                                 :loading="processing"
-                                :disabled="processing"
                                 variant="flat"
                                 size="large"
                             >

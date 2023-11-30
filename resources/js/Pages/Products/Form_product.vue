@@ -113,14 +113,14 @@ function Create_Product() {
         .post("/products", data)
         .then(({ data }) => {
             snackbar.value = true;
-            snackbarColor.value = "success";
+            snackbar.value.color = "success";
             snackbar.value.text = "Actualizacion exitosa";
             router.visit("/products/list");
         })
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
-            snackbarColor.value = "error";
+            snackbar.value.color = "error";
             snackbar.value.text = error.response.data.message;
         })
         .finally(() => {
@@ -152,14 +152,14 @@ function Edit_Product() {
         .put("/products/" + productForm.value.id, productForm.value)
         .then(({ data }) => {
             snackbar.value = true;
-            snackbarColor.value = "success";
+            snackbar.value.color = "success";
             snackbar.value.text = "Actualizacion exitosa";
             router.visit("/products/list");
         })
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
-            snackbarColor.value = "error";
+            snackbar.value.color = "error";
             snackbar.value.text = error.response.data.message;
         })
         .finally(() => {

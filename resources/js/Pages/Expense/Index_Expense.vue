@@ -56,7 +56,7 @@ function Remove_Expense() {
         .delete("/expenses/" + expense.value.id)
         .then(({ data }) => {
             snackbar.value = true;
-            snackbarColor.value = "success";
+            snackbar.value.color = "success";
             snackbar.value.text = labels.delete_message;
             router.reload({
                 preserveState: true,
@@ -68,7 +68,7 @@ function Remove_Expense() {
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
-            snackbarColor.value = "error";
+            snackbar.value.color = "error";
             snackbar.value.text = error.response.data.message;
         })
         .finally(() => {

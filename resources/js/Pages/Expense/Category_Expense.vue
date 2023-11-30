@@ -84,7 +84,7 @@ function Create_Category() {
         })
         .then(({ data }) => {
             snackbar.value = true;
-            snackbarColor.value = "success";
+            snackbar.value.color = "success";
             snackbar.value.text = labels.success_message;
             router.reload({
                 preserveState: true,
@@ -96,7 +96,7 @@ function Create_Category() {
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
-            snackbarColor.value = "error";
+            snackbar.value.color = "error";
             snackbar.value.text = error.response.data.message;
         })
         .finally(() => {
@@ -117,7 +117,7 @@ function Update_Category() {
         })
         .then(({ data }) => {
             snackbar.value = true;
-            snackbarColor.value = "success";
+            snackbar.value.color = "success";
             snackbar.value.text = labels.success_message;
             router.reload({
                 preserveState: true,
@@ -129,7 +129,7 @@ function Update_Category() {
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
-            snackbarColor.value = "error";
+            snackbar.value.color = "error";
             snackbar.value.text = error.response.data.message;
         })
         .finally(() => {
@@ -159,7 +159,7 @@ function Delete_Category() {
         .delete("/expenses_category/" + category.value.id)
         .then(({ data }) => {
             snackbar.value = true;
-            snackbarColor.value = "success";
+            snackbar.value.color = "success";
             snackbar.value.text = labels.delete_message;
             router.reload({
                 preserveState: true,
@@ -170,7 +170,7 @@ function Delete_Category() {
         .catch((error) => {
             console.log(error);
             snackbar.value = true;
-            snackbarColor.value = "error";
+            snackbar.value.color = "error";
             snackbar.value.text = error.response.data.message;
         })
         .finally(() => {

@@ -1,9 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import helper from "@/helpers";
-import labels from "@/labels";
-import api from "@/api";
+import {helpers,rules,labels,api} from "@/helpers";
 
 const props = defineProps({
     user: Object,
@@ -53,21 +51,16 @@ onMounted(() => {
 });
 </script>
 <template>
-    <Layout
-        :snackbar-view="snackbar.view"
-        :snackbar-color="snackbar.color"
-        :snackbar-text="snackbar.text"
-    >
+    <Layout>
+    <snackbar
+    v-model="snackbar.view"
+    :color="snackbar.color"
+        :text="snackbar.text"></snackbar>
         <v-card :loading="loading">
-            <v-form @submit.prevent="Submit_Profile" ref="form">
+            <v-form @submit.prevent="Submit_Profile" ref="form" :disabled="loading">
                 <v-toolbar height="15"></v-toolbar>
 
                 <v-card-text>
-                    <v-overlay
-                        :model-value="loading"
-                        contained
-                        class="align-center justify-center"
-                    ></v-overlay>
                     <!--  Profile -->
                     <v-row>
                         <!-- First name -->
@@ -77,9 +70,9 @@ onMounted(() => {
                                 v-model="userForm.firstname"
                                 :placeholder="labels.user.firstname"
                                 :rules="
-                                    helper.required
-                                        .concat(helper.max(20))
-                                        .concat(helper.min(4))
+                                    rules.required
+                                        .concat(rules.max(20))
+                                        .concat(rules.min(4))
                                 "
                                 hide-details="auto"
                             >
@@ -93,9 +86,9 @@ onMounted(() => {
                                 v-model="userForm.lastname"
                                 :placeholder="labels.user.lastname"
                                 :rules="
-                                    helper.required
-                                        .concat(helper.max(20))
-                                        .concat(helper.min(4))
+                                    rules.required
+                                        .concat(rules.max(20))
+                                        .concat(rules.min(4))
                                 "
                                 hide-details="auto"
                             >
@@ -108,7 +101,7 @@ onMounted(() => {
                                 :label="labels.user.phone + ' *'"
                                 v-model="userForm.phone"
                                 :placeholder="labels.user.phone"
-                                :rules="helper.required"
+                                :rules="rules.required"
                                 hide-details="auto"
                             >
                             </v-text-field>
@@ -120,7 +113,7 @@ onMounted(() => {
                                 :label="labels.user.email + ' *'"
                                 v-model="userForm.email"
                                 :placeholder="labels.user.email"
-                                :rules="helper.required"
+                                :rules="rules.required"
                                 hide-details="auto"
                                 type="mail"
                             >
@@ -133,7 +126,7 @@ onMounted(() => {
                                 :label="labels.user.NewPassword + ' *'"
                                 v-model="userForm.NewPassword"
                                 :placeholder="labels.user.NewPassword"
-                                :rules="helper.min(6).concat(helper.max(14))"
+                                :rules="rules.min(6).concat(rules.max(14))"
                                 hide-details="auto"
                                 type="password"
                             >
@@ -149,7 +142,6 @@ onMounted(() => {
                                 type="submit"
                                 color="primary"
                                 :loading="loading"
-                                :disabled="loading"
                                 >{{ labels.submit }}
                             </v-btn>
                         </v-col>

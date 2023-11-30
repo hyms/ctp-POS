@@ -109,12 +109,12 @@ function Verified_paidAmount() {
     } else if (payment.value.amount > payment.value.received_amount) {
         snackbar.value = true;
         snackbar.value.text = "Pago es mayor al monto recibido";
-        snackbarColor.value = "warning";
+        snackbar.value.color = "warning";
         payment.value.amount = 0;
     } else if (payment.value.amount > GrandTotal.value) {
         snackbar.value = true;
         snackbar.value.text = "Pago es mayor al monto total";
-        snackbarColor.value = "warning";
+        snackbar.value.color = "warning";
         payment.value.amount = 0;
     }
 }
@@ -134,7 +134,7 @@ async function Submit_Sale() {
     if (!validate.valid) {
         snackbar.value = true;
         snackbar.value.text = "llene el formulario correctamente";
-        snackbarColor.value = "error";
+        snackbar.value.color = "error";
     } else {
         if (!editmode.value) {
             Create_Sale();
@@ -284,7 +284,7 @@ function SearchProduct(result) {
     ) {
         snackbar.value = true;
         snackbar.value.text = "Ya esta añadido";
-        snackbarColor.value = "warning";
+        snackbar.value.color = "warning";
     } else {
         product.value.code = result.code;
         product.value.stock = result.qte_sale;
@@ -340,7 +340,7 @@ function Verified_Qty(detail, id) {
             if (detail.quantity > detail.stock) {
                 snackbar.value = true;
                 snackbar.value.text = "bajo stock";
-                snackbarColor.value = "warning";
+                snackbar.value.color = "warning";
                 detailsForm.value[i].quantity = detail.stock;
             } else {
                 detailsForm.value[i].quantity = detail.quantity;
@@ -358,7 +358,7 @@ function increment(detail, id) {
             if (detail.quantity + 1 > detail.stock) {
                 snackbar.value = true;
                 snackbar.value.text = "bajo stock";
-                snackbarColor.value = "warning";
+                snackbar.value.color = "warning";
             } else {
                 helper.formatNumber(detailsForm.value[i].quantity++, 2);
             }
@@ -376,7 +376,7 @@ function decrement(detail, id) {
                 if (detail.quantity - 1 > detail.stock) {
                     snackbar.value = true;
                     snackbar.value.text = "bajo stock";
-                    snackbarColor.value = "warning";
+                    snackbar.value.color = "warning";
                 } else {
                     helper.formatNumber(detailsForm.value[i].quantity--, 2);
                 }
@@ -425,7 +425,7 @@ function verifiedForm() {
     if (detailsForm.value.length <= 0) {
         snackbar.value = true;
         snackbar.value.text = "debes añadir un producto";
-        snackbarColor.value = "warning";
+        snackbar.value.color = "warning";
         return false;
     } else {
         let count = 0;
@@ -441,7 +441,7 @@ function verifiedForm() {
         if (count > 0) {
             snackbar.value = true;
             snackbar.value.text = "Debes añadir cantidades";
-            snackbarColor.value = "warning";
+            snackbar.value.color = "warning";
             return false;
         } else {
             return true;
@@ -482,14 +482,14 @@ function Create_Sale() {
             .then((response) => {
                 snackbar.value = true;
                 snackbar.value.text = "compra exitosa";
-                snackbarColor.value = "success";
+                snackbar.value.color = "success";
                 router.visit("/sales");
             })
             .catch((error) => {
                 console.log(error);
                 snackbar.value = true;
                 snackbar.value.text = "No se pudo procesar el pago";
-                snackbarColor.value = "error";
+                snackbar.value.color = "error";
             })
             .finally(() => {
                 loading.value = false;
@@ -521,7 +521,7 @@ function Update_Sale() {
             .then((response) => {
                 snackbar.value = true;
                 snackbar.value.text = "compra exitosa";
-                snackbarColor.value = "success";
+                snackbar.value.color = "success";
                 router.visit("/sales", {
                     onStart: () => {
                         loading.value = true;
@@ -535,7 +535,7 @@ function Update_Sale() {
                 console.log(error);
                 snackbar.value = true;
                 snackbar.value.text = "No se pudo procesar el pago";
-                snackbarColor.value = "error";
+                snackbar.value.color = "error";
             })
             .finally(() => {
                 loading.value = false;

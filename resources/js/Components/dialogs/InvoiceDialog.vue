@@ -2,13 +2,17 @@
 import {helpers,labels} from "@/helpers";
 
 const props = defineProps({
-    model: Boolean,
+    modelValue: Boolean,
     invoice_pos: Object,
 });
+const emit = defineEmits(['update:modelValue'])
+function updateValue(value) {
+    emit('update:modelValue', value)
+}
 </script>
 <template>
     <!-- Modal Show Invoice POS-->
-    <v-dialog :model-value="model" max-width="350">
+    <v-dialog :model-value="modelValue" max-width="350" @update:modelValue="updateValue">
         <v-card>
             <v-card-text>
                 <div id="invoice-POS">
