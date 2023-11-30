@@ -24,32 +24,6 @@ const transferStatus = [
     { title: "Pendiente", value: "pending", color: "error" },
 ];
 
-const toggleFullScreen = () => {
-    let doc = window.document;
-    let docEl = doc.documentElement;
-
-    let requestFullScreen =
-        docEl.requestFullscreen ||
-        docEl.mozRequestFullScreen ||
-        docEl.webkitRequestFullScreen ||
-        docEl.msRequestFullscreen;
-    let cancelFullScreen =
-        doc.exitFullscreen ||
-        doc.mozCancelFullScreen ||
-        doc.webkitExitFullscreen ||
-        doc.msExitFullscreen;
-
-    if (
-        !doc.fullscreenElement &&
-        !doc.mozFullScreenElement &&
-        !doc.webkitFullscreenElement &&
-        !doc.msFullscreenElement
-    ) {
-        requestFullScreen.call(docEl);
-    } else {
-        cancelFullScreen.call(doc);
-    }
-};
 const print_pos = (element_id) => {
     const pos_css = new URL("@/../css/pos_print.css", import.meta.url).href;
     let divContents = document.getElementById(element_id).innerHTML;
@@ -181,7 +155,6 @@ const maxEnableButtons = (timeSale, enableDays) => {
 export default {
     formatNumber,
     print_pdf,
-    toggleFullScreen,
     linkVisit,
     linkBack,
     newLine,

@@ -1,247 +1,221 @@
 <script setup>
-import { router, usePage } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 import { computed, onMounted, ref } from "vue";
 import MenuUser from "@/Components/Menu_user.vue";
-import Full_screen from "@/Components/buttons/full_screen.vue";
+import FullScreen from "@/Components/buttons/FullScreen.vue";
 import { helpers } from "@/helpers";
 
 const isDrawerOpen = ref(null);
-const menuItems = ref([
-    {
+const menuItems = ref([]);
+const open = ref([]);
+
+
+function loadMenu()
+{
+    let subItems = [];
+    menuItems.value=[];
+    menuItems.value.push({
         label: "Tablero",
         url: "/",
-        role: "all",
+        activate: ['/'],
         icon: "",
         subItems: [],
-    },
-    {
-        label: "Ordenes",
-        url: "",
-        role: "all",
-        icon: "",
-        subItems: [
-            {
-                label: "Crear Orden",
-                url: "/sales/create",
-                role: "all",
-            },
-            {
+    });
+    subItems = [];
+    subItems.push( {
+        label: "Crear Orden",
+        url: "/sales/create",
+        activate: ['/sales/create'],
+    });
+    subItems.push( {
                 label: "Listar Ordenes",
                 url: "/sales",
-                role: "all",
-            },
-        ],
-    },
-    {
+        activate: ['/sales'],
+    });
+    menuItems.value.push({
+       label: "Ordenes",
+        url: "",
+        activate: ['/sales/create','/sales'],
+        icon: "",
+        subItems: subItems.slice()
+    });
+
+    menuItems.value.push({
         label: "Clientes",
         url: "/clients",
-        role: "all",
+        activate: ['/clients'],
         icon: "",
         subItems: [],
-    },
-    {
-        label: "Gastos",
-        url: "",
-        role: "vendor",
-        icon: "",
-        subItems: [
-            {
+    });
+
+    subItems = [];
+    subItems.push(  {
                 label: "Añadir Gastos",
                 url: "/expenses/create",
-                role: "vendor",
-            },
-            {
+        activate: ['/expenses/create'],
+    });
+    subItems.push(  {
                 label: "Listar Gastos",
                 url: "/expenses",
-                role: "vendor",
-            },
-        ],
-    },
-    {
-        label: "Transferencias de Stock",
+        activate: ['/expenses'],
+    });
+    menuItems.value.push({
+        label: "Gastos",
         url: "",
-        role: "vendor",
+        activate: ['/expenses','/expenses/create'],
         icon: "",
-        subItems: [
-            {
+        subItems: subItems.slice()
+    });
+
+    subItems = [];
+    subItems.push({
                 label: "Crear Transferencia",
                 url: "/transfers/create",
-                role: "admin",
-            },
-            {
-                label: "Listar Transferencias",
-                url: "/transfers/",
-                role: "vendor",
-            },
-        ],
-    },
-    {
-        label: "Ajustes de Stock",
+        activate: ['/transfers/create'],
+    });
+    subItems.push( {
+        label: "Listar Transferencias",
+        url: "/transfers",
+        activate: ['/transfers'],
+    });
+    menuItems.value.push({
+        label: "Transferencias de Stock",
         url: "",
-        role: "vendor",
+        activate: ['/transfers','/transfers/create'],
         icon: "",
-        subItems: [
-            {
+        subItems: subItems.slice()
+    });
+    subItems = [];
+    subItems.push({
                 label: "Crear Ajuste",
                 url: "/adjustments/create",
-                role: "admin",
-            },
-            {
+        activate: ['/adjustments/create'],
+    });
+    subItems.push( {
                 label: "Listar Ajustes",
                 url: "/adjustments/list",
-                role: "vendor",
-            },
-        ],
-    },
-    {
-        label: "Productos",
+        activate: ['/adjustments'],
+    });
+    menuItems.value.push({
+        label: "Ajustes de Stock",
         url: "",
-        role: "vendor",
+        activate: ['/adjustments','/adjustments/create'],
         icon: "",
-        subItems: [
-            {
+       subItems: subItems.slice()
+    });
+    subItems = [];
+    subItems.push({
                 label: "Añadir Productos",
                 url: "/products/create",
-                role: "admin",
-            },
-            {
+        activate: ['/products/create'],
+    });
+    subItems.push({
                 label: "Listar Productos",
                 url: "/products/list",
-                role: "vendor",
-            },
-            {
+        activate: ['/products/list'],
+    });
+    subItems.push({
                 label: "Categorias",
                 url: "/products/categories",
-                role: "admin",
-            },
-            {
-                label: "Unidades",
-                url: "/products/units",
-                role: "admin",
-            },
-        ],
-    },
-
-    {
-        label: "Informes",
+        activate: ['/products/categories'],
+    });
+    subItems.push({
+        label: "Unidades",
+        url: "/products/units",
+        activate: ['/products/units'],
+    });
+    menuItems.value.push({
+        label: "Productos",
         url: "",
-        role: "vendor",
+        activate: ['/products/create','/products/list','/products/categories','/products/units'],
         icon: "",
-        subItems: [
-            {
+       subItems: subItems.slice()
+    });
+    subItems = [];
+    subItems.push({
                 label: "Pagos de ventas",
                 url: "/payment_sale",
-                role: "vendor",
-            },
-            {
+        activate: ['/payment_sale'],
+    });
+    subItems.push({
                 label: "Reporte de ventas",
                 url: "/report/sales",
-                role: "vendor",
-            },
-            {
+        activate: ['/report/sales'],
+    });
+    subItems.push({
                 label: "Reporte de Clientes",
                 url: "/report/client",
-                role: "admin",
-            },
-            // {
-            //   label: "Alerta de Productos",
-            //   url: "/report/quantity_alerts",
-            //   role: "admin",
-            // },
-            // {
-            //   label: "Reporte de Agencias",
-            //   url: "/report/warehouse_report",
-            //   role: "admin",
-            // },
-            {
+        activate: ['/report/client'],
+    });
+    //subItems.push({
+    //    label: "Alerta de Productos",
+    //    url: "/report/quantity_alerts",
+    //    role: "admin",
+    //});
+    //subItems.push( {
+    //           label: "Reporte de Agencias",
+    //           url: "/report/warehouse_report",
+    //       role: "admin",
+    //     });
+    subItems.push({
                 label: "Reporte de Stock",
                 url: "/report/stock",
-                role: "vendor",
-            },
-            // {
+        activate: ["/report/stock"],
+    });
+    //subItems.push( {
             //   label: "Reporte de Usuarios",
             //   url: "/report/users_report",
             //   role: "admin",
-            // },
-            {
+    // });
+    subItems.push({
                 label: "Top productos vendidos",
                 url: "/report/top_products",
-                role: "admin",
-            },
-            {
+        activate: ["/report/top_products"],
+    });
+    subItems.push({
                 label: "Top Clientes",
                 url: "/report/top_customers",
-                role: "admin",
-            },
-        ],
-    },
-    {
-        label: "Configuraciones",
+        activate: ["/report/top_customers"],
+    });
+    menuItems.value.push({
+        label: "Informes",
         url: "",
-        role: "admin",
+        activate: ["/payment_sale",'/report/sales','/report/client',"/report/stock","/report/top_products","/report/top_customers"],
         icon: "",
-        subItems: [
-            {
+        subItems: subItems.slice()
+    });
+    subItems = [];
+    subItems.push({
                 label: "Categorias de Gastos",
                 url: "/expenses_category",
-                role: "admin",
-            },
-            {
+        activate: ["/expenses_category"],
+    });
+    subItems.push( {
                 label: "Tipos de ventas",
                 url: "/sales_types",
-                role: "admin",
-            },
-            {
+        activate: ["/sales_types"],
+    });
+    subItems.push({
                 label: "Almacenes",
                 url: "/warehouses",
-                role: "admin",
-            },
-            {
+        activate: ["/warehouses"],
+    });
+    subItems.push({
                 label: "Usuarios",
                 url: "/users",
-                role: "admin",
-            },
-
-            // {
-            //     label: "respaldo",
-            //     url: "/backup",
-            //     role: "admin",
-            //     //newPage: true,
-            // },
-        ],
-    },
-]);
-
-const roles = computed(() => usePage().props.rolesP);
-const user = computed(() => usePage().props.user);
-const open = ref([]);
-
-// const url = computed(() => usePage().url);
-
-function getPermission(role) {
-    for (const key in roles.value) {
-        for (const [key, item] of Object.entries(roles.value)) {
-            if (key === role) {
-                if (item.includes(user.value.role)) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
-function getAllPermission(data) {
-    for (const val of data) {
-        let value = getPermission(val.role);
-        if (value) {
-            return true;
-        }
-    }
-    return false;
+        activate: ["/users"],
+    });
+    menuItems.value.push({
+        label: "Configuraciones",
+        url: "",
+        activate: ["/expenses_category","/sales_types","/warehouses","/users"],
+        icon: "",
+        subItems: subItems.slice()
+    });
 }
 
 onMounted(() => {
+    loadMenu();
     router.on("success", (event) => {
         for (let item of menuItems.value) {
             if (item.subItems.length > 0) {
@@ -279,7 +253,6 @@ onMounted(() => {
             <template v-for="(link, key) in menuItems">
                 <template v-if="link.subItems.length > 0">
                     <v-list-group
-                        v-if="getAllPermission(link.subItems)"
                         :key="key"
                         :value="link.label"
                     >
@@ -291,26 +264,23 @@ onMounted(() => {
                             </v-list-item>
                         </template>
                         <template v-for="(subLink, subKey) in link.subItems">
-                            <template v-if="getPermission(subLink.role)">
                                 <v-list-item
                                     :key="key + '' + subKey"
                                     @click="helpers.linkVisit(subLink.url)"
-                                    :active="$page.url.includes(subLink.url)"
+                                    :active="subLink.activate.includes($page.url)"
                                     :value="subLink.label"
                                 >
                                     <v-list-item-title class="text-capitalize">
                                         {{ subLink.label }}
                                     </v-list-item-title>
                                 </v-list-item>
-                            </template>
                         </template>
                     </v-list-group>
                 </template>
                 <template v-else>
                     <v-list-item
-                        v-if="getPermission(link.role)"
                         @click="helpers.linkVisit(link.url)"
-                        :active="$page.url.includes(link.url)"
+                        :active="link.activate.includes($page.url)"
                         :key="key"
                         :value="link.label"
                     >
@@ -330,11 +300,11 @@ onMounted(() => {
         <v-toolbar-title>{{ $page.props.titlePage }}</v-toolbar-title>
 
         <v-spacer></v-spacer>
-        <full_screen></full_screen>
+        <full-screen></full-screen>
         <v-btn
             color="primary"
             variant="flat"
-            prepend-icon="mdi-cart"
+            prepend-icon="fas fa-shopping-cart"
             class="mr-3 elevation-2"
             @click="helpers.linkVisit('/pos')"
         >
