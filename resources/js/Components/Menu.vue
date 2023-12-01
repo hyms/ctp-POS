@@ -1,151 +1,161 @@
 <script setup>
 import { router } from "@inertiajs/vue3";
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import MenuUser from "@/Components/Menu_user.vue";
 import FullScreen from "@/Components/buttons/FullScreen.vue";
-import { helpers } from "@/helpers";
+import { globals, helpers, labelsNew } from "@/helpers";
 
 const isDrawerOpen = ref(null);
 const menuItems = ref([]);
 const open = ref([]);
 
-
-function loadMenu()
-{
+function loadMenu() {
     let subItems = [];
-    menuItems.value=[];
+    menuItems.value = [];
     menuItems.value.push({
-        label: "Tablero",
+        label: labelsNew.dashboard,
         url: "/",
-        activate: ['/'],
-        icon: "",
+        activate: ["/"],
+
         subItems: [],
     });
     subItems = [];
-    subItems.push( {
+    subItems.push({
         label: "Crear Orden",
         url: "/sales/create",
-        activate: ['/sales/create'],
+        activate: ["/sales/create"],
     });
-    subItems.push( {
-                label: "Listar Ordenes",
-                url: "/sales",
-        activate: ['/sales'],
+    subItems.push({
+        label: "Listar Ordenes",
+        url: "/sales",
+        activate: ["/sales"],
     });
     menuItems.value.push({
-       label: "Ordenes",
+        label: "Ordenes",
         url: "",
-        activate: ['/sales/create','/sales'],
-        icon: "",
-        subItems: subItems.slice()
+        activate: ["/sales/create", "/sales"],
+
+        subItems: subItems.slice(),
     });
 
     menuItems.value.push({
         label: "Clientes",
         url: "/clients",
-        activate: ['/clients'],
-        icon: "",
+        activate: ["/clients"],
+
         subItems: [],
     });
 
     subItems = [];
-    subItems.push(  {
-                label: "Añadir Gastos",
-                url: "/expenses/create",
-        activate: ['/expenses/create'],
+    subItems.push({
+        label: "Añadir Gastos",
+        url: "/expenses/create",
+        activate: ["/expenses/create"],
     });
-    subItems.push(  {
-                label: "Listar Gastos",
-                url: "/expenses",
-        activate: ['/expenses'],
+    subItems.push({
+        label: "Listar Gastos",
+        url: "/expenses",
+        activate: ["/expenses"],
     });
     menuItems.value.push({
         label: "Gastos",
         url: "",
-        activate: ['/expenses','/expenses/create'],
-        icon: "",
-        subItems: subItems.slice()
+        activate: ["/expenses", "/expenses/create"],
+
+        subItems: subItems.slice(),
     });
 
     subItems = [];
     subItems.push({
-                label: "Crear Transferencia",
-                url: "/transfers/create",
-        activate: ['/transfers/create'],
+        label: "Crear Transferencia",
+        url: "/transfers/create",
+        activate: ["/transfers/create"],
     });
-    subItems.push( {
+    subItems.push({
         label: "Listar Transferencias",
         url: "/transfers",
-        activate: ['/transfers'],
+        activate: ["/transfers"],
     });
     menuItems.value.push({
         label: "Transferencias de Stock",
         url: "",
-        activate: ['/transfers','/transfers/create'],
-        icon: "",
-        subItems: subItems.slice()
+        activate: ["/transfers", "/transfers/create"],
+
+        subItems: subItems.slice(),
     });
     subItems = [];
     subItems.push({
-                label: "Crear Ajuste",
-                url: "/adjustments/create",
-        activate: ['/adjustments/create'],
+        label: "Crear Ajuste",
+        url: "/adjustments/create",
+        activate: ["/adjustments/create"],
     });
-    subItems.push( {
-                label: "Listar Ajustes",
-                url: "/adjustments/list",
-        activate: ['/adjustments'],
+    subItems.push({
+        label: "Listar Ajustes",
+        url: "/adjustments/list",
+        activate: ["/adjustments"],
     });
     menuItems.value.push({
         label: "Ajustes de Stock",
         url: "",
-        activate: ['/adjustments','/adjustments/create'],
-        icon: "",
-       subItems: subItems.slice()
+        activate: ["/adjustments", "/adjustments/create"],
+
+        subItems: subItems.slice(),
     });
+    globals.userPermision([
+        "products_add",
+        "products_view",
+        "unit",
+        "category",
+    ]);
     subItems = [];
     subItems.push({
-                label: "Añadir Productos",
-                url: "/products/create",
-        activate: ['/products/create'],
+        label: "Añadir Productos",
+        url: "/products/create",
+        activate: ["/products/create"],
     });
     subItems.push({
-                label: "Listar Productos",
-                url: "/products/list",
-        activate: ['/products/list'],
+        label: "Listar Productos",
+        url: "/products/list",
+        activate: ["/products/list"],
     });
     subItems.push({
-                label: "Categorias",
-                url: "/products/categories",
-        activate: ['/products/categories'],
+        label: "Categorias",
+        url: "/products/categories",
+        activate: ["/products/categories"],
     });
     subItems.push({
         label: "Unidades",
         url: "/products/units",
-        activate: ['/products/units'],
+        activate: ["/products/units"],
     });
     menuItems.value.push({
-        label: "Productos",
+        label: labelsNew.Products,
         url: "",
-        activate: ['/products/create','/products/list','/products/categories','/products/units'],
-        icon: "",
-       subItems: subItems.slice()
+        activate: [
+            "/products/create",
+            "/products/list",
+            "/products/categories",
+            "/products/units",
+        ],
+
+        subItems: subItems.slice(),
     });
+
     subItems = [];
     subItems.push({
-                label: "Pagos de ventas",
-                url: "/payment_sale",
-        activate: ['/payment_sale'],
+        label: "Pagos de ventas",
+        url: "/payment_sale",
+        activate: ["/payment_sale"],
     });
     subItems.push({
-                label: "Reporte de ventas",
-                url: "/report/sales",
-        activate: ['/report/sales'],
+        label: "Reporte de ventas",
+        url: "/report/sales",
+        activate: ["/report/sales"],
     });
     subItems.push({
-                label: "Reporte de Clientes",
-                url: "/report/client",
-        activate: ['/report/client'],
+        label: "Reporte de Clientes",
+        url: "/report/client",
+        activate: ["/report/client"],
     });
     //subItems.push({
     //    label: "Alerta de Productos",
@@ -158,60 +168,122 @@ function loadMenu()
     //       role: "admin",
     //     });
     subItems.push({
-                label: "Reporte de Stock",
-                url: "/report/stock",
+        label: "Reporte de Stock",
+        url: "/report/stock",
         activate: ["/report/stock"],
     });
     //subItems.push( {
-            //   label: "Reporte de Usuarios",
-            //   url: "/report/users_report",
-            //   role: "admin",
+    //   label: "Reporte de Usuarios",
+    //   url: "/report/users_report",
+    //   role: "admin",
     // });
     subItems.push({
-                label: "Top productos vendidos",
-                url: "/report/top_products",
+        label: "Top productos vendidos",
+        url: "/report/top_products",
         activate: ["/report/top_products"],
     });
     subItems.push({
-                label: "Top Clientes",
-                url: "/report/top_customers",
+        label: "Top Clientes",
+        url: "/report/top_customers",
         activate: ["/report/top_customers"],
     });
     menuItems.value.push({
         label: "Informes",
         url: "",
-        activate: ["/payment_sale",'/report/sales','/report/client',"/report/stock","/report/top_products","/report/top_customers"],
-        icon: "",
-        subItems: subItems.slice()
+        activate: [
+            "/payment_sale",
+            "/report/sales",
+            "/report/client",
+            "/report/stock",
+            "/report/top_products",
+            "/report/top_customers",
+        ],
+        subItems: subItems.slice(),
     });
-    subItems = [];
-    subItems.push({
+
+    // settings
+    if (
+        globals.userPermision([
+            "setting_system",
+            "pos_settings",
+            "permissions_view",
+            "expenses_category_view",
+            "sales_types",
+            "warehouse",
+            "users_view",
+        ])
+    ) {
+        subItems = [];
+        if (globals.userPermision(["setting_system"])) {
+            subItems.push({
+                label: labelsNew.SystemSettings,
+                url: "/system_settings",
+                activate: ["/system_settings"],
+            });
+        }
+        if (globals.userPermision(["pos_settings"])) {
+            subItems.push({
+                label: labelsNew.pos_settings,
+                url: "/pos_settings",
+                activate: ["/pos_settings"],
+            });
+        }
+        if (globals.userPermision(["permissions_view"])) {
+            subItems.push({
+                label: labelsNew.GroupPermissions,
+                url: "/roles",
+                activate: ["/roles"],
+            });
+        }
+        if (globals.userPermision(["expenses_category_view"])) {
+            subItems.push({
                 label: "Categorias de Gastos",
                 url: "/expenses_category",
-        activate: ["/expenses_category"],
-    });
-    subItems.push( {
+                activate: ["/expenses_category"],
+            });
+        }
+        if (globals.userPermision(["sales_types"])) {
+            subItems.push({
                 label: "Tipos de ventas",
                 url: "/sales_types",
-        activate: ["/sales_types"],
-    });
-    subItems.push({
-                label: "Almacenes",
+                activate: ["/sales_types"],
+            });
+        }
+        if (globals.userPermision(["warehouse"])) {
+            subItems.push({
+                label: labelsNew.Warehouses,
                 url: "/warehouses",
-        activate: ["/warehouses"],
-    });
-    subItems.push({
-                label: "Usuarios",
+                activate: ["/warehouses"],
+            });
+        }
+        if (globals.userPermision(["users_view"])) {
+            subItems.push({
+                label: labelsNew.Users,
                 url: "/users",
-        activate: ["/users"],
-    });
-    menuItems.value.push({
-        label: "Configuraciones",
-        url: "",
-        activate: ["/expenses_category","/sales_types","/warehouses","/users"],
-        icon: "",
-        subItems: subItems.slice()
-    });
+                activate: ["/users"],
+            });
+        }
+        if (globals.userPermision(["backup"])) {
+            subItems.push({
+                label: labelsNew.Backup,
+                url: "/backup",
+                activate: ["/backup"],
+            });
+        }
+
+        menuItems.value.push({
+            label: labelsNew.Settings,
+            url: "",
+            activate: [
+                "/expenses_category",
+                "/sales_types",
+                "/warehouses",
+                "/users",
+                "/backup",
+            ],
+            subItems: subItems.slice(),
+        });
+    }
 }
 
 onMounted(() => {
@@ -252,10 +324,7 @@ onMounted(() => {
         <v-list density="comfortable" :opened="open">
             <template v-for="(link, key) in menuItems">
                 <template v-if="link.subItems.length > 0">
-                    <v-list-group
-                        :key="key"
-                        :value="link.label"
-                    >
+                    <v-list-group :key="key" :value="link.label">
                         <template v-slot:activator="{ props }">
                             <v-list-item v-bind="props">
                                 <v-list-item-title class="text-capitalize">
@@ -263,18 +332,17 @@ onMounted(() => {
                                 </v-list-item-title>
                             </v-list-item>
                         </template>
-                        <template v-for="(subLink, subKey) in link.subItems">
-                                <v-list-item
-                                    :key="key + '' + subKey"
-                                    @click="helpers.linkVisit(subLink.url)"
-                                    :active="subLink.activate.includes($page.url)"
-                                    :value="subLink.label"
-                                >
-                                    <v-list-item-title class="text-capitalize">
-                                        {{ subLink.label }}
-                                    </v-list-item-title>
-                                </v-list-item>
-                        </template>
+                        <v-list-item
+                            v-for="(subLink, subKey) in link.subItems"
+                            :key="key + '' + subKey"
+                            @click="helpers.linkVisit(subLink.url)"
+                            :active="subLink.activate.includes($page.url)"
+                            :value="subLink.label"
+                        >
+                            <v-list-item-title class="text-capitalize">
+                                {{ subLink.label }}
+                            </v-list-item-title>
+                        </v-list-item>
                     </v-list-group>
                 </template>
                 <template v-else>

@@ -1,5 +1,5 @@
 <script setup>
-import { globals, helpers,labelsNew } from "@/helpers";
+import { globals, helpers, labelsNew } from "@/helpers";
 
 const fullName = globals.fullName();
 </script>
@@ -8,7 +8,7 @@ const fullName = globals.fullName();
     <v-btn
         color="secondary"
         variant="flat"
-        prepend-icon="mdi-account"
+        prepend-icon="fas fa-user"
         class="elevation-2"
     >
         {{ fullName }}
@@ -19,10 +19,14 @@ const fullName = globals.fullName();
                     @click="helpers.linkVisit('/profile')"
                     :active="$page.url === '/profile'"
                 >
-                    <v-list-item-title>{{labelsNew.profil}}</v-list-item-title>
+                    <v-list-item-title>{{
+                        labelsNew.profil
+                    }}</v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="helpers.linkVisit('/logout', 'post')">
-                    <v-list-item-title>{{labelsNew.logout}}</v-list-item-title>
+                    <v-list-item-title>{{
+                        labelsNew.logout
+                    }}</v-list-item-title>
                 </v-list-item>
             </v-list>
         </v-menu>

@@ -55,6 +55,7 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
 
     //------------------------------- Users --------------------------\\
     Route::get('users', [UserController::class, 'index']);
+    Route::get('users-data', [UserController::class, 'getTable']);
     Route::get('users/{id}/edit', [UserController::class, 'edit']);
     Route::post('users', [UserController::class, 'store']);
     Route::put('users/{id}', [UserController::class, 'update']);

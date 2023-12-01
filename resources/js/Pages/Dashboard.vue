@@ -1,7 +1,7 @@
 <script setup>
-import { computed, inject, onMounted, ref } from "vue";
+import { inject, onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import { helpers,labels } from "@/helpers";
+import { globals, helpers, labels } from "@/helpers";
 import VChart from "vue-echarts";
 
 import { use } from "echarts/core";
@@ -318,7 +318,7 @@ function all_dashboard_data(warehouseId = null) {
 
 onMounted(() => {
     all_dashboard_data();
-    CurrentMonth.value = moment.format("MMMM");
+    CurrentMonth.value = moment().format("MMMM");
 });
 </script>
 
@@ -331,7 +331,7 @@ onMounted(() => {
         <!--                    <v-card-subtitle></v-card-subtitle>-->
         <!--                </v-card>-->
         <!-- warehouse -->
-        <v-row v-if="global.rolePermision('admin')">
+        <v-row v-if="globals.rolePermision(['Admin'])">
             <v-col sm="4" cols="12">
                 <v-select
                     @update:modelValue="Selected_Warehouse"
@@ -345,7 +345,7 @@ onMounted(() => {
                 ></v-select>
             </v-col>
         </v-row>
-        <v-row v-if="global.rolePermision('admin')">
+        <v-row v-if="globals.rolePermision(['Admin'])">
             <v-col md="8" cols="12">
                 <v-card :loading="loading">
                     <v-card-title>
@@ -380,7 +380,7 @@ onMounted(() => {
                 </v-card>
             </v-col>
         </v-row>
-        <v-row v-if="global.rolePermision('admin')">
+        <v-row v-if="globals.rolePermision(['Admin'])">
             <!-- Stock Alert -->
             <v-col cols="12" md="8">
                 <v-card :loading="loading">

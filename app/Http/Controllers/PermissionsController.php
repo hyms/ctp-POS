@@ -8,13 +8,17 @@ use App\utils\helpers;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PermissionsController extends Controller
 {
 
     //----------- GET ALL Roles --------------\\
 
-    public function index(Request $request){}
+    public function index(Request $request){
+        Inertia::share(['title' => 'Permissions']);
+        return Inertia::render('Settings/permissions/index');
+    }
     public function getTable(Request $request)
     {
         $this->authorizeForUser($request->user('api'), 'view', Role::class);

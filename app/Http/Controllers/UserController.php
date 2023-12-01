@@ -7,15 +7,10 @@ use App\Models\role_user;
 use App\Models\User;
 use App\Models\UserWarehouse;
 use App\Models\Warehouse;
-use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -25,6 +20,11 @@ class UserController extends Controller
     //------------- GET ALL USERS---------\\
 
     public function index(request $request)
+    {
+        Inertia::share('titlePage', 'Usuarios');
+        return Inertia::render('People/Users');
+    }
+    public function getTable(request $request)
     {
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->exists();
@@ -38,9 +38,7 @@ class UserController extends Controller
         $users = $users->get();
         $warehouses = Warehouse::get(['id', 'name']);
         $roles = Role::get(['id', 'name']);
-        Inertia::share('titlePage', 'Usuarios');
-        return Inertia::render('People/Users',
-            ['users' => $users, 'warehouses' => $warehouses, 'roles' => $roles]);
+        return response()->json(['users' => $users, 'warehouses' => $warehouses, 'roles' => $roles]);
     }
 
     //------------- GET USER Auth ---------\\
