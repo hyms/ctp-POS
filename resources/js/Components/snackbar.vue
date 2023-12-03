@@ -28,7 +28,7 @@ function updateValue(value) {
         <div v-html="text"></div>
         <template v-slot:actions>
             <v-btn
-                icon="mdi-close"
+                icon="fas fa-times"
                 size="x-small"
                 variant="tonal"
                 @click="updateValue(false)"

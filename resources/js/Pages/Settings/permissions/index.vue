@@ -1,7 +1,7 @@
 <script setup>
 import Layout from "@/Layouts/Authenticated.vue";
 import { onMounted, ref } from "vue";
-import { api, labels, labelsNew } from "@/helpers";
+import { api, globals, labelsNew } from "@/helpers";
 import DialogDelete from "@/Components/dialogs/DeleteDialog.vue";
 // import DialogForm from "./form.vue";
 import Snackbar from "@/Components/snackbar.vue";
@@ -18,7 +18,11 @@ const dialogForm = ref(false);
 const dialogDelete = ref(false);
 const itemId = ref(null);
 const items = ref([]);
-const fields = ref([{ title: labels.user.full_name, key: "full_name" }]);
+const fields = ref([
+    { title: labelsNew.RoleName, key: "name" },
+    { title: labelsNew.Description, key: "description" },
+    { title: labelsNew.Action, key: "action" },
+]);
 
 function showForm(id = null) {
     itemId.value = id;
@@ -44,7 +48,7 @@ function deleteItem() {
 
 function loadTable() {
     api.get({
-        url: "/admin/items-data",
+        url: "/roles-data",
         snackbar,
         loadingItem: loadingTable,
         onSuccess: (data) => {
@@ -54,7 +58,7 @@ function loadTable() {
 }
 
 onMounted(() => {
-    // loadTable();
+    loadTable();
 });
 </script>
 <template>
@@ -87,8 +91,12 @@ onMounted(() => {
                 </v-col>
                 <v-spacer></v-spacer>
                 <v-col cols="12" sm="auto">
-                    <v-btn variant="flat" color="primary" @click="showForm()"
-                        >{{ labelsNew.New_Customer }}
+                    <v-btn
+                        v-if="globals.userPermision(['permissions_add'])"
+                        variant="flat"
+                        color="primary"
+                        @click="showForm()"
+                        >{{ labelsNew.Add }}
                     </v-btn>
                 </v-col>
             </v-row>
@@ -98,26 +106,18 @@ onMounted(() => {
                 :search="search"
                 :loading="loadingTable"
             >
-                <template v-slot:item.full_name="{ item }">
-                    <v-btn
-                        color="primary"
-                        variant="text"
-                        density="compact"
-                        @click="showView(item.id)"
-                        >{{ item.full_name }}
-                    </v-btn>
-                    <h6 class="text-subtitle-2">{{ item.email }}</h6>
-                </template>
                 <template v-slot:item.action="{ item }">
                     <v-btn
-                        class="rounded mx-1"
-                        icon="fas fa-pen"
-                        size="small"
+                        v-if="globals.userPermision(['permissions_edit'])"
                         color="primary"
-                        variant="tonal"
+                        class="rounded mx-1"
                         @click="showForm(item.id)"
+                        icon="fas fa-edit"
+                        size="small"
+                        variant="tonal"
                     ></v-btn>
                     <v-btn
+                        v-if="globals.userPermision(['permissions_delete'])"
                         class="rounded mx-1"
                         icon="fas fa-trash"
                         size="small"

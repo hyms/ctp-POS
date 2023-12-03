@@ -297,6 +297,7 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
     //------------------------------- Permission Groups user -----------\\
 //    Route::resource('roles', 'PermissionsController');
     Route::get('roles', [PermissionsController::class,'index']);
+    Route::get('roles-data', [PermissionsController::class,'getTable']);
 //    Route::resource('roles/check/create_page', [PermissionsController::class,'Check_Create_Page']);
 //    Route::post('roles/delete/by_selection', 'PermissionsController@delete_by_selection');
     //------------------------------------------------------------------\\

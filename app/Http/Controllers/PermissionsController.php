@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Permission;
 use App\Models\Role;
-use App\utils\helpers;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class PermissionsController extends Controller
@@ -15,43 +15,20 @@ class PermissionsController extends Controller
 
     //----------- GET ALL Roles --------------\\
 
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         Inertia::share(['title' => 'Permissions']);
         return Inertia::render('Settings/permissions/index');
     }
+
     public function getTable(Request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'view', Role::class);
-        // How many items do you want to display.
-        $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
-        // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-        $order = $request->SortField;
-        $dir = $request->SortType;
-        $helpers = new helpers();
+        $user = Auth::user();
+        $user->can('permissions_view');
 
-        $roles = Role::where('deleted_at', '=', null)
-            // Search With Multiple Param
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('search'), function ($query) use ($request) {
-                    return $query->where('name', 'LIKE', "%{$request->search}%")
-                        ->orWhere('description', 'LIKE', "%{$request->search}%");
-                });
-            });
-        $totalRows = $roles->count();
-        if ($perPage == "-1") {
-            $perPage = $totalRows;
-        }
-        $roles = $roles->offset($offSet)
-            ->limit($perPage)
-            ->orderBy($order, $dir)
-            ->get();
+        $roles = Role::get();
 
-        return response()->json([
-            'roles' => $roles,
-            'totalRows' => $totalRows,
-        ]);
+        return response()->json(['data' => $roles]);
     }
 
     //----------- Store new Role --------------\\

@@ -1,5 +1,5 @@
 import { router } from "@inertiajs/vue3";
-import labels from "@/Functions/labels";
+import { labels } from "@/helpers";
 import { ref } from "vue";
 
 const snackbarDefault = ref({
@@ -34,7 +34,7 @@ const global = (
         .then(({ data }) => {
             snackbar.value.color = "success";
             if (data["redirect"] !== undefined) {
-                snackbar.value.text = labels.message.success;
+                snackbar.value.text = labels.success_message;
                 if (data["redirect"] !== "") {
                     router.get(data["redirect"], {}, {});
                 } else {
@@ -45,15 +45,16 @@ const global = (
                 localSuccess(data);
             }
         })
-        .catch(({ response }) => {
-            console.log(response);
+        .catch((data) => {
+            console.log(data);
+            let response = data.response;
             snackbar.value.color = "error";
             snackbar.value.text = "";
             if (response.status >= 400 && response.status <= 499) {
                 snackbar.value.text = response.data.message;
             }
             if (response.status >= 500 && response.status <= 599) {
-                snackbar.value.text = labels.message.error;
+                snackbar.value.text = labels.error_message;
             }
             if (response.data["errors"]) {
                 let errors = "";

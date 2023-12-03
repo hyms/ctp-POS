@@ -53,14 +53,8 @@ return new class extends Migration {
             $table->integer('status')->default(0);
             $table->timestamps(6);
             $table->softDeletes();
-        });
-        Schema::create('role_user', function(Blueprint $table)
-        {
-            $table->engine = 'InnoDB';
-            $table->id();
-            $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('role_id')->constrained('roles');
-            $table->timestamps(6);
+            $table->string('guard_name'); // For MySQL 8.0 use string('guard_name', 125);
+            $table->unique(['name', 'guard_name']);
         });
 
         Schema::create('permissions', function(Blueprint $table)
@@ -72,14 +66,65 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->timestamps(6);
             $table->softDeletes();
+            $table->string('guard_name'); // For MySQL 8.0 use string('guard_name', 125);
+            $table->unique(['name', 'guard_name']);
         });
-        Schema::create('permission_role', function(Blueprint $table)
-        {
-            $table->engine = 'InnoDB';
-            $table->id();
-            $table->foreignId('permission_id')->constrained('permissions');
-            $table->foreignId('role_id')->constrained('roles');
+        $tableNames = config('permission.table_names');
+        $columnNames = config('permission.column_names');
+
+        Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames) {
+            $table->unsignedBigInteger('permission_id');
+
+            $table->string('model_type');
+            $table->unsignedBigInteger($columnNames['model_morph_key']);
+            $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_permissions_model_id_model_type_index');
+
+            $table->foreign('permission_id')
+                ->references('id') // permission id
+                ->on($tableNames['permissions'])
+                ->onDelete('cascade');
+
+            $table->primary(['permission_id', $columnNames['model_morph_key'], 'model_type'],
+                'model_has_permissions_permission_model_type_primary');
+
         });
+
+        Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames) {
+            $table->unsignedBigInteger('role_id');
+
+            $table->string('model_type');
+            $table->unsignedBigInteger($columnNames['model_morph_key']);
+            $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_roles_model_id_model_type_index');
+
+            $table->foreign('role_id')
+                ->references('id') // role id
+                ->on($tableNames['roles'])
+                ->onDelete('cascade');
+
+            $table->primary(['role_id', $columnNames['model_morph_key'], 'model_type'],
+                'model_has_roles_role_model_type_primary');
+        });
+
+        Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
+            $table->unsignedBigInteger('permission_id');
+            $table->unsignedBigInteger('role_id');
+
+            $table->foreign('permission_id')
+                ->references('id') // permission id
+                ->on($tableNames['permissions'])
+                ->onDelete('cascade');
+
+            $table->foreign('role_id')
+                ->references('id') // role id
+                ->on($tableNames['roles'])
+                ->onDelete('cascade');
+
+            $table->primary(['permission_id', 'role_id'], 'role_has_permissions_permission_id_role_id_primary');
+        });
+
+        app('cache')
+            ->store(config('permission.cache.store') != 'default' ? config('permission.cache.store') : null)
+            ->forget(config('permission.cache.key'));
     }
 
     /**

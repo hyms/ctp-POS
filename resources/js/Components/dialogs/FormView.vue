@@ -1,54 +1,48 @@
 <script setup>
-import {labels} from "@/helpers";
-import {ref} from "vue";
+import { labelsNew } from "@/helpers";
+import { ref } from "vue";
 
 const props = defineProps({
-    modelValue: Boolean,
     onSave: {
         type: Function,
-        default: null
+        default: null,
     },
     loading: Boolean,
-    title: String,
     submitText: {
         type: String,
-        default: labels.btn.save
+        default: labelsNew.submit,
     },
 });
 const form = ref({});
 
 async function submitForm() {
     const validate = await form.value.validate();
-        if (props.onSave != undefined && typeof (props.onSave) === 'function') {
-            props.onSave(validate.valid);
-        }
+    if (props.onSave != undefined && typeof props.onSave === "function") {
+        props.onSave(validate.valid);
+    }
 }
-
 </script>
 <template>
-        <v-card class="pa-2">
-            <v-card-title>{{ title }}</v-card-title>
-            <v-form ref="form" @submit.prevent="submitForm" fast-fail :disabled="loading">
-                <v-card-text>
-                    <slot></slot>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        type="reset"
-                        variant="tonal"
-                        color="error"
-                        :disabled="loading">
-                        {{ labels.btn.discard }}
-                    </v-btn>
-                    <v-btn
-                        type="submit"
-                        color="primary"
-                        variant="elevated"
-                        :loading="loading">
-                        {{ submitText }}
-                    </v-btn>
-                </v-card-actions>
-            </v-form>
-        </v-card>
+    <v-card :loading="loading">
+        <v-form @submit.prevent="submitForm" ref="form" :disabled="loading">
+            <v-toolbar height="15"></v-toolbar>
+            <v-card-text>
+                <slot></slot>
+            </v-card-text>
+            <v-card-actions>
+                <v-row>
+                    <v-col cols="12">
+                        <v-btn
+                            type="submit"
+                            color="primary"
+                            variant="elevated"
+                            :loading="loading"
+                        >
+                            {{ submitText }}
+                        </v-btn>
+                    </v-col>
+                </v-row>
+            </v-card-actions>
+        </v-form>
+    </v-card>
 </template>

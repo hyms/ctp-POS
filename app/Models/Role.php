@@ -3,12 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Role extends Model
 {
     protected $guarded = ['id'];
-    use SoftDeletes;
 //    protected $fillable = ['name','status', 'label', 'description'];
 
     public function permissions()
