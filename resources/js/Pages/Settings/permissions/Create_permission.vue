@@ -165,104 +165,63 @@ function Create_Permission() {
                     </v-expansion-panels>
                 </v-col>
 
-                <!--                &lt;!&ndash;&ndash;&gt;-->
-                <!--                &lt;!&ndash;  Permissions &ndash;&gt;-->
-                <!--                <v-col md="4">-->
-                <!--                    <v-card no-body class="ul-card__border-radius">-->
-                <!--                        <v-card-header-->
-                <!--                            header-tag="header"-->
-                <!--                            class="p-1"-->
-                <!--                            role="tab"-->
-                <!--                        >-->
-                <!--                            <v-button-->
-                <!--                                class="card-title mv-0"-->
-                <!--                                block-->
-                <!--                                href="#"-->
-                <!--                                v-v-toggle.panel-Permissions-->
-                <!--                                variant="transparent"-->
-                <!--                                >{{ $t("UserPermissions") }}-->
-                <!--                            </v-button>-->
-                <!--                        </v-card-header>-->
-                <!--                        <v-collapse-->
-                <!--                            id="panel-Permissions "-->
-                <!--                            :visible="true"-->
-                <!--                            accordion="my-accordion2"-->
-                <!--                            role="tabpanel"-->
-                <!--                        >-->
-                <!--                            <v-card-body>-->
-                <!--                                <v-card-text>-->
-                <!--                                    <v-row>-->
-                <!--                                        &lt;!&ndash;Permissions View &ndash;&gt;-->
-                <!--                                         <v-col cols="12" md="6">-->
-                <!--                                            <label-->
-                <!--                                                class="checkbox checkbox-outline-primary"-->
-                <!--                                            >-->
-                <!--                                                <input-->
-                <!--                                                    type="checkbox"-->
-                <!--                                                    checked-->
-                <!--                                                    v-model="permissions"-->
-                <!--                                                    value="permissions_view"-->
-                <!--                                                />-->
-                <!--                                                <span>{{ $t("View") }}</span>-->
-                <!--                                                <span class="checkmark"></span>-->
-                <!--                                            </label>-->
-                <!--                                        </v-col>-->
-                <!--                                        &lt;!&ndash;Permissions ADD &ndash;&gt;-->
-                <!--                                         <v-col cols="12" md="6">-->
-                <!--                                            <label-->
-                <!--                                                class="checkbox checkbox-outline-primary"-->
-                <!--                                            >-->
-                <!--                                                <input-->
-                <!--                                                    type="checkbox"-->
-                <!--                                                    checked-->
-                <!--                                                    v-model="permissions"-->
-                <!--                                                    value="permissions_add"-->
-                <!--                                                />-->
-                <!--                                                <span>{{ $t("Add") }}</span>-->
-                <!--                                                <span class="checkmark"></span>-->
-                <!--                                            </label>-->
-                <!--                                        </v-col>-->
-                <!--                                        &lt;!&ndash;Permissions Edit &ndash;&gt;-->
-                <!--                                         <v-col cols="12" md="6">-->
-                <!--                                            <label-->
-                <!--                                                class="checkbox checkbox-outline-primary"-->
-                <!--                                            >-->
-                <!--                                                <input-->
-                <!--                                                    type="checkbox"-->
-                <!--                                                    checked-->
-                <!--                                                    v-model="permissions"-->
-                <!--                                                    value="permissions_edit"-->
-                <!--                                                />-->
-                <!--                                                <span>{{ $t("Edit") }}</span>-->
-                <!--                                                <span class="checkmark"></span>-->
-                <!--                                            </label>-->
-                <!--                                        </v-col>-->
-                <!--                                        &lt;!&ndash;Permissions Delete &ndash;&gt;-->
-                <!--                                         <v-col cols="12" md="6">-->
-                <!--                                            <label-->
-                <!--                                                class="checkbox checkbox-outline-primary"-->
-                <!--                                            >-->
-                <!--                                                <input-->
-                <!--                                                    type="checkbox"-->
-                <!--                                                    checked-->
-                <!--                                                    v-model="permissions"-->
-                <!--                                                    value="permissions_delete"-->
-                <!--                                                />-->
-                <!--                                                <span>{{ $t("Del") }}</span>-->
-                <!--                                                <span class="checkmark"></span>-->
-                <!--                                            </label>-->
-                <!--                                        </v-col>-->
-                <!--                                    </v-row>-->
-                <!--                                </v-card-text>-->
-                <!--                            </v-card-body>-->
-                <!--                        </v-collapse>-->
-                <!--                    </v-card>-->
-                <!--                </v-col>-->
-                <!--                &lt;!&ndash;&ndash;&gt;-->
-                <!--                &lt;!&ndash;  Products &ndash;&gt;-->
-                <!--                <v-col md="4">-->
-                <!--                    <v-card no-body class="ul-card__border-radius">-->
-                <!--                        <v-card-header-->
+
+                                <!--  Permissions -->
+                                <v-col md="4">
+                                  <v-expansion-panels>
+                        <v-expansion-panel>
+                            <v-expansion-panel-title>
+                            {{ labelsNew.UserPermissions }}
+                            </v-expansion-panel-title>
+                            <v-expansion-panel-text>
+                                                    <v-row>
+                                                        <!--Permissions View -->
+                                                         <v-col cols="12" md="6">
+                                        <v-checkbox
+                                            color="primary"
+                                            v-model="permissions['permissions_view']"
+                                            :label="labelsNew.View"
+                                            hide-details="auto"
+                                        ></v-checkbox>
+                                    </v-col>
+                                                        <!--Permissions ADD -->
+                                                         <v-col cols="12" md="6">
+                                                         <v-checkbox
+                                            color="primary"
+                                            v-model="permissions['permissions_add']"
+                                            :label="labelsNew.Add"
+                                            hide-details="auto"
+                                        ></v-checkbox>
+                                                        </v-col>
+                                                        <!--Permissions Edit -->
+                                                         <v-col cols="12" md="6">
+                                                         <v-checkbox
+                                            color="primary"
+                                            v-model="permissions['permissions_edit']"
+                                            :label="labelsNew.Edit"
+                                            hide-details="auto"
+                                        ></v-checkbox>
+                                                        </v-col>
+                                                        <!--Permissions Delete -->
+                                                         <v-col cols="12" md="6">
+                                                          <v-checkbox
+                                            color="primary"
+                                            v-model="permissions['permissions_delete']"
+                                            :label="labelsNew.Del"
+                                            hide-details="auto"
+                                        ></v-checkbox>
+                                                        </v-col>
+                                                    </v-row>
+                            </v-expansion-panel-text>
+                        </v-expansion-panel>
+                                  </v-expansion-panels>
+                                </v-col>
+
+
+                                <!--  Products -->
+                                <!--<v-col md="4">-->
+                                <!--    <v-card no-body class="ul-card__border-radius">-->
+                                <!--        <v-card-header-->
                 <!--                            header-tag="header"-->
                 <!--                            class="p-1"-->
                 <!--                            role="tab"-->
@@ -2147,230 +2106,8 @@ function Create_Permission() {
                 <!--                    </v-card>-->
                 <!--                </v-col>-->
 
-                <!--                &lt;!&ndash; hrm &ndash;&gt;-->
-                <!--                <v-col md="4">-->
-                <!--                    <v-card no-body class="ul-card__border-radius">-->
-                <!--                        <v-card-header-->
-                <!--                            header-tag="header"-->
-                <!--                            class="p-1"-->
-                <!--                            role="tab"-->
-                <!--                        >-->
-                <!--                            <v-button-->
-                <!--                                class="card-title mv-0"-->
-                <!--                                block-->
-                <!--                                href="#"-->
-                <!--                                v-v-toggle.panel-hrm-->
-                <!--                                variant="transparent"-->
-                <!--                                >{{ $t("HRM") }}-->
-                <!--                            </v-button>-->
-                <!--                        </v-card-header>-->
-                <!--                        <v-collapse-->
-                <!--                            id="panel-hrm"-->
-                <!--                            :visible="true"-->
-                <!--                            accordion="my-accordion21"-->
-                <!--                            role="tabpanel"-->
-                <!--                        >-->
-                <!--                            <v-card-body>-->
-                <!--                                <v-card-text>-->
-                <!--                                    <v-row>-->
-                <!--                                        &lt;!&ndash;view Employee&ndash;&gt;-->
-                <!--                                         <v-col cols="12" md="6">-->
-                <!--                                            <label-->
-                <!--                                                class="checkbox checkbox-outline-primary"-->
-                <!--                                            >-->
-                <!--                                                <input-->
-                <!--                                                    type="checkbox"-->
-                <!--                                                    checked-->
-                <!--                                                    v-model="permissions"-->
-                <!--                                                    value="view_employee"-->
-                <!--                                                />-->
-                <!--                                                <span>{{-->
-                <!--                                                    $t("view_employee")-->
-                <!--                                                }}</span>-->
-                <!--                                                <span class="checkmark"></span>-->
-                <!--                                            </label>-->
-                <!--                                        </v-col>-->
-                <!--                                        &lt;!&ndash;add Employee&ndash;&gt;-->
-                <!--                                         <v-col cols="12" md="6">-->
-                <!--                                            <label-->
-                <!--                                                class="checkbox checkbox-outline-primary"-->
-                <!--                                            >-->
-                <!--                                                <input-->
-                <!--                                                    type="checkbox"-->
-                <!--                                                    checked-->
-                <!--                                                    v-model="permissions"-->
-                <!--                                                    value="add_employee"-->
-                <!--                                                />-->
-                <!--                                                <span>{{-->
-                <!--                                                    $t("Add_Employee")-->
-                <!--                                                }}</span>-->
-                <!--                                                <span class="checkmark"></span>-->
-                <!--                                            </label>-->
-                <!--                                        </v-col>-->
-                <!--                                        &lt;!&ndash;edit employee &ndash;&gt;-->
-                <!--                                         <v-col cols="12" md="6">-->
-                <!--                                            <label-->
-                <!--                                                class="checkbox checkbox-outline-primary"-->
-                <!--                                            >-->
-                <!--                                                <input-->
-                <!--                                                    type="checkbox"-->
-                <!--                                                    checked-->
-                <!--                                                    v-model="permissions"-->
-                <!--                                                    value="edit_employee"-->
-                <!--                                                />-->
-                <!--                                                <span>{{-->
-                <!--                                                    $t("edit_employee")-->
-                <!--                                                }}</span>-->
-                <!--                                                <span class="checkmark"></span>-->
-                <!--                                            </label>-->
-                <!--                                        </v-col>-->
-                <!--                                        &lt;!&ndash;delete employee &ndash;&gt;-->
-                <!--                                         <v-col cols="12" md="6">-->
-                <!--                                            <label-->
-                <!--                                                class="checkbox checkbox-outline-primary"-->
-                <!--                                            >-->
-                <!--                                                <input-->
-                <!--                                                    type="checkbox"-->
-                <!--                                                    checked-->
-                <!--                                                    v-model="permissions"-->
-                <!--                                                    value="delete_employee"-->
-                <!--                                                />-->
-                <!--                                                <span>{{-->
-                <!--                                                    $t("delete_employee")-->
-                <!--                                                }}</span>-->
-                <!--                                                <span class="checkmark"></span>-->
-                <!--                                            </label>-->
-                <!--                                        </v-col>-->
 
-                <!--                                        &lt;!&ndash;Company &ndash;&gt;-->
-                <!--                                         <v-col cols="12" md="6">-->
-                <!--                                            <label-->
-                <!--                                                class="checkbox checkbox-outline-primary"-->
-                <!--                                            >-->
-                <!--                                                <input-->
-                <!--                                                    type="checkbox"-->
-                <!--                                                    checked-->
-                <!--                                                    v-model="permissions"-->
-                <!--                                                    value="company"-->
-                <!--                                                />-->
-                <!--                                                <span>{{ $t("Company") }}</span>-->
-                <!--                                                <span class="checkmark"></span>-->
-                <!--                                            </label>-->
-                <!--                                        </v-col>-->
-
-                <!--                                        &lt;!&ndash;department &ndash;&gt;-->
-                <!--                                         <v-col cols="12" md="6">-->
-                <!--                                            <label-->
-                <!--                                                class="checkbox checkbox-outline-primary"-->
-                <!--                                            >-->
-                <!--                                                <input-->
-                <!--                                                    type="checkbox"-->
-                <!--                                                    checked-->
-                <!--                                                    v-model="permissions"-->
-                <!--                                                    value="department"-->
-                <!--                                                />-->
-                <!--                                                <span>{{-->
-                <!--                                                    $t("department")-->
-                <!--                                                }}</span>-->
-                <!--                                                <span class="checkmark"></span>-->
-                <!--                                            </label>-->
-                <!--                                        </v-col>-->
-
-                <!--                                        &lt;!&ndash;designation &ndash;&gt;-->
-                <!--                                         <v-col cols="12" md="6">-->
-                <!--                                            <label-->
-                <!--                                                class="checkbox checkbox-outline-primary"-->
-                <!--                                            >-->
-                <!--                                                <input-->
-                <!--                                                    type="checkbox"-->
-                <!--                                                    checked-->
-                <!--                                                    v-model="permissions"-->
-                <!--                                                    value="designation"-->
-                <!--                                                />-->
-                <!--                                                <span>{{-->
-                <!--                                                    $t("Designation")-->
-                <!--                                                }}</span>-->
-                <!--                                                <span class="checkmark"></span>-->
-                <!--                                            </label>-->
-                <!--                                        </v-col>-->
-
-                <!--                                        &lt;!&ndash;office_shift &ndash;&gt;-->
-                <!--                                         <v-col cols="12" md="6">-->
-                <!--                                            <label-->
-                <!--                                                class="checkbox checkbox-outline-primary"-->
-                <!--                                            >-->
-                <!--                                                <input-->
-                <!--                                                    type="checkbox"-->
-                <!--                                                    checked-->
-                <!--                                                    v-model="permissions"-->
-                <!--                                                    value="office_shift"-->
-                <!--                                                />-->
-                <!--                                                <span>{{-->
-                <!--                                                    $t("Office_Shift")-->
-                <!--                                                }}</span>-->
-                <!--                                                <span class="checkmark"></span>-->
-                <!--                                            </label>-->
-                <!--                                        </v-col>-->
-
-                <!--                                        &lt;!&ndash;attendance &ndash;&gt;-->
-                <!--                                         <v-col cols="12" md="6">-->
-                <!--                                            <label-->
-                <!--                                                class="checkbox checkbox-outline-primary"-->
-                <!--                                            >-->
-                <!--                                                <input-->
-                <!--                                                    type="checkbox"-->
-                <!--                                                    checked-->
-                <!--                                                    v-model="permissions"-->
-                <!--                                                    value="attendance"-->
-                <!--                                                />-->
-                <!--                                                <span>{{-->
-                <!--                                                    $t("Attendance")-->
-                <!--                                                }}</span>-->
-                <!--                                                <span class="checkmark"></span>-->
-                <!--                                            </label>-->
-                <!--                                        </v-col>-->
-
-                <!--                                        &lt;!&ndash;leave &ndash;&gt;-->
-                <!--                                         <v-col cols="12" md="6">-->
-                <!--                                            <label-->
-                <!--                                                class="checkbox checkbox-outline-primary"-->
-                <!--                                            >-->
-                <!--                                                <input-->
-                <!--                                                    type="checkbox"-->
-                <!--                                                    checked-->
-                <!--                                                    v-model="permissions"-->
-                <!--                                                    value="leave"-->
-                <!--                                                />-->
-                <!--                                                <span>{{-->
-                <!--                                                    $t("Leave_request")-->
-                <!--                                                }}</span>-->
-                <!--                                                <span class="checkmark"></span>-->
-                <!--                                            </label>-->
-                <!--                                        </v-col>-->
-
-                <!--                                        &lt;!&ndash;holiday &ndash;&gt;-->
-                <!--                                         <v-col cols="12" md="6">-->
-                <!--                                            <label-->
-                <!--                                                class="checkbox checkbox-outline-primary"-->
-                <!--                                            >-->
-                <!--                                                <input-->
-                <!--                                                    type="checkbox"-->
-                <!--                                                    checked-->
-                <!--                                                    v-model="permissions"-->
-                <!--                                                    value="holiday"-->
-                <!--                                                />-->
-                <!--                                                <span>{{ $t("Holiday") }}</span>-->
-                <!--                                                <span class="checkmark"></span>-->
-                <!--                                            </label>-->
-                <!--                                        </v-col>-->
-                <!--                                    </v-row>-->
-                <!--                                </v-card-text>-->
-                <!--                            </v-card-body>-->
-                <!--                        </v-collapse>-->
-                <!--                    </v-card>-->
-                <!--                </v-col>-->
-
-                <!--                &lt;!&ndash; Settings &ndash;&gt;-->
+                                <!-- Settings -->
                 <!--                 <v-col cols="12" md="6">-->
                 <!--                    <v-card no-body class="ul-card__border-radius">-->
                 <!--                        <v-card-header-->
