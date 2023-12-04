@@ -1,5 +1,5 @@
 import { router } from "@inertiajs/vue3";
-import { labels } from "@/helpers";
+import { labels, labelsNew } from "@/helpers";
 import { ref } from "vue";
 
 const snackbarDefault = ref({
@@ -54,7 +54,7 @@ const global = (
                 snackbar.value.text = response.data.message;
             }
             if (response.status >= 500 && response.status <= 599) {
-                snackbar.value.text = labels.error_message;
+                snackbar.value.text = labelsNew.InvalidData;
             }
             if (response.data["errors"]) {
                 let errors = "";

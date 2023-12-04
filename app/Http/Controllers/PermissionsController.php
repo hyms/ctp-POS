@@ -17,17 +17,15 @@ class PermissionsController extends Controller
 
     public function index(Request $request)
     {
-        Inertia::share(['title' => 'Permissions']);
-        return Inertia::render('Settings/permissions/index');
+        Inertia::share(['titlePage' => 'Permisos']);
+        return Inertia::render('Settings/permissions/Permissions');
     }
 
     public function getTable(Request $request)
     {
         $user = Auth::user();
         $user->can('permissions_view');
-
         $roles = Role::get();
-
         return response()->json(['data' => $roles]);
     }
 
@@ -35,55 +33,37 @@ class PermissionsController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'create', Role::class);
+        $user = Auth::user();
+        $user->can('permissions_store');
+        $request->validate([
+            'role.name' => 'required',
+        ]);
 
-        try {
-            request()->validate([
-                'role.name' => 'required',
-            ]);
+        DB::transaction(function () use ($request) {
 
-            DB::transaction(function () use ($request) {
+            //-- Create New Role
+            $Role = new Role;
+            $Role->name = $request['role']['name'];
+            $Role->label = $request['role']['name'];
+            $Role->status = 0;
+            $Role->description = $request['role']['description'];
+            $Role->save();
 
-                //-- Create New Role
-                $Role = new Role;
-                $Role->name = $request['role']['name'];
-                $Role->label = $request['role']['name'];
-                $Role->status = 0;
-                $Role->description = $request['role']['description'];
-                $Role->save();
+            $role = Role::findOrFail($Role->id);
+            $permissions = $request->permissions;
+            $role->syncPermissions($permissions);
 
-                $role = Role::findOrFail($Role->id);
-                $role->permissions()->detach();
-                $permissions = $request->permissions;
+        }, 10);
 
-                foreach ($permissions as $permission_slug) {
-                    $perm = Permission::firstOrCreate(['name' => $permission_slug]);
-                    $data[] = $perm->id;
-                }
-
-                $role->permissions()->attach($data);
-
-            }, 10);
-
-            return response()->json(['success' => true]);
-
-        } catch (ValidationException $e) {
-
-            return response()->json([
-                'status' => 422,
-                'msg' => 'error',
-                'errors' => $e->errors(),
-            ], 422);
-        }
-
+        return response()->json(['redirect' => '/roles']);
     }
 
     //------------ function show -----------\\
 
-    public function show($id)
+    public function create()
     {
-        //
-
+        Inertia::share(['titlePage' => 'Crear Permisos']);
+        return Inertia::render('Settings/permissions/Create_permission');
     }
 
     //----------- Update Role --------------\\
@@ -139,23 +119,6 @@ class PermissionsController extends Controller
         ]);
         return response()->json(['success' => true]);
     }
-
-    //-------------- Delete by selection  ---------------\\
-
-    public function delete_by_selection(Request $request)
-    {
-
-        $this->authorizeForUser($request->user('api'), 'delete', Role::class);
-
-        $selectedIds = $request->selectedIds;
-        foreach ($selectedIds as $role_id) {
-            Role::whereId($role_id)->update([
-                'deleted_at' => Carbon::now(),
-            ]);
-        }
-        return response()->json(['success' => true]);
-    }
-
 
     //----------- GET ALL Roles without paginate --------------\\
 
