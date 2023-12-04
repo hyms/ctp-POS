@@ -7,6 +7,12 @@ import FormView from "@/Components/dialogs/FormView.vue";
 
 const snackbar = ref({ view: false, color: "", text: "" });
 
+const props = defineProps({
+    roleItem: Object,
+    permissionsItems: Object,
+    errors: Object,
+});
+
 const loading = ref(false);
 const permissions = ref([]);
 const role = ref({
@@ -25,6 +31,37 @@ function Submit_Permission(success) {
     }
 }
 
+//     //------------------------ Update Permissions -------------------\\
+//     Update_Permission() {
+//        this.SubmitProcessing = true;
+//       NProgress.start();
+//       NProgress.set(0.1);
+//       let id = this.$route.params.id;
+//       axios
+//         .put(`roles/${id}`, {
+//           role: this.role,
+//           permissions: this.permissions
+//         })
+//         .then(response => {
+//           this.SubmitProcessing = false;
+//           NProgress.done();
+//           this.makeToast(
+//             "success",
+//             this.$t("Update.TitleRole"),
+//             this.$t("Success")
+//           );
+//
+//           this.$router.push({ name: "groupPermission" });
+//           this.$store.dispatch("refreshUserPermissions");
+//         })
+//         .catch(error => {
+//           this.SubmitProcessing = false;
+//           NProgress.done();
+//           this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+//         });
+//     },
+//
+
 //------------------------ Create Permissions -------------------\\
 function Create_Permission() {
     api.post({
@@ -39,7 +76,11 @@ function Create_Permission() {
             snackbar.value.text = labelsNew.Create.TitleRole;
         },
     });
-} //end Methods
+}
+
+//   created: function() {
+//     this.GetElements();
+//   }
 </script>
 <template>
     <Layout title-page="">
