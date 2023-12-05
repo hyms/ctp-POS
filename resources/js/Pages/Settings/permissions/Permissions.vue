@@ -29,9 +29,8 @@ function showForm(id = null) {
             method: "get",
         });
     } else {
-        router.visit("/roles-edit", {
+        router.visit("/roles-edit/" + id, {
             method: "get",
-            params: { id },
         });
     }
 }

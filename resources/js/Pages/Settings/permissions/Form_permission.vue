@@ -206,63 +206,71 @@ function Create_Permission() {
                     </v-expansion-panels>
                 </v-col>
 
-
-                                <!--  Permissions -->
-                                <v-col md="4">
-                                  <v-expansion-panels>
+                <!--  Permissions -->
+                <v-col md="4">
+                    <v-expansion-panels>
                         <v-expansion-panel>
                             <v-expansion-panel-title>
-                            {{ labelsNew.UserPermissions }}
+                                {{ labelsNew.UserPermissions }}
                             </v-expansion-panel-title>
                             <v-expansion-panel-text>
-                                                    <v-row>
-                                                        <!--Permissions View -->
-                                                         <v-col cols="12" md="6">
+                                <v-row>
+                                    <!--Permissions View -->
+                                    <v-col cols="12" md="6">
                                         <v-checkbox
                                             color="primary"
-                                            v-model="permissions['permissions_view']"
+                                            v-model="
+                                                permissions['permissions_view']
+                                            "
                                             :label="labelsNew.View"
                                             hide-details="auto"
                                         ></v-checkbox>
                                     </v-col>
-                                                        <!--Permissions ADD -->
-                                                         <v-col cols="12" md="6">
-                                                         <v-checkbox
+                                    <!--Permissions ADD -->
+                                    <v-col cols="12" md="6">
+                                        <v-checkbox
                                             color="primary"
-                                            v-model="permissions['permissions_add']"
+                                            v-model="
+                                                permissions['permissions_add']
+                                            "
                                             :label="labelsNew.Add"
                                             hide-details="auto"
                                         ></v-checkbox>
-                                                        </v-col>
-                                                        <!--Permissions Edit -->
-                                                         <v-col cols="12" md="6">
-                                                         <v-checkbox
+                                    </v-col>
+                                    <!--Permissions Edit -->
+                                    <v-col cols="12" md="6">
+                                        <v-checkbox
                                             color="primary"
-                                            v-model="permissions['permissions_edit']"
+                                            v-model="
+                                                permissions['permissions_edit']
+                                            "
                                             :label="labelsNew.Edit"
                                             hide-details="auto"
                                         ></v-checkbox>
-                                                        </v-col>
-                                                        <!--Permissions Delete -->
-                                                         <v-col cols="12" md="6">
-                                                          <v-checkbox
+                                    </v-col>
+                                    <!--Permissions Delete -->
+                                    <v-col cols="12" md="6">
+                                        <v-checkbox
                                             color="primary"
-                                            v-model="permissions['permissions_delete']"
+                                            v-model="
+                                                permissions[
+                                                    'permissions_delete'
+                                                ]
+                                            "
                                             :label="labelsNew.Del"
                                             hide-details="auto"
                                         ></v-checkbox>
-                                                        </v-col>
-                                                    </v-row>
+                                    </v-col>
+                                </v-row>
                             </v-expansion-panel-text>
                         </v-expansion-panel>
-                                  </v-expansion-panels>
-                                </v-col>
+                    </v-expansion-panels>
+                </v-col>
 
-
-                                <!--  Products -->
-                                <!--<v-col md="4">-->
-                                <!--    <v-card no-body class="ul-card__border-radius">-->
-                                <!--        <v-card-header-->
+                <!--  Products -->
+                <!--<v-col md="4">-->
+                <!--    <v-card no-body class="ul-card__border-radius">-->
+                <!--        <v-card-header-->
                 <!--                            header-tag="header"-->
                 <!--                            class="p-1"-->
                 <!--                            role="tab"-->
@@ -2147,8 +2155,7 @@ function Create_Permission() {
                 <!--                    </v-card>-->
                 <!--                </v-col>-->
 
-
-                                <!-- Settings -->
+                <!-- Settings -->
                 <!--                 <v-col cols="12" md="6">-->
                 <!--                    <v-card no-body class="ul-card__border-radius">-->
                 <!--                        <v-card-header-->

@@ -51,10 +51,10 @@ return new class extends Migration {
             $table->string('label', 192)->nullable();
             $table->text('description')->nullable();
             $table->integer('status')->default(0);
-            $table->timestamps(6);
-            $table->softDeletes();
             $table->string('guard_name'); // For MySQL 8.0 use string('guard_name', 125);
             $table->unique(['name', 'guard_name']);
+            $table->timestamps(6);
+            $table->softDeletes();
         });
 
         Schema::create('permissions', function(Blueprint $table)
@@ -64,10 +64,10 @@ return new class extends Migration {
             $table->string('name', 192);
             $table->string('label', 192)->nullable();
             $table->text('description')->nullable();
-            $table->timestamps(6);
-            $table->softDeletes();
             $table->string('guard_name'); // For MySQL 8.0 use string('guard_name', 125);
             $table->unique(['name', 'guard_name']);
+            $table->timestamps(6);
+            $table->softDeletes();
         });
         $tableNames = config('permission.table_names');
         $columnNames = config('permission.column_names');

@@ -24,6 +24,7 @@ use App\Http\Controllers\SalesTypeController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TransferController;
 use App\Http\Controllers\UnitsController;
+use App\Http\Controllers\UpgradeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Http\Request;
@@ -41,8 +42,8 @@ use Inertia\Inertia;
 |
 */
 
-//Route::get('/upgrade', [UpgradeController::class, 'index'])->name('upgrade');
-//Route::post('/upgrade', [UpgradeController::class, 'upgrade'])->name('upgrade');
+Route::get('/upgrade', [UpgradeController::class, 'index'])->name('upgrade');
+Route::post('/upgrade', [UpgradeController::class, 'upgrade'])->name('upgrade');
 
 Route::get('/', [DashboardController::class, 'index']
 )->middleware(['auth', 'verified','auth.session'])->name('dashboard');
@@ -302,7 +303,7 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
     Route::delete('roles', [PermissionsController::class,'destroy']);
     Route::get('roles-data', [PermissionsController::class,'getTable']);
     Route::get('roles-create', [PermissionsController::class,'create']);
-    Route::get('roles-edit', [PermissionsController::class,'edit']);
+    Route::get('roles-edit/{id}', [PermissionsController::class,'edit']);
 //    Route::resource('roles/check/create_page', [PermissionsController::class,'Check_Create_Page']);
 //    Route::post('roles/delete/by_selection', 'PermissionsController@delete_by_selection');
     //------------------------------------------------------------------\\

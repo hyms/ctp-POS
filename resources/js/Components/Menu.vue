@@ -232,7 +232,7 @@ function loadMenu() {
             subItems.push({
                 label: labelsNew.GroupPermissions,
                 url: "/roles",
-                activate: ["/roles"],
+                activate: ["/roles", "/roles-create"],
             });
         }
         if (globals.userPermision(["expenses_category_view"])) {
@@ -280,6 +280,8 @@ function loadMenu() {
                 "/warehouses",
                 "/users",
                 "/backup",
+                "/roles-create",
+                "/roles",
             ],
             subItems: subItems.slice(),
         });

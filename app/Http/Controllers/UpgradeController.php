@@ -2,6 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\Client;
+use App\Models\PaymentSale;
+use App\Models\Permission;
+use App\Models\Product;
+use App\Models\product_warehouse;
+use App\Models\Role;
+use App\Models\SaleDetail;
+use App\Models\SalesType;
+use App\Models\Setting;
+use App\Models\Unit;
+use App\Models\Warehouse;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -41,20 +53,18 @@ class UpgradeController extends Controller
 //                }
 //            }
             DB::transaction(function () {
-                $id = DB::table('settings')->insertGetId([
+                Setting::create([
                     'CompanyName' => "Prographics",
                     'email' => "",
                     'CompanyPhone' => "",
                     'CompanyAdress' => "",
                     'days' => 1,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                    'deleted_at' => null,
                 ]);
+
                 Log::info("finish settings migration");
                 $items = DB::table('clientes')->get()->collect();
                 $items->each(function ($item) {
-                    $id = DB::table('clients')->insertGetId([
+                    Client::create([
                         'id' => $item->id,
                         'name' => $item->nombreCompleto,
                         'company_name' => $item->nombre,
@@ -65,14 +75,13 @@ class UpgradeController extends Controller
                         'adresse' => $item->direccion,
                         'nit_ci' => $item->nitCi,
                         'created_at' => $item->created_at,
-                        'updated_at' => Carbon::now(),
                         'deleted_at' => $item->deleted_at,
                     ]);
                 });
                 Log::info("finish client migration");
                 $items = DB::table('sucursales')->get()->collect();
                 $items->each(function ($item) {
-                    $id = DB::table('warehouses')->insertGetId([
+                    Warehouse::create([
                         'id' => $item->id,
                         'name' => $item->nombre,
                         'city' => null,
@@ -80,7 +89,6 @@ class UpgradeController extends Controller
                         'email' => null,
                         'country' => null,
                         'created_at' => $item->created_at,
-                        'updated_at' => Carbon::now(),
                         'deleted_at' => $item->deleted_at,
                     ]);
                 });
@@ -93,7 +101,6 @@ class UpgradeController extends Controller
                     ]);
                 });
                 Log::info("finish user_warehouse migration");
-
                 $items = collect([
                     ['value' => 1, 'text' => 'sadmin'],
                     ['value' => 2, 'text' => 'dueño'],
@@ -101,33 +108,199 @@ class UpgradeController extends Controller
                     ['value' => 4, 'text' => 'operario']
                 ]);
                 $items->each(function ($item) {
-                    $id = DB::table('roles')->insertGetId([
-                        'id' => $item['value'],
+                    Role::create([
                         'name' => $item['text'],
                         'label' => Str::of($item['text'])->ucfirst(),
                         'status' => ($item['value'] == 1) ? 1 : 0,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
+                        'guard_name'=>'web'
                     ]);
                 });
                 Log::info("finish roles migration");
-
-                $id = DB::table('role_user')->insertGetId([
-                    'user_id' => 1,
-                    'role_id' => 1,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
+                $items = collect([
+                    [
+                        'name' => 'users_view',
+                        'guard_name'=>'web'
+                    ],
+                    [
+                        'name' => 'users_edit',
+                    ],
+                    [
+                        'name' => 'record_view',
+                    ],
+                    [
+                        'name' => 'users_delete',
+                    ],
+                    [
+                        'name' => 'users_add',
+                    ],
+                    [
+                        'name' => 'permissions_edit',
+                    ],
+                    [
+                        'name' => 'permissions_view',
+                    ],
+                    [
+                        'name' => 'permissions_delete',
+                    ],
+                    [
+                        'name' => 'permissions_add',
+                    ],
+                    [
+                        'name' => 'products_delete',
+                    ],
+                    [
+                        'name' => 'products_view',
+                    ],
+                    [
+                        'name' => 'barcode_view',
+                    ],
+                    [
+                        'name' => 'products_edit',
+                    ],
+                    [
+                        'name' => 'products_add',
+                    ],
+                    [
+                        'name' => 'expense_add',
+                    ],
+                    [
+                        'name' => 'expense_delete',
+                    ],
+                    [
+                        'name' => 'expense_edit'
+                    ],
+                    [
+                        'name' => 'expense_view'
+                    ],
+                    [
+                        'name' => 'transfer_delete',
+                    ],
+                    [
+                        'name' => 'transfer_add',
+                    ],
+                    [
+                        'name' => 'transfer_view',
+                    ],
+                    [
+                        'name' => 'transfer_edit',
+                    ],
+                    [
+                        'name' => 'adjustment_delete',
+                    ],
+                    [
+                        'name' => 'adjustment_add',
+                    ],
+                    [
+                        'name' => 'adjustment_edit',
+                    ],
+                    [
+                        'name' => 'adjustment_view',
+                    ],
+                    [
+                        'name' => 'Sales_edit',
+                    ],
+                    [
+                        'name' => 'Sales_view',
+                    ],
+                    [
+                        'name' => 'Sales_delete',
+                    ],
+                    [
+                        'name' => 'Sales_add',
+                    ],
+                    [
+                        'name' => 'payment_sales_delete',
+                    ],
+                    [
+                        'name' => 'payment_sales_add',
+                    ],
+                    [
+                        'name' => 'payment_sales_edit',
+                    ],
+                    [
+                        'name' => 'payment_sales_view',
+                    ],
+                    [
+                        'name' => 'Customers_edit',
+                    ],
+                    [
+                        'name' => 'Customers_view',
+                    ],
+                    [
+                        'name' => 'Customers_delete',
+                    ],
+                    [
+                        'name' => 'Customers_add',
+                    ],
+                    [
+                        'name' => 'unit',
+                    ],
+                    [
+                        'name' => 'currency',
+                    ],
+                    [
+                        'name' => 'category',
+                    ],
+                    [
+                        'name' => 'backup',
+                    ],
+                    [
+                        'name' => 'warehouse',
+                    ],
+                    [
+                        'name' => 'sales_type',
+                    ],
+                    [
+                        'name' => 'setting_system',
+                    ],
+                    [
+                        'name' => 'Warehouse_report',
+                    ],
+                    [
+                        'name' => 'Reports_quantity_alerts',
+                    ],
+                    [
+                        'name' => 'Reports_profit',
+                    ],
+                    [
+                        'name' => 'Reports_suppliers',
+                    ],
+                    [
+                        'name' => 'Reports_customers',
+                    ],
+                    [
+                        'name' => 'Reports_purchase',
+                    ],
+                    [
+                        'name' => 'Reports_sales',
+                    ],
+                    [
+                        'name' => 'Reports_payments_purchase_Return',
+                    ],
+                    [
+                        'name' => 'Reports_payments_Sale_Returns',
+                    ],
+                    [
+                        'name' => 'Reports_payments_Purchases',
+                    ],
+                    [
+                        'name' => 'Reports_payments_Sales',
+                    ],
+                    [
+                        'name' => 'Pos_view',
+                    ],
                 ]);
-                $id = DB::table('role_user')->insertGetId([
-                    'user_id' => 8,
-                    'role_id' => 2,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ]);
+                $items->each(function ($item) {
+                    Permission::create([
+                        'name' => $item['name'],
+                        'label' => Str::of($item['name'])->ucfirst(),
+                        'guard_name'=>'web'
+                    ]);
+                });
                 Log::info("finish role_user migration");
                 $items = DB::table('tipoProducto')->get();
                 $items->each(function ($item) {
-                    $id = DB::table('categories')->insertGetId([
+                    Category::create([
                         'id' => $item->id,
                         'code' => $item->codigo,
                         'name' => $item->nombre,
@@ -137,33 +310,26 @@ class UpgradeController extends Controller
                     ]);
                 });
                 Log::info("finish categories migration");
-
-                $unit_id = DB::table('units')->insertGetId([
+                Unit::create([
                     'id' => 1,
                     'name' => 'placa',
                     'ShortName' => 'placa',
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
                 ]);
-                $id = DB::table('units')->insertGetId([
+                Unit::create([
                     'id' => 2,
                     'name' => 'bidon',
                     'ShortName' => 'bidon',
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
                 ]);
-                $id = DB::table('units')->insertGetId([
+                Unit::create([
                     'id' => 3,
                     'name' => 'impresion',
                     'ShortName' => 'imp',
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
                 ]);
                 Log::info("finish units migration");
 
                 $items = DB::table('tipoProducto')->get();
                 $items->each(function ($item) {
-                    $id = DB::table('sales_type')->insertGetId([
+                    SalesType::create([
                         'id' => $item->id,
                         'code' => $item->codigo,
                         'name' => $item->nombre,
@@ -175,8 +341,7 @@ class UpgradeController extends Controller
                 Log::info("finish sales_type migration");
                 $items = DB::table('productos')->get();
                 $items->each(function ($item) {
-
-                    $id = DB::table('products')->insertGetId([
+                    Product::create([
                         'id' => $item->id,
                         'code' => $item->codigo,
                         'name' => $item->formato,
@@ -203,8 +368,7 @@ class UpgradeController extends Controller
                 $items = DB::table('stock')->get();
                 Log::info("stock count " . $items->count());
                 $items->each(function ($item) {
-
-                    $id = DB::table('product_warehouse')->insertGetId([
+                    product_warehouse::create([
                         'id' => $item->id,
                         'product_id' => $item->producto,
                         'warehouse_id' => $item->sucursal,
@@ -323,10 +487,10 @@ class UpgradeController extends Controller
                                 "sales_type_id" => $item->tipoOrden,
                             ]);
                             foreach ($sale_datail as $detail) {
-                                $id = DB::table('sale_details')->insertGetId($detail);
+                                SaleDetail::create($detail);
                             }
                             foreach ($sale_payment as $payment) {
-                                $id = DB::table('payment_sales')->insertGetId($payment);
+                                PaymentSale::create($payment);
                             }
                         }
                     });

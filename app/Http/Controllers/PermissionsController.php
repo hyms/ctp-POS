@@ -33,8 +33,7 @@ class PermissionsController extends Controller
 
     public function store(Request $request)
     {
-        $user = Auth::user();
-        $user->can('permissions_store');
+
         $request->validate([
             'role.name' => 'required',
         ]);
@@ -58,12 +57,40 @@ class PermissionsController extends Controller
         return response()->json(['redirect' => '/roles']);
     }
 
-    //------------ function show -----------\\
+    //------------ Show Form create Permissions -----------\\
 
     public function create()
     {
+        $user = Auth::user();
+        $user->can('permissions_add');
         Inertia::share(['titlePage' => 'Crear Permisos']);
-        return Inertia::render('Settings/permissions/Create_permission');
+        return Inertia::render('Settings/permissions/Form_permission');
+    }
+
+//------------- Show Form Edit Permissions -----------\\
+    public function edit($id, Request $request)
+    {
+        $user = Auth::user();
+        $user->can('permissions_edit');
+
+        if ($id != '1') {
+            $Role = Role::with('permissions')->where('deleted_at', '=', null)->findOrFail($id);
+            $item = collect();
+            $data = collect();
+            if ($Role) {
+                $item->put('name', $Role->name);
+                $item->put('description', $Role->description);
+                foreach ($Role->permissions as $permission) {
+                    $data->put($permission->name, true);
+                }
+            }
+            Inertia::share(['titlePage' => 'Crear Permisos']);
+            return Inertia::render('Settings/permissions/Form_permission', [
+                'permissionsItem' => $data,
+                'roleItem' => $item,
+            ]);
+        }
+
     }
 
     //----------- Update Role --------------\\
@@ -127,36 +154,5 @@ class PermissionsController extends Controller
         $roles = Role::where('deleted_at', null)->get(['id', 'name']);
         return response()->json($roles);
     }
-
-    //------------- Show Form Edit Permissions -----------\\
-
-    public function edit(Request $request, $id)
-    {
-
-        $this->authorizeForUser($request->user('api'), 'update', Role::class);
-
-        if ($id != '1') {
-            $Role = Role::with('permissions')->where('deleted_at', '=', null)->findOrFail($id);
-            if ($Role) {
-                $item['name'] = $Role->name;
-                $item['description'] = $Role->description;
-                $data = [];
-                if ($Role) {
-                    foreach ($Role->permissions as $permission) {
-                        $data[] = $permission->name;
-                    }
-                }
-            }
-            return response()->json([
-                'permissions' => $data,
-                'role' => $item,
-            ]);
-
-        } else {
-            return response()->json([
-                'success' => false,
-            ], 401);
-        }
-    }
-
 }
+
