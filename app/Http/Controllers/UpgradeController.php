@@ -9,6 +9,7 @@ use App\Models\Permission;
 use App\Models\Product;
 use App\Models\product_warehouse;
 use App\Models\Role;
+use App\Models\Sale;
 use App\Models\SaleDetail;
 use App\Models\SalesType;
 use App\Models\Setting;
@@ -63,8 +64,8 @@ class UpgradeController extends Controller
 
                 Log::info("finish settings migration");
                 $items = DB::table('clientes')->get()->collect();
-                $items->each(function ($item) {
-                    Client::create([
+                $client = $items->map(function ($item){
+                    return [
                         'id' => $item->id,
                         'name' => $item->nombreCompleto,
                         'company_name' => $item->nombre,
@@ -76,12 +77,13 @@ class UpgradeController extends Controller
                         'nit_ci' => $item->nitCi,
                         'created_at' => $item->created_at,
                         'deleted_at' => $item->deleted_at,
-                    ]);
+                    ];
                 });
+                Client::insert($client->toArray());
                 Log::info("finish client migration");
                 $items = DB::table('sucursales')->get()->collect();
-                $items->each(function ($item) {
-                    Warehouse::create([
+                $warehouse = $items->map(function ($item){
+                   return [
                         'id' => $item->id,
                         'name' => $item->nombre,
                         'city' => null,
@@ -90,8 +92,9 @@ class UpgradeController extends Controller
                         'country' => null,
                         'created_at' => $item->created_at,
                         'deleted_at' => $item->deleted_at,
-                    ]);
+                    ];
                 });
+                Warehouse::insert($warehouse->toArray());
                 Log::info("finish warehouses migration");
                 $items = DB::table('users')->get()->collect();
                 $items->each(function ($item) {
@@ -107,19 +110,19 @@ class UpgradeController extends Controller
                     ['value' => 3, 'text' => 'venta'],
                     ['value' => 4, 'text' => 'operario']
                 ]);
-                $items->each(function ($item) {
-                    Role::create([
+                $role = $items->map(function ($item) {
+                    return [
                         'name' => $item['text'],
                         'label' => Str::of($item['text'])->ucfirst(),
                         'status' => ($item['value'] == 1) ? 1 : 0,
                         'guard_name'=>'web'
-                    ]);
+                    ];
                 });
+                Role::insert($role->toArray());
                 Log::info("finish roles migration");
                 $items = collect([
                     [
                         'name' => 'users_view',
-                        'guard_name'=>'web'
                     ],
                     [
                         'name' => 'users_edit',
@@ -290,58 +293,60 @@ class UpgradeController extends Controller
                         'name' => 'Pos_view',
                     ],
                 ]);
-                $items->each(function ($item) {
-                    Permission::create([
+                $permision = $items->map(function ($item) {
+                    return [
                         'name' => $item['name'],
                         'label' => Str::of($item['name'])->ucfirst(),
                         'guard_name'=>'web'
-                    ]);
+                    ];
                 });
+                Permission::insert($permision->toArray());
                 Log::info("finish role_user migration");
                 $items = DB::table('tipoProducto')->get();
-                $items->each(function ($item) {
-                    Category::create([
+                $category = $items->map(function ($item) {
+                    return [
                         'id' => $item->id,
                         'code' => $item->codigo,
                         'name' => $item->nombre,
                         'created_at' => $item->created_at,
                         'updated_at' => $item->updated_at,
                         'deleted_at' => $item->deleted_at,
-                    ]);
+                    ];
                 });
+                Category::insert($category->toArray());
                 Log::info("finish categories migration");
-                Unit::create([
+                Unit::insert([
+                    [
                     'id' => 1,
                     'name' => 'placa',
                     'ShortName' => 'placa',
-                ]);
-                Unit::create([
+                ],[
                     'id' => 2,
                     'name' => 'bidon',
                     'ShortName' => 'bidon',
-                ]);
-                Unit::create([
+                ],[
                     'id' => 3,
                     'name' => 'impresion',
                     'ShortName' => 'imp',
-                ]);
+                ]]);
                 Log::info("finish units migration");
 
                 $items = DB::table('tipoProducto')->get();
-                $items->each(function ($item) {
-                    SalesType::create([
+                $salesType = $items->map(function ($item) {
+                    return [
                         'id' => $item->id,
                         'code' => $item->codigo,
                         'name' => $item->nombre,
                         'created_at' => $item->created_at,
                         'updated_at' => $item->updated_at,
                         'deleted_at' => $item->deleted_at,
-                    ]);
+                    ];
                 });
+                SalesType::insert($salesType->toArray());
                 Log::info("finish sales_type migration");
                 $items = DB::table('productos')->get();
-                $items->each(function ($item) {
-                    Product::create([
+                $product = $items->map(function ($item) {
+                    return [
                         'id' => $item->id,
                         'code' => $item->codigo,
                         'name' => $item->formato,
@@ -361,13 +366,14 @@ class UpgradeController extends Controller
                         'created_at' => $item->created_at,
                         'updated_at' => $item->updated_at,
                         'deleted_at' => $item->deleted_at,
-                    ]);
+                    ];
                 });
+                Product::insert($product->toArray());
                 Log::info("finish products migration");
 
                 $items = DB::table('stock')->get();
                 Log::info("stock count " . $items->count());
-                $items->each(function ($item) {
+                $product_warehouse = $items->map(function ($item) {
                     product_warehouse::create([
                         'id' => $item->id,
                         'product_id' => $item->producto,
@@ -380,6 +386,7 @@ class UpgradeController extends Controller
                         'deleted_at' => $item->deleted_at,
                     ]);
                 });
+                product_warehouse::insert($product_warehouse->toArray());
                 Log::info("finish product_warehouse migration");
 
                 $items = DB::table('ordenesTrabajo');
@@ -389,7 +396,7 @@ class UpgradeController extends Controller
                 for ($i = 0; $i <= $pages; $i++) {
                     $items = DB::table('ordenesTrabajo')->skip($paginate * $i)->take($paginate)->get();
                     Log::info("ordenesTrabajo start page" . $i);
-                    $items->each(function ($item) {
+                    $sales = $items->map(function ($item) {
                         if ($item->estado >= 0 && $item->estado < 10) {
                             if (empty($item->tipoOrden)) {
                                 $item->tipoOrden = 1;
@@ -462,7 +469,8 @@ class UpgradeController extends Controller
                             } else if ($due == $GrandTotal) {
                                 $payment_statut = 'unpaid';
                             }
-                            $id = DB::table('sales')->insertGetId([
+                            return [
+                               "sale"=> [
                                 "id" => $item->id,
                                 "user_pos" => $item->userDiseñador,
                                 "user_id" => $item->userVenta ?? $item->userDiseñador,
@@ -485,15 +493,16 @@ class UpgradeController extends Controller
                                 "updated_at" => $item->updated_at,
                                 "deleted_at" => $item->deleted_at,
                                 "sales_type_id" => $item->tipoOrden,
-                            ]);
-                            foreach ($sale_datail as $detail) {
-                                SaleDetail::create($detail);
-                            }
-                            foreach ($sale_payment as $payment) {
-                                PaymentSale::create($payment);
-                            }
+                            ],
+                            "detail"=>$sale_datail,
+                            "paymentSale"=>$sale_payment
+                            ];
                         }
                     });
+
+                    Sale::insert($sales['sale']);
+                    SaleDetail::insert($sales['detail']);
+                    PaymentSale::insert($sales['paymentSale']);
                 }
 
                 Log::info("finish sales migration");
