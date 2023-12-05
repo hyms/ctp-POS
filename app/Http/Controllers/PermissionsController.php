@@ -33,7 +33,6 @@ class PermissionsController extends Controller
 
     public function store(Request $request)
     {
-
         $request->validate([
             'role.name' => 'required',
         ]);
@@ -49,8 +48,12 @@ class PermissionsController extends Controller
             $Role->save();
 
             $role = Role::findOrFail($Role->id);
-            $permissions = $request->permissions;
-            $role->syncPermissions($permissions);
+            $permissions = collect($request->permissions);
+            $permissions = $permissions->filter();
+            $permissions = $permissions->map(function($item,$key){
+               return $key;
+            });
+            $role->givePermissionTo($permissions);
 
         }, 10);
 
@@ -84,7 +87,7 @@ class PermissionsController extends Controller
                     $data->put($permission->name, true);
                 }
             }
-            Inertia::share(['titlePage' => 'Crear Permisos']);
+            Inertia::share(['titlePage' => 'Editar Permisos']);
             return Inertia::render('Settings/permissions/Form_permission', [
                 'permissionsItem' => $data,
                 'roleItem' => $item,
@@ -95,12 +98,9 @@ class PermissionsController extends Controller
 
     //----------- Update Role --------------\\
 
-    public function update(Request $request, $id)
+    public function update($id, Request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'update', Role::class);
-
-        try {
-            request()->validate([
+            $request->validate([
                 'role.name' => 'required',
             ]);
 
@@ -109,42 +109,30 @@ class PermissionsController extends Controller
                 Role::whereId($id)->update($request['role']);
 
                 $role = Role::findOrFail($id);
-                $role->permissions()->detach();
-                $permissions = $request->permissions;
 
-                foreach ($permissions as $permission_slug) {
-
-                    //get the permission object by name
-                    $perm = Permission::firstOrCreate(['name' => $permission_slug]);
-                    $data[] = $perm->id;
-                }
-
-                $role->permissions()->attach($data);
+                 $permissions = collect($request->permissions);
+            $permissions = $permissions->filter();
+            $permissions = $permissions->map(function($item,$key){
+               return $key;
+            });
+            $role->syncPermissionTo($permissions);
 
             }, 10);
 
-            return response()->json(['success' => true]);
-
-        } catch (ValidationException $e) {
-            return response()->json([
-                'status' => 422,
-                'msg' => 'error',
-                'errors' => $e->errors(),
-            ], 422);
-        }
-
+            return response()->json(['redirect' => '/roles']);
     }
 
     //----------- Delete Role --------------\\
 
     public function destroy(Request $request, $id)
     {
-        $this->authorizeForUser($request->user('api'), 'delete', Role::class);
+        $user = Auth::user();
+        $user->can('permissions_del');
 
         Role::whereId($id)->update([
             'deleted_at' => Carbon::now(),
         ]);
-        return response()->json(['success' => true]);
+        return response()->json(['redirect' => '']);
     }
 
     //----------- GET ALL Roles without paginate --------------\\

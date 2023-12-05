@@ -304,8 +304,8 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
     Route::get('roles-data', [PermissionsController::class,'getTable']);
     Route::get('roles-create', [PermissionsController::class,'create']);
     Route::get('roles-edit/{id}', [PermissionsController::class,'edit']);
+    Route::get('roles-all', [PermissionsController::class,'getRoleswithoutpaginate']);
 //    Route::resource('roles/check/create_page', [PermissionsController::class,'Check_Create_Page']);
-//    Route::post('roles/delete/by_selection', 'PermissionsController@delete_by_selection');
     //------------------------------------------------------------------\\
 });
 /*

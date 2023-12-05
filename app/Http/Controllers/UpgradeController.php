@@ -379,7 +379,7 @@ class UpgradeController extends Controller
                         'product_id' => $item->producto,
                         'warehouse_id' => $item->sucursal,
                         'product_variant_id' => null,
-                        'qty' => $item->cantidad,
+                        'qty' => ($item->cantidad<0)?0:$item->cantidad,
                         'price' => $item->precioUnidad,
                         'created_at' => $item->created_at,
                         'updated_at' => $item->updated_at,
