@@ -299,12 +299,12 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
 //    Route::resource('roles', 'PermissionsController');
     Route::get('roles', [PermissionsController::class,'index']);
     Route::post('roles', [PermissionsController::class,'store']);
-    Route::put('roles', [PermissionsController::class,'update']);
+    Route::put('roles/{id}', [PermissionsController::class,'update']);
     Route::delete('roles', [PermissionsController::class,'destroy']);
-    Route::get('roles-data', [PermissionsController::class,'getTable']);
-    Route::get('roles-create', [PermissionsController::class,'create']);
-    Route::get('roles-edit/{id}', [PermissionsController::class,'edit']);
-    Route::get('roles-all', [PermissionsController::class,'getRoleswithoutpaginate']);
+    Route::get('roles/data', [PermissionsController::class,'getTable']);
+    Route::get('roles/create', [PermissionsController::class,'create']);
+    Route::get('roles/edit/{id}', [PermissionsController::class,'edit']);
+    Route::get('roles/all', [PermissionsController::class,'getRoleswithoutpaginate']);
 //    Route::resource('roles/check/create_page', [PermissionsController::class,'Check_Create_Page']);
     //------------------------------------------------------------------\\
 });
@@ -312,91 +312,6 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
 
 
 
-//hrm
-    //------------------------------Employee------------------------------------\\
-    //--------------------------------------------------------------------------\\
-
-    Route::resource('employees', 'hrm\EmployeesController');
-    Route::post('employees/import/csv', 'hrm\EmployeesController@import_employees');
-    Route::post('employees/delete/by_selection', 'hrm\EmployeesController@delete_by_selection');
-    Route::get("get_employees_by_department", "hrm\EmployeesController@Get_employees_by_department");
-    Route::put("update_social_profile/{id}", "hrm\EmployeesController@update_social_profile");
-    Route::get("get_experiences_by_employee", "hrm\EmployeesController@get_experiences_by_employee");
-    Route::get("get_accounts_by_employee", "hrm\EmployeesController@get_accounts_by_employee");
-
-    //------------------------------- Employee Experience ----------------\\
-    //--------------------------------------------------------------------\\
-
-    Route::resource('work_experience', 'hrm\EmployeeExperienceController');
-
-
-    //------------------------------- Employee Accounts bank ----------------\\
-    //--------------------------------------------------------------------\\
-
-    Route::resource('employee_account', 'hrm\EmployeeAccountController');
-
-
-     //------------------------------- company --------------------------\\
-    //--------------------------------------------------------------------\\
-    Route::resource('company', 'hrm\CompanyController');
-    Route::get("get_all_company", "hrm\CompanyController@Get_all_Company");
-    Route::post("company/delete/by_selection", "hrm\CompanyController@delete_by_selection");
-
-
-     //------------------------------- departments --------------------------\\
-    //--------------------------------------------------------------------\\
-    Route::resource('departments', 'hrm\DepartmentsController');
-    Route::get("get_all_departments", "hrm\DepartmentsController@Get_all_Departments");
-    Route::get("get_departments_by_company", "hrm\DepartmentsController@Get_departments_by_company")->name('Get_departments_by_company');
-    Route::post("departments/delete/by_selection", "hrm\DepartmentsController@delete_by_selection");
-
-    //------------------------------- designations --------------------------\\
-    //--------------------------------------------------------------------\\
-    Route::resource('designations', 'hrm\DesignationsController');
-    Route::get("get_designations_by_department", "hrm\DesignationsController@Get_designations_by_department");
-    Route::post("designations/delete/by_selection", "hrm\DesignationsController@delete_by_selection");
-
-    //------------------------------- office_shift ------------------\\
-    //----------------------------------------------------------------\\
-
-    Route::resource('office_shift', 'hrm\OfficeShiftController');
-    Route::post("office_shift/delete/by_selection", "hrm\OfficeShiftController@delete_by_selection");
-
-    //------------------------------- Attendances ------------------------\\
-    //--------------------------------------------------------------------\\
-    Route::resource('attendances', 'hrm\AttendancesController');
-    Route::get("daily_attendance", "hrm\AttendancesController@daily_attendance")->name('daily_attendance');
-    Route::post('attendance_by_employee/{id}', 'hrm\EmployeeSessionController@attendance_by_employee')->name('attendance_by_employee.post');
-    Route::post("attendances/delete/by_selection", "hrm\AttendancesController@delete_by_selection");
-
-
-
-    //------------------------------- Request leave  -----------------------\\
-    //----------------------------------------------------------------\\
-
-    Route::resource('leave', 'hrm\LeaveController');
-    Route::resource('leave_type', 'hrm\LeaveTypeController');
-    Route::post("leave/delete/by_selection", "hrm\LeaveController@delete_by_selection");
-    Route::post("leave_type/delete/by_selection", "hrm\LeaveTypeController@delete_by_selection");
-
-
-     //------------------------------- holiday ----------------------\\
-    //----------------------------------------------------------------\\
-
-    Route::resource('holiday', 'hrm\HolidayController');
-    Route::post("holiday/delete/by_selection", "hrm\HolidayController@delete_by_selection");
-
-    //------------------------------- core --------------------------\\
-    //--------------------------------------------------------------------\\
-
-    Route::prefix('core')->group(function () {
-
-       Route::get("get_departments_by_company", "hrm\CoreController@Get_departments_by_company");
-       Route::get("get_designations_by_department", "hrm\CoreController@Get_designations_by_department");
-       Route::get("get_office_shift_by_company", "hrm\CoreController@Get_office_shift_by_company");
-       Route::get("get_employees_by_company", "hrm\CoreController@Get_employees_by_company");
-
-    });
 
     //------------------------------- Providers --------------------------\\
     //--------------------------------------------------------------------\\

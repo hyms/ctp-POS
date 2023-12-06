@@ -25,11 +25,11 @@ const fields = ref([
 
 function showForm(id = null) {
     if (id == null) {
-        router.visit("/roles-create", {
+        router.visit("/roles/create", {
             method: "get",
         });
     } else {
-        router.visit("/roles-edit/" + id, {
+        router.visit("/roles/edit/" + id, {
             method: "get",
         });
     }
@@ -54,7 +54,7 @@ function deleteItem() {
 
 function loadTable() {
     api.get({
-        url: "/roles-data",
+        url: "/roles/data",
         snackbar,
         loadingItem: loadingTable,
         onSuccess: (data) => {

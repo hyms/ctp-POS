@@ -1,6 +1,6 @@
 <script setup>
 import Layout from "@/Layouts/Authenticated.vue";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { api, labelsNew, rules } from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
 import FormView from "@/Components/dialogs/FormView.vue";
@@ -8,12 +8,13 @@ import FormView from "@/Components/dialogs/FormView.vue";
 const snackbar = ref({ view: false, color: "", text: "" });
 
 const props = defineProps({
-    roleItem: Object,
-    permissionsItems: Object,
+    roleItem: { type: Object, default: null },
+    permissionsItems:{ type: Object, default: null },
     errors: Object,
 });
 
 const loading = ref(false);
+const editmode = ref(false);
 const permissions = ref([]);
 const role = ref({
     name: "",
@@ -27,40 +28,28 @@ function Submit_Permission(success) {
         snackbar.value.color = "error";
         snackbar.value.view = true;
     } else {
-        Create_Permission();
+        if(editmode.value===false){
+            Update_Permission(role.value.id);
+        }else
+        {Create_Permission();}
     }
 }
 
-//     //------------------------ Update Permissions -------------------\\
-//     Update_Permission() {
-//        this.SubmitProcessing = true;
-//       NProgress.start();
-//       NProgress.set(0.1);
-//       let id = this.$route.params.id;
-//       axios
-//         .put(`roles/${id}`, {
-//           role: this.role,
-//           permissions: this.permissions
-//         })
-//         .then(response => {
-//           this.SubmitProcessing = false;
-//           NProgress.done();
-//           this.makeToast(
-//             "success",
-//             this.$t("Update.TitleRole"),
-//             this.$t("Success")
-//           );
-//
-//           this.$router.push({ name: "groupPermission" });
-//           this.$store.dispatch("refreshUserPermissions");
-//         })
-//         .catch(error => {
-//           this.SubmitProcessing = false;
-//           NProgress.done();
-//           this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-//         });
-//     },
-//
+     //------------------------ Update Permissions -------------------\\
+    function Update_Permission(id) {
+        api.put({
+            url: "/roles/"+id,
+            params: {
+                role: role.value,
+                permissions: permissions.value,
+            },
+            snackbar,
+            loadingItem: loading,
+            onSuccess: () => {
+                snackbar.value.text = labelsNew.Update.TitleRole;
+            },
+        });
+     }
 
 //------------------------ Create Permissions -------------------\\
 function Create_Permission() {
@@ -78,9 +67,29 @@ function Create_Permission() {
     });
 }
 
-//   created: function() {
-//     this.GetElements();
-//   }
+function resetForm(){
+    permissions.value = [];
+    role.value = {
+    name: "",
+    description: "",
+};
+}
+
+watch(
+    () => [props.roleItem],
+    () => {
+        if (props.roleItem != null) {
+            editmode.value = true;
+        } else {
+            resetForm();
+            editmode.value = false;
+        }
+    }
+);
+onMounted(() => {
+    role.value = props.roleItem;
+    permissions.value = props.permissionsItems;
+});
 </script>
 <template>
     <Layout title-page="">
