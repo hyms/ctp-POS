@@ -26,9 +26,11 @@ class UserController extends Controller
     }
     public function getTable(request $request)
     {
+        $user = Auth::user();
+        $user->can('users_view');
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->exists();
-//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+        //        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $users = User::where(function ($query) use ($ShowRecord) {
             if (!$ShowRecord) {
@@ -89,8 +91,9 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'create', User::class);
-        $this->validate($request, [
+        $user = Auth::user();
+        $user->can('users_add');
+        $request->validate([
             'username' => 'required|unique:users',
         ], [
             'username.unique' => 'Este Usuario ya existe.',
@@ -109,10 +112,8 @@ class UserController extends Controller
             $User->statut = 1;
             $User->save();
 
-            $role_user = new role_user;
-            $role_user->user_id = $User->id;
-            $role_user->role_id = $request->get('role');
-            $role_user->save();
+            $role = Role::find($request->get('role'));
+            $User->assignRole($role);
 
             if ($User->is_all_warehouses == 0) {
                 $User->assignedWarehouses()->sync($request->get('assigned_to'));
@@ -133,7 +134,8 @@ class UserController extends Controller
 
     public function edit(Request $request, $id)
     {
-//        $this->authorizeForUser($request->user('api'), 'update', User::class);
+        $user = Auth::user();
+        $user->can('users_edit');
 
         $assigned_warehouses = UserWarehouse::where('user_id', $id)->pluck('warehouse_id')->toArray();
         $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $assigned_warehouses)->pluck('id')->toArray();
@@ -147,14 +149,15 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-//        $this->authorizeForUser($request->user('api'), 'update', User::class);
+        $user = Auth::user();
+        $user->can('users_edit');
 
-//        $this->validate($request, [
-//            'email' => 'required|email|unique:users',
-//            'email' => Rule::unique('users')->ignore($id),
-//        ], [
-//            'email.unique' => 'This Email already taken.',
-//        ]);
+        $request->validate([
+            'username' => 'required|unique:users',
+            'username' => Rule::unique('users')->ignore($id),
+        ], [
+            'username.unique' => 'Este Usuario ya existe.',
+        ]);
 
         DB::transaction(function () use ($id, $request) {
             $user = User::findOrFail($id);
@@ -181,6 +184,9 @@ class UserController extends Controller
 
             ]);
 
+            $role = Role::find($request->get('role'));
+            $User->revokeRole($role);
+            
             role_user::where('user_id', $id)->update([
                 'user_id' => $id,
                 'role_id' => $request->get('role'),
@@ -189,7 +195,7 @@ class UserController extends Controller
             $user_saved = User::findOrFail($id);
             $user_saved->assignedWarehouses()->sync($request->get('assigned_to'));
 
-        }, 10);
+            }, 10);
 
         return response()->json(['redirect' => '']);
 
@@ -204,7 +210,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $current = $user->password;
         $pass = $user->password;
-        if (!empty($request->NewPassword) && $request->NewPassword != 'undefined') {
+        if ($request->filled('NewPassword') && $request->NewPassword != 'undefined') {
             $password_new = Hash::make($request->NewPassword);
             if ($password_new != $current) {
                 $pass = $password_new;
@@ -228,39 +234,13 @@ class UserController extends Controller
 
     public function IsActivated(request $request, $id)
     {
-        $user = Auth::user();
-        if ($request->get('id') !== $user->id) {
-            User::whereId($id)->update([
-                'statut' => $request->get('statut'),
+        User::whereId($id)->update([
+            'statut' => $request->get('statut'),
             ]);
-            return response()->json([
-                'success' => true,
-            ]);
-        } else {
-            return response()->json([
-                'success' => false,
-            ]);
-        }
+        return response()->json(['redirect' => '']);
     }
 
-    public function GetPermissions()
-    {
-        $roles = Auth::user()->roles()->with('permissions')->first();
-        $data = [];
-        if ($roles) {
-            foreach ($roles->permissions as $permission) {
-                $item[$permission->name]['slug'] = $permission->name;
-                $item[$permission->name]['id'] = $permission->id;
-
-            }
-            $data[] = $item;
-        }
-        return $data[0];
-
-    }
-
-    //------------- GET USER Auth ---------\\
-
+//------------- GET USER Auth ---------\\
     public function GetInfoProfile(Request $request)
     {
         $data = Auth::user();

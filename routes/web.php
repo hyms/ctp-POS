@@ -62,11 +62,11 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
          Route::post('/', [UserController::class, 'store']);
          Route::put('/{id}', [UserController::class, 'update']);
      });
-    Route::get('get_user_auth', [UserController::class, 'GetUserAuth']);
-    Route::post('users_switch_activated/{id}', [UserController::class, 'IsActivated']);
-    Route::get('profile', [UserController::class, 'GetInfoProfile']);
-    Route::put('update_user_profile/{id}', [UserController::class, 'updateProfile']);
-    //------------------------------------------------------------------\\
+     Route::get('get_user_auth', [UserController::class, 'GetUserAuth']);
+     Route::post('users_switch_activated/{id}', [UserController::class, 'IsActivated']);
+     Route::get('profile', [UserController::class, 'GetInfoProfile']);
+     Route::put('update_user_profile/{id}', [UserController::class, 'updateProfile']);
+     //------------------------------------------------------------------\\
 
     //------------------------------- WAREHOUSES --------------------------\\
  Route::prefix('warehouses')->group(function () {
@@ -76,17 +76,17 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
      Route::put('/{id}', [WarehouseController::class, 'update']);
      Route::delete('/{id}', [WarehouseController::class, 'destroy']);
  });
-    //------------------------------------------------------------------\\
+ //------------------------------------------------------------------\\
 
     //------------------------------- sales type --------------------------\\
      Route::prefix('sales_types')->group(function () {
-    Route::get('/', [SalesTypeController::class, 'index']);
-    Route::get('/list', [SalesTypeController::class, 'getTable']);
-    Route::post('/', [SalesTypeController::class, 'store']);
-    Route::put('/{id}', [SalesTypeController::class, 'update']);
-    Route::delete('/{id}', [SalesTypeController::class, 'destroy']);
+         Route::get('/', [SalesTypeController::class, 'index']);
+         Route::get('/list', [SalesTypeController::class, 'getTable']);
+         Route::post('/', [SalesTypeController::class, 'store']);
+         Route::put('/{id}', [SalesTypeController::class, 'update']);
+         Route::delete('/{id}', [SalesTypeController::class, 'destroy']);
      });
-    //------------------------------------------------------------------\\
+     //------------------------------------------------------------------\\
 
     //------------------------------- CLIENTS --------------------------\\
     Route::prefix('clients')->group(function () {
@@ -98,7 +98,7 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
         Route::post('/import/csv', [ClientController::class, 'import_clients']);
     });
     Route::get('get_clients_without_paginate', [ClientController::class, 'Get_Clients_Without_Paginate']);
-//    Route::post('clients/delete/by_selection', [ClientController::class,'delete_by_selection']);
+    //    Route::post('clients/delete/by_selection', [ClientController::class,'delete_by_selection']);
     Route::post('clients_pay_due', [ClientController::class, 'clients_pay_due']);
     Route::post('clients_pay_return_due', [ClientController::class, 'destpay_sale_return_dueroy']);
     //------------------------------------------------------------------\\
@@ -116,9 +116,9 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
          Route::post('/import/csv', [ProductsController::class, 'import_products']);
          Route::get('/detail/{id}', [ProductsController::class, 'Get_Products_Details']);
      });
-    Route::get('get_Products_by_warehouse/{id}', [ProductsController::class, 'Products_by_Warehouse']);
-    Route::get('get_products_stock_alerts', [ProductsController::class, 'Products_Alert']);
-    //------------------------------------------------------------------\\
+     Route::get('get_Products_by_warehouse/{id}', [ProductsController::class, 'Products_by_Warehouse']);
+     Route::get('get_products_stock_alerts', [ProductsController::class, 'Products_Alert']);
+     //------------------------------------------------------------------\\
 
     Route::prefix('products')->group(function () {
         //------------------------------- Category --------------------------\\
@@ -194,7 +194,7 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
     Route::get('convert_to_sale_data/{id}', [SalesController::class, 'Elemens_Change_To_Sale']);
     Route::get('get_payments_by_sale/{id}', [SalesController::class, 'Payments_Sale']);
     Route::post('sales_send_email', [SalesController::class, 'Send_Email']);
-//    Route::post('sales_send_sms',[SalesController::class, 'Send_SMS']);
+    //    Route::post('sales_send_sms',[SalesController::class, 'Send_SMS']);
     Route::get('get_Products_by_sale/{id}', [SalesController::class, 'get_Products_by_sale']);
     //------------------------------------------------------------------\\
 
@@ -207,7 +207,7 @@ Route::prefix('payment_sale')->group(function () {
     Route::delete('/{id}', [PaymentSalesController::class, 'destroy']);
 });
 Route::get('payment_sale_get_number', [PaymentSalesController::class, 'getNumberOrder']);
-    //------------------------------------------------------------------\\
+//------------------------------------------------------------------\\
 
     //------------------------------- Transfers --------------------------\\
     Route::prefix('transfer')->group(function () {
@@ -337,7 +337,7 @@ Route::get('payment_sale_get_number', [PaymentSalesController::class, 'getNumber
          Route::get('/all', [PermissionsController::class,'getRoleswithoutpaginate']);
          //    Route::resource('roles/check/create_page', [PermissionsController::class,'Check_Create_Page']);
      });
-    //------------------------------------------------------------------\\
+     //------------------------------------------------------------------\\
 });
 /*
 

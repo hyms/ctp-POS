@@ -4,7 +4,7 @@ import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import Snackbar from "@/Components/Snackbar2.vue";
 
-import helper from "@/helpers";
+import {rules} from "@/helpers";
 import labels from "@/labels";
 import api from "@/api";
 
@@ -65,7 +65,6 @@ function isChecked(user) {
         url: "/users_switch_activated/" + user.id,
         params: {
             statut: user.statut === 1,
-            id: user.id,
         },
         loadingItem: loading,
         snackbar,
@@ -190,7 +189,7 @@ function Edit_User(item) {
 //---------------------- Get_Data_Warehouses  ------------------------------\\
 function Get_Data_Warehouses(id) {
     axios
-        .get("/users/" + id + "/edit")
+        .get("/users/edit/"+id)
         .then(({ data }) => {
             assigned_warehouses.value = data.assigned_warehouses;
         })
@@ -243,9 +242,9 @@ function onClose() {
                                     v-model="user.firstname"
                                     :placeholder="labels.user.firstname"
                                     :rules="
-                                        helper.required
-                                            .concat(helper.min(3))
-                                            .concat(helper.max(30))
+                                        rules.required
+                                            .concat(rules.min(3))
+                                            .concat(rules.max(30))
                                     "
                                     hide-details="auto"
                                 >
@@ -259,9 +258,9 @@ function onClose() {
                                     v-model="user.lastname"
                                     :placeholder="labels.user.lastname"
                                     :rules="
-                                        helper.required
-                                            .concat(helper.min(3))
-                                            .concat(helper.max(30))
+                                        rules.required
+                                            .concat(rules.min(3))
+                                            .concat(rules.max(30))
                                     "
                                     hide-details="auto"
                                 >
@@ -275,9 +274,9 @@ function onClose() {
                                     v-model="user.username"
                                     :placeholder="labels.user.username"
                                     :rules="
-                                        helper.required
-                                            .concat(helper.min(3))
-                                            .concat(helper.max(30))
+                                        rules.required
+                                            .concat(rules.min(3))
+                                            .concat(rules.max(30))
                                     "
                                     hide-details="auto"
                                 >
@@ -291,7 +290,7 @@ function onClose() {
                                     v-model="user.phone"
                                     :placeholder="labels.user.phone"
                                     :rules="
-                                        helper.required.concat(helper.number)
+                                        rules.required.concat(rules.number)
                                     "
                                     hide-details="auto"
                                 >
@@ -304,7 +303,7 @@ function onClose() {
                                     :label="labels.user.email + ' *'"
                                     v-model="user.email"
                                     :placeholder="labels.user.email"
-                                    :rules="helper.required"
+                                    :rules="rules.required"
                                     hide-details="auto"
                                     type="mail"
                                 >
@@ -318,9 +317,9 @@ function onClose() {
                                     v-model="user.password"
                                     :placeholder="labels.user.password"
                                     :rules="
-                                        helper.required
-                                            .concat(helper.min(6))
-                                            .concat(helper.max(14))
+                                        rules.required
+                                            .concat(rules.min(6))
+                                            .concat(rules.max(14))
                                     "
                                     hide-details="auto"
                                     type="password"
@@ -333,7 +332,7 @@ function onClose() {
                                 <v-select
                                     v-model="user.role"
                                     :items="roles"
-                                    :rules="helper.required"
+                                    :rules="rules.required"
                                     :label="labels.user.role"
                                     item-title="name"
                                     item-value="id"
@@ -348,7 +347,7 @@ function onClose() {
                                     v-model="user.NewPassword"
                                     :placeholder="labels.user.NewPassword"
                                     :rules="
-                                        helper.min(6).concat(helper.max(14))
+                                        rules.min(6).concat(rules.max(14))
                                     "
                                     hide-details="auto"
                                     type="password"
@@ -360,7 +359,7 @@ function onClose() {
                                     :label="labels.user.ci"
                                     v-model="user.ci"
                                     :placeholder="labels.user.ci"
-                                    :rules="helper.number"
+                                    :rules="rules.number"
                                     hide-details="auto"
                                 >
                                 </v-text-field>
