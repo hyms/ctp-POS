@@ -54,7 +54,7 @@ function deleteItem() {
 
 function loadTable() {
     api.get({
-        url: "/roles/data",
+        url: "/roles/list",
         snackbar,
         loadingItem: loadingTable,
         onSuccess: (data) => {

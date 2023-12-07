@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
@@ -92,8 +91,8 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
-        Schema::drop('transfer_details');
-        Schema::drop('transfers');
+        Schema::dropIfExists('transfer_details');
+        Schema::dropIfExists('transfers');
 
         Schema::create('transfers', function (Blueprint $table) {
             $table->engine = 'InnoDB';

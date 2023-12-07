@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Permission;
 use App\Models\Role;
 use Carbon\Carbon;
 use DB;
@@ -50,8 +49,8 @@ class PermissionsController extends Controller
             $role = Role::findOrFail($Role->id);
             $permissions = collect($request->permissions);
             $permissions = $permissions->filter();
-            $permissions = $permissions->map(function($item,$key){
-               return $key;
+            $permissions = $permissions->map(function ($item, $key) {
+                return $key;
             });
             $role->givePermissionTo($permissions);
 
@@ -76,23 +75,24 @@ class PermissionsController extends Controller
         $user = Auth::user();
         $user->can('permissions_edit');
 
-        if ($id != '1') {
-            $Role = Role::with('permissions')->where('deleted_at', '=', null)->findOrFail($id);
-            $item = collect();
-            $data = collect();
-            if ($Role) {
-                $item->put('name', $Role->name);
-                $item->put('description', $Role->description);
-                foreach ($Role->permissions as $permission) {
-                    $data->put($permission->name, true);
-                }
+//        if ($id != '1') {
+        $Role = Role::with('permissions')->where('deleted_at', '=', null)->findOrFail($id);
+        $item = collect();
+        $data = collect();
+        if ($Role) {
+            $item->put('id', $Role->id);
+            $item->put('name', $Role->name);
+            $item->put('description', $Role->description);
+            foreach ($Role->permissions as $permission) {
+                $data->put($permission->name, true);
             }
-            Inertia::share(['titlePage' => 'Editar Permisos']);
-            return Inertia::render('Settings/permissions/Form_permission', [
-                'permissionsItem' => $data,
-                'roleItem' => $item,
-            ]);
         }
+        Inertia::share(['titlePage' => 'Editar Permisos']);
+        return Inertia::render('Settings/permissions/Form_permission', [
+            'permissionsItem' => $data,
+            'roleItem' => $item,
+        ]);
+//        }
 
     }
 
@@ -100,26 +100,26 @@ class PermissionsController extends Controller
 
     public function update($id, Request $request)
     {
-            $request->validate([
-                'role.name' => 'required',
-            ]);
+        $request->validate([
+            'role.name' => 'required',
+        ]);
 
-            DB::transaction(function () use ($request, $id) {
+        DB::transaction(function () use ($request, $id) {
 
-                Role::whereId($id)->update($request['role']);
+            Role::whereId($id)->update($request['role']);
 
-                $role = Role::findOrFail($id);
+            $role = Role::findOrFail($id);
 
-                 $permissions = collect($request->permissions);
+            $permissions = collect($request->permissions);
             $permissions = $permissions->filter();
-            $permissions = $permissions->map(function($item,$key){
-               return $key;
-            });
-            $role->syncPermissionTo($permissions);
+            $permissions = $permissions->map(function ($item, $key) {
+                return $key;
+            })->all();
+            $role->syncPermissions($permissions);
 
-            }, 10);
+        }, 10);
 
-            return response()->json(['redirect' => '/roles']);
+        return response()->json(['redirect' => '/roles']);
     }
 
     //----------- Delete Role --------------\\

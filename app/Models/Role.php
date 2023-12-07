@@ -8,7 +8,7 @@ use Spatie\Permission\Models\Role as roleModal;
 class Role extends roleModal
 {
     use SoftDeletes;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 //    protected $fillable = ['name','status', 'label', 'description'];
 
 }

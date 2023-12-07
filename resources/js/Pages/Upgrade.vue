@@ -32,6 +32,25 @@ function upgrade() {
             sending.value = false;
         });
 }
+function upgrade_perms() {
+    sending.value = true;
+    axios
+        .post("/upgrade-perms")
+        .then(({ data }) => {
+            errorsMessage.value = JSON.stringify(data["errorsMessage"]);
+            alert.value =
+                errorsMessage.value !== "" && errorsMessage.value !== undefined;
+            console.log(errorsMessage.value);
+        })
+        .catch((error) => {
+            // handle error
+            errorsData.value = error;
+            console.log(error);
+        })
+        .finally(() => {
+            sending.value = false;
+        });
+}
 </script>
 
 <template>
@@ -49,6 +68,14 @@ function upgrade() {
                         :disabled="sending"
                     >
                         {{ message }}
+                    </v-btn>
+                    <v-btn
+                        color="primary"
+                        @click="upgrade_perms"
+                        :loading="sending"
+                        :disabled="sending"
+                    >
+                        setPerms
                     </v-btn>
                 </template>
                 <template v-else>

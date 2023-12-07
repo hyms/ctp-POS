@@ -1,6 +1,6 @@
 <script setup>
 import Layout from "@/Layouts/Authenticated.vue";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { api, labelsNew, rules } from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
 import FormView from "@/Components/dialogs/FormView.vue";
@@ -9,7 +9,7 @@ const snackbar = ref({ view: false, color: "", text: "" });
 
 const props = defineProps({
     roleItem: { type: Object, default: null },
-    permissionsItems:{ type: Object, default: null },
+    permissionsItem: { type: Object, default: null },
     errors: Object,
 });
 
@@ -28,28 +28,29 @@ function Submit_Permission(success) {
         snackbar.value.color = "error";
         snackbar.value.view = true;
     } else {
-        if(editmode.value===false){
+        if (editmode.value === false) {
             Update_Permission(role.value.id);
-        }else
-        {Create_Permission();}
+        } else {
+            Create_Permission();
+        }
     }
 }
 
-     //------------------------ Update Permissions -------------------\\
-    function Update_Permission(id) {
-        api.put({
-            url: "/roles/"+id,
-            params: {
-                role: role.value,
-                permissions: permissions.value,
-            },
-            snackbar,
-            loadingItem: loading,
-            onSuccess: () => {
-                snackbar.value.text = labelsNew.Update.TitleRole;
-            },
-        });
-     }
+//------------------------ Update Permissions -------------------\\
+function Update_Permission(id) {
+    api.put({
+        url: "/roles/" + id,
+        params: {
+            role: role.value,
+            permissions: permissions.value,
+        },
+        snackbar,
+        loadingItem: loading,
+        onSuccess: () => {
+            snackbar.value.text = labelsNew.Update.TitleRole;
+        },
+    });
+}
 
 //------------------------ Create Permissions -------------------\\
 function Create_Permission() {
@@ -67,18 +68,20 @@ function Create_Permission() {
     });
 }
 
-function resetForm(){
+function resetForm() {
     permissions.value = [];
     role.value = {
-    name: "",
-    description: "",
-};
+        name: "",
+        description: "",
+    };
 }
 
 watch(
     () => [props.roleItem],
     () => {
         if (props.roleItem != null) {
+            console.log(props.roleItem);
+            console.log(props.permissionsItems);
             editmode.value = true;
         } else {
             resetForm();
@@ -87,18 +90,21 @@ watch(
     }
 );
 onMounted(() => {
-    role.value = props.roleItem;
-    permissions.value = props.permissionsItems;
+    if (props.roleItem != null) {
+        console.log(props.permissionsItem);
+        role.value = props.roleItem;
+        permissions.value = props.permissionsItem;
+    }
 });
 </script>
 <template>
-    <Layout title-page="">
+    <Layout>
         <snackbar
             :text="snackbar.text"
             v-model="snackbar.view"
             :color="snackbar.color"
         ></snackbar>
-        <form-view>
+        <form-view :on-save="Submit_Permission">
             <v-row>
                 <!-- Role Name -->
                 <v-col cols="12" md="6">

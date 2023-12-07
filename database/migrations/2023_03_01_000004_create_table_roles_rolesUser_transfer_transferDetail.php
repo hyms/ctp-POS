@@ -136,9 +136,9 @@ return new class extends Migration {
     {
         Schema::drop('transfer_details');
         Schema::drop('transfers');
-        Schema::drop('roles');
         Schema::drop('role_user');
-        Schema::drop('permissions');
         Schema::drop('permission_role');
+        Schema::drop('roles');
+        Schema::drop('permissions');
     }
 };

@@ -14,6 +14,7 @@ use App\Models\SaleDetail;
 use App\Models\SalesType;
 use App\Models\Setting;
 use App\Models\Unit;
+use App\Models\User;
 use App\Models\Warehouse;
 use Carbon\Carbon;
 use Exception;
@@ -44,7 +45,7 @@ class UpgradeController extends Controller
     function upgrade(): JsonResponse
     {
         $errors = "";
-        set_time_limit(300);
+        set_time_limit(500);
         try {
 //            $versions = env('APP_VERSION');
 //            if (!empty($versions)) {
@@ -64,7 +65,7 @@ class UpgradeController extends Controller
 
                 Log::info("finish settings migration");
                 $items = DB::table('clientes')->get()->collect();
-                $client = $items->map(function ($item){
+                $client = $items->map(function ($item) {
                     return [
                         'id' => $item->id,
                         'name' => $item->nombreCompleto,
@@ -76,14 +77,15 @@ class UpgradeController extends Controller
                         'adresse' => $item->direccion,
                         'nit_ci' => $item->nitCi,
                         'created_at' => $item->created_at,
+                        'updated_at' => Carbon::now(),
                         'deleted_at' => $item->deleted_at,
                     ];
                 });
                 Client::insert($client->toArray());
                 Log::info("finish client migration");
                 $items = DB::table('sucursales')->get()->collect();
-                $warehouse = $items->map(function ($item){
-                   return [
+                $warehouse = $items->map(function ($item) {
+                    return [
                         'id' => $item->id,
                         'name' => $item->nombre,
                         'city' => null,
@@ -91,6 +93,7 @@ class UpgradeController extends Controller
                         'email' => null,
                         'country' => null,
                         'created_at' => $item->created_at,
+                        'updated_at' => Carbon::now(),
                         'deleted_at' => $item->deleted_at,
                     ];
                 });
@@ -115,7 +118,9 @@ class UpgradeController extends Controller
                         'name' => $item['text'],
                         'label' => Str::of($item['text'])->ucfirst(),
                         'status' => ($item['value'] == 1) ? 1 : 0,
-                        'guard_name'=>'web'
+                        'guard_name' => 'web',
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
                     ];
                 });
                 Role::insert($role->toArray());
@@ -292,15 +297,21 @@ class UpgradeController extends Controller
                     [
                         'name' => 'Pos_view',
                     ],
+                    [
+                        'name' => 'dashboard',
+                    ],
                 ]);
                 $permision = $items->map(function ($item) {
                     return [
                         'name' => $item['name'],
                         'label' => Str::of($item['name'])->ucfirst(),
-                        'guard_name'=>'web'
+                        'guard_name' => 'web',
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
                     ];
                 });
                 Permission::insert($permision->toArray());
+
                 Log::info("finish role_user migration");
                 $items = DB::table('tipoProducto')->get();
                 $category = $items->map(function ($item) {
@@ -317,18 +328,24 @@ class UpgradeController extends Controller
                 Log::info("finish categories migration");
                 Unit::insert([
                     [
-                    'id' => 1,
-                    'name' => 'placa',
-                    'ShortName' => 'placa',
-                ],[
-                    'id' => 2,
-                    'name' => 'bidon',
-                    'ShortName' => 'bidon',
-                ],[
-                    'id' => 3,
-                    'name' => 'impresion',
-                    'ShortName' => 'imp',
-                ]]);
+                        'id' => 1,
+                        'name' => 'placa',
+                        'ShortName' => 'placa',
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ], [
+                        'id' => 2,
+                        'name' => 'bidon',
+                        'ShortName' => 'bidon',
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ], [
+                        'id' => 3,
+                        'name' => 'impresion',
+                        'ShortName' => 'imp',
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]]);
                 Log::info("finish units migration");
 
                 $items = DB::table('tipoProducto')->get();
@@ -374,28 +391,29 @@ class UpgradeController extends Controller
                 $items = DB::table('stock')->get();
                 Log::info("stock count " . $items->count());
                 $product_warehouse = $items->map(function ($item) {
-                    product_warehouse::create([
+                    return [
                         'id' => $item->id,
                         'product_id' => $item->producto,
                         'warehouse_id' => $item->sucursal,
                         'product_variant_id' => null,
-                        'qty' => ($item->cantidad<0)?0:$item->cantidad,
+                        'qty' => ($item->cantidad < 0) ? 0 : $item->cantidad,
                         'price' => $item->precioUnidad,
                         'created_at' => $item->created_at,
                         'updated_at' => $item->updated_at,
                         'deleted_at' => $item->deleted_at,
-                    ]);
+                    ];
                 });
                 product_warehouse::insert($product_warehouse->toArray());
                 Log::info("finish product_warehouse migration");
 
-                $items = DB::table('ordenesTrabajo');
+                $items = DB::table('ordenesTrabajo')->get();
                 $totalItems = $items->count();
-                $paginate = 200;
+                $paginate = 1000;
                 $pages = (int)$totalItems / $paginate;
                 for ($i = 0; $i <= $pages; $i++) {
                     $items = DB::table('ordenesTrabajo')->skip($paginate * $i)->take($paginate)->get();
-                    Log::info("ordenesTrabajo start page" . $i);
+                    Log::info("ordenesTrabajo start page " . $i);
+//                    Log::info("ordenesTrabajo start page ");
                     $sales = $items->map(function ($item) {
                         if ($item->estado >= 0 && $item->estado < 10) {
                             if (empty($item->tipoOrden)) {
@@ -470,39 +488,46 @@ class UpgradeController extends Controller
                                 $payment_statut = 'unpaid';
                             }
                             return [
-                               "sale"=> [
-                                "id" => $item->id,
-                                "user_pos" => $item->userDiseñador,
-                                "user_id" => $item->userVenta ?? $item->userDiseñador,
-                                "date" => Carbon::parse($item->created_at),
-                                "Ref" => $item->codigoServicio ?? $item->correlativo,
-                                "is_pos" => 0,
-                                "client_id" => $item->cliente,
-                                "warehouse_id" => $item->sucursal,
-                                "TaxNet" => 0,
-                                "tax_rate" => 0,
-                                "discount" => 0,
-                                "shipping" => 0,
-                                "GrandTotal" => $GrandTotal,
-                                "paid_amount" => $paid_amount,
-                                "payment_statut" => $payment_statut,
-                                "statut" => ($item->estado == 1) ? 'pending' : 'completed',
-                                "shipping_status" => "",
-                                "notes" => $item->observaciones,
-                                "created_at" => $item->created_at,
-                                "updated_at" => $item->updated_at,
-                                "deleted_at" => $item->deleted_at,
-                                "sales_type_id" => $item->tipoOrden,
-                            ],
-                            "detail"=>$sale_datail,
-                            "paymentSale"=>$sale_payment
+                                "sale" => collect([
+                                    "id" => $item->id,
+                                    "user_pos" => $item->userDiseñador,
+                                    "user_id" => $item->userVenta ?? $item->userDiseñador,
+                                    "date" => Carbon::parse($item->created_at),
+                                    "Ref" => $item->codigoServicio ?? $item->correlativo,
+                                    "is_pos" => 0,
+                                    "client_id" => $item->cliente,
+                                    "warehouse_id" => $item->sucursal,
+                                    "TaxNet" => 0,
+                                    "tax_rate" => 0,
+                                    "discount" => 0,
+                                    "shipping" => 0,
+                                    "GrandTotal" => $GrandTotal,
+                                    "paid_amount" => $paid_amount,
+                                    "payment_statut" => $payment_statut,
+                                    "statut" => ($item->estado == 1) ? 'pending' : 'completed',
+                                    "shipping_status" => "",
+                                    "notes" => $item->observaciones,
+                                    "created_at" => $item->created_at,
+                                    "updated_at" => $item->updated_at,
+                                    "deleted_at" => $item->deleted_at,
+                                    "sales_type_id" => $item->tipoOrden,
+                                ]),
+                                "detail" => $sale_datail,
+                                "paymentSale" => $sale_payment,
                             ];
                         }
                     });
-
-                    Sale::insert($sales['sale']);
-                    SaleDetail::insert($sales['detail']);
-                    PaymentSale::insert($sales['paymentSale']);
+                    $sales = $sales->filter()->collect();
+                    $detail = $sales->pluck('detail');
+                    $paymentSale = $sales->pluck('paymentSale');
+                    $sales = $sales->pluck('sale');
+                    Sale::insert($sales->toArray());
+                    $detail->each(function ($item) {
+                        SaleDetail::insert($item->toArray());
+                    });
+                    $paymentSale->each(function ($item) {
+                        PaymentSale::insert($item->toArray());
+                    });
                 }
 
                 Log::info("finish sales migration");
@@ -533,6 +558,25 @@ class UpgradeController extends Controller
                 Log::info("finish payment_sales migration");
 
             });
+
+        } catch (Exception $ex) {
+            $errors = $ex->getMessage();
+            Log::error($ex->getMessage());
+        }
+        return response()->json([
+            'errorsMessage' => $errors,
+        ]);
+    }
+
+    function setPermissions()
+    {
+        $errors = "";
+        try {
+            $adminRole = Role::where('name', '=', 'sadmin')->first();
+            $allPermission = Permission::pluck('name', 'id');
+            $adminRole->givePermissionTo($allPermission);
+            $user = User::where('username', '=', 'admin')->first();
+            $user->assignRole($adminRole);
         } catch (Exception $ex) {
             $errors = $ex->getMessage();
             Log::error($ex->getMessage());
