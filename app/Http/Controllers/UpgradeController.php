@@ -179,6 +179,17 @@ class UpgradeController extends Controller
                     ],
                     [
                         'name' => 'expense_view'
+                    ], [
+                        'name' => 'expense_category_add',
+                    ],
+                    [
+                        'name' => 'expense_category_delete',
+                    ],
+                    [
+                        'name' => 'expense_category_edit'
+                    ],
+                    [
+                        'name' => 'expense_category_view'
                     ],
                     [
                         'name' => 'transfer_delete',

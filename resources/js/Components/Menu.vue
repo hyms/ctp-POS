@@ -16,191 +16,241 @@ function loadMenu() {
         label: labelsNew.dashboard,
         url: "/",
         activate: ["/"],
-
         subItems: [],
     });
-    subItems = [];
-    subItems.push({
-        label: "Crear Orden",
-        url: "/sales/create",
-        activate: ["/sales/create"],
-    });
-    subItems.push({
-        label: "Listar Ordenes",
-        url: "/sales",
-        activate: ["/sales"],
-    });
-    menuItems.value.push({
-        label: "Ordenes",
-        url: "",
-        activate: ["/sales/create", "/sales"],
+    if (
+        globals.userPermision(["Sales_add", "Sales_view", "unit", "category"])
+    ) {
+        subItems = [];
+        if (globals.userPermision(["Sales_add"])) {
+            subItems.push({
+                label: "Crear Orden",
+                url: "/sales/create",
+                activate: ["/sales/create"],
+            });
+        }
+        if (globals.userPermision(["Sales_view"])) {
+            subItems.push({
+                label: "Listar Ordenes",
+                url: "/sales",
+                activate: ["/sales"],
+            });
+        }
+        menuItems.value.push({
+            label: "Ordenes",
+            url: "",
+            activate: ["/sales/create", "/sales"],
+            subItems: subItems.slice(),
+        });
+    }
+    if (globals.userPermision(["Customers_view"])) {
+        menuItems.value.push({
+            label: "Clientes",
+            url: "/clients",
+            activate: ["/clients"],
+            subItems: [],
+        });
+    }
+    if (globals.userPermision(["expense_view", "expense_add"])) {
+        subItems = [];
+        if (globals.userPermision(["expense_add"])) {
+            subItems.push({
+                label: "Añadir Gastos",
+                url: "/expenses/create",
+                activate: ["/expenses/create"],
+            });
+        }
+        if (globals.userPermision(["expense_view"])) {
+            subItems.push({
+                label: "Listar Gastos",
+                url: "/expenses",
+                activate: ["/expenses"],
+            });
+        }
+        menuItems.value.push({
+            label: "Gastos",
+            url: "",
+            activate: ["/expenses", "/expenses/create"],
 
-        subItems: subItems.slice(),
-    });
+            subItems: subItems.slice(),
+        });
+    }
+    if (globals.userPermision(["transfer_view", "transfer_add"])) {
+        subItems = [];
+        if (globals.userPermision(["transfer_add"])) {
+            subItems.push({
+                label: "Crear Transferencia",
+                url: "/transfers/create",
+                activate: ["/transfers/create"],
+            });
+        }
+        if (globals.userPermision(["transfer_view"])) {
+            subItems.push({
+                label: "Listar Transferencias",
+                url: "/transfers",
+                activate: ["/transfers"],
+            });
+        }
+        menuItems.value.push({
+            label: "Transferencias de Stock",
+            url: "",
+            activate: ["/transfers", "/transfers/create"],
 
-    menuItems.value.push({
-        label: "Clientes",
-        url: "/clients",
-        activate: ["/clients"],
+            subItems: subItems.slice(),
+        });
+    }
+    if (globals.userPermision(["adjustment_add", "adjustment_view"])) {
+        subItems = [];
+        if (globals.userPermision(["adjustment_add"])) {
+            subItems.push({
+                label: "Crear Ajuste",
+                url: "/adjustments/create",
+                activate: ["/adjustments/create"],
+            });
+        }
+        if (globals.userPermision(["adjustment_view"])) {
+            subItems.push({
+                label: "Listar Ajustes",
+                url: "/adjustments/list",
+                activate: ["/adjustments"],
+            });
+        }
+        menuItems.value.push({
+            label: "Ajustes de Stock",
+            url: "",
+            activate: ["/adjustments", "/adjustments/create"],
 
-        subItems: [],
-    });
+            subItems: subItems.slice(),
+        });
+    }
+    if (
+        globals.userPermision([
+            "products_add",
+            "products_view",
+            "unit",
+            "category",
+        ])
+    ) {
+        subItems = [];
+        if (globals.userPermision(["products_add"])) {
+            subItems.push({
+                label: "Añadir Productos",
+                url: "/products/create",
+                activate: ["/products/create"],
+            });
+        }
+        if (globals.userPermision(["products_view"])) {
+            subItems.push({
+                label: "Listar Productos",
+                url: "/products/list",
+                activate: ["/products/list"],
+            });
+        }
+        if (globals.userPermision(["category"])) {
+            subItems.push({
+                label: "Categorias",
+                url: "/products/categories",
+                activate: ["/products/categories"],
+            });
+        }
+        if (globals.userPermision(["unit"])) {
+            subItems.push({
+                label: "Unidades",
+                url: "/products/units",
+                activate: ["/products/units"],
+            });
+        }
+        menuItems.value.push({
+            label: labelsNew.Products,
+            url: "",
+            activate: [
+                "/products/create",
+                "/products/list",
+                "/products/categories",
+                "/products/units",
+            ],
 
-    subItems = [];
-    subItems.push({
-        label: "Añadir Gastos",
-        url: "/expenses/create",
-        activate: ["/expenses/create"],
-    });
-    subItems.push({
-        label: "Listar Gastos",
-        url: "/expenses",
-        activate: ["/expenses"],
-    });
-    menuItems.value.push({
-        label: "Gastos",
-        url: "",
-        activate: ["/expenses", "/expenses/create"],
+            subItems: subItems.slice(),
+        });
+    }
+    if (
+        globals.userPermision([
+            "product_sales_report",
+            "product_report",
+            "stock_report",
+            "users_report",
+            "Reports_profit",
+            "Warehouse_report",
+            "Reports_customers",
+            "Reports_sales",
+            "Reports_payments_Sales",
+        ])
+    ) {
+        subItems = [];
+        if (globals.userPermision(["Reports_payments_Sales"])) {
+            subItems.push({
+                label: "Pagos de ventas",
+                url: "/payment_sale",
+                activate: ["/payment_sale"],
+            });
+        }
+        if (globals.userPermision(["Reports_sales"])) {
+            subItems.push({
+                label: "Reporte de ventas",
+                url: "/report/sales",
+                activate: ["/report/sales"],
+            });
+        }
+        if (globals.userPermision(["Reports_customers"])) {
+            subItems.push({
+                label: "Reporte de Clientes",
+                url: "/report/client",
+                activate: ["/report/client"],
+            });
+        }
+        //subItems.push({
+        //    label: "Alerta de Productos",
+        //    url: "/report/quantity_alerts",
+        //    role: "admin",
+        //});
+        //subItems.push( {
+        //           label: "Reporte de Agencias",
+        //           url: "/report/warehouse_report",
+        //       role: "admin",
+        //     });
+        if (globals.userPermision(["stock_report"])) {
+            subItems.push({
+                label: "Reporte de Stock",
+                url: "/report/stock",
+                activate: ["/report/stock"],
+            });
+        }
+        //subItems.push( {
+        //   label: "Reporte de Usuarios",
+        //   url: "/report/users_report",
+        //   role: "admin",
+        // });
+        if (globals.userPermision(["product_report"])) {
+            subItems.push({
+                label: "Top productos vendidos",
+                url: "/report/top_products",
+                activate: ["/report/top_products"],
+            });
+        }
 
-        subItems: subItems.slice(),
-    });
-
-    subItems = [];
-    subItems.push({
-        label: "Crear Transferencia",
-        url: "/transfers/create",
-        activate: ["/transfers/create"],
-    });
-    subItems.push({
-        label: "Listar Transferencias",
-        url: "/transfers",
-        activate: ["/transfers"],
-    });
-    menuItems.value.push({
-        label: "Transferencias de Stock",
-        url: "",
-        activate: ["/transfers", "/transfers/create"],
-
-        subItems: subItems.slice(),
-    });
-    subItems = [];
-    subItems.push({
-        label: "Crear Ajuste",
-        url: "/adjustments/create",
-        activate: ["/adjustments/create"],
-    });
-    subItems.push({
-        label: "Listar Ajustes",
-        url: "/adjustments/list",
-        activate: ["/adjustments"],
-    });
-    menuItems.value.push({
-        label: "Ajustes de Stock",
-        url: "",
-        activate: ["/adjustments", "/adjustments/create"],
-
-        subItems: subItems.slice(),
-    });
-    globals.userPermision([
-        "products_add",
-        "products_view",
-        "unit",
-        "category",
-    ]);
-    subItems = [];
-    subItems.push({
-        label: "Añadir Productos",
-        url: "/products/create",
-        activate: ["/products/create"],
-    });
-    subItems.push({
-        label: "Listar Productos",
-        url: "/products/list",
-        activate: ["/products/list"],
-    });
-    subItems.push({
-        label: "Categorias",
-        url: "/products/categories",
-        activate: ["/products/categories"],
-    });
-    subItems.push({
-        label: "Unidades",
-        url: "/products/units",
-        activate: ["/products/units"],
-    });
-    menuItems.value.push({
-        label: labelsNew.Products,
-        url: "",
-        activate: [
-            "/products/create",
-            "/products/list",
-            "/products/categories",
-            "/products/units",
-        ],
-
-        subItems: subItems.slice(),
-    });
-
-    subItems = [];
-    subItems.push({
-        label: "Pagos de ventas",
-        url: "/payment_sale",
-        activate: ["/payment_sale"],
-    });
-    subItems.push({
-        label: "Reporte de ventas",
-        url: "/report/sales",
-        activate: ["/report/sales"],
-    });
-    subItems.push({
-        label: "Reporte de Clientes",
-        url: "/report/client",
-        activate: ["/report/client"],
-    });
-    //subItems.push({
-    //    label: "Alerta de Productos",
-    //    url: "/report/quantity_alerts",
-    //    role: "admin",
-    //});
-    //subItems.push( {
-    //           label: "Reporte de Agencias",
-    //           url: "/report/warehouse_report",
-    //       role: "admin",
-    //     });
-    subItems.push({
-        label: "Reporte de Stock",
-        url: "/report/stock",
-        activate: ["/report/stock"],
-    });
-    //subItems.push( {
-    //   label: "Reporte de Usuarios",
-    //   url: "/report/users_report",
-    //   role: "admin",
-    // });
-    subItems.push({
-        label: "Top productos vendidos",
-        url: "/report/top_products",
-        activate: ["/report/top_products"],
-    });
-    subItems.push({
-        label: "Top Clientes",
-        url: "/report/top_customers",
-        activate: ["/report/top_customers"],
-    });
-    menuItems.value.push({
-        label: "Informes",
-        url: "",
-        activate: [
-            "/payment_sale",
-            "/report/sales",
-            "/report/client",
-            "/report/stock",
-            "/report/top_products",
-            "/report/top_customers",
-        ],
-        subItems: subItems.slice(),
-    });
-
+        menuItems.value.push({
+            label: "Informes",
+            url: "",
+            activate: [
+                "/payment_sale",
+                "/report/sales",
+                "/report/client",
+                "/report/stock",
+                "/report/top_products",
+            ],
+            subItems: subItems.slice(),
+        });
+    }
     // settings
     if (
         globals.userPermision([

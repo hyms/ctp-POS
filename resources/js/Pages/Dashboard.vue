@@ -331,7 +331,7 @@ onMounted(() => {
         <!--                    <v-card-subtitle></v-card-subtitle>-->
         <!--                </v-card>-->
         <!-- warehouse -->
-        <v-row v-if="globals.rolePermision(['Admin'])">
+        <v-row v-if="globals.userPermision(['dashboard'])">
             <v-col sm="4" cols="12">
                 <v-select
                     @update:modelValue="Selected_Warehouse"
@@ -345,7 +345,7 @@ onMounted(() => {
                 ></v-select>
             </v-col>
         </v-row>
-        <v-row v-if="globals.rolePermision(['Admin'])">
+        <v-row v-if="globals.userPermision(['dashboard'])">
             <v-col md="8" cols="12">
                 <v-card :loading="loading">
                     <v-card-title>

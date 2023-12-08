@@ -257,6 +257,31 @@ function loadPermissions() {
             ],
         },
         {
+            title: labelsNew.Expense_Category,
+            items: [
+                {
+                    cols: "6",
+                    label: labelsNew.View,
+                    permission: "expenses_category_view",
+                },
+                {
+                    cols: "6",
+                    label: labelsNew.Add,
+                    permission: "expenses_category_add",
+                },
+                {
+                    cols: "6",
+                    label: labelsNew.Edit,
+                    permission: "expenses_category_edit",
+                },
+                {
+                    cols: "6",
+                    label: labelsNew.Del,
+                    permission: "expenses_category_delete",
+                },
+            ],
+        },
+        {
             title: labelsNew.Sales,
             items: [
                 {
@@ -369,15 +394,20 @@ function loadPermissions() {
                     label: labelsNew.Warehouse_report,
                     permission: "Warehouse_report",
                 },
-                {
-                    cols: "12",
-                    label: labelsNew.Top_Selling_Products,
-                    permission: "Top_products",
-                },
+                // {
+                //     cols: "12",
+                //     label: labelsNew.Top_Selling_Products,
+                //     permission: "Top_products",
+                // },
                 {
                     cols: "12",
                     label: labelsNew.Users_Report,
                     permission: "users_report",
+                },
+                {
+                    cols: "12",
+                    label: labelsNew.CustomersReport,
+                    permission: "Reports_customers",
                 },
                 {
                     cols: "12",
