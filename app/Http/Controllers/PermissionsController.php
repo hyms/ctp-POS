@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Role;
+use App\utils\helpers;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
@@ -22,8 +23,9 @@ class PermissionsController extends Controller
 
     public function getTable(Request $request)
     {
-        $user = Auth::user();
-        $user->can('permissions_view');
+        if(!helpers::checkPermission('permissions_view')){
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $roles = Role::get();
         return response()->json(['data' => $roles]);
     }
@@ -32,6 +34,9 @@ class PermissionsController extends Controller
 
     public function store(Request $request)
     {
+        if(!helpers::checkPermission('permissions_add')){
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $request->validate([
             'role.name' => 'required',
         ]);
@@ -72,8 +77,6 @@ class PermissionsController extends Controller
 //------------- Show Form Edit Permissions -----------\\
     public function edit($id, Request $request)
     {
-        $user = Auth::user();
-        $user->can('permissions_edit');
 
 //        if ($id != '1') {
         $Role = Role::with('permissions')->where('deleted_at', '=', null)->findOrFail($id);
@@ -100,6 +103,9 @@ class PermissionsController extends Controller
 
     public function update($id, Request $request)
     {
+        if(!helpers::checkPermission('permissions_edit')){
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $request->validate([
             'role.name' => 'required',
         ]);
@@ -126,8 +132,9 @@ class PermissionsController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $user = Auth::user();
-        $user->can('permissions_del');
+        if(!helpers::checkPermission('permissions_delete')){
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         Role::whereId($id)->update([
             'deleted_at' => Carbon::now(),

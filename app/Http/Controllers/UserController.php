@@ -34,8 +34,8 @@ class UserController extends Controller
         $ShowRecord = Role::findOrFail($Role->id)->exists();
         //        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $users = User::where(function ($query) use ($ShowRecord) {
-            if (!$ShowRecord) {
+        $users = User::where(function ($query) {
+            if(!helpers::checkPermission('record_view')){
                 return $query->where('id', '=', Auth::user()->id);
             }
         });

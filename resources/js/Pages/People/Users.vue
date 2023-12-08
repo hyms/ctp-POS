@@ -20,6 +20,7 @@ const roles = ref([]);
 const form = ref(null);
 const search = ref("");
 const loading = ref(false);
+const loadingWarehouse = ref(false);
 const alert = ref(false);
 const snackbar = ref({
     view: false,
@@ -189,12 +190,14 @@ function Edit_User(item) {
 
 //---------------------- Get_Data_Warehouses  ------------------------------\\
 function Get_Data_Warehouses(id) {
-    axios
-        .get("/users/edit/" + id)
-        .then(({ data }) => {
+    api.get({
+        url: "/users/edit/" + id,
+        loadingItem: loadingWarehouse,
+        snackbar,
+        onSuccess: (data) => {
             assigned_warehouses.value = data.assigned_warehouses;
-        })
-        .catch((error) => {});
+        },
+    });
 }
 
 //---------------------- modal  ------------------------------\\
@@ -391,6 +394,7 @@ onMounted(() => {
                                     hide-details="auto"
                                 ></v-checkbox>
                                 <v-select
+                                    :loading="loadingWarehouse"
                                     v-model="assigned_warehouses"
                                     :items="helpers.toArraySelect(warehouses)"
                                     :label="labels.warehouse_some"
