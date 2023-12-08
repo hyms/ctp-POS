@@ -103,7 +103,7 @@ function Delete_Expense(id) {
             <v-col>
                 <v-text-field
                     v-model="search"
-                    prepend-icon="mdi-magnify"
+                    prepend-icon="fas fa-search"
                     hide-details
                     :label="labels.search"
                     single-line
@@ -147,7 +147,7 @@ function Delete_Expense(id) {
                         <v-btn
                             class="ma-1"
                             color="primary"
-                            icon="mdi-pencil"
+                            icon="fas fa-pen"
                             size="x-small"
                             variant="outlined"
                             :disabled="

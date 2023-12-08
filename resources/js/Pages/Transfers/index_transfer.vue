@@ -259,7 +259,7 @@ function Remove_Transfer(id) {
             <v-col>
                 <v-text-field
                     v-model="search"
-                    prepend-icon="mdi-magnify"
+                    prepend-icon="fas fa-search"
                     hide-details
                     label="Buscar"
                     single-line
@@ -276,7 +276,7 @@ function Remove_Transfer(id) {
                 <v-btn
                     color="primary"
                     class="ma-1"
-                    prepend-icon="mdi-account-plus"
+                    prepend-icon="fas fa-user-plus"
                     @click="router.visit('/transfers/create')"
                 >
                     Añadir
@@ -314,7 +314,7 @@ function Remove_Transfer(id) {
                         <v-btn
                             class="ma-1"
                             color="primary"
-                            icon="mdi-pencil"
+                            icon="fas fa-pen"
                             size="x-small"
                             variant="outlined"
                             :disabled="

@@ -761,7 +761,7 @@ function Submit_Pay_due() {
             <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="search"
-                    prepend-icon="mdi-magnify"
+                    prepend-icon="fas fa-search"
                     hide-details
                     label="Buscar"
                     single-line
@@ -788,7 +788,7 @@ function Submit_Pay_due() {
                 <v-btn
                     color="primary"
                     class="ma-1"
-                    prepend-icon="mdi-account-plus"
+                    prepend-icon="fas fa-user-plus"
                     @click="New_Client"
                 >
                     {{ labels.add }}
@@ -852,7 +852,7 @@ function Submit_Pay_due() {
 
                                 <v-list-item
                                     @click="Edit_Client(item)"
-                                    prepend-icon="mdi-pencil"
+                                    prepend-icon="fas fa-pen"
                                 >
                                     <v-list-item-title>
                                         Editar Cliente

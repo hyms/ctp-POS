@@ -1,21 +1,22 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
-import Snackbar from "@/Components/Snackbar2.vue";
+import Snackbar from "@/Components/snackbar.vue";
 
-import {rules} from "@/helpers";
-import labels from "@/labels";
-import api from "@/api";
+import { api, globals, helpers, labels, rules } from "@/helpers";
 
 const props = defineProps({
-    users: Array,
-    warehouses: Array,
-    roles: Array,
+    // users: Array,
+    // warehouses: Array,
+    // roles: Array,
     errors: Object,
 });
 
 //declare variable
+const users = ref([]);
+const warehouses = ref([]);
+const roles = ref([]);
 const form = ref(null);
 const search = ref("");
 const loading = ref(false);
@@ -64,25 +65,23 @@ function isChecked(user) {
     api.post({
         url: "/users_switch_activated/" + user.id,
         params: {
-            statut: user.statut === 1,
+            statut: user.statut !== 1,
         },
         loadingItem: loading,
         snackbar,
-        Success: (data) => {
-            if (data.success) {
+        onSuccess: (data) => {
+            if (data["success"]) {
                 snackbar.value.color = "success";
                 if (user.statut === 0) {
-                    user.statut = 1;
                     snackbar.value.text = "Usuario activado";
                 } else {
-                    user.statut = 0;
                     snackbar.value.text = "Usuario desactivado";
                 }
             } else {
-                user.statut = 1;
                 snackbar.value.color = "warning";
                 snackbar.value.text = labels.warning_message;
             }
+            loadData();
         },
     });
 }
@@ -112,7 +111,8 @@ function Create_User() {
         },
         loadingItem: loading,
         snackbar,
-        Success: () => {
+        onSuccess: () => {
+            loadData();
             dialog.value = false;
         },
     });
@@ -144,7 +144,8 @@ function Update_User() {
         },
         loadingItem: loading,
         snackbar,
-        Success: () => {
+        onSuccess: () => {
+            loadData();
             dialog.value = false;
         },
     });
@@ -189,7 +190,7 @@ function Edit_User(item) {
 //---------------------- Get_Data_Warehouses  ------------------------------\\
 function Get_Data_Warehouses(id) {
     axios
-        .get("/users/edit/"+id)
+        .get("/users/edit/" + id)
         .then(({ data }) => {
             assigned_warehouses.value = data.assigned_warehouses;
         })
@@ -211,6 +212,23 @@ function onClose() {
     dialog.value = false;
     reset_Form();
 }
+
+function loadData() {
+    api.get({
+        url: "/users/list",
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
+            users.value = data.users;
+            roles.value = data.roles;
+            warehouses.value = data.warehouses;
+        },
+    });
+}
+
+onMounted(() => {
+    loadData();
+});
 </script>
 
 <template>
@@ -289,9 +307,7 @@ function onClose() {
                                     :label="labels.user.phone + ' *'"
                                     v-model="user.phone"
                                     :placeholder="labels.user.phone"
-                                    :rules="
-                                        rules.required.concat(rules.number)
-                                    "
+                                    :rules="rules.required.concat(rules.number)"
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -331,11 +347,9 @@ function onClose() {
                             <v-col cols="12" md="6">
                                 <v-select
                                     v-model="user.role"
-                                    :items="roles"
+                                    :items="helpers.toArraySelect(roles)"
                                     :rules="rules.required"
                                     :label="labels.user.role"
-                                    item-title="name"
-                                    item-value="id"
                                     hide-details="auto"
                                 ></v-select>
                             </v-col>
@@ -346,9 +360,7 @@ function onClose() {
                                     :label="labels.user.NewPassword + ' *'"
                                     v-model="user.NewPassword"
                                     :placeholder="labels.user.NewPassword"
-                                    :rules="
-                                        rules.min(6).concat(rules.max(14))
-                                    "
+                                    :rules="rules.min(6).concat(rules.max(14))"
                                     hide-details="auto"
                                     type="password"
                                 >
@@ -380,10 +392,8 @@ function onClose() {
                                 ></v-checkbox>
                                 <v-select
                                     v-model="assigned_warehouses"
-                                    :items="warehouses"
+                                    :items="helpers.toArraySelect(warehouses)"
                                     :label="labels.warehouse_some"
-                                    item-title="name"
-                                    item-value="id"
                                     multiple
                                     chips
                                     hide-details="auto"
@@ -421,7 +431,7 @@ function onClose() {
             <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="search"
-                    prepend-icon="mdi-magnify"
+                    prepend-icon="fas fa-search"
                     hide-details
                     :label="labels.search"
                     single-line
@@ -431,14 +441,16 @@ function onClose() {
             <v-spacer></v-spacer>
             <v-col cols="12" sm="auto" class="text-right">
                 <ExportBtn
+                    v-if="globals.userPermision(['users_view'])"
                     :data="users"
                     :fields="jsonFields"
                     name-file="Usuarios"
                 ></ExportBtn>
                 <v-btn
+                    v-if="globals.userPermision(['users_add'])"
                     color="primary"
                     class="ma-1"
-                    prepend-icon="mdi-account-plus"
+                    prepend-icon="fas fa-user-plus"
                     @click="New_User"
                 >
                     {{ labels.add }}
@@ -464,9 +476,12 @@ function onClose() {
                     </template>
                     <template v-slot:item.actions="{ item }">
                         <v-btn
+                            v-if="
+                                globals.userPermision(['users_edit', 'users'])
+                            "
                             class="ma-1"
                             color="primary"
-                            icon="mdi-pencil"
+                            icon="fas fa-pen"
                             size="x-small"
                             variant="outlined"
                             @click="Edit_User(item)"

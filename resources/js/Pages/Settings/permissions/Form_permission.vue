@@ -80,8 +80,6 @@ watch(
     () => [props.roleItem],
     () => {
         if (props.roleItem != null) {
-            console.log(props.roleItem);
-            console.log(props.permissionsItems);
             editmode.value = true;
         } else {
             resetForm();
@@ -91,7 +89,6 @@ watch(
 );
 onMounted(() => {
     if (props.roleItem != null) {
-        console.log(props.permissionsItem);
         role.value = props.roleItem;
         permissions.value = props.permissionsItem;
     }

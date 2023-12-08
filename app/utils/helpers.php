@@ -8,8 +8,8 @@ use App\Models\Setting;
 use App\Models\UserWarehouse;
 use App\Models\Warehouse;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -42,7 +42,22 @@ class helpers
         return $model;
     }
 
-    //  Check If Hass Permission Show All records
+    //  Check If Hass Permission
+    public static function checkPermissionJson(string $permission)
+    {
+        $user = Auth::user();
+        if (!$user->can($permission)) {
+           return response()->json(['error' => "No tiene permisos"], 406);
+        }
+    }
+
+    public static function checkPermission(string $permission)
+    {
+        $user = Auth::user();
+        return $user->can($permission);
+    }
+
+    ////  Check If Hass Permission Show All records
     public function Show_Records($model)
     {
         $Role = Auth::user()->roles()->first();

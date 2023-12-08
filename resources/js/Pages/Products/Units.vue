@@ -346,7 +346,7 @@ function Remove_Unit() {
             <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="search"
-                    prepend-icon="mdi-magnify"
+                    prepend-icon="fas fa-search"
                     hide-details
                     label="Buscar"
                     single-line
@@ -373,7 +373,7 @@ function Remove_Unit() {
                         <v-btn
                             class="ma-1"
                             color="primary"
-                            icon="mdi-pencil"
+                            icon="fas fa-pen"
                             size="x-small"
                             variant="outlined"
                             @click="Edit_Unit(item)"

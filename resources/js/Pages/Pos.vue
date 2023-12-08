@@ -1,10 +1,9 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Pos.vue";
-import {helpers,rules,labels,global} from "@/helpers";
+import { global, labels } from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
 import MenuUser from "@/Components/Menu_user.vue";
-import FullScreen from "@/Components/buttons/Full_screen.vue";
 import InvoiceDialog from "@/Components/InvoiceDialog.vue";
 import SelectClient from "@/Components/select_client.vue";
 
@@ -331,18 +330,18 @@ function verifiedForm() {
         return false;
     }
 
-        for (let i = 0; i < details.value.length; i++) {
-            if (
-                details.value[i].quantity == "" ||
-                parseFloat(details.value[i].quantity) === 0
-            ) {
-                snackbar.value.view = true;
-                snackbar.value.text = labels.no_add_qty;
-                snackbar.value.color = "warning";
-                return false;
-            }
+    for (let i = 0; i < details.value.length; i++) {
+        if (
+            details.value[i].quantity == "" ||
+            parseFloat(details.value[i].quantity) === 0
+        ) {
+            snackbar.value.view = true;
+            snackbar.value.text = labels.no_add_qty;
+            snackbar.value.color = "warning";
+            return false;
+        }
 
-            return true;
+        return true;
     }
 }
 
@@ -1265,7 +1264,7 @@ onMounted(() => {
                                                 v-model="searchProducts"
                                                 clearable
                                                 hide-details
-                                                prepend-inner-icon="mdi-magnify"
+                                                prepend-inner-icon="fas fa-search"
                                                 placeholder="Search"
                                                 variant="solo"
                                             ></v-text-field>

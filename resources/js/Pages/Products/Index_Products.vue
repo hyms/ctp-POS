@@ -168,7 +168,7 @@ function Remove_Product() {
             <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="search"
-                    prepend-icon="mdi-magnify"
+                    prepend-icon="fas fa-search"
                     hide-details
                     :label="labels.search"
                     single-line
@@ -194,7 +194,7 @@ function Remove_Product() {
                 <v-btn
                     color="primary"
                     class="ma-1"
-                    prepend-icon="mdi-account-plus"
+                    prepend-icon="fas fa-user-plus"
                     @click="router.visit('/products/create')"
                 >
                     {{ labels.add }}
@@ -224,7 +224,7 @@ function Remove_Product() {
                         <v-btn
                             class="ma-1"
                             color="primary"
-                            icon="mdi-pencil"
+                            icon="fas fa-pen"
                             size="x-small"
                             variant="outlined"
                             @click="router.visit('/products/edit/' + item.id)"

@@ -720,7 +720,7 @@ onMounted(() => {
                                 label="Añadir Producto"
                                 :disabled="products.length == 0"
                                 clearable
-                                prepend-inner-icon="mdi-magnify"
+                                prepend-inner-icon="fas fa-search"
                             ></v-autocomplete>
                         </v-col>
 

@@ -32,7 +32,7 @@ let jsonFields = ref({
             <v-col cols="12" sm="4">
                 <v-text-field
                     v-model="search"
-                    prepend-icon="mdi-magnify"
+                    prepend-icon="fas fa-search"
                     hide-details
                     :label="labels.search"
                     single-line

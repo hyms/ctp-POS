@@ -228,7 +228,7 @@ function Remove_SalesType() {
             <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="search"
-                    prepend-icon="mdi-magnify"
+                    prepend-icon="fas fa-search"
                     hide-details
                     :label="labels.search"
                     single-line

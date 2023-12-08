@@ -521,7 +521,7 @@ function Remove_Sale(id, sale_has_return) {
                                                         enableDays
                                                     )
                                                 "
-                                                icon="mdi-pencil"
+                                                icon="fas fa-pen"
                                                 class="mx-1 rounded"
                                             >
                                             </v-btn>

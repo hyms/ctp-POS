@@ -114,7 +114,7 @@ function Get_Sales(page) {
             <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="search"
-                    prepend-icon="mdi-magnify"
+                    prepend-icon="fas fa-search"
                     hide-details
                     :label="labels.search"
                     single-line
@@ -136,7 +136,7 @@ function Get_Sales(page) {
                             elevation="1"
                             class="mr-2 my-1"
                             v-bind="props"
-                            append-icon="mdi-magnify"
+                            append-icon="fas fa-search"
                         >
                             {{ labels.filters }}
                         </v-btn>

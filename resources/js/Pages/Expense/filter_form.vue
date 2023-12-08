@@ -60,7 +60,7 @@ function search() {
                 elevation="1"
                 class="mr-2 my-1"
                 v-bind="props"
-                append-icon="mdi-magnify"
+                append-icon="fas fa-search"
             >
                 {{ labels.filters }}
             </v-btn>

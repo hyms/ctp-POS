@@ -249,7 +249,7 @@ function onCloseDelete() {
             <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="search"
-                    prepend-icon="mdi-magnify"
+                    prepend-icon="fas fa-search"
                     hide-details
                     :label="labels.search"
                     single-line
@@ -260,7 +260,7 @@ function onCloseDelete() {
                 <v-btn
                     color="primary"
                     class="ma-1"
-                    prepend-icon="mdi-account-plus"
+                    prepend-icon="fas fa-user-plus"
                     @click="New_Warehouse"
                 >
                     {{ labels.add }}
@@ -280,7 +280,7 @@ function onCloseDelete() {
                             <v-btn
                                 class="ma-1"
                                 color="primary"
-                                icon="mdi-pencil"
+                                icon="fas fa-pen"
                                 size="x-small"
                                 variant="outlined"
                                 @click="Edit_Warehouse(item)"

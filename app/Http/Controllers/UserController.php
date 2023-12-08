@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Role;
-use App\Models\role_user;
 use App\Models\User;
 use App\Models\UserWarehouse;
 use App\Models\Warehouse;
+use App\utils\helpers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,10 +24,12 @@ class UserController extends Controller
         Inertia::share('titlePage', 'Usuarios');
         return Inertia::render('People/Users');
     }
+
     public function getTable(request $request)
     {
-        $user = Auth::user();
-        $user->can('users_view');
+        if(!helpers::checkPermission('users_view')){
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->exists();
         //        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
@@ -37,9 +39,23 @@ class UserController extends Controller
                 return $query->where('id', '=', Auth::user()->id);
             }
         });
-        $users = $users->get();
-        $warehouses = Warehouse::get(['id', 'name']);
-        $roles = Role::get(['id', 'name']);
+        $users = $users->get()->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'firstname' => $item->firstname,
+                'lastname' => $item->lastname,
+                'username' => $item->username,
+                'password' => $item->password,
+                'email' => $item->email,
+                'phone' => $item->phone,
+                'ci' => $item->ci,
+                'statut' => $item->statut,
+                'role' => $item->role . "",
+                'is_all_warehouses' => $item->is_all_warehouses,
+            ];
+        });
+        $warehouses = Warehouse::pluck('name', 'id');
+        $roles = Role::pluck('name', 'id');
         return response()->json(['users' => $users, 'warehouses' => $warehouses, 'roles' => $roles]);
     }
 
@@ -91,8 +107,9 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $user = Auth::user();
-        $user->can('users_add');
+        if(!helpers::checkPermission('users_add')){
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $request->validate([
             'username' => 'required|unique:users',
         ], [
@@ -134,11 +151,13 @@ class UserController extends Controller
 
     public function edit(Request $request, $id)
     {
-        $user = Auth::user();
-        $user->can('users_edit');
-
         $assigned_warehouses = UserWarehouse::where('user_id', $id)->pluck('warehouse_id')->toArray();
-        $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $assigned_warehouses)->pluck('id')->toArray();
+        $warehouses = Warehouse::where('deleted_at', '=', null)
+            ->whereIn('id', $assigned_warehouses)
+            ->get()
+            ->map(function ($item) {
+                return $item->id . "";
+            });
 
         return response()->json([
             'assigned_warehouses' => $warehouses,
@@ -149,12 +168,11 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        $user = Auth::user();
-        $user->can('users_edit');
-
+        if(!helpers::checkPermission('users_edit')){
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $request->validate([
-            'username' => 'required|unique:users',
-            'username' => Rule::unique('users')->ignore($id),
+            'username' => 'required|unique:users,username,' . $id,
         ], [
             'username.unique' => 'Este Usuario ya existe.',
         ]);
@@ -163,7 +181,7 @@ class UserController extends Controller
             $user = User::findOrFail($id);
             $current = $user->password;
             $pass = $user->password;
-            if (!empty($request->NewPassword) && $request->NewPassword != "null") {
+            if ($request->filled('NewPassword') && $request->NewPassword != "null") {
                 $password_new = Hash::make($request->NewPassword);
                 if ($password_new != $current) {
                     $pass = $password_new;
@@ -185,17 +203,12 @@ class UserController extends Controller
             ]);
 
             $role = Role::find($request->get('role'));
-            $User->revokeRole($role);
-            
-            role_user::where('user_id', $id)->update([
-                'user_id' => $id,
-                'role_id' => $request->get('role'),
-            ]);
+            $user->syncRoles($role);
 
             $user_saved = User::findOrFail($id);
             $user_saved->assignedWarehouses()->sync($request->get('assigned_to'));
 
-            }, 10);
+        }, 10);
 
         return response()->json(['redirect' => '']);
 
@@ -236,8 +249,8 @@ class UserController extends Controller
     {
         User::whereId($id)->update([
             'statut' => $request->get('statut'),
-            ]);
-        return response()->json(['redirect' => '']);
+        ]);
+        return response()->json(['success' => true]);
     }
 
 //------------- GET USER Auth ---------\\

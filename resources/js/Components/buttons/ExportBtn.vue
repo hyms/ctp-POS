@@ -33,7 +33,7 @@ async function fetchData() {
         :before-generate="startDownload"
         :before-finish="finishDownload"
     >
-        <v-icon>mdi-file-excel-box</v-icon>
+        <v-icon>fas fa-file-excel</v-icon>
         Exportar
     </json-excel>
 </template>
