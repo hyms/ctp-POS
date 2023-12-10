@@ -277,7 +277,7 @@ function Remove_Adjustment() {
                         <v-btn
                             class="ma-1"
                             color="error"
-                            icon="mdi-delete"
+                            icon="fas fa-trash"
                             size="x-small"
                             variant="outlined"
                             :disabled="

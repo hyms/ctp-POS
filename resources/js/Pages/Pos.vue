@@ -827,7 +827,7 @@ onMounted(() => {
                                                     </th>
                                                     <th class="text-center">
                                                         <v-icon
-                                                            icon="mdi-delete"
+                                                            icon="fas fa-trash"
                                                         ></v-icon>
                                                     </th>
                                                 </tr>
@@ -937,7 +937,7 @@ onMounted(() => {
                                                                 )
                                                             "
                                                             title="Delete"
-                                                            icon="mdi-delete"
+                                                            icon="fas fa-trash"
                                                             color="error"
                                                             size="small"
                                                             variant="tonal"

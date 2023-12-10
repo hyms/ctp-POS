@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\product_warehouse;
+use App\Models\ProductVariant;
 use App\Models\Warehouse;
+use App\utils\helpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,10 +21,16 @@ class WarehouseController extends Controller
     {
 //        $this->authorizeForUser($request->user('api'), 'view', Warehouse::class);
 
-        $warehouses = Warehouse::get();
         Inertia::share('titlePage', 'Almacenes');
-        return Inertia::render('Settings/Warehouses',
-            ['warehouses' => $warehouses]);
+        return Inertia::render('Settings/Warehouses');
+    }
+
+    public function getTable(Request $request){
+        if(!helpers::checkPermission('warehouse')){
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
+        $warehouses = Warehouse::get();
+        return response()->json(['warehouses' => $warehouses]);
     }
 
     //----------- Store new Warehouse --------------\\

@@ -1,18 +1,16 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import Snackbar from "@/Components/Snackbar2.vue";
-import helper from "@/helpers";
-import labels from "@/labels";
-import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
-import api from "@/api";
+import Snackbar from "@/Components/snackbar.vue";
+import { api, globals, labels, rules } from "@/helpers";
+import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
 
 const props = defineProps({
-    warehouses: Array,
     errors: Object,
 });
 
 //declare variable
+const warehouses = ref([]);
 const form = ref(null);
 const search = ref("");
 const loading = ref(false);
@@ -70,6 +68,10 @@ function Create_Warehouse() {
         },
         loadingItem: loading,
         snackbar,
+        onSuccess: () => {
+            loadData();
+            dialog.value = false;
+        },
     });
 }
 
@@ -85,7 +87,8 @@ function Update_Warehouse() {
         },
         loadingItem: loading,
         snackbar,
-        Success: () => {
+        onSuccess: () => {
+            loadData();
             dialog.value = false;
         },
     });
@@ -132,7 +135,8 @@ function Remove_Warehouse() {
         url: "/warehouses/" + warehouse.value.id,
         loadingItem: loading,
         snackbar,
-        Success: () => {
+        onSuccess: () => {
+            loadData();
             dialog.value = false;
         },
     });
@@ -142,6 +146,21 @@ function onCloseDelete() {
     reset_Form();
     dialogDelete.value = false;
 }
+
+function loadData() {
+    api.get({
+        url: "/warehouses/list",
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
+            warehouses.value = data.warehouses;
+        },
+    });
+}
+
+onMounted(() => {
+    loadData();
+});
 </script>
 
 <template>
@@ -179,7 +198,7 @@ function onCloseDelete() {
                                     :label="labels.warehouse.name + ' *'"
                                     v-model="warehouse.name"
                                     :placeholder="labels.warehouse.name"
-                                    :rules="helper.required"
+                                    :rules="rules.required"
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -258,6 +277,7 @@ function onCloseDelete() {
             </v-col>
             <v-col cols="12" sm="6" class="text-right">
                 <v-btn
+                    v-if="globals.userPermision(['warehouse'])"
                     color="primary"
                     class="ma-1"
                     prepend-icon="fas fa-user-plus"
@@ -289,7 +309,7 @@ function onCloseDelete() {
                             <v-btn
                                 class="ma-1"
                                 color="error"
-                                icon="mdi-delete"
+                                icon="fas fa-trash"
                                 size="x-small"
                                 variant="outlined"
                                 @click="Delete_Warehouse(item)"

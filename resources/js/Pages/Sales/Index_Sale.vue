@@ -823,7 +823,7 @@ function Remove_Sale(id, sale_has_return) {
                             <!--                </v-dropdown-item>-->
                             <v-list-item
                                 @click="Delete_Item(item)"
-                                prepend-icon="mdi-delete"
+                                prepend-icon="fas fa-trash"
                                 :disabled="
                                     helper.maxEnableButtons(
                                         item.updated_at,

@@ -861,7 +861,7 @@ function Submit_Pay_due() {
 
                                 <v-list-item
                                     @click="Delete_Client(item)"
-                                    prepend-icon="mdi-delete"
+                                    prepend-icon="fas fa-trash"
                                 >
                                     <v-list-item-title>
                                         Eliminar Cliente

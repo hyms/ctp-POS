@@ -862,7 +862,7 @@ onMounted(() => {
                                             <v-btn
                                                 class="ma-1 rounded"
                                                 color="error"
-                                                icon="mdi-delete"
+                                                icon="fas fa-trash"
                                                 size="small"
                                                 density="comfortable"
                                                 variant="elevated"
