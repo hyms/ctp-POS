@@ -170,7 +170,7 @@ onMounted(() => {});
                     @click="print()"
                     color="warning"
                     size="small"
-                    prepend-icon="mdi-printer"
+                    prepend-icon="fas fa-print"
                 >
                     Imprimir
                 </v-btn>

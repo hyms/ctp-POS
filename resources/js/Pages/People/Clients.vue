@@ -843,7 +843,7 @@ function Submit_Pay_due() {
 
                                 <v-list-item
                                     @click="showDetails(item)"
-                                    prepend-icon="mdi-eye"
+                                    prepend-icon="fas fa-eye"
                                 >
                                     <v-list-item-title>
                                         Detalles del cliente
@@ -1170,7 +1170,7 @@ function Submit_Pay_due() {
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
-                    prepend-icon="mdi-printer"
+                    prepend-icon="fas fa-print"
                     @click="
                         helper.print_pdf('invoice-POS', payment.client_name)
                     "
@@ -1180,7 +1180,7 @@ function Submit_Pay_due() {
                     {{ labels.print }} PDF
                 </v-btn>
                 <v-btn
-                    prepend-icon="mdi-printer"
+                    prepend-icon="fas fa-print"
                     @click="helper.print_pos('invoice-POS')"
                     color="primary"
                     variant="outlined"

@@ -142,8 +142,8 @@ function loadMenu() {
         if (globals.userPermision(["products_view"])) {
             subItems.push({
                 label: "Listar Productos",
-                url: "/products/list",
-                activate: ["/products/list"],
+                url: "/products/",
+                activate: ["/products/"],
             });
         }
         if (globals.userPermision(["category"])) {
@@ -165,7 +165,7 @@ function loadMenu() {
             url: "",
             activate: [
                 "/products/create",
-                "/products/list",
+                "/products/",
                 "/products/categories",
                 "/products/units",
             ],

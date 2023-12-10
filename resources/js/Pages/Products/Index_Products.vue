@@ -1,22 +1,25 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import { router } from "@inertiajs/vue3";
-import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
-import labels from "@/labels";
+import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
+import Snackbar from "@/Components/snackbar.vue";
+import { api, labels } from "@/helpers";
 
 const props = defineProps({
-    warehouses: Array,
-    categories: Array,
-    products: Array,
     errors: Object,
 });
+const warehouses = ref([]);
+const categories = ref([]);
+const products = ref([]);
 const search = ref("");
 const loading = ref(false);
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("info");
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
 const dialogDelete = ref(false);
 
 const fields = ref([
@@ -125,42 +128,44 @@ function Delete_Item(item) {
 }
 
 function Remove_Product() {
-    snackbar.value = false;
-    axios
-        .delete("/products/" + product.value.id)
-        .then(({ data }) => {
-            dialogDelete.value = false;
-            snackbar.value = true;
-            snackbar.value.color = "success";
+    api.delete({
+        url: "/products/" + product.value.id,
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
             snackbar.value.text = labels.delete_message;
-            router.reload({
-                preserveState: true,
-                preserveScroll: true,
-            });
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbar.value.color = "error";
-            snackbar.value.text = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
+            loadData();
+            dialogDelete.value = false;
+        },
+    });
 }
+
+function loadData() {
+    api.get({
+        url: "/products/list",
+        loadingItem: loading,
+        onSuccess: (data) => {
+            warehouses.value = data.warehouses;
+            categories.value = data.categories;
+            products.value = data.products;
+        },
+    });
+}
+
+onMounted(() => {
+    loadData();
+});
 </script>
 <template>
-    <layout
-        :loading="loading"
-        :snackbar-view="snackbar"
-        :snackbar-text="snackbarText"
-        :snackbar-color="snackbarColor"
-    >
+    <layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <!-- Modal Remove Product -->
         <delete-dialog
-            :model="dialogDelete"
+            v-model="dialogDelete"
             :on-save="Remove_Product"
             :on-close="onCloseDelete"
         ></delete-dialog>
@@ -210,12 +215,13 @@ function Remove_Product() {
                     hover
                     class="elevation-2"
                     :no-data-text="labels.no_data_table"
+                    :loading="loading"
                 >
                     <template v-slot:item.actions="{ item }">
                         <v-btn
                             class="ma-1"
                             color="info"
-                            icon="mdi-eye"
+                            icon="fas fa-eye"
                             size="x-small"
                             variant="outlined"
                             @click="router.visit('/products/detail/' + item.id)"

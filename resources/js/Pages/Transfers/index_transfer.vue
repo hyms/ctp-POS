@@ -305,7 +305,7 @@ function Remove_Transfer(id) {
                         <v-btn
                             class="ma-1"
                             color="info"
-                            icon="mdi-eye"
+                            icon="fas fa-eye"
                             size="x-small"
                             variant="outlined"
                             @click="showDetails(item.id)"

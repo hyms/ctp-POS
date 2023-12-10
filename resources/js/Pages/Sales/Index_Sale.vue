@@ -505,7 +505,7 @@ function Remove_Sale(id, sale_has_return) {
                                             <!--                        size="x-small"-->
                                             <!--                        color="info"-->
                                             <!--                        @click="Payment_Sale_PDF(payment,payment.id)"-->
-                                            <!--                        icon="mdi-printer"-->
+                                            <!--                        icon="fas fa-print"-->
                                             <!--                        class="ma-1"-->
                                             <!--                    >-->
                                             <!--                    </v-btn>-->
@@ -761,7 +761,7 @@ function Remove_Sale(id, sale_has_return) {
                                 @click="
                                     router.visit('/sales/detail/' + item.id)
                                 "
-                                prepend-icon="mdi-eye"
+                                prepend-icon="fas fa-eye"
                             >
                                 <v-list-item-title>
                                     Detalle de Orden
@@ -810,7 +810,7 @@ function Remove_Sale(id, sale_has_return) {
                             <!--              </v-list-item>-->
                             <v-list-item
                                 @click="Invoice_POS(item.id)"
-                                prepend-icon="mdi-printer-pos-outline"
+                                prepend-icon="fas fa-print"
                             >
                                 <v-list-item-title>
                                     Impresion Orden

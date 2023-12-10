@@ -123,7 +123,7 @@ function Get_Client_Report(page) {
                     <v-btn
                         class="ma-1"
                         color="primary"
-                        icon="mdi-eye"
+                        icon="fas fa-eye"
                         size="x-small"
                         variant="outlined"
                         @click="helper.linkVisit('/report/client/' + item.id)"

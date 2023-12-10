@@ -1,20 +1,15 @@
 <script setup>
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import printJS from "print-js";
-import helper from "@/helpers";
-import labels from "@/labels";
-import { usePage } from "@inertiajs/vue3";
+import { globals, helpers, labels } from "@/helpers";
 
 defineProps({
     product: Object,
 });
-const currency = computed(() => usePage().props.currency);
+const currency = globals.currency();
 
 const loading = ref(false);
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("info");
 
 //------- printproduct
 function print_product() {
@@ -22,19 +17,14 @@ function print_product() {
 }
 </script>
 <template>
-    <Layout
-        :loading="loading"
-        :snackbar-view="snackbar"
-        :snackbar-color="snackbarColor"
-        :snackbar-text="snackbarText"
-    >
+    <Layout :loading="loading">
         <v-card>
             <v-toolbar>
                 <v-btn
                     @click="print_product()"
                     variant="outlined"
                     color="primary"
-                    prepend-icon="mdi-printer"
+                    prepend-icon="fas fa-print"
                     >{{ labels.print }}
                 </v-btn>
             </v-toolbar>
@@ -70,7 +60,7 @@ function print_product() {
                                             <td class="font-weight-bold">
                                                 {{ currency }}
                                                 {{
-                                                    helper.formatNumber(
+                                                    helpers.formatNumber(
                                                         product.cost,
                                                         2
                                                     )
@@ -82,7 +72,7 @@ function print_product() {
                                             <td class="font-weight-bold">
                                                 {{ currency }}
                                                 {{
-                                                    helper.formatNumber(
+                                                    helpers.formatNumber(
                                                         product.price,
                                                         2
                                                     )
@@ -123,7 +113,7 @@ function print_product() {
                                                 <span
                                                     class="badge badge-outline-warning"
                                                     >{{
-                                                        helper.formatNumber(
+                                                        helpers.formatNumber(
                                                             product.stock_alert,
                                                             2
                                                         )
@@ -159,7 +149,7 @@ function print_product() {
                                             <td>{{ prod_w.mag }}</td>
                                             <td>
                                                 {{
-                                                    helper.formatNumber(
+                                                    helpers.formatNumber(
                                                         prod_w.qty,
                                                         2
                                                     )
@@ -192,7 +182,7 @@ function print_product() {
                                             <td>{{ prod_v.variant }}</td>
                                             <td>
                                                 {{
-                                                    helper.formatNumber(
+                                                    helpers.formatNumber(
                                                         prod_v.qty,
                                                         2
                                                     )
