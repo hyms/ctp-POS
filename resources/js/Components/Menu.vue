@@ -264,20 +264,20 @@ function loadMenu() {
         ])
     ) {
         subItems = [];
-        if (globals.userPermision(["setting_system"])) {
-            subItems.push({
-                label: labelsNew.SystemSettings,
-                url: "/system_settings",
-                activate: ["/system_settings"],
-            });
-        }
-        if (globals.userPermision(["pos_settings"])) {
-            subItems.push({
-                label: labelsNew.pos_settings,
-                url: "/pos_settings",
-                activate: ["/pos_settings"],
-            });
-        }
+        // if (globals.userPermision(["setting_system"])) {
+        //     subItems.push({
+        //         label: labelsNew.SystemSettings,
+        //         url: "/system_settings",
+        //         activate: ["/system_settings"],
+        //     });
+        // }
+        // if (globals.userPermision(["pos_settings"])) {
+        //     subItems.push({
+        //         label: labelsNew.pos_settings,
+        //         url: "/pos_settings",
+        //         activate: ["/pos_settings"],
+        //     });
+        // }
         if (globals.userPermision(["permissions_view"])) {
             subItems.push({
                 label: labelsNew.GroupPermissions,
@@ -292,7 +292,7 @@ function loadMenu() {
                 activate: ["/expenses_category"],
             });
         }
-        if (globals.userPermision(["sales_types"])) {
+        if (globals.userPermision(["sales_type"])) {
             subItems.push({
                 label: "Tipos de ventas",
                 url: "/sales_types",
@@ -313,13 +313,13 @@ function loadMenu() {
                 activate: ["/users"],
             });
         }
-        if (globals.userPermision(["backup"])) {
-            subItems.push({
-                label: labelsNew.Backup,
-                url: "/backup",
-                activate: ["/backup"],
-            });
-        }
+        // if (globals.userPermision(["backup"])) {
+        //     subItems.push({
+        //         label: labelsNew.Backup,
+        //         url: "/backup",
+        //         activate: ["/backup"],
+        //     });
+        // }
 
         menuItems.value.push({
             label: labelsNew.Settings,

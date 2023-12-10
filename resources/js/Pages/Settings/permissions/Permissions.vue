@@ -111,19 +111,19 @@ onMounted(() => {
                     <v-btn
                         v-if="globals.userPermision(['permissions_edit'])"
                         color="primary"
-                        class="rounded mx-1"
                         @click="showForm(item.id)"
-                        icon="fas fa-edit"
-                        size="small"
-                        variant="tonal"
+                        icon="fas fa-pen"
+                        size="x-small"
+                        variant="outlined"
+                        class="ma-1"
                     ></v-btn>
                     <v-btn
                         v-if="globals.userPermision(['permissions_delete'])"
-                        class="rounded mx-1"
                         icon="fas fa-trash"
-                        size="small"
+                        size="x-small"
+                        variant="outlined"
                         color="error"
-                        variant="tonal"
+                        class="ma-1"
                         @click="showDelete(item.id)"
                     ></v-btn>
                 </template>

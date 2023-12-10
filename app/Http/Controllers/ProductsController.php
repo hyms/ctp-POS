@@ -2,20 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\UserWarehouse;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\product_warehouse;
+use App\Models\ProductVariant;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use App\utils\helpers;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -25,7 +23,11 @@ class ProductsController extends Controller
 
     //------------ Get ALL Products --------------\\
 
-    public function index(request $request)
+    public function index(request $request){
+        Inertia::share('titlePage', 'Productos');
+        return Inertia::render('Products/Index_Products', );
+    }
+    public function getTable(request $request)
     {
 //        $this->authorizeForUser($request->user('api'), 'view', Product::class);
         $products = Product::with('unit', 'category')
@@ -61,8 +63,7 @@ class ProductsController extends Controller
         $warehouses = helpers::getWarehouses(auth()->user());
 
         $categories = Category::where('deleted_at', null)->get(['id', 'name']);
-        Inertia::share('titlePage', 'Productos');
-        return Inertia::render('Products/Index_Products', [
+        return response()->json([
             'warehouses' => $warehouses,
             'categories' => $categories,
             'products' => $data,

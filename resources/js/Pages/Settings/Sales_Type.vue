@@ -1,21 +1,19 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import Snackbar from "@/Components/Snackbar2.vue";
-import helper from "@/helpers";
-import labels from "@/labels";
-import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
+import Snackbar from "@/Components/snackbar.vue";
+import { api, globals, labels, rules } from "@/helpers";
+import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
 import DeleteBtn from "@/Components/buttons/DeleteBtn.vue";
 import ModifyBtn from "@/Components/buttons/ModifyBtn.vue";
 import NewBtn from "@/Components/buttons/NewBtn.vue";
-import api from "@/api";
 
 const props = defineProps({
-    sales_types: Array,
     errors: Object,
 });
 
 //declare variable
+const sales_types = ref([]);
 const form = ref(null);
 const search = ref("");
 const loading = ref(false);
@@ -80,7 +78,8 @@ function Create_SalesType() {
         },
         loadingItem: loading,
         snackbar,
-        Success: () => {
+        onSuccess: () => {
+            loadData();
             dialog.value = false;
         },
     });
@@ -96,7 +95,8 @@ function Update_SalesType() {
         },
         loadingItem: loading,
         snackbar,
-        Success: () => {
+        onSuccess: () => {
+            loadData();
             dialog.value = false;
         },
     });
@@ -135,11 +135,26 @@ function Remove_SalesType() {
         },
         loadingItem: loading,
         snackbar,
-        Success: () => {
+        onSuccess: () => {
+            loadData();
             dialogDelete.value = false;
         },
     });
 }
+
+function loadData() {
+    api.get({
+        url: "/sales_types/list",
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
+            sales_types.value = data.sales_types;
+        },
+    });
+}
+onMounted(() => {
+    loadData();
+});
 </script>
 <template>
     <Layout>
@@ -149,7 +164,7 @@ function Remove_SalesType() {
             :color="snackbar.color"
         ></snackbar>
         <delete-dialog
-            :model="dialogDelete"
+            v-model="dialogDelete"
             :on-close="onCloseDelete"
             :on-save="Remove_SalesType"
         >
@@ -179,7 +194,7 @@ function Remove_SalesType() {
                                     :label="labels.sales_type.code + ' *'"
                                     v-model="sales_type.code"
                                     :placeholder="labels.sales_type.code"
-                                    :rules="helper.required"
+                                    :rules="rules.required"
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -191,7 +206,7 @@ function Remove_SalesType() {
                                     :label="labels.sales_type.name + ' *'"
                                     v-model="sales_type.name"
                                     :placeholder="labels.sales_type.name"
-                                    :rules="helper.required"
+                                    :rules="rules.required"
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -237,6 +252,7 @@ function Remove_SalesType() {
             </v-col>
             <v-col cols="12" sm="6" class="text-right">
                 <new-btn
+                    v-if="globals.userPermision(['sales_type'])"
                     :label="labels.add"
                     :on-click="New_SalesType"
                 ></new-btn>

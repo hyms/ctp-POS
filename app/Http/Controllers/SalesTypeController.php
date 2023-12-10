@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SalesType;
+use App\utils\helpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,11 +15,19 @@ class SalesTypeController extends Controller
 
     public function index(Request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'view', Category::class);
-
         $salesType = SalesType::where('deleted_at', '=', null)->get();
         Inertia::share('titlePage', 'Tipos de Venta');
         return Inertia::render('Settings/Sales_Type', [
+            'sales_types' => $salesType,
+        ]);
+    }
+    public function getTable(Request $request)
+    {
+        if(!helpers::checkPermission('sales_type')){
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
+        $salesType = SalesType::where('deleted_at', '=', null)->get();
+        return response()->json([
             'sales_types' => $salesType,
         ]);
     }

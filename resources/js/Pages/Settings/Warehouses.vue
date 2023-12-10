@@ -171,7 +171,7 @@ onMounted(() => {
             :color="snackbar.color"
         ></snackbar>
         <delete-dialog
-            :model="dialogDelete"
+            v-model="dialogDelete"
             :on-save="Remove_Warehouse"
             :on-close="onCloseDelete"
         >
