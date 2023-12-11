@@ -701,7 +701,7 @@ function Remove_Sale(id, sale_has_return) {
                     color="primary"
                     class="ma-1"
                     variant="flat"
-                    prepend-icon="mdi-plus"
+                    prepend-icon="fas fa-plus"
                     @click="router.visit('/sales/create')"
                 >
                     Añadir

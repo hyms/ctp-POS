@@ -2,8 +2,9 @@
 import { onMounted, ref, watch } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router } from "@inertiajs/vue3";
-import { labels, rules } from "@/helpers";
+import { api, helpers, labels, rules } from "@/helpers";
 import Vue3TagsInput from "vue3-tags-input";
+import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
     categories: Object,
@@ -14,9 +15,12 @@ const props = defineProps({
 const form = ref(null);
 const editmode = ref(false);
 const loading = ref(false);
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("info");
+const loadingUnit = ref(false);
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
 const units_sub = ref([]);
 const variants = ref([]);
 const productForm = ref({
@@ -72,8 +76,13 @@ async function Submit_Product() {
 
 //---------------------- Get Sub Units with Unit id ------------------------------\\
 function Get_Units_SubBase(value) {
-    axios.get("/get_sub_units_by_base?id=" + value).then(({ data }) => {
-        units_sub.value = data;
+    api.get({
+        url: "/get_sub_units_by_base?id=" + value,
+        snackbar,
+        loadingItem: loadingUnit,
+        onSuccess: (data) => {
+            units_sub.value = data;
+        },
     });
 }
 
@@ -87,53 +96,35 @@ function Selected_Unit(value) {
 
 //------------------------------ Create new Product ------------------------------\\
 function Create_Product() {
-    loading.value = true;
-    snackbar.value = false;
-    // Start the progress bar.
-    let data = new FormData();
-
+    let params = {};
     if (productForm.value.is_variant && variants.value.length <= 0) {
         productForm.value.is_variant = false;
     }
     // append objet product
     Object.entries(productForm.value).forEach(([key, value]) => {
-        data.append(key, value);
+        params[key] = value;
     });
-
     // append array variants
     if (variants.value.length) {
+        params[variants] = [];
         for (let i = 0; i < variants.value.length; i++) {
-            data.append("variants[" + i + "]", variants.value[i]);
+            params[variants][i] = variants.value[i];
         }
     }
-
-    // Send Data with axios
-    axios
-        .post("/products", data)
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbar.value.color = "success";
+    api.post({
+        url: "/products",
+        snackbar,
+        loadingItem: loading,
+        params,
+        onSuccess: () => {
             snackbar.value.text = "Actualizacion exitosa";
-            router.visit("/products/list");
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbar.value.color = "error";
-            snackbar.value.text = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
+            router.visit("/products/");
+        },
+    });
 }
 
 //------------------------------ Edit  Product ------------------------------\\
 function Edit_Product() {
-    loading.value = true;
-    snackbar.value = false;
-
     if (productForm.value.is_variant && variants.value.length <= 0) {
         productForm.value.is_variant = false;
     }
@@ -147,25 +138,16 @@ function Edit_Product() {
         }
     }
     // Send Data with axios
-    axios
-        .put("/products/" + productForm.value.id, productForm.value)
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbar.value.color = "success";
+    api.put({
+        url: "/products/" + productForm.value.id,
+        snackbar,
+        loadingItem: loading,
+        params: productForm.value,
+        onSuccess: () => {
             snackbar.value.text = "Actualizacion exitosa";
-            router.visit("/products/list");
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbar.value.color = "error";
-            snackbar.value.text = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
+            router.visit("/products/");
+        },
+    });
 }
 
 function onChangeTag(value) {
@@ -201,16 +183,20 @@ onMounted(() => {
 });
 </script>
 <template>
-    <Layout
-        :loading="loading"
-        :snackbar-view="snackbar"
-        :snackbar-color="snackbarColor"
-        :snackbar-text="snackbarText"
-    >
+    <Layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <v-card variant="elevated">
             <v-toolbar height="15"></v-toolbar>
             <v-card-text>
-                <v-form @submit.prevent="Submit_Product" ref="form">
+                <v-form
+                    @submit.prevent="Submit_Product"
+                    ref="form"
+                    :disabled="loading"
+                >
                     <v-row>
                         <!-- Name -->
                         <v-col cols="12" md="6">
@@ -240,10 +226,8 @@ onMounted(() => {
                         <v-col cols="12" md="6">
                             <v-select
                                 v-model="productForm.category_id"
-                                :items="categories"
+                                :items="helpers.toArraySelect(categories)"
                                 :label="labels.product.category_id"
-                                item-title="title"
-                                item-value="value"
                                 hide-details="auto"
                                 clearable
                                 :rules="rules.required"
@@ -287,10 +271,8 @@ onMounted(() => {
                             <v-select
                                 @update:modelValue="Selected_Unit"
                                 v-model="productForm.unit_id"
-                                :items="units"
+                                :items="helpers.toArraySelect(units)"
                                 :label="labels.product.unit_id"
-                                item-title="title"
-                                item-value="value"
                                 hide-details="auto"
                                 clearable
                                 :rules="rules.required"
@@ -301,13 +283,12 @@ onMounted(() => {
                         <v-col cols="12" md="6">
                             <v-select
                                 v-model="productForm.unit_sale_id"
-                                :items="units_sub"
+                                :items="helpers.toArraySelect(units_sub)"
                                 :label="labels.product.unit_sale_id"
-                                item-title="name"
-                                item-value="id"
                                 hide-details="auto"
                                 clearable
                                 :rules="rules.required"
+                                :loading="loadingUnit"
                             ></v-select>
                         </v-col>
                         <!---->
@@ -315,17 +296,11 @@ onMounted(() => {
                         <v-col cols="12" md="6">
                             <v-select
                                 v-model="productForm.unit_purchase_id"
-                                :items="
-                                    units_sub.map((units_sub) => ({
-                                        title: units_sub.name,
-                                        value: units_sub.id,
-                                    }))
-                                "
+                                :items="helpers.toArraySelect(units_sub)"
                                 :label="labels.product.unit_purchase_id"
-                                item-title="title"
-                                item-value="value"
                                 hide-details="auto"
                                 clearable
+                                :loading="loadingUnit"
                                 :rules="rules.required"
                             ></v-select>
                         </v-col>

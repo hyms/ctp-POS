@@ -1,23 +1,24 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import helper from "@/helpers";
-import { router } from "@inertiajs/vue3";
-import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
-import labels from "@/labels";
+import { api, labels, rules } from "@/helpers";
+import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
+import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
-    categories: Array,
     errors: Object,
 });
 
 //declare variable
 const form = ref(null);
+const categories = ref([]);
 const search = ref("");
 const loading = ref(false);
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("info");
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
 const dialog = ref(false);
 const dialogDelete = ref(false);
 const editmode = ref(false);
@@ -66,68 +67,38 @@ function Edit_category(item) {
 
 //----------------------------------Create new Category ----------------\\
 function Create_Category() {
-    loading.value = true;
-    snackbar.value = false;
-    axios
-        .post("categories", {
+    api.post({
+        url: "/products/categories/",
+        params: {
             name: category.value.name,
             code: category.value.code,
-        })
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbar.value.color = "success";
+        },
+        snackbar,
+        loadingItem: loading,
+        onSuccess: () => {
             snackbar.value.text = labels.success_message;
-            router.reload({
-                preserveState: true,
-                preserveScroll: true,
-            });
-
+            loadData();
             dialog.value = false;
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbar.value.color = "error";
-            snackbar.value.text = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
+        },
+    });
 }
 
 //---------------------------------- Update Category ----------------\\
 function Update_Category() {
-    loading.value = true;
-    snackbar.value = false;
-    axios
-        .put("categories/" + category.value.id, {
+    api.put({
+        url: "/products/categories/" + category.value.id,
+        params: {
             name: category.value.name,
             code: category.value.code,
-        })
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbar.value.color = "success";
+        },
+        snackbar,
+        loadingItem: loading,
+        onSuccess: () => {
             snackbar.value.text = labels.success_message;
-            router.reload({
-                preserveState: true,
-                preserveScroll: true,
-            });
-
+            loadData();
             dialog.value = false;
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbar.value.color = "error";
-            snackbar.value.text = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
+        },
+    });
 }
 
 //--------------------------- reset Form ----------------\\
@@ -154,42 +125,41 @@ function onCloseDelete() {
 
 //--------------------------- Remove Category----------------\\
 function Remove_Category() {
-    loading.value = true;
-    snackbar.value = false;
-    axios
-        .delete("categories/" + category.value.id)
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbar.value.color = "success";
-            snackbar.value.text = labels.delete_message;
-            router.reload({
-                preserveState: true,
-                preserveScroll: true,
-            });
-
+    api.delete({
+        url: "/products/categories/" + category.value.id,
+        snackbar,
+        loadingItem: loading,
+        onSuccess: () => {
+            snackbar.value.text = labels.success_message;
+            loadData();
             dialogDelete.value = false;
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbar.value.color = "error";
-            snackbar.value.text = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
+        },
+    });
 }
+function loadData() {
+    api.get({
+        url: "/products/categories/list",
+        snackbar,
+        loadingItem: loading,
+        onSuccess: (data) => {
+            categories.value = data.categories;
+        },
+    });
+}
+
+onMounted(() => {
+    loadData();
+});
 </script>
 <template>
-    <Layout
-        :snackbar-view="snackbar"
-        :snackbar-color="snackbarColor"
-        :snackbar-text="snackbarText"
-    >
+    <Layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <delete-dialog
-            :model="dialogDelete"
+            v-model="dialogDelete"
             :on-save="Remove_Category"
             :on-close="onCloseDelete"
         >
@@ -215,7 +185,7 @@ function Remove_Category() {
                                     :label="labels.category.code + ' *'"
                                     v-model="category.code"
                                     :placeholder="labels.category.code"
-                                    :rules="helper.required"
+                                    :rules="rules.required"
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -227,7 +197,7 @@ function Remove_Category() {
                                     :label="labels.category.name + ' *'"
                                     v-model="category.name"
                                     :placeholder="labels.category.name"
-                                    :rules="helper.required"
+                                    :rules="rules.required"
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -275,7 +245,7 @@ function Remove_Category() {
                 <v-btn
                     color="primary"
                     class="ma-1"
-                    prepend-icon="mdi-plus"
+                    prepend-icon="fas fa-plus"
                     @click="New_category"
                 >
                     {{ labels.add }}

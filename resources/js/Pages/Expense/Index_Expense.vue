@@ -125,7 +125,7 @@ function Delete_Expense(id) {
                 <v-btn
                     color="primary"
                     class="ma-1"
-                    prepend-icon="mdi-plus"
+                    prepend-icon="fas fa-plus"
                     @click="router.visit('/expenses/create')"
                 >
                     {{ labels.add }}

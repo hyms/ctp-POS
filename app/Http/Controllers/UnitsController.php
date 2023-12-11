@@ -145,7 +145,7 @@ class UnitsController extends Controller
                 return $query->where('id', $request->id)
                     ->orWhere('base_unit', $request->id);
             });
-        })->get();
+        })->get()->pluck('name','id');
 
         return response()->json($units);
     }

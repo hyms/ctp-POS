@@ -54,8 +54,8 @@ class UserController extends Controller
                 'is_all_warehouses' => $item->is_all_warehouses,
             ];
         });
-        $warehouses = Warehouse::pluck('name', 'id');
-        $roles = Role::pluck('name', 'id');
+        $warehouses = Warehouse::get()->pluck('name', 'id');
+        $roles = Role::get()->pluck('name', 'id');
         return response()->json(['users' => $users, 'warehouses' => $warehouses, 'roles' => $roles]);
     }
 
@@ -156,7 +156,7 @@ class UserController extends Controller
             ->whereIn('id', $assigned_warehouses)
             ->get()
             ->map(function ($item) {
-                return $item->id . "";
+                return $item->id;
             });
 
         return response()->json([

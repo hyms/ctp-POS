@@ -86,6 +86,15 @@ const toArraySelect = (object) => {
     let array = [];
     if (typeof object === "object" && object !== null) {
         for (let val of Object.entries(object)) {
+            array.push({ value: parseInt(val[0]), title: val[1] });
+        }
+    }
+    return array;
+};
+const toArraySelectString = (object) => {
+    let array = [];
+    if (typeof object === "object" && object !== null) {
+        for (let val of Object.entries(object)) {
             array.push({ value: val[0], title: val[1] });
         }
     }
@@ -160,6 +169,7 @@ export default {
     newLine,
     toArray,
     toArraySelect,
+    toArraySelectString,
     resetForm,
     maxEnableButtons,
     statutTransfer,

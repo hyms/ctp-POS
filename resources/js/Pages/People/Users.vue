@@ -350,7 +350,7 @@ onMounted(() => {
                             <v-col cols="12" md="6">
                                 <v-select
                                     v-model="user.role"
-                                    :items="helpers.toArraySelect(roles)"
+                                    :items="helpers.toArraySelectString(roles)"
                                     :rules="rules.required"
                                     :label="labels.user.role"
                                     hide-details="auto"

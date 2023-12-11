@@ -23,13 +23,17 @@ class ProductsController extends Controller
 
     //------------ Get ALL Products --------------\\
 
-    public function index(request $request){
+    public function index(request $request)
+    {
         Inertia::share('titlePage', 'Productos');
-        return Inertia::render('Products/Index_Products', );
+        return Inertia::render('Products/Index_Products',);
     }
+
     public function getTable(request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'view', Product::class);
+        if (!helpers::checkPermission('products_view')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $products = Product::with('unit', 'category')
             ->where('deleted_at', '=', null)
             ->get();
@@ -60,9 +64,9 @@ class ProductsController extends Controller
         }
 
         //get warehouses assigned to user
-        $warehouses = helpers::getWarehouses(auth()->user());
+        $warehouses = helpers::getWarehouses(auth()->user())->pluck('name', 'id');
 
-        $categories = Category::where('deleted_at', null)->get(['id', 'name']);
+        $categories = Category::where('deleted_at', null)->pluck('name', 'id');
         return response()->json([
             'warehouses' => $warehouses,
             'categories' => $categories,
@@ -74,7 +78,9 @@ class ProductsController extends Controller
 
     public function store(Request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'create', Product::class);
+        if (!helpers::checkPermission('products_add')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         try {
             $this->validate($request, [
@@ -172,6 +178,9 @@ class ProductsController extends Controller
 
     public function update(Request $request, $id)
     {
+        if (!helpers::checkPermission('products_edit')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         try {
             $this->validate($request, [
                 'code' => 'required|unique:products',
@@ -340,7 +349,9 @@ class ProductsController extends Controller
 
     public function destroy(Request $request, $id)
     {
-//        $this->authorizeForUser($request->user('api'), 'delete', Product::class);
+        if (!helpers::checkPermission('products_delete')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         DB::transaction(function () use ($id) {
 
@@ -367,8 +378,6 @@ class ProductsController extends Controller
 
     public function Get_Products_Details(Request $request, $id)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'view', Product::class);
 
         $Product = Product::where('deleted_at', '=', null)->findOrFail($id);
         //get warehouses assigned to user
@@ -524,44 +533,38 @@ class ProductsController extends Controller
 
     public function show($id)
     {
-
         $Product_data = Product::with('unit')
             ->where('id', $id)
             ->where('deleted_at', '=', null)
             ->first();
 
         $data = collect();
-        $item['id'] = $Product_data['id'];
-        $item['name'] = $Product_data['name'];
-        $item['Type_barcode'] = $Product_data['Type_barcode'];
-        $item['unit_id'] = $Product_data['unit']->id;
-        $item['unit'] = $Product_data['unit']->ShortName;
-        $item['purchase_unit_id'] = $Product_data['unitPurchase']->id;
-        $item['unitPurchase'] = $Product_data['unitPurchase']->ShortName;
-        $item['sale_unit_id'] = $Product_data['unitSale']->id;
-        $item['unitSale'] = $Product_data['unitSale']->ShortName;
-        $item['tax_method'] = $Product_data['tax_method'];
-        $item['tax_percent'] = $Product_data['TaxNet'];
-        $item['is_imei'] = $Product_data['is_imei'];
-        $item['not_selling'] = $Product_data['not_selling'];
+        $data->put('id', $Product_data['id']);
+        $data->put('name', $Product_data['name']);
+        $data->put('Type_barcode', $Product_data['Type_barcode']);
+        $data->put('unit_id', $Product_data['unit']->id);
+        $data->put('unit', $Product_data['unit']->ShortName);
+        $data->put('purchase_unit_id', $Product_data['unitPurchase']->id);
+        $data->put('unitPurchase', $Product_data['unitPurchase']->ShortName);
+        $data->put('sale_unit_id', $Product_data['unitSale']->id);
+        $data->put('unitSale', $Product_data['unitSale']->ShortName);
+        $data->put('tax_method', $Product_data['tax_method']);
+        $data->put('tax_percent', $Product_data['TaxNet']);
+        $data->put('is_imei', $Product_data['is_imei']);
+        $data->put('not_selling', $Product_data['not_selling']);
 
-        if ($Product_data['unitSale']->operator == '/') {
-            $price = $Product_data['price'] / $Product_data['unitSale']->operator_value;
+        $price = $Product_data['unitSale']->operator == '/'
+            ? $Product_data['price'] / $Product_data['unitSale']->operator_value
+            : $Product_data['price'] * $Product_data['unitSale']->operator_value;
 
-        } else {
-            $price = $Product_data['price'] * $Product_data['unitSale']->operator_value;
-        }
+        $cost = $Product_data['unitPurchase']->operator == '/'
+            ? $Product_data['cost'] / $Product_data['unitPurchase']->operator_value
+            : $Product_data['cost'] * $Product_data['unitPurchase']->operator_value;
 
-        if ($Product_data['unitPurchase']->operator == '/') {
-            $cost = $Product_data['cost'] / $Product_data['unitPurchase']->operator_value;
-        } else {
-            $cost = $Product_data['cost'] * $Product_data['unitPurchase']->operator_value;
-        }
-
-        $item['Unit_cost'] = $cost;
-        $item['fix_cost'] = $Product_data['cost'];
-        $item['Unit_price'] = $price;
-        $item['fix_price'] = $Product_data['price'];
+        $data->put('Unit_cost', $cost);
+        $data->put('fix_cost', $Product_data['cost']);
+        $data->put('Unit_price', $price);
+        $data->put('fix_price', $Product_data['price']);
 
         if ($Product_data->TaxNet !== 0.0) {
             //Exclusive
@@ -569,34 +572,31 @@ class ProductsController extends Controller
                 $tax_price = $price * $Product_data['TaxNet'] / 100;
                 $tax_cost = $cost * $Product_data['TaxNet'] / 100;
 
-                $item['Total_cost'] = $cost + $tax_cost;
-                $item['Total_price'] = $price + $tax_price;
-                $item['Net_cost'] = $cost;
-                $item['Net_price'] = $price;
-                $item['tax_price'] = $tax_price;
-                $item['tax_cost'] = $tax_cost;
+                $data->put('Total_cost', $cost + $tax_cost);
+                $data->put('Total_price', $price + $tax_price);
+                $data->put('Net_cost', $cost);
+                $data->put('Net_price', $price);
+                $data->put('tax_price', $tax_price);
+                $data->put('tax_cost', $tax_cost);
 
                 // Inxclusive
             } else {
-                $item['Total_cost'] = $cost;
-                $item['Total_price'] = $price;
-                $item['Net_cost'] = $cost / (($Product_data['TaxNet'] / 100) + 1);
-                $item['Net_price'] = $price / (($Product_data['TaxNet'] / 100) + 1);
-                $item['tax_cost'] = $item['Total_cost'] - $item['Net_cost'];
-                $item['tax_price'] = $item['Total_price'] - $item['Net_price'];
+                $data->put('Total_cost', $cost);
+                $data->put('Total_price', $price);
+                $data->put('Net_cost', $cost / (($Product_data['TaxNet'] / 100) + 1));
+                $data->put('Net_price', $price / (($Product_data['TaxNet'] / 100) + 1));
+                $data->put('tax_cost', $data->get('Total_cost') - $data->get('Net_cost'));
+                $data->put('tax_price', $data->get('Total_price') - $data->get('Net_price'));
             }
         } else {
-            $item['Total_cost'] = $cost;
-            $item['Total_price'] = $price;
-            $item['Net_cost'] = $cost;
-            $item['Net_price'] = $price;
-            $item['tax_price'] = 0;
-            $item['tax_cost'] = 0;
+            $data->put('Total_cost', $cost);
+            $data->put('Total_price', $price);
+            $data->put('Net_cost', $cost);
+            $data->put('Net_price', $price);
+            $data->put('tax_price', 0);
+            $data->put('tax_cost', 0);
         }
-
-        $data->add($item);
-
-        return response()->json($data[0]);
+        return response()->json($data);
     }
 
     //--------------  Product Quantity Alerts ---------------\\
@@ -657,17 +657,8 @@ class ProductsController extends Controller
 
     public function create(Request $request)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'create', Product::class);
-
-        $categories = Category::where('deleted_at', null)->get(['id', 'name'])
-            ->map(function ($item, $key) {
-                return ['value' => $item->id, 'title' => $item->name];
-            });
-        $units = Unit::where('deleted_at', null)->where('base_unit', null)->get()
-            ->map(function ($item, $key) {
-                return ['value' => $item->id, 'title' => $item->name];
-            });
+        $categories = Category::where('deleted_at', null)->pluck('name', 'id');
+        $units = Unit::where('deleted_at', null)->where('base_unit', null)->pluck('name', 'id');
         Inertia::share('titlePage', 'Añadir producto');
         return Inertia::render('Products/Form_product', [
             'categories' => $categories,
@@ -700,98 +691,82 @@ class ProductsController extends Controller
 
     public function edit(Request $request, $id)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'update', Product::class);
-
         $Product = Product::where('deleted_at', '=', null)->findOrFail($id);
-
-        $item['id'] = $Product->id;
-        $item['code'] = $Product->code;
-        $item['name'] = $Product->name;
-        if ($Product->category_id) {
-            if (Category::where('id', $Product->category_id)
+        $data = collect();
+        $data->put('id', $Product->id);
+        $data->put('code', $Product->code);
+        $data->put('name', $Product->name);
+        $category = '';
+        if ($Product->category_id && Category::where('id', $Product->category_id)
                 ->where('deleted_at', '=', null)
                 ->first()) {
-                $item['category_id'] = $Product->category_id;
-            } else {
-                $item['category_id'] = '';
-            }
-        } else {
-            $item['category_id'] = '';
+            $category = $Product->category_id;
         }
+        $data->put('category_id', $category);
 
         if ($Product->unit_id) {
             if (Unit::where('id', $Product->unit_id)
                 ->where('deleted_at', '=', null)
                 ->first()) {
-                $item['unit_id'] = $Product->unit_id;
+                $data->put('unit_id', $Product->unit_id);
+
             } else {
-                $item['unit_id'] = '';
+                $data->put('unit_id', '');
             }
 
             if (Unit::where('id', $Product->unit_sale_id)
                 ->where('deleted_at', '=', null)
-                ->first()) {
-                $item['unit_sale_id'] = $Product->unit_sale_id;
+                ->exists()) {
+                $data->put('unit_sale_id', $Product->unit_sale_id);
             } else {
-                $item['unit_sale_id'] = '';
+                $data->put('unit_sale_id', '');
             }
 
             if (Unit::where('id', $Product->unit_purchase_id)
                 ->where('deleted_at', '=', null)
-                ->first()) {
-                $item['unit_purchase_id'] = $Product->unit_purchase_id;
+                ->exists()) {
+                $data->put('unit_purchase_id', $Product->unit_purchase_id);
             } else {
-                $item['unit_purchase_id'] = '';
+                $data->put('unit_purchase_id', '');
             }
 
         } else {
-            $item['unit_id'] = '';
+            $data->put('unit_id', '');
         }
 
-        $item['tax_method'] = $Product->tax_method;
-        $item['price'] = $Product->price;
-        $item['cost'] = $Product->cost;
-        $item['stock_alert'] = $Product->stock_alert;
-        $item['TaxNet'] = $Product->TaxNet;
-        $item['note'] = $Product->note ? $Product->note : '';
-
+        $data->put('tax_method', $Product->tax_method);
+        $data->put('price', $Product->price);
+        $data->put('cost', $Product->cost);
+        $data->put('stock_alert', $Product->stock_alert);
+        $data->put('TaxNet', $Product->TaxNet);
+        $data->put('note', $Product->note ?? '');
+        $variant_item = collect();
         if ($Product->is_variant) {
-            $item['is_variant'] = true;
+            $data->put('is_variant', true);
             $productsVariants = ProductVariant::where('product_id', $id)
                 ->where('deleted_at', null)
                 ->get();
             foreach ($productsVariants as $variant) {
-                $variant_item['id'] = $variant->id;
-                $variant_item['text'] = $variant->name;
-                $variant_item['qty'] = $variant->qty;
-                $variant_item['product_id'] = $variant->product_id;
-                $item['ProductVariant'][] = $variant_item;
+                $variant_item->add([
+                    'id' => $variant->id,
+                    'text' => $variant->name,
+                    'qty' => $variant->qty,
+                    'product_id' => $variant->product_id,
+                ]) ;
             }
         } else {
-            $item['is_variant'] = false;
-            $item['ProductVariant'] = [];
+            $data->put('is_variant', false);
         }
+        $data->put('ProductVariant', $variant_item);
+        $data->put('not_selling', (bool)$Product->not_selling);
 
-        $item['not_selling'] = $Product->not_selling ? true : false;
-
-        $data = $item;
-        $categories = Category::where('deleted_at', null)->get(['id', 'name'])
-            ->map(function ($item, $key) {
-                return ['value' => $item->id, 'title' => $item->name];
-            });
-        $units = Unit::where('deleted_at', null)->where('base_unit', null)->get()
-            ->map(function ($item, $key) {
-                return ['value' => $item->id, 'title' => $item->name];
-            });
+        $categories = Category::where('deleted_at', null)->pluck('name','id');
+        $units = Unit::where('deleted_at', null)->where('base_unit', null)->pluck('name','id');
 
         $product_units = Unit::where('id', $Product->unit_id)
             ->orWhere('base_unit', $Product->unit_id)
             ->where('deleted_at', null)
-            ->get()->map(function ($item, $key) {
-                return ['value' => $item->id, 'title' => $item->name];
-            });
-
+            ->pluck('name','id');
 
         Inertia::share('titlePage', 'Editar producto');
         return Inertia::render('Products/Form_product', [
