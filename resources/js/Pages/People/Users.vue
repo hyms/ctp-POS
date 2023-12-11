@@ -3,13 +3,9 @@ import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import Snackbar from "@/Components/snackbar.vue";
-
 import { api, globals, helpers, labels, rules } from "@/helpers";
 
 const props = defineProps({
-    // users: Array,
-    // warehouses: Array,
-    // roles: Array,
     errors: Object,
 });
 

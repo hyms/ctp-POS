@@ -22,9 +22,16 @@ class ClientController extends Controller
 
     //------------- Get ALL Customers -------------\\
 
-    public function index(request $request)
+     public function index(request $request)
+     {
+         Inertia::share('titlePage', 'Clientes');
+         return Inertia::render('People/Clients');
+     }
+    public function getTable(request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'view', Client::class);
+        if(!helpers::checkPermission('Customers_view')){
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $clients = Client::where('deleted_at', '=', null)
             ->get();
@@ -69,8 +76,7 @@ class ClientController extends Controller
 
         $company_info = Setting::where('deleted_at', '=', null)->first();
 
-        Inertia::share('titlePage', 'Clientes');
-        return Inertia::render('People/Clients', [
+        return response()->json([
             'clients' => $data,
             'company_info' => $company_info,
         ]);

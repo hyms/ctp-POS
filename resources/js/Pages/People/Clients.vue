@@ -1,21 +1,19 @@
 <script setup>
-import { computed, ref } from "vue";
+import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
-import helper from "@/helpers";
-import labels from "@/labels";
-import { usePage } from "@inertiajs/vue3";
-import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
-import api from "@/api";
+import {api, globals, labels, rules} from "@/helpers";
+import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
+import Snackbar from "@/Components/snackbar.vue";
 
-const currency = computed(() => usePage().props.currency);
+const currency = globals.currency();
 
 const props = defineProps({
-    clients: Array,
-    company_info: Object,
     errors: Object,
 });
 //declare variable
+ const clients = ref([]);
+ const company_info  = ref({});
 const form = ref(null);
 const formPayDue = ref(null);
 const search = ref("");
@@ -173,7 +171,7 @@ function Create_Client() {
         },
         loadingItem: loading,
         snackbar,
-        Success: () => {
+        onSuccess: () => {
             dialog.value = false;
         },
     });
@@ -195,7 +193,7 @@ function Update_Client() {
         },
         loadingItem: loading,
         snackbar,
-        Success: () => {
+        onSuccess: () => {
             dialog.value = false;
         },
     });
@@ -222,7 +220,7 @@ function Remove_Client() {
         url: "/clients/" + client.value.id,
         loadingItem: loading,
         snackbar,
-        Success: () => {
+        onSuccess: () => {
             dialogDelete.value = false;
         },
     });
@@ -304,7 +302,7 @@ function Submit_Pay_due() {
         },
         loadingItem: loading,
         snackbar,
-        Success: (data) => {
+        onSuccess: (data) => {
             payment_codes.value = data.payment_codes;
             dialogPayDue.value = false;
             dialogInvoice.value = true;
@@ -416,14 +414,30 @@ function Submit_Pay_due() {
 //             loading.value = false;
 //         });
 // }
+function loadData() {
+    api.get({
+        url: "/clients/list",
+        snackbar,
+        loadingItem: loading,
+        onSuccess: (data) => {
+            clients.value = data.clients;
+            company_info.value = data.company_info;
+        },
+    });
+}
+
+onMounted(() => {
+    loadData();
+});
 </script>
 
 <template>
-    <layout
-        :snackbar-view="snackbar.view"
-        :snackbar-text="snackbar.text"
-        :snackbar-color="snackbar.color"
-    >
+    <layout>
+      <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <!-- Modal Show Import Clients -->
         <!--        <v-dialog v-model="dialogImport" max-width="600px" scrollable>
                 <v-card>
@@ -654,7 +668,7 @@ function Submit_Pay_due() {
                                     :label="labels.client.name + ' *'"
                                     v-model="client.name"
                                     :placeholder="labels.client.name"
-                                    :rules="helper.required"
+                                    :rules="rules.required"
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -666,7 +680,7 @@ function Submit_Pay_due() {
                                     :label="labels.client.company_name + ' *'"
                                     v-model="client.company_name"
                                     :placeholder="labels.client.company_name"
-                                    :rules="helper.required"
+                                    :rules="rules.required"
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -753,7 +767,7 @@ function Submit_Pay_due() {
         </v-dialog>
         <!-- Modal Remove Customer -->
         <delete-dialog
-            :model="dialogDelete"
+            v-model="dialogDelete"
             :on-save="Remove_Client"
             :on-close="onCloseDelete"
         ></delete-dialog>
@@ -786,6 +800,7 @@ function Submit_Pay_due() {
                 <!--                    Importar-->
                 <!--                </v-btn>-->
                 <v-btn
+                  v-if="globals.userPermision(['Customers_add'])"
                     color="primary"
                     class="ma-1"
                     prepend-icon="fas fa-user-plus"
@@ -812,7 +827,7 @@ function Submit_Pay_due() {
                                 <v-btn
                                     v-bind="props"
                                     class="ma-1"
-                                    icon="mdi-dots-vertical"
+                                    icon="fas fa-ellipsis-v"
                                     color="primary"
                                     size="x-small"
                                     variant="elevated"
@@ -821,9 +836,10 @@ function Submit_Pay_due() {
                             </template>
                             <v-list>
                                 <v-list-item
-                                    v-if="item.due > 0"
+
+                                    v-if="globals.userPermision(['Customers_view']) && item.due > 0"
                                     @click="Pay_due(item)"
-                                    prepend-icon="mdi-currency-usd"
+                                    prepend-icon="fas fa-dollar-sign"
                                 >
                                     <v-list-item-title>
                                         Pagar todas la deudas a la vez
@@ -842,6 +858,7 @@ function Submit_Pay_due() {
                                 <!--                                </v-list-item>-->
 
                                 <v-list-item
+                                 v-if="globals.userPermision(['Customers_view'])"
                                     @click="showDetails(item)"
                                     prepend-icon="fas fa-eye"
                                 >
@@ -851,6 +868,7 @@ function Submit_Pay_due() {
                                 </v-list-item>
 
                                 <v-list-item
+                                 v-if="globals.userPermision(['Customers_edit'])"
                                     @click="Edit_Client(item)"
                                     prepend-icon="fas fa-pen"
                                 >
@@ -860,6 +878,7 @@ function Submit_Pay_due() {
                                 </v-list-item>
 
                                 <v-list-item
+                                 v-if="globals.userPermision(['Customers_delete'])"
                                     @click="Delete_Client(item)"
                                     prepend-icon="fas fa-trash"
                                 >
@@ -896,8 +915,8 @@ function Submit_Pay_due() {
                                 v-model="payment.amount"
                                 :placeholder="labels.payment.amount"
                                 :rules="
-                                    helper.required.concat(
-                                        helper.numberWithDecimal
+                                    rules.required.concat(
+                                        rules.numberWithDecimal
                                     )
                                 "
                                 hide-details="auto"
@@ -910,9 +929,9 @@ function Submit_Pay_due() {
                             <v-select
                                 v-model="payment.Reglement"
                                 hide-details="auto"
-                                :items="helper.reglamentPayment()"
+                                :items="helpers.reglamentPayment()"
                                 label="Tipo de Pago"
-                                :rules="helper.required"
+                                :rules="rules.required"
                             ></v-select>
                         </v-col>
 
@@ -1132,21 +1151,21 @@ function Submit_Pay_due() {
                             <tr>
                                 <td style="text-align: left" colspan="1">
                                     <div
-                                        v-html="helper.newLine(payment_codes)"
+                                        v-html="helpers.newLine(payment_codes)"
                                     ></div>
                                 </td>
                                 <td style="text-align: left" colspan="1">
                                     {{
-                                        helper.getReglamentPayment(
+                                        helpers.getReglamentPayment(
                                             payment.Reglement
                                         )[0].title
                                     }}
                                 </td>
                                 <td style="text-align: center" colspan="1">
-                                    {{ helper.formatNumber(payment.amount, 2) }}
+                                    {{ helpers.formatNumber(payment.amount, 2) }}
                                 </td>
                                 <td style="text-align: right" colspan="1">
-                                    {{ helper.formatNumber(payment.due, 2) }}
+                                    {{ helpers.formatNumber(payment.due, 2) }}
                                 </td>
                             </tr>
                         </tbody>
@@ -1172,7 +1191,7 @@ function Submit_Pay_due() {
                 <v-btn
                     prepend-icon="fas fa-print"
                     @click="
-                        helper.print_pdf('invoice-POS', payment.client_name)
+                        helpers.print_pdf('invoice-POS', payment.client_name)
                     "
                     color="primary"
                     variant="outlined"
@@ -1181,7 +1200,7 @@ function Submit_Pay_due() {
                 </v-btn>
                 <v-btn
                     prepend-icon="fas fa-print"
-                    @click="helper.print_pos('invoice-POS')"
+                    @click="helpers.print_pos('invoice-POS')"
                     color="primary"
                     variant="outlined"
                 >
