@@ -1,24 +1,24 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import helper from "@/helpers";
-import { router } from "@inertiajs/vue3";
-import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
-import NewBtn from "@/Components/buttons/NewBtn.vue";
-import labels from "@/labels";
+import {api, labels, rules, helpers, globals} from "@/helpers";
+import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
+import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
-    units: Array,
-    units_base: Array,
     errors: Object,
 });
 //declare variable
+const units = ref([]);
+const units_base = ref([""]);
 const form = ref(null);
 const search = ref("");
 const loading = ref(false);
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("info");
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
 const dialog = ref(false);
 const dialogDelete = ref(false);
 const editmode = ref(false);
@@ -97,76 +97,46 @@ function setToStrings() {
 
 //---------------- Send Request with axios ( Create Unit) --------------------\\
 function Create_Unit() {
-    loading.value = true;
-    snackbar.value = false;
     setToStrings();
-    axios
-        .post("units", {
+    api.post({
+        url: "/products/units/",
+        params: {
             name: unit.value.name,
             ShortName: unit.value.ShortName,
             base_unit: unit.value.base_unit,
             operator: unit.value.operator,
             operator_value: unit.value.operator_value,
-        })
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbar.value.color = "success";
-            snackbar.value.text = "Proceso exitoso";
-            router.reload({
-                preserveState: true,
-                preserveScroll: true,
-            });
-
+        },
+        snackbar,
+        loadingItem: loading,
+        onSuccess: () => {
+            snackbar.value.text = labels.success_message;
+            loadData();
             dialog.value = false;
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbar.value.color = "error";
-            snackbar.value.text = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
+        },
+    });
 }
 
 //--------------- Send Request with axios ( Update Unit) --------------------\\
 function Update_Unit() {
-    loading.value = true;
-    snackbar.value = false;
     setToStrings();
-    axios
-        .put("units/" + unit.value.id, {
+    api.put({
+        url: "/products/units/"+ unit.value.id,
+        params: {
             name: unit.value.name,
             ShortName: unit.value.ShortName,
             base_unit: unit.value.base_unit,
             operator: unit.value.operator,
             operator_value: unit.value.operator_value,
-        })
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbar.value.color = "success";
-            snackbar.value.text = "Proceso exitoso";
-            router.reload({
-                preserveState: true,
-                preserveScroll: true,
-            });
-
+        },
+        snackbar,
+        loadingItem: loading,
+        onSuccess: () => {
+            snackbar.value.text = labels.success_message;
+            loadData();
             dialog.value = false;
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbar.value.color = "error";
-            snackbar.value.text = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
+        },
+    });
 }
 
 //------------------------------ reset Form ------------------------------\\
@@ -196,40 +166,44 @@ function onCloseDelete() {
 
 //--------------------------------- Remove Unit --------------------\\
 function Remove_Unit() {
-    axios
-        .delete("units/" + unit.value.id)
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbar.value.color = "success";
-            snackbar.value.text = "Borrado exitoso";
-            router.reload({
-                preserveState: true,
-                preserveScroll: true,
-            });
-
+    api.delete({
+        url: "/products/units/" + unit.value.id,
+        snackbar,
+        loadingItem: loading,
+        onSuccess: () => {
+            snackbar.value.text = labels.success_message;
+            loadData();
             dialogDelete.value = false;
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbar.value.color = "error";
-            snackbar.value.text = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
+        },
+    });
 }
+
+function loadData() {
+    api.get({
+        url: "/products/units/list",
+        snackbar,
+        loadingItem: loading,
+        onSuccess: (data) => {
+            units.value = data.units;
+            units_base.value = data.units_base;
+        },
+    });
+}
+
+onMounted(() => {
+    loadData();
+});
+
 </script>
 <template>
-    <Layout
-        :snackbar-view="snackbar"
-        :snackbar-color="snackbarColor"
-        :snackbar-text="snackbarText"
-    >
+    <Layout>
+     <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <delete-dialog
-            :model="dialogDelete"
+            v-model="dialogDelete"
             :on-save="Remove_Unit"
             :on-close="onCloseDelete"
         >
@@ -256,7 +230,7 @@ function Remove_Unit() {
                                     v-model="unit.name"
                                     :placeholder="unitLabels.name"
                                     :rules="
-                                        helper.required.concat(helper.max(15))
+                                        rules.required.concat(rules.max(15))
                                     "
                                     hide-details="auto"
                                 >
@@ -269,7 +243,7 @@ function Remove_Unit() {
                                     v-model="unit.ShortName"
                                     :placeholder="unitLabels.ShortName"
                                     :rules="
-                                        helper.required.concat(helper.max(15))
+                                        rules.required.concat(rules.max(15))
                                     "
                                     hide-details="auto"
                                 >
@@ -282,8 +256,6 @@ function Remove_Unit() {
                                     v-model="unit.base_unit"
                                     :items="units_base"
                                     :label="unitLabels.base_unit"
-                                    item-title="title"
-                                    item-value="value"
                                     hide-details="auto"
                                     clearable
                                 ></v-select>
@@ -292,10 +264,8 @@ function Remove_Unit() {
                             <v-col cols="12" v-if="show_operator">
                                 <v-select
                                     v-model="unit.operator"
-                                    :items="helper.getOperatorUnit()"
+                                    :items="helpers.getOperatorUnit()"
                                     :label="unitLabels.operator"
-                                    item-title="title"
-                                    item-value="value"
                                     hide-details="auto"
                                 ></v-select>
                             </v-col>
@@ -307,8 +277,8 @@ function Remove_Unit() {
                                     v-model="unit.operator_value"
                                     :placeholder="unitLabels.operator_value"
                                     :rules="
-                                        helper.required.concat(
-                                            helper.numberWithDecimal
+                                        rules.required.concat(
+                                            rules.numberWithDecimal
                                         )
                                     "
                                     hide-details="auto"
@@ -354,7 +324,15 @@ function Remove_Unit() {
                 ></v-text-field>
             </v-col>
             <v-col cols="12" sm="6" class="text-right">
-                <new-btn :on-click="New_Unit" label="Añadir"></new-btn>
+             <v-btn
+                 v-if="globals.userPermision(['unit'])"
+                    color="primary"
+                    class="ma-1"
+                    prepend-icon="fas fa-plus"
+                    @click="New_Unit"
+                >
+                    {{ labels.add }}
+                </v-btn>
             </v-col>
         </v-row>
         <v-row>
@@ -365,9 +343,8 @@ function Remove_Unit() {
                     :search="search"
                     hover
                     class="elevation-2"
-                    no-data-text="No existen datos a mostrar"
+                     :no-data-text="labels.no_data_table"
                     :loading="loading"
-                    loading-text="Cargando..."
                 >
                     <template v-slot:item.actions="{ item }">
                         <v-btn

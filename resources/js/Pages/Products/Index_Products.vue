@@ -197,6 +197,7 @@ onMounted(() => {
                 <!--                    Importar-->
                 <!--                </v-btn>-->
                 <v-btn
+                  v-if="globals.userPermision(['products_add'])"
                     color="primary"
                     class="ma-1"
                     prepend-icon="fas fa-user-plus"
@@ -228,6 +229,7 @@ onMounted(() => {
                         >
                         </v-btn>
                         <v-btn
+                        v-if="globals.userPermision(['products_edit'])"
                             class="ma-1"
                             color="primary"
                             icon="fas fa-pen"
@@ -237,6 +239,7 @@ onMounted(() => {
                         >
                         </v-btn>
                         <v-btn
+                        v-if="globals.userPermision(['products_delete'])"
                             class="ma-1"
                             color="error"
                             icon="fas fa-trash"

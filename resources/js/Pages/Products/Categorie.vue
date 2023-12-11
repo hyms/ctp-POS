@@ -243,6 +243,7 @@ onMounted(() => {
             </v-col>
             <v-col cols="12" sm="6" class="text-right">
                 <v-btn
+                 v-if="globals.userPermision(['category'])"
                     color="primary"
                     class="ma-1"
                     prepend-icon="fas fa-plus"
