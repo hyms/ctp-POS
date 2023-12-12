@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import {api, labels, rules, helpers, globals} from "@/helpers";
+import { api, globals, helpers, labels, rules } from "@/helpers";
 import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
 import Snackbar from "@/Components/snackbar.vue";
 
@@ -121,7 +121,7 @@ function Create_Unit() {
 function Update_Unit() {
     setToStrings();
     api.put({
-        url: "/products/units/"+ unit.value.id,
+        url: "/products/units/" + unit.value.id,
         params: {
             name: unit.value.name,
             ShortName: unit.value.ShortName,
@@ -193,11 +193,10 @@ function loadData() {
 onMounted(() => {
     loadData();
 });
-
 </script>
 <template>
     <Layout>
-     <snackbar
+        <snackbar
             v-model="snackbar.view"
             :text="snackbar.text"
             :color="snackbar.color"
@@ -254,7 +253,7 @@ onMounted(() => {
                                 <v-select
                                     @update:modelValue="Selected_Base_Unit"
                                     v-model="unit.base_unit"
-                                    :items="units_base"
+                                    :items="helpers.toArraySelect(units_base)"
                                     :label="unitLabels.base_unit"
                                     hide-details="auto"
                                     clearable
@@ -324,8 +323,8 @@ onMounted(() => {
                 ></v-text-field>
             </v-col>
             <v-col cols="12" sm="6" class="text-right">
-             <v-btn
-                 v-if="globals.userPermision(['unit'])"
+                <v-btn
+                    v-if="globals.userPermision(['unit'])"
                     color="primary"
                     class="ma-1"
                     prepend-icon="fas fa-plus"
@@ -343,7 +342,7 @@ onMounted(() => {
                     :search="search"
                     hover
                     class="elevation-2"
-                     :no-data-text="labels.no_data_table"
+                    :no-data-text="labels.no_data_table"
                     :loading="loading"
                 >
                     <template v-slot:item.actions="{ item }">

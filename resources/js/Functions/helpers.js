@@ -161,6 +161,12 @@ const maxEnableButtons = (timeSale, enableDays) => {
     );
     return moment().isAfter(time);
 };
+const getOperatorUnit = () => {
+    return [
+        { title: "Multiplicar (*)", value: "*" },
+        { title: "Dividir (/)", value: "/" },
+    ];
+};
 export default {
     formatNumber,
     print_pdf,
@@ -180,5 +186,6 @@ export default {
     statusPaymentColor,
     getReglamentPayment,
     reglamentPayment,
+    getOperatorUnit,
     print_pos,
 };

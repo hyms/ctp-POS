@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import { api, labels, rules } from "@/helpers";
+import { api, globals, labels, rules } from "@/helpers";
 import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
 import Snackbar from "@/Components/snackbar.vue";
 
@@ -243,7 +243,7 @@ onMounted(() => {
             </v-col>
             <v-col cols="12" sm="6" class="text-right">
                 <v-btn
-                 v-if="globals.userPermision(['category'])"
+                    v-if="globals.userPermision(['category'])"
                     color="primary"
                     class="ma-1"
                     prepend-icon="fas fa-plus"

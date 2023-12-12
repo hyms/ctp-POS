@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Unit;
+use App\utils\helpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,15 +13,17 @@ class UnitsController extends Controller
 {
 
     //-------------- show All Units -----------\\
- public function index(Request $request){
-     Inertia::share('titlePage', 'Unidades');
-     return Inertia::render('Products/Units');
- }
+    public function index(Request $request)
+    {
+        Inertia::share('titlePage', 'Unidades');
+        return Inertia::render('Products/Units');
+    }
+
     public function getTable(Request $request)
     {
- if (!helpers::checkPermission('unit')) {
-    return response()->json(['message' => "No tiene permisos"], 406);
-}
+        if (!helpers::checkPermission('unit')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $Units = Unit::where('deleted_at', '=', null)
             ->get();
 
@@ -47,7 +50,7 @@ class UnitsController extends Controller
         $Units_base = Unit::where('base_unit', null)
             ->where('deleted_at', null)
             ->orderBy('id', 'DESC')
-            ->pluck('name','id');
+            ->pluck('name', 'id');
         return response()->json([
             'units' => $data,
             'units_base' => $Units_base,
@@ -58,8 +61,6 @@ class UnitsController extends Controller
 
     public function store(Request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'create', Unit::class);
-
         $request->validate([
             'name' => 'required',
             'ShortName' => 'required',
@@ -89,7 +90,7 @@ class UnitsController extends Controller
 
     public function update(Request $request, $id)
     {
-      $request->validate([
+        $request->validate([
             'name' => 'required',
             'ShortName' => 'required',
         ]);
@@ -142,7 +143,7 @@ class UnitsController extends Controller
                 return $query->where('id', $request->id)
                     ->orWhere('base_unit', $request->id);
             });
-        })->get()->pluck('name','id');
+        })->get()->pluck('name', 'id');
 
         return response()->json($units);
     }
