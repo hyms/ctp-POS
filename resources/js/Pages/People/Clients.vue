@@ -841,9 +841,8 @@ onMounted(() => {
                             <v-list>
                                 <v-list-item
                                     v-if="
-                                        globals.userPermision([
-                                            'Customers_view',
-                                        ]) && item.due > 0
+                                        globals.userPermision(['pay_due']) &&
+                                        item.due > 0
                                     "
                                     @click="Pay_due(item)"
                                     prepend-icon="fas fa-dollar-sign"

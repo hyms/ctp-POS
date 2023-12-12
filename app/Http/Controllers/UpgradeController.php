@@ -126,196 +126,74 @@ class UpgradeController extends Controller
                 Role::insert($role->toArray());
                 Log::info("finish roles migration");
                 $items = collect([
-                    [
-                        'name' => 'users_view',
-                    ],
-                    [
-                        'name' => 'users_edit',
-                    ],
-                    [
-                        'name' => 'record_view',
-                    ],
-                    [
-                        'name' => 'users_delete',
-                    ],
-                    [
-                        'name' => 'users_add',
-                    ],
-                    [
-                        'name' => 'permissions_edit',
-                    ],
-                    [
-                        'name' => 'permissions_view',
-                    ],
-                    [
-                        'name' => 'permissions_delete',
-                    ],
-                    [
-                        'name' => 'permissions_add',
-                    ],
-                    [
-                        'name' => 'products_delete',
-                    ],
-                    [
-                        'name' => 'products_view',
-                    ],
-                    [
-                        'name' => 'barcode_view',
-                    ],
-                    [
-                        'name' => 'products_edit',
-                    ],
-                    [
-                        'name' => 'products_add',
-                    ],
-                    [
-                        'name' => 'expense_add',
-                    ],
-                    [
-                        'name' => 'expense_delete',
-                    ],
-                    [
-                        'name' => 'expense_edit'
-                    ],
-                    [
-                        'name' => 'expense_view'
-                    ], [
-                        'name' => 'expense_category_add',
-                    ],
-                    [
-                        'name' => 'expense_category_delete',
-                    ],
-                    [
-                        'name' => 'expense_category_edit'
-                    ],
-                    [
-                        'name' => 'expense_category_view'
-                    ],
-                    [
-                        'name' => 'transfer_delete',
-                    ],
-                    [
-                        'name' => 'transfer_add',
-                    ],
-                    [
-                        'name' => 'transfer_view',
-                    ],
-                    [
-                        'name' => 'transfer_edit',
-                    ],
-                    [
-                        'name' => 'adjustment_delete',
-                    ],
-                    [
-                        'name' => 'adjustment_add',
-                    ],
-                    [
-                        'name' => 'adjustment_edit',
-                    ],
-                    [
-                        'name' => 'adjustment_view',
-                    ],
-                    [
-                        'name' => 'Sales_edit',
-                    ],
-                    [
-                        'name' => 'Sales_view',
-                    ],
-                    [
-                        'name' => 'Sales_delete',
-                    ],
-                    [
-                        'name' => 'Sales_add',
-                    ],
-                    [
-                        'name' => 'payment_sales_delete',
-                    ],
-                    [
-                        'name' => 'payment_sales_add',
-                    ],
-                    [
-                        'name' => 'payment_sales_edit',
-                    ],
-                    [
-                        'name' => 'payment_sales_view',
-                    ],
-                    [
-                        'name' => 'Customers_edit',
-                    ],
-                    [
-                        'name' => 'Customers_view',
-                    ],
-                    [
-                        'name' => 'Customers_delete',
-                    ],
-                    [
-                        'name' => 'Customers_add',
-                    ],
-                    [
-                        'name' => 'unit',
-                    ],
-                    [
-                        'name' => 'currency',
-                    ],
-                    [
-                        'name' => 'category',
-                    ],
-                    [
-                        'name' => 'backup',
-                    ],
-                    [
-                        'name' => 'warehouse',
-                    ],
-                    [
-                        'name' => 'sales_type',
-                    ],
-                    [
-                        'name' => 'setting_system',
-                    ],
-                    [
-                        'name' => 'Warehouse_report',
-                    ],
-                    [
-                        'name' => 'Reports_quantity_alerts',
-                    ],
-                    [
-                        'name' => 'Reports_profit',
-                    ],
-                    [
-                        'name' => 'Reports_suppliers',
-                    ],
-                    [
-                        'name' => 'Reports_customers',
-                    ],
-                    [
-                        'name' => 'Reports_purchase',
-                    ],
-                    [
-                        'name' => 'Reports_sales',
-                    ],
-                    [
-                        'name' => 'Reports_payments_purchase_Return',
-                    ],
-                    [
-                        'name' => 'Reports_payments_Sale_Returns',
-                    ],
-                    [
-                        'name' => 'Reports_payments_Purchases',
-                    ],
-                    [
-                        'name' => 'Reports_payments_Sales',
-                    ],
-                    [
-                        'name' => 'Pos_view',
-                    ],
-                    [
-                        'name' => 'dashboard',
-                    ],
+                    'users_view',
+                    'users_edit',
+                    'record_view',
+                    'users_delete',
+                    'users_add',
+                    'permissions_edit',
+                    'permissions_view',
+                    'permissions_delete',
+                    'permissions_add',
+                    'products_delete',
+                    'products_view',
+                    'barcode_view',
+                    'products_edit',
+                    'products_add',
+                    'expense_add',
+                    'expense_delete',
+                    'expense_edit',
+                    'expense_view',
+                    'expense_category_add',
+                    'expense_category_delete',
+                    'expense_category_edit',
+                    'expense_category_view',
+                    'transfer_delete',
+                    'transfer_add',
+                    'transfer_view',
+                    'transfer_edit',
+                    'adjustment_delete',
+                    'adjustment_add',
+                    'adjustment_edit',
+                    'adjustment_view',
+                    'Sales_edit',
+                    'Sales_view',
+                    'Sales_delete',
+                    'Sales_add',
+                    'payment_sales_delete',
+                    'payment_sales_add',
+                    'payment_sales_edit',
+                    'payment_sales_view',
+                    'Customers_edit',
+                    'Customers_view',
+                    'Customers_delete',
+                    'Customers_add',
+                    'pay_due',
+                    'unit',
+                    'currency',
+                    'category',
+                    'backup',
+                    'warehouse',
+                    'sales_type',
+                    'setting_system',
+                    'Warehouse_report',
+                    'Reports_quantity_alerts',
+                    'Reports_profit',
+                    'Reports_suppliers',
+                    'Reports_customers',
+                    'Reports_purchase',
+                    'Reports_sales',
+                    'Reports_payments_purchase_Return',
+                    'Reports_payments_Sale_Returns',
+                    'Reports_payments_Purchases',
+                    'Reports_payments_Sales',
+                    'Pos_view',
+                    'dashboard',
                 ]);
                 $permision = $items->map(function ($item) {
                     return [
-                        'name' => $item['name'],
-                        'label' => Str::of($item['name'])->ucfirst(),
+                        'name' => $item,
+                        'label' => Str::of($item)->ucfirst(),
                         'guard_name' => 'web',
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),

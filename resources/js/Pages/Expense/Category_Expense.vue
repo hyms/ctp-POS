@@ -1,23 +1,23 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
+import { api, globals, labels, rules } from "@/helpers";
+import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
 import Snackbar from "@/Components/snackbar.vue";
-import helper from "@/helpers";
-import labels from "@/labels";
-import { router } from "@inertiajs/vue3";
-import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
-import NewBtn from "@/Components/buttons/NewBtn.vue";
 
 const props = defineProps({
-    Expenses_category: Object,
+    error: Object,
 });
 
+const Expenses_category = ref([]);
 const form = ref(null);
 const search = ref("");
 const loading = ref(false);
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("info");
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
 const editmode = ref(false);
 const category = ref({
     id: "",
@@ -75,68 +75,38 @@ function reset_Form() {
 
 //----------------------------------Create new Category ----------------\\
 function Create_Category() {
-    loading.value = true;
-    snackbar.value = false;
-    axios
-        .post("/expenses_category", {
+    api.post({
+        url: "/expenses_category",
+        params: {
             name: category.value.name,
             description: category.value.description,
-        })
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbar.value.color = "success";
+        },
+        loadingItem: loading,
+        snackbar,
+        onSuccess: () => {
             snackbar.value.text = labels.success_message;
-            router.reload({
-                preserveState: true,
-                preserveScroll: true,
-            });
-
+            loadData();
             dialog.value = false;
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbar.value.color = "error";
-            snackbar.value.text = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
+        },
+    });
 }
 
 //---------------------------------- Update Category ----------------\\
 function Update_Category() {
-    loading.value = true;
-    snackbar.value = false;
-    axios
-        .put("/expenses_category/" + category.value.id, {
+    api.put({
+        url: "/expenses_category/" + category.value.id,
+        params: {
             name: category.value.name,
             description: category.value.description,
-        })
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbar.value.color = "success";
+        },
+        loadingItem: loading,
+        snackbar,
+        onSuccess: () => {
             snackbar.value.text = labels.success_message;
-            router.reload({
-                preserveState: true,
-                preserveScroll: true,
-            });
-
+            loadData();
             dialog.value = false;
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbar.value.color = "error";
-            snackbar.value.text = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
+        },
+    });
 }
 
 //---------------------- delete modal  ------------------------------\\
@@ -153,46 +123,41 @@ function onCloseDelete() {
 
 //--------------------------- Delete Category----------------\\
 function Delete_Category() {
-    loading.value = true;
-    snackbar.value = false;
-    axios
-        .delete("/expenses_category/" + category.value.id)
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbar.value.color = "success";
+    api.delete({
+        url: "/expenses_category/" + category.value.id,
+        loadingItem: loading,
+        snackbar,
+        onSuccess: () => {
             snackbar.value.text = labels.delete_message;
-            router.reload({
-                preserveState: true,
-                preserveScroll: true,
-            });
+            loadData();
             dialogDelete.value = false;
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbar.value.color = "error";
-            snackbar.value.text = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
+        },
+    });
 }
+function loadData() {
+    api.get({
+        url: "/expenses_category/list",
+        snackbar,
+        loadingItem: loading,
+        onSuccess: (data) => {
+            Expenses_category.value = data.Expenses_category;
+        },
+    });
+}
+
+onMounted(() => {
+    loadData();
+});
 </script>
 <template>
-    <Layout
-        :snackbar-view="snackbar"
-        :snackbar-color="snackbarColor"
-        :snackbar-text="snackbarText"
-    >
+    <Layout>
         <snackbar
             v-model="snackbar.view"
             :text="snackbar.text"
             :color="snackbar.color"
         ></snackbar>
         <delete-dialog
-            :model="dialogDelete"
+            v-model="dialogDelete"
             :on-close="onCloseDelete"
             :on-save="Delete_Category"
         >
@@ -222,7 +187,7 @@ function Delete_Category() {
                                     :label="labels.category.name + ' *'"
                                     v-model="category.name"
                                     :placeholder="labels.category.name"
-                                    :rules="helper.required"
+                                    :rules="rules.required"
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -278,7 +243,15 @@ function Delete_Category() {
                 ></v-text-field>
             </v-col>
             <v-col cols="12" sm="6" class="text-right">
-                <new-btn :on-click="New_Category" :label="labels.add"></new-btn>
+                <v-btn
+                    v-if="globals.userPermision(['expense_category_add'])"
+                    color="primary"
+                    class="ma-1"
+                    prepend-icon="fas fa-user-plus"
+                    @click="New_Category"
+                >
+                    {{ labels.add }}
+                </v-btn>
             </v-col>
         </v-row>
         <v-row>
@@ -294,6 +267,9 @@ function Delete_Category() {
                 >
                     <template v-slot:item.actions="{ item }">
                         <v-btn
+                            v-if="
+                                globals.userPermision(['expense_category_edit'])
+                            "
                             class="ma-1"
                             color="primary"
                             icon="fas fa-pen"
@@ -303,6 +279,11 @@ function Delete_Category() {
                         >
                         </v-btn>
                         <v-btn
+                            v-if="
+                                globals.userPermision([
+                                    'expense_category_delete',
+                                ])
+                            "
                             class="ma-1"
                             color="error"
                             icon="fas fa-trash"

@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\ExpenseCategory;
-use App\Models\Role;
+use App\utils\helpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class CategoryExpenseController extends Controller
@@ -16,13 +17,17 @@ class CategoryExpenseController extends Controller
 
     public function index(Request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'view', ExpenseCategory::class);
-        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
-        $ExpenseCategory = ExpenseCategory::where('deleted_at', '=', null)->get();
-
         Inertia::share('titlePage', 'Categoria de Gastos');
-        return Inertia::render('Expense/Category_Expense', [
+        return Inertia::render('Expense/Category_Expense',);
+    }
+
+    public function getTable(Request $request)
+    {
+        if (!helpers::checkPermission('expense_category_view')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
+        $ExpenseCategory = ExpenseCategory::where('deleted_at', '=', null)->get();
+        return response()->json([
             'Expenses_category' => $ExpenseCategory,
         ]);
     }
@@ -31,10 +36,11 @@ class CategoryExpenseController extends Controller
 
     public function store(Request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'create', ExpenseCategory::class);
-
-        request()->validate([
-            'name' => 'required',
+        if (!helpers::checkPermission('expense_category_add')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
+        $request->validate([
+            'name' => 'required|unique:expense_categories',
         ]);
 
         ExpenseCategory::create([
@@ -58,19 +64,13 @@ class CategoryExpenseController extends Controller
 
     public function update(Request $request, $id)
     {
-//        $this->authorizeForUser($request->user('api'), 'update', ExpenseCategory::class);
-        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+        if (!helpers::checkPermission('expense_category_edit')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $ExpenseCategory = ExpenseCategory::findOrFail($id);
 
-        // Check If User Has Permission view All Records
-//        if (!$view_records) {
-//            // Check If User->id === ExpenseCategory->id
-//            $this->authorizeForUser($request->user('api'), 'check_record', $ExpenseCategory);
-//        }
-
-        request()->validate([
-            'name' => 'required',
+        $request->validate([
+            'name' => ['required',Rule::unique('expense_categories')->ignore($id)],
         ]);
 
         $ExpenseCategory->update([
@@ -86,16 +86,10 @@ class CategoryExpenseController extends Controller
 
     public function destroy(Request $request, $id)
     {
-//        $this->authorizeForUser($request->user('api'), 'delete', ExpenseCategory::class);
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+        if (!helpers::checkPermission('expense_category_delete')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $ExpenseCategory = ExpenseCategory::find($id);
-
-        // Check If User Has Permission view All Records
-//        if (!$view_records) {
-//            // Check If User->id === ExpenseCategory->id
-//            $this->authorizeForUser($request->user('api'), 'check_record', $ExpenseCategory);
-//        }
         $ExpenseCategory->update([
             'deleted_at' => Carbon::now(),
         ]);

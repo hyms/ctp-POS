@@ -262,22 +262,22 @@ function loadPermissions() {
                 {
                     cols: "6",
                     label: labelsNew.View,
-                    permission: "expenses_category_view",
+                    permission: "expense_category_view",
                 },
                 {
                     cols: "6",
                     label: labelsNew.Add,
-                    permission: "expenses_category_add",
+                    permission: "expense_category_add",
                 },
                 {
                     cols: "6",
                     label: labelsNew.Edit,
-                    permission: "expenses_category_edit",
+                    permission: "expense_category_edit",
                 },
                 {
                     cols: "6",
                     label: labelsNew.Del,
-                    permission: "expenses_category_delete",
+                    permission: "expense_category_delete",
                 },
             ],
         },

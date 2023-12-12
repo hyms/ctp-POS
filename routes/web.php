@@ -174,10 +174,13 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
     });
 
     //------------------------------- Expenses Category--------------------------\\
-    Route::get('expenses_category', [CategoryExpenseController::class, 'index']);
-    Route::post('expenses_category', [CategoryExpenseController::class, 'store']);
-    Route::put('expenses_category/{id}', [CategoryExpenseController::class, 'update']);
-    Route::delete('expenses_category/{id}', [CategoryExpenseController::class, 'destroy']);
+    Route::prefix('expenses_category')->group(function () {
+        Route::get('/', [CategoryExpenseController::class, 'index']);
+        Route::get('/list', [CategoryExpenseController::class, 'getTable']);
+        Route::post('/', [CategoryExpenseController::class, 'store']);
+        Route::put('/{id}', [CategoryExpenseController::class, 'update']);
+        Route::delete('/{id}', [CategoryExpenseController::class, 'destroy']);
+    });
     //------------------------------------------------------------------\\
 
     //-------------------------------  Sales --------------------------\\

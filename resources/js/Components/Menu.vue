@@ -257,7 +257,7 @@ function loadMenu() {
             "setting_system",
             "pos_settings",
             "permissions_view",
-            "expenses_category_view",
+            "expense_category_view",
             "sales_types",
             "warehouse",
             "users_view",
@@ -285,7 +285,7 @@ function loadMenu() {
                 activate: ["/roles", "/roles-create"],
             });
         }
-        if (globals.userPermision(["expenses_category_view"])) {
+        if (globals.userPermision(["expense_category_view"])) {
             subItems.push({
                 label: "Categorias de Gastos",
                 url: "/expenses_category",
