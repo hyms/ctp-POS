@@ -2,7 +2,7 @@
 import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
-import {api, globals, labels, rules} from "@/helpers";
+import { api, globals, helpers, labels, rules } from "@/helpers";
 import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
 import Snackbar from "@/Components/snackbar.vue";
 
@@ -12,8 +12,8 @@ const props = defineProps({
     errors: Object,
 });
 //declare variable
- const clients = ref([]);
- const company_info  = ref({});
+const clients = ref([]);
+const company_info = ref({});
 const form = ref(null);
 const formPayDue = ref(null);
 const search = ref("");
@@ -172,6 +172,7 @@ function Create_Client() {
         loadingItem: loading,
         snackbar,
         onSuccess: () => {
+            loadData();
             dialog.value = false;
         },
     });
@@ -194,6 +195,7 @@ function Update_Client() {
         loadingItem: loading,
         snackbar,
         onSuccess: () => {
+            loadData();
             dialog.value = false;
         },
     });
@@ -221,6 +223,7 @@ function Remove_Client() {
         loadingItem: loading,
         snackbar,
         onSuccess: () => {
+            loadData();
             dialogDelete.value = false;
         },
     });
@@ -303,6 +306,7 @@ function Submit_Pay_due() {
         loadingItem: loading,
         snackbar,
         onSuccess: (data) => {
+            loadData();
             payment_codes.value = data.payment_codes;
             dialogPayDue.value = false;
             dialogInvoice.value = true;
@@ -433,123 +437,123 @@ onMounted(() => {
 
 <template>
     <layout>
-      <snackbar
+        <snackbar
             v-model="snackbar.view"
             :text="snackbar.text"
             :color="snackbar.color"
         ></snackbar>
         <!-- Modal Show Import Clients -->
         <!--        <v-dialog v-model="dialogImport" max-width="600px" scrollable>
-                <v-card>
-                    <v-toolbar border  title="Importar Clientes">
-                    </v-toolbar>
-                    <v-card-text>
-                        <v-form
-                            @submit.prevent="Submit_import"
-                            enctype="multipart/form-data"
-                        >
-                            <v-row>
-                                &lt;!&ndash; File &ndash;&gt;
-                                <v-col md="12" sm="12" class="mb-3">
-                                    <v-file-input
-                                        accept="csv/*"
-                                        label="Elige el archivo"
-                                        variant="solo"
-                                        density="comfortable"
-                                        hide-details="auto"
-                                        @change="onFileSelected"
-                                    ></v-file-input>
-                                </v-col>
+        <v-card>
+            <v-toolbar border  title="Importar Clientes">
+            </v-toolbar>
+            <v-card-text>
+                <v-form
+                    @submit.prevent="Submit_import"
+                    enctype="multipart/form-data"
+                >
+                    <v-row>
+                        &lt;!&ndash; File &ndash;&gt;
+                        <v-col md="12" sm="12" class="mb-3">
+                            <v-file-input
+                                accept="csv/*"
+                                label="Elige el archivo"
+                                variant="solo"
+                                density="comfortable"
+                                hide-details="auto"
+                                @change="onFileSelected"
+                            ></v-file-input>
+                        </v-col>
 
-                                <v-col cols="12" md="6">
-                                    <v-btn
-                                        type="submit"
-                                        color="primary"
-                                        variant="elevated"
-                                        :disabled="ImportProcessing"
-                                        size="small"
-                                        block
-                                        >Enviar
-                                    </v-btn>
-                                    <div
-                                        v-once
-                                        class="typo__p"
-                                        v-if="ImportProcessing"
-                                    >
-                                        <div
-                                            class="spinner sm spinner-primary mt-3"
-                                        ></div>
-                                    </div>
-                                </v-col>
+                        <v-col cols="12" md="6">
+                            <v-btn
+                                type="submit"
+                                color="primary"
+                                variant="elevated"
+                                :disabled="ImportProcessing"
+                                size="small"
+                                block
+                                >Enviar
+                            </v-btn>
+                            <div
+                                v-once
+                                class="typo__p"
+                                v-if="ImportProcessing"
+                            >
+                                <div
+                                    class="spinner sm spinner-primary mt-3"
+                                ></div>
+                            </div>
+                        </v-col>
 
-                                <v-col cols="12" md="6">
-                                    <v-btn
-                                        :href="'/import/exemples/import_clients.csv'"
-                                        color="info"
-                                        variant="elevated"
-                                        size="small"
-                                        block
-                                        >Decargar Ejemplo
-                                    </v-btn>
-                                </v-col>
+                        <v-col cols="12" md="6">
+                            <v-btn
+                                :href="'/import/exemples/import_clients.csv'"
+                                color="info"
+                                variant="elevated"
+                                size="small"
+                                block
+                                >Decargar Ejemplo
+                            </v-btn>
+                        </v-col>
 
-                                <v-col md="12" sm="12">
-                                    <v-table >
-                                        <tbody>
-                                            <tr>
-                                                <td>Nombre</td>
-                                                <th>
-                                                    <v-btn
-                                                        variant="outlined"
+                        <v-col md="12" sm="12">
+                            <v-table >
+                                <tbody>
+                                    <tr>
+                                        <td>Nombre</td>
+                                        <th>
+                                            <v-btn
+                                                variant="outlined"
 
-                                                        size="small"
-                                                        color="success"
-                                                        >campo requerido
-                                                    </v-btn>
-                                                </th>
-                                            </tr>
-                                            <tr>
-                                                <td>telefono</td>
-                                            </tr>
+                                                size="small"
+                                                color="success"
+                                                >campo requerido
+                                            </v-btn>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td>telefono</td>
+                                    </tr>
 
-                                            <tr>
-                                                <td>correo</td>
-                                            </tr>
+                                    <tr>
+                                        <td>correo</td>
+                                    </tr>
 
-                                            <tr>
-                                                <td>pais</td>
-                                            </tr>
+                                    <tr>
+                                        <td>pais</td>
+                                    </tr>
 
-                                            <tr>
-                                                <td>ciudad</td>
-                                            </tr>
+                                    <tr>
+                                        <td>ciudad</td>
+                                    </tr>
 
-                                            <tr>
-                                                <td>direccion</td>
-                                            </tr>
-                                            <tr>
-                                                <td>numero de impuesto</td>
-                                            </tr>
-                                        </tbody>
-                                    </v-table>
-                                </v-col>
-                            </v-row>
-                        </v-form>
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn
-                            size="small"
-                            variant="elevated"
-                            color="primary"
-                            class="ma-1"
-                            @click="dialogImport = false"
-                        >
-                            Cerrar
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>-->
+                                    <tr>
+                                        <td>direccion</td>
+                                    </tr>
+                                    <tr>
+                                        <td>numero de impuesto</td>
+                                    </tr>
+                                </tbody>
+                            </v-table>
+                        </v-col>
+                    </v-row>
+                </v-form>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                    size="small"
+                    variant="elevated"
+                    color="primary"
+                    class="ma-1"
+                    @click="dialogImport = false"
+                >
+                    Cerrar
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>-->
         <!-- Modal Show Customer Details -->
         <v-dialog v-model="dialogDetail" max-width="600px" scrollable>
             <v-card>
@@ -800,7 +804,7 @@ onMounted(() => {
                 <!--                    Importar-->
                 <!--                </v-btn>-->
                 <v-btn
-                  v-if="globals.userPermision(['Customers_add'])"
+                    v-if="globals.userPermision(['Customers_add'])"
                     color="primary"
                     class="ma-1"
                     prepend-icon="fas fa-user-plus"
@@ -836,8 +840,11 @@ onMounted(() => {
                             </template>
                             <v-list>
                                 <v-list-item
-
-                                    v-if="globals.userPermision(['Customers_view']) && item.due > 0"
+                                    v-if="
+                                        globals.userPermision([
+                                            'Customers_view',
+                                        ]) && item.due > 0
+                                    "
                                     @click="Pay_due(item)"
                                     prepend-icon="fas fa-dollar-sign"
                                 >
@@ -858,7 +865,11 @@ onMounted(() => {
                                 <!--                                </v-list-item>-->
 
                                 <v-list-item
-                                 v-if="globals.userPermision(['Customers_view'])"
+                                    v-if="
+                                        globals.userPermision([
+                                            'Customers_view',
+                                        ])
+                                    "
                                     @click="showDetails(item)"
                                     prepend-icon="fas fa-eye"
                                 >
@@ -868,7 +879,11 @@ onMounted(() => {
                                 </v-list-item>
 
                                 <v-list-item
-                                 v-if="globals.userPermision(['Customers_edit'])"
+                                    v-if="
+                                        globals.userPermision([
+                                            'Customers_edit',
+                                        ])
+                                    "
                                     @click="Edit_Client(item)"
                                     prepend-icon="fas fa-pen"
                                 >
@@ -878,7 +893,11 @@ onMounted(() => {
                                 </v-list-item>
 
                                 <v-list-item
-                                 v-if="globals.userPermision(['Customers_delete'])"
+                                    v-if="
+                                        globals.userPermision([
+                                            'Customers_delete',
+                                        ])
+                                    "
                                     @click="Delete_Client(item)"
                                     prepend-icon="fas fa-trash"
                                 >
@@ -1162,7 +1181,9 @@ onMounted(() => {
                                     }}
                                 </td>
                                 <td style="text-align: center" colspan="1">
-                                    {{ helpers.formatNumber(payment.amount, 2) }}
+                                    {{
+                                        helpers.formatNumber(payment.amount, 2)
+                                    }}
                                 </td>
                                 <td style="text-align: right" colspan="1">
                                     {{ helpers.formatNumber(payment.due, 2) }}
