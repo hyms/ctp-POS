@@ -31,8 +31,6 @@ class UserController extends Controller
             return response()->json(['message' => "No tiene permisos"], 406);
         }
         $Role = Auth::user()->roles()->first();
-        $ShowRecord = Role::findOrFail($Role->id)->exists();
-        //        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
         $users = User::where(function ($query) {
             if(!helpers::checkPermission('record_view')){

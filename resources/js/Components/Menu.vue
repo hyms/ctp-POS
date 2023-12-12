@@ -111,7 +111,7 @@ function loadMenu() {
         if (globals.userPermision(["adjustment_view"])) {
             subItems.push({
                 label: "Listar Ajustes",
-                url: "/adjustments/list",
+                url: "/adjustments/",
                 activate: ["/adjustments"],
             });
         }

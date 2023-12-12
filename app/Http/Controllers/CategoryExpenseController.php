@@ -26,7 +26,13 @@ class CategoryExpenseController extends Controller
         if (!helpers::checkPermission('expense_category_view')) {
             return response()->json(['message' => "No tiene permisos"], 406);
         }
-        $ExpenseCategory = ExpenseCategory::where('deleted_at', '=', null)->get();
+        $ExpenseCategory = ExpenseCategory::where('deleted_at', '=', null)
+            ->where(function ($query) {
+                if(!helpers::checkPermission('record_view')){
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })
+            ->get();
         return response()->json([
             'Expenses_category' => $ExpenseCategory,
         ]);

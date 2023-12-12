@@ -2,22 +2,22 @@
 import { onMounted, ref, watch } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router } from "@inertiajs/vue3";
-import helper from "@/helpers";
-import labels from "@/labels";
+import { labels } from "@/helpers";
 
 const props = defineProps({
-    warehouses: Object,
-    adjustment: { type: Object, default: null },
-    details: { type: Object, default: null },
     errors: Object,
 });
-
+const warehouses = ref([]);
+const adjustment = ref({});
+const details = ref({});
 const form = ref(null);
 const loading = ref(false);
 const loadingFilter = ref(false);
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("info");
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
 const search_input = ref("");
 const products = ref([]);
 const detailsForm = ref([]);

@@ -1,24 +1,26 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
-import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
-import { router, usePage } from "@inertiajs/vue3";
-import helper from "@/helpers";
-import labels from "@/labels";
+import { router } from "@inertiajs/vue3";
+import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
+import Snackbar from "@/Components/snackbar.vue";
+import { api, globals, helpers, labels } from "@/helpers";
 
 const props = defineProps({
-    warehouses: Array,
-    adjustments: Array,
     errors: Object,
 });
 const enableDays = computed(() => usePage().props.day);
 
+const warehouses = ref([]);
+const adjustments = ref([]);
 const search = ref("");
 const loading = ref(false);
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("info");
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
 const dialogDelete = ref(false);
 const dialogDetail = ref(false);
 
@@ -40,21 +42,17 @@ const adjustment = ref({});
 
 //---------------Get Details Adjustement ----------------------\\
 function showDetails(id) {
-    loading.value = true;
     dialogDetail.value = false;
-    axios
-        .get("/adjustments/detail/" + id)
-        .then(({ data }) => {
+    api.get({
+        url: "/adjustments/detail/" + id,
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
             adjustment.value = data.adjustment;
             details.value = data.details;
             dialogDetail.value = true;
-        })
-        .catch((response) => {
-            dialogDetail.value = true;
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+        },
+    });
 }
 
 //-------------------------------- Reset Form -------------------------------\\
@@ -75,43 +73,43 @@ function Delete_Item(item) {
 }
 
 function Remove_Adjustment() {
-    snackbar.value = false;
-    axios
-        .delete("/adjustments/" + adjustment.value.id)
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbar.value.color = "success";
+    api.delete({
+        url: "/adjustments/" + adjustment.value.id,
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
             snackbar.value.text = labels.delete_message;
-            router.reload({
-                preserveState: true,
-                preserveScroll: true,
-            });
-
+            loadData();
             dialogDelete.value = false;
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbar.value.color = "error";
-            snackbar.value.text = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
+        },
+    });
 }
+
+function loadData() {
+    api.get({
+        url: "/adjustments/list",
+        loadingItem: loading,
+        onSuccess: (data) => {
+            warehouses.value = data.warehouses;
+            adjustments.value = data.adjustments;
+        },
+    });
+}
+
+onMounted(() => {
+    loadData();
+});
 </script>
 <template>
-    <layout
-        :loading="loading"
-        :snackbar-view="snackbar"
-        :snackbar-text="snackbarText"
-        :snackbar-color="snackbarColor"
-    >
+    <layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <!-- Modal Remove Adjustment -->
         <delete-dialog
-            :model="dialogDelete"
+            v-model="dialogDelete"
             :on-save="Remove_Adjustment"
             :on-close="onCloseDelete"
         ></delete-dialog>
@@ -225,9 +223,10 @@ function Remove_Adjustment() {
                 <ExportBtn
                     :data="adjustments"
                     :fields="jsonFields"
-                    name-file="Productos"
+                    name-file="Ajuste Stock"
                 ></ExportBtn>
                 <v-btn
+                    v-if="globals.userPermision(['adjustment_add'])"
                     color="primary"
                     class="ma-1"
                     prepend-icon="fas fa-user-plus"
@@ -249,6 +248,7 @@ function Remove_Adjustment() {
                 >
                     <template v-slot:item.actions="{ item }">
                         <v-btn
+                            v-if="globals.userPermision(['adjustment_view'])"
                             class="ma-1"
                             color="info"
                             icon="fas fa-eye"
@@ -258,13 +258,14 @@ function Remove_Adjustment() {
                         >
                         </v-btn>
                         <v-btn
+                            v-if="globals.userPermision(['adjustment_edit'])"
                             class="ma-1"
                             color="primary"
                             icon="fas fa-pen"
                             size="x-small"
                             variant="outlined"
                             :disabled="
-                                helper.maxEnableButtons(
+                                helpers.maxEnableButtons(
                                     item.updated_at,
                                     enableDays
                                 )
@@ -275,13 +276,14 @@ function Remove_Adjustment() {
                         >
                         </v-btn>
                         <v-btn
+                            v-if="globals.userPermision(['adjustment_delete'])"
                             class="ma-1"
                             color="error"
                             icon="fas fa-trash"
                             size="x-small"
                             variant="outlined"
                             :disabled="
-                                helper.maxEnableButtons(
+                                helpers.maxEnableButtons(
                                     item.updated_at,
                                     enableDays
                                 )
