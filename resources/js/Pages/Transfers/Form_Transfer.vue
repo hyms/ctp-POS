@@ -1,11 +1,9 @@
 <script setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import { router, usePage } from "@inertiajs/vue3";
-import helper from "@/helpers";
-import labels from "@/labels";
-import api from "@/api";
-import DeleteBtn from "@/Components/buttons/DeleteBtn.vue";
+import { router } from "@inertiajs/vue3";
+import { api, globals, helpers, labels, rules } from "@/helpers";
+import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
     details: Object,
@@ -13,11 +11,13 @@ const props = defineProps({
     warehouses: Object,
     errors: Object,
 });
-const currency = computed(() => usePage().props.currency);
+const currency = globals.currency();
 
 const form = ref(null);
 const loading = ref(false);
 const loadingFilter = ref(false);
+const loadingProduct = ref(false);
+const loadingUnits = ref(false);
 const dialogUpdateDetail = ref(false);
 const snackbar = ref({
     view: false,
@@ -151,7 +151,14 @@ async function Submit_Transfer() {
 
 //---------------------- get_units ------------------------------\\
 function get_units(value) {
-    axios.get("/get_units?id=" + value).then(({ data }) => (this.units = data));
+    api.get({
+        url: "/get_units?id=" + value,
+        loadingItem: loadingUnits,
+        snackbar,
+        onSuccess: (data) => {
+            units.value = data;
+        },
+    });
 }
 
 //
@@ -289,7 +296,8 @@ function Create_Transfer() {
                 GrandTotal: GrandTotal.value,
             },
             snackbar,
-            Success: () => {
+            loadingItem: loading,
+            onSuccess: () => {
                 snackbar.value.text = "Actualizacion exitosa";
                 router.visit("/transfers/");
             },
@@ -309,7 +317,8 @@ function Update_Transfer() {
                 GrandTotal: GrandTotal.value,
             },
             snackbar,
-            Success: () => {
+            loadingItem: loading,
+            onSuccess: () => {
                 snackbar.value.text = "Actualizacion exitosa";
                 router.visit("/transfers/");
             },
@@ -367,7 +376,7 @@ function increment(detail, id) {
                 snackbar.value.color = "warning";
                 snackbar.value.text = labels.low_qty;
             } else {
-                helper.formatNumber(detailsForm.value[i].quantity++, 2);
+                helpers.formatNumber(detailsForm.value[i].quantity++, 2);
             }
         }
     }
@@ -388,7 +397,7 @@ function decrement(detail, id) {
                     snackbar.value.color = "warning";
                     snackbar.value.text = labels.low_qty;
                 } else {
-                    helper.formatNumber(detailsForm.value[i].quantity--, 2);
+                    helpers.formatNumber(detailsForm.value[i].quantity--, 2);
                 }
             }
         }
@@ -400,18 +409,20 @@ function decrement(detail, id) {
 
 function Get_Products_By_Warehouse(id) {
     products.value = [];
-    axios
-        .get("/get_Products_by_warehouse/" + id + "?stock=" + 0)
-        .then((response) => {
-            products.value = response.data;
-        })
-        .catch((error) => {});
+    api.get({
+        url: "/get_Products_by_warehouse/" + id + "?stock=" + 0,
+        loadingItem: loadingProduct,
+        snackbar,
+        onSuccess: (data) => {
+            products.value = data;
+        },
+    });
 }
 
 //     //---------------------------------Get Product Details ------------------------\\
 //
 function Get_Product_Details(product_id) {
-    axios.get("/product/" + product_id).then((response) => {
+    axios.get("/products/item/" + product_id).then((response) => {
         product.value.discount = 0;
         product.value.DiscountNet = 0;
         product.value.discount_Method = "2";
@@ -458,18 +469,18 @@ onMounted(() => {
 });
 </script>
 <template>
-    <layout
-        :loading="loading"
-        :snackbar-view="snackbar.view"
-        :snackbar-text="snackbar.text"
-        :snackbar-color="snackbar.color"
-    >
+    <Layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <v-form
             ref="form"
             @submit.prevent="Submit_Transfer"
             :disabled="loading"
         >
-            <v-card>
+            <v-card :loading="loading">
                 <v-toolbar height="15"></v-toolbar>
                 <v-card-text>
                     <v-row>
@@ -480,7 +491,7 @@ onMounted(() => {
                                 :label="labels.transfer.date"
                                 hide-details="auto"
                                 type="date"
-                                :rules="helper.required"
+                                :rules="rules.required"
                             >
                             </v-text-field>
                         </v-col>
@@ -489,13 +500,11 @@ onMounted(() => {
                             <v-select
                                 @update:modelValue="Selected_Warehouse"
                                 v-model="transferForm.from_warehouse"
-                                :items="warehouses"
+                                :items="helpers.toArraySelect(warehouses)"
                                 :label="labels.transfer.from_warehouse"
-                                item-title="name"
-                                item-value="id"
                                 hide-details="auto"
                                 clearable
-                                :rules="helper.required"
+                                :rules="rules.required"
                                 :disabled="detailsForm.length > 0"
                             ></v-select>
                         </v-col>
@@ -504,20 +513,18 @@ onMounted(() => {
                         <v-col lg="4" md="4" cols="12" class="mb-3">
                             <v-select
                                 v-model="transferForm.to_warehouse"
-                                :items="warehouses"
+                                :items="helpers.toArraySelect(warehouses)"
                                 :label="labels.transfer.to_warehouse"
-                                item-title="name"
-                                item-value="id"
                                 hide-details="auto"
                                 clearable
-                                :rules="helper.required"
+                                :rules="rules.required"
                             ></v-select>
                         </v-col>
                         <!-- Product -->
                         <v-col cols="12" class="mb-5">
                             <v-autocomplete
                                 @update:modelValue="querySelections"
-                                :loading="loadingFilter"
+                                :loading="loadingFilter || loadingProduct"
                                 :items="products"
                                 :model-value="search_input"
                                 item-title="name"
@@ -572,18 +579,16 @@ onMounted(() => {
                                     <tr v-for="detail in detailsForm">
                                         <td>{{ detail.detail_id }}</td>
                                         <td>
-                                            <v-chip
-                                                color="primary"
-                                                size="small"
-                                                >{{ detail.code }}</v-chip
-                                            >
+                                            <v-chip color="primary" size="small"
+                                                >{{ detail.code }}
+                                            </v-chip>
                                             {{ detail.name }}
                                             <!--                    <i @click="Modal_Updat_Detail(detail)" class="i-Edit"></i>-->
                                         </td>
                                         <td>
                                             {{ currency }}
                                             {{
-                                                helper.formatNumber(
+                                                helpers.formatNumber(
                                                     detail.Net_cost,
                                                     2
                                                 )
@@ -592,17 +597,15 @@ onMounted(() => {
                                         <td>
                                             <v-chip color="default" size="small"
                                                 >{{ detail.stock }}
-                                                {{
-                                                    detail.unitPurchase
-                                                }}</v-chip
-                                            >
+                                                {{ detail.unitPurchase }}
+                                            </v-chip>
                                         </td>
                                         <td>
                                             <div class="quantity">
                                                 <v-text-field
                                                     class="my-1"
                                                     hide-details="auto"
-                                                    :rules="helper.number"
+                                                    :rules="rules.number"
                                                     v-model="detail.quantity"
                                                     @keyup="
                                                         Verified_Qty(
@@ -623,7 +626,7 @@ onMounted(() => {
                                                                 )
                                                             "
                                                         >
-                                                            mdi-plus-box
+                                                            fas fa-plus-square
                                                         </v-icon>
                                                     </template>
                                                     <template v-slot:prepend>
@@ -636,7 +639,7 @@ onMounted(() => {
                                                                 )
                                                             "
                                                         >
-                                                            mdi-minus-box
+                                                            fas fa-minus-square
                                                         </v-icon>
                                                     </template>
                                                 </v-text-field>
@@ -647,14 +650,19 @@ onMounted(() => {
                                         <td>
                                             {{ currency }}
                                             {{
-                                                helper.formatNumber(
+                                                helpers.formatNumber(
                                                     detail.subtotal,
                                                     2
                                                 )
                                             }}
                                         </td>
                                         <td>
-                                            <delete-btn
+                                            <v-btn
+                                                class="ma-1"
+                                                color="error"
+                                                icon="fas fa-trash"
+                                                size="x-small"
+                                                variant="outlined"
                                                 @click="
                                                     () => {
                                                         delete_Product_Detail(
@@ -662,7 +670,7 @@ onMounted(() => {
                                                         );
                                                     }
                                                 "
-                                            ></delete-btn>
+                                            ></v-btn>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -781,13 +789,13 @@ onMounted(() => {
                         <v-col lg="4" md="4" cols="12" class="mb-3">
                             <v-select
                                 v-model="transferForm.statut"
-                                :items="helper.statutTransfer()"
+                                :items="helpers.statutTransfer()"
                                 :label="labels.transfer.statut"
                                 item-title="title"
                                 item-value="value"
                                 hide-details="auto"
                                 clearable
-                                :rules="helper.required"
+                                :rules="rules.required"
                             ></v-select>
                         </v-col>
 
@@ -815,5 +823,5 @@ onMounted(() => {
                 </v-card-text>
             </v-card>
         </v-form>
-    </layout>
+    </Layout>
 </template>

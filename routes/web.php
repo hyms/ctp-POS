@@ -213,7 +213,7 @@ Route::get('payment_sale_get_number', [PaymentSalesController::class, 'getNumber
 //------------------------------------------------------------------\\
 
     //------------------------------- Transfers --------------------------\\
-    Route::prefix('transfer')->group(function () {
+    Route::prefix('transfers')->group(function () {
         Route::get('/item/{id}', [TransferController::class, 'show']);
         Route::get('/', [TransferController::class, 'index']);
         Route::get('/list', [TransferController::class, 'getTable']);

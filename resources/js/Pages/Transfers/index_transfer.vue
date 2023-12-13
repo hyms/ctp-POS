@@ -1,21 +1,20 @@
 <script setup>
-import { computed, ref } from "vue";
+import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
-import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
-import { router, usePage } from "@inertiajs/vue3";
-import helper from "@/helpers";
-import labels from "@/labels";
-import api from "@/api";
+import { router } from "@inertiajs/vue3";
+import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
+import Snackbar from "@/Components/snackbar.vue";
+import { api, globals, helpers, labels } from "@/helpers";
 
-const currency = computed(() => usePage().props.currency);
-const enableDays = computed(() => usePage().props.day);
+const currency = globals.currency();
+const enableDays = globals.oldDay();
 
 const props = defineProps({
-    warehouses: Array,
-    transfers: Array,
     errors: Object,
 });
+const warehouses = ref([]);
+const transfers = ref([]);
 const search = ref("");
 const loading = ref(false);
 const snackbar = ref({
@@ -63,16 +62,15 @@ const jsonFields = ref({
 function showDetails(id) {
     dialogDetail.value = false;
     api.get({
-        url: "/transfer/" + id,
+        url: "/transfers/item/" + id,
         loadingItem: loading,
-        Success: (data) => {
+        snackbar,
+        onSuccess: (data) => {
             transfer.value = data.transfer;
             details.value = data.details;
-            //            console.log(transfer.value)
-            //            console.log(details.value)
             dialogDetail.value = true;
         },
-        Error: () => {
+        onError: () => {
             dialogDetail.value = true;
         },
     });
@@ -98,25 +96,40 @@ function Delete_Item(item) {
 function Remove_Transfer(id) {
     api.delete({
         url: "/transfers/" + transfer.value.id,
+        loadingItem: loading,
         snackbar,
-        Success: () => {
-            snackbar.value.text = "Borrado exitoso";
-            router.reload({
-                preserveState: true,
-                preserveScroll: true,
-            });
+        onSuccess: (data) => {
+            snackbar.value.text = labels.delete_message;
+            loadData();
             dialogDelete.value = false;
         },
     });
 }
+
+function loadData() {
+    api.get({
+        url: "/transfers/list",
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
+            console.log(data);
+            warehouses.value = data.warehouses;
+            transfers.value = data.transfers;
+        },
+    });
+}
+
+onMounted(() => {
+    loadData();
+});
 </script>
 <template>
-    <layout
-        :loading="loading"
-        :snackbar-view="snackbar.view"
-        :snackbar-text="snackbar.text"
-        :snackbar-color="snackbar.color"
-    >
+    <Layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <!-- Modal Remove Adjustment -->
         <delete-dialog
             :model="dialogDelete"
@@ -129,73 +142,81 @@ function Remove_Transfer(id) {
                 <v-toolbar title="Detalle de Transferencia" border></v-toolbar>
                 <v-card-text>
                     <v-row>
-                        <v-col lg="5" cols="12" class="mt-2">
+                        <v-col md="5" cols="12" class="mt-2">
                             <v-table hover>
                                 <tbody>
                                     <!-- date -->
                                     <tr>
                                         <td>{{ labels.transfer.date }}</td>
-                                        <th>{{ transfer.date }}</th>
+                                        <td class="font-weight-bold">
+                                            {{ transfer.date }}
+                                        </td>
                                     </tr>
                                     <!-- Reference -->
                                     <tr>
                                         <td>{{ labels.transfer.Ref }}</td>
-                                        <th>{{ transfer.Ref }}</th>
+                                        <td class="font-weight-bold">
+                                            {{ transfer.Ref }}
+                                        </td>
                                     </tr>
                                     <!-- From warehouse -->
                                     <tr>
                                         <td>
                                             {{ labels.transfer.from_warehouse }}
                                         </td>
-                                        <th>{{ transfer.from_warehouse }}</th>
+                                        <td class="font-weight-bold">
+                                            {{ transfer.from_warehouse }}
+                                        </td>
                                     </tr>
                                     <!-- To warehouse -->
                                     <tr>
                                         <td>
                                             {{ labels.transfer.to_warehouse }}
                                         </td>
-                                        <th>{{ transfer.to_warehouse }}</th>
+                                        <td class="font-weight-bold">
+                                            {{ transfer.to_warehouse }}
+                                        </td>
                                     </tr>
                                     <!-- Grand Total -->
                                     <tr>
                                         <td>
                                             {{ labels.transfer.GrandTotal }}
                                         </td>
-                                        <th>
+                                        <td class="font-weight-bold">
                                             {{ currency
                                             }}{{
-                                                helper.formatNumber(
+                                                helpers.formatNumber(
                                                     transfer.GrandTotal,
                                                     2
                                                 )
                                             }}
-                                        </th>
+                                        </td>
                                     </tr>
                                     <!-- Status -->
                                     <tr>
                                         <td>{{ labels.transfer.statut }}</td>
-                                        <th>
+                                        <td class="font-weight-bold">
                                             <v-chip
                                                 :color="
-                                                    helper.statutTransferColor(
+                                                    helpers.statutTransferColor(
                                                         transfer.statut
                                                     )
                                                 "
                                                 variant="tonal"
                                                 size="x-small"
                                                 >{{
-                                                    helper.statutTransfer(
+                                                    helpers.statutTransfer(
                                                         transfer.statut
                                                     )
                                                 }}
                                             </v-chip>
-                                        </th>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </v-table>
                         </v-col>
-                        <v-col lg="7" cols="12" sm="12" class="mt-2">
-                            <v-table border>
+                        <v-col md="7" cols="12" class="mt-2">
+                            <v-table border hover>
                                 <thead>
                                     <tr>
                                         <th scope="col">
@@ -220,7 +241,7 @@ function Remove_Transfer(id) {
                                         <td>{{ detail.code }}</td>
                                         <td>
                                             {{
-                                                helper.formatNumber(
+                                                helpers.formatNumber(
                                                     detail.quantity,
                                                     2
                                                 )
@@ -236,7 +257,7 @@ function Remove_Transfer(id) {
                             </v-table>
                         </v-col>
                     </v-row>
-                    <hr v-show="transfer.note" />
+                    <v-divider v-show="transfer.note"></v-divider>
                     <v-row class="mt-3">
                         <v-col cols="12">
                             <p>{{ transfer.note }}</p>
@@ -274,12 +295,13 @@ function Remove_Transfer(id) {
                     name-file="Transferencias"
                 ></ExportBtn>
                 <v-btn
+                    v-if="globals.userPermision(['transfer_add'])"
                     color="primary"
                     class="ma-1"
                     prepend-icon="fas fa-user-plus"
                     @click="router.visit('/transfers/create')"
                 >
-                    Añadir
+                    {{ labels.add }}
                 </v-btn>
             </v-col>
         </v-row>
@@ -292,17 +314,19 @@ function Remove_Transfer(id) {
                     hover
                     class="elevation-2"
                     no-data-text="No existen datos a mostrar"
+                    :loading="loading"
                 >
                     <template v-slot:item.statut="{ item }">
                         <v-chip
-                            :color="helper.statutTransferColor(item.statut)"
+                            :color="helpers.statutTransferColor(item.statut)"
                             variant="tonal"
                             size="x-small"
-                            >{{ helper.statutTransfer(item.statut) }}
+                            >{{ helpers.statutTransfer(item.statut) }}
                         </v-chip>
                     </template>
                     <template v-slot:item.actions="{ item }">
                         <v-btn
+                            v-if="globals.userPermision(['transfer_view'])"
                             class="ma-1"
                             color="info"
                             icon="fas fa-eye"
@@ -312,13 +336,14 @@ function Remove_Transfer(id) {
                         >
                         </v-btn>
                         <v-btn
+                            v-if="globals.userPermision(['transfer_edit'])"
                             class="ma-1"
                             color="primary"
                             icon="fas fa-pen"
                             size="x-small"
                             variant="outlined"
                             :disabled="
-                                helper.maxEnableButtons(
+                                helpers.maxEnableButtons(
                                     item.updated_at,
                                     enableDays
                                 )
@@ -327,13 +352,14 @@ function Remove_Transfer(id) {
                         >
                         </v-btn>
                         <v-btn
+                            v-if="globals.userPermision(['transfer_delete'])"
                             class="ma-1"
                             color="error"
                             icon="fas fa-trash"
                             size="x-small"
                             variant="outlined"
                             :disabled="
-                                helper.maxEnableButtons(
+                                helpers.maxEnableButtons(
                                     item.updated_at,
                                     enableDays
                                 )
@@ -397,5 +423,5 @@ function Remove_Transfer(id) {
         <!--              ></v-select>-->
         <!--            </v-form-group>-->
         <!--          </v-col>-->
-    </layout>
+    </Layout>
 </template>
