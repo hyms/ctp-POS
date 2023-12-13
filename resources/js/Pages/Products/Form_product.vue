@@ -189,7 +189,7 @@ onMounted(() => {
             :text="snackbar.text"
             :color="snackbar.color"
         ></snackbar>
-        <v-card variant="elevated">
+        <v-card variant="elevated" :loading="loading">
             <v-toolbar height="15"></v-toolbar>
             <v-card-text>
                 <v-form

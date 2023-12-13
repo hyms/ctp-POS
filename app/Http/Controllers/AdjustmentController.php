@@ -36,9 +36,9 @@ class AdjustmentController extends Controller
         // Check If User Has Permission View  All Records
         $Adjustments = Adjustment::with('warehouse')
             ->where('deleted_at', '=', null)
-            ->whereIn('warehouse_id', $warehouses->pluck('value'))
+            ->whereIn('warehouse_id', $warehouses->map(function ($item,$key) { return $key; }))
             ->where(function ($query) {
-                if (!helpers::checkPermission('record_view')) {
+                if (helpers::checkPermission('record_view')) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             });
@@ -203,12 +203,11 @@ class AdjustmentController extends Controller
             return response()->json(['message' => "No tiene permisos"], 406);
         }
         DB::transaction(function () use ($id, $request) {
-            $current_adjustment = Adjustment::findOrFail($id)
-                ->where(function ($query) {
-                    if (!helpers::checkPermission('record_view')) {
+            $current_adjustment = Adjustment::where(function ($query) {
+                    if (helpers::checkPermission('record_view')) {
                         return $query->where('user_id', '=', Auth::user()->id);
                     }
-                });
+                })->findOrFail($id);
             $old_adjustment_details = AdjustmentDetail::where('adjustment_id', $id)->get();
 
             // Init Data with old Parametre
@@ -260,12 +259,11 @@ class AdjustmentController extends Controller
 
         $Adjustment_data = Adjustment::with('details.product')
             ->where('deleted_at', '=', null)
-            ->findOrFail($id)
             ->where(function ($query) {
-                if (!helpers::checkPermission('record_view')) {
+                if (helpers::checkPermission('record_view')) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
-            });
+            })->findOrFail($id);
         $details = collect();
         $adjustment['warehouse_id'] = '';
         if ($Adjustment_data->warehouse_id) {
@@ -338,12 +336,11 @@ class AdjustmentController extends Controller
 
         $Adjustment_data = Adjustment::with('details.product.unit')
             ->where('deleted_at', '=', null)
-            ->findOrFail($id)
             ->where(function ($query) {
                 if (!helpers::checkPermission('record_view')) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
-            });
+            })->findOrFail($id);
 
         $Adjustment['Ref'] = $Adjustment_data->Ref;
         $Adjustment['date'] = $Adjustment_data->date;
@@ -402,15 +399,10 @@ class AdjustmentController extends Controller
     {
         $user_auth = auth()->user();
         if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name'])->map(function ($item, $key) {
-                return ['value' => $item->id, 'title' => $item->name];
-            });
+            $warehouses = Warehouse::where('deleted_at', '=', null)->pluck('name', 'id');
         } else {
             $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name'])
-                ->map(function ($item, $key) {
-                    return ['value' => $item->id, 'title' => $item->name];
-                });
+            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->pluck('name', 'id');
         }
         return $warehouses;
     }

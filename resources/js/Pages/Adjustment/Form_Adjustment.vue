@@ -2,17 +2,20 @@
 import { onMounted, ref, watch } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router } from "@inertiajs/vue3";
-import { labels } from "@/helpers";
+import { api, helpers, labels, rules } from "@/helpers";
+import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
+    warehouses: Object,
+    adjustment: { type: Object, default: null },
+    details: { type: Object, default: null },
     errors: Object,
 });
-const warehouses = ref([]);
-const adjustment = ref({});
-const details = ref({});
+
 const form = ref(null);
 const loading = ref(false);
 const loadingFilter = ref(false);
+const loadingProduct = ref(false);
 const snackbar = ref({
     view: false,
     color: "",
@@ -75,13 +78,13 @@ function querySelections(val) {
 
 //---------------- Submit Search Product-----------------\\
 function SearchProduct(result) {
-    snackbar.value = false;
+    snackbar.value.view = false;
     product.value = {};
     if (
         detailsForm.value.length > 0 &&
         detailsForm.value.some((detail) => detail.name === result.name)
     ) {
-        snackbar.value = true;
+        snackbar.value.view = true;
         snackbar.value.text = labels.add_exist_item;
         snackbar.value.color = "warning";
     } else {
@@ -120,13 +123,14 @@ function Selected_Warehouse(value) {
 //------------------------------------ Get Products By Warehouse -------------------------\\
 
 function Get_Products_By_Warehouse(id) {
-    products.value = [];
-    axios
-        .get("/get_Products_by_warehouse/" + id + "?stock=" + 0)
-        .then((response) => {
-            products.value = response.data;
-        })
-        .catch((error) => {});
+    api.get({
+        url: "/get_Products_by_warehouse/" + id + "?stock=" + 0,
+        snackbar,
+        loadingItem: loadingProduct,
+        onSuccess: (data) => {
+            products.value = data;
+        },
+    });
 }
 
 //----------------------------------------- Add Product To list -------------------------\\
@@ -141,7 +145,7 @@ function add_product() {
 
 //-----------------------------------Verified QTY ------------------------------\\
 function Verified_Qty(detail, id) {
-    snackbar.value = false;
+    snackbar.value.view = false;
     for (let i = 0; i < detailsForm.value.length; i++) {
         if (detailsForm.value[i].detail_id === id) {
             if (isNaN(detail.quantity)) {
@@ -149,7 +153,7 @@ function Verified_Qty(detail, id) {
             }
 
             if (detail.type == "sub" && detail.quantity > detail.current) {
-                snackbar.value = true;
+                snackbar.value.view = true;
                 snackbar.value.text = labels.low_qty;
                 snackbar.value.color = "warning";
                 detailsForm.value[i].quantity = detail.current;
@@ -162,19 +166,19 @@ function Verified_Qty(detail, id) {
 
 //----------------------------------- Increment QTY ------------------------------\\
 function increment(detail, id) {
-    snackbar.value = false;
+    snackbar.value.view = false;
     for (let i = 0; i < detailsForm.value.length; i++) {
         if (detailsForm.value[i].detail_id === id) {
             if (detail.type === "sub") {
                 if (detail.quantity + 1 > detail.current) {
-                    snackbar.value = true;
+                    snackbar.value.view = true;
                     snackbar.value.text = labels.low_qty;
                     snackbar.value.color = "warning";
                 } else {
-                    helper.formatNumber(detailsForm.value[i].quantity++, 2);
+                    helpers.formatNumber(detailsForm.value[i].quantity++, 2);
                 }
             } else {
-                helper.formatNumber(detailsForm.value[i].quantity++, 2);
+                helpers.formatNumber(detailsForm.value[i].quantity++, 2);
             }
         }
     }
@@ -182,7 +186,7 @@ function increment(detail, id) {
 
 //----------------------------------- Decrement QTY ------------------------------\\
 function decrement(detail, id) {
-    snackbar.value = false;
+    snackbar.value.view = false;
     for (let i = 0; i < detailsForm.value.length; i++) {
         if (detailsForm.value[i].detail_id === id) {
             if (detail.quantity - 1 > 0) {
@@ -190,11 +194,11 @@ function decrement(detail, id) {
                     detail.type === "sub" &&
                     detail.quantity - 1 > detail.current
                 ) {
-                    snackbar.value = true;
+                    snackbar.value.view = true;
                     snackbar.value.text = labels.low_qty;
                     snackbar.value.color = "warning";
                 } else {
-                    helper.formatNumber(detailsForm.value[i].quantity--, 2);
+                    helpers.formatNumber(detailsForm.value[i].quantity--, 2);
                 }
             }
         }
@@ -212,9 +216,9 @@ function Remove_Product(id) {
 
 //----------------------------------- Verified Quantity if Null Or zero ------------------------------\\
 function verifiedForm() {
-    snackbar.value = false;
+    snackbar.value.view = false;
     if (detailsForm.value.length <= 0) {
-        snackbar.value = true;
+        snackbar.value.view = true;
         snackbar.value.text = labels.no_add_item;
         snackbar.value.color = "warning";
         return false;
@@ -230,7 +234,7 @@ function verifiedForm() {
     }
 
     if (count > 0) {
-        snackbar.value = true;
+        snackbar.value.view = true;
         snackbar.value.text = labels.no_qty_add_item;
         snackbar.value.color = "warning";
         return false;
@@ -241,65 +245,42 @@ function verifiedForm() {
 //--------------------------------- Create New Adjustment -------------------------\\
 function Create_Adjustment() {
     if (verifiedForm()) {
-        loading.value = true;
-        snackbar.value = false;
-        axios
-            .post("/adjustments", {
+        api.post({
+            url: "/adjustments",
+            params: {
                 warehouse_id: adjustmentForm.value.warehouse_id,
                 date: adjustmentForm.value.date,
                 notes: adjustmentForm.value.notes,
                 details: detailsForm.value,
-            })
-            .then(({ data }) => {
-                snackbar.value = true;
-                snackbar.value.color = "success";
+            },
+            snackbar,
+            loadingItem: loading,
+            onSuccess: (data) => {
                 snackbar.value.text = labels.success_message;
-                router.visit("/adjustments/list");
-            })
-            .catch((error) => {
-                console.log(error);
-                snackbar.value = true;
-                snackbar.value.color = labels.error_message;
-                snackbar.value.text = error.response.data.message;
-            })
-            .finally(() => {
-                setTimeout(() => {
-                    loading.value = false;
-                }, 1000);
-            });
+                router.visit("/adjustments/");
+            },
+        });
     }
 }
 
 //--------------------------------- Update Adjustment -------------------------\\
 function Update_Adjustment() {
     if (verifiedForm()) {
-        loading.value = true;
-        snackbar.value = false;
-        let id = props.adjustment.id;
-        axios
-            .put(`/adjustments/${id}`, {
+        api.put({
+            url: `/adjustments/${props.adjustment.id}`,
+            params: {
                 warehouse_id: adjustmentForm.value.warehouse_id,
                 date: adjustmentForm.value.date,
                 notes: adjustmentForm.value.notes,
                 details: detailsForm.value,
-            })
-            .then(({ data }) => {
-                snackbar.value = true;
-                snackbar.value.color = "success";
+            },
+            snackbar,
+            loadingItem: loading,
+            onSuccess: (data) => {
                 snackbar.value.text = labels.success_message;
-                router.visit("/adjustments/list");
-            })
-            .catch((error) => {
-                console.log(error);
-                snackbar.value = true;
-                snackbar.value.color = labels.error_message;
-                snackbar.value.text = error.response.data.message;
-            })
-            .finally(() => {
-                setTimeout(() => {
-                    loading.value = false;
-                }, 1000);
-            });
+                router.visit("/adjustments/");
+            },
+        });
     }
 }
 
@@ -341,20 +322,24 @@ onMounted(() => {
         editmode.value = true;
         Get_Products_By_Warehouse(adjustmentForm.value.warehouse_id);
     } else if (props.warehouses.length == 1) {
-        adjustmentForm.value.warehouse_id = props.warehouses[0].value;
+        adjustmentForm.value.warehouse_id = props.warehouses[0];
         Get_Products_By_Warehouse(adjustmentForm.value.warehouse_id);
     }
 });
 </script>
 <template>
-    <layout
-        :loading="loading"
-        :snackbar-view="snackbar"
-        :snackbar-text="snackbarText"
-        :snackbar-color="snackbarColor"
-    >
-        <v-form ref="form">
-            <v-card>
+    <Layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
+        <v-form
+            ref="form"
+            :disabled="loading"
+            @submit.prevent="Submit_Adjustment"
+        >
+            <v-card :loading="loading">
                 <v-toolbar height="15"></v-toolbar>
                 <v-card-text>
                     <v-row>
@@ -363,13 +348,11 @@ onMounted(() => {
                             <v-select
                                 @update:modelValue="Selected_Warehouse"
                                 v-model="adjustmentForm.warehouse_id"
-                                :items="warehouses"
+                                :items="helpers.toArraySelect(warehouses)"
                                 :label="labels.adjustment.warehouse_id"
-                                item-title="title"
-                                item-value="value"
                                 hide-details="auto"
                                 clearable
-                                :rules="helper.required"
+                                :rules="rules.required"
                                 :disabled="detailsForm.length > 0"
                             ></v-select>
                         </v-col>
@@ -381,7 +364,7 @@ onMounted(() => {
                                 :label="labels.adjustment.date"
                                 hide-details="auto"
                                 type="date"
-                                :rules="helper.required"
+                                :rules="rules.required"
                             >
                             </v-text-field>
                         </v-col>
@@ -391,7 +374,7 @@ onMounted(() => {
                         <v-col cols="12">
                             <v-autocomplete
                                 @update:modelValue="querySelections"
-                                :loading="loadingFilter"
+                                :loading="loadingFilter || loadingProduct"
                                 :items="products"
                                 :model-value="search_input"
                                 item-title="name"
@@ -459,7 +442,7 @@ onMounted(() => {
                                             <v-text-field
                                                 class="my-1"
                                                 hide-details="auto"
-                                                :rules="helper.number"
+                                                :rules="rules.number"
                                                 v-model="detail.quantity"
                                                 @keyup="
                                                     Verified_Qty(
@@ -480,7 +463,7 @@ onMounted(() => {
                                                             )
                                                         "
                                                     >
-                                                        mdi-plus-box
+                                                        fas fa-plus-square
                                                     </v-icon>
                                                 </template>
                                                 <template v-slot:prepend>
@@ -493,7 +476,7 @@ onMounted(() => {
                                                             )
                                                         "
                                                     >
-                                                        mdi-minus-box
+                                                        fas fa-minus-square
                                                     </v-icon>
                                                 </template>
                                             </v-text-field>
@@ -553,7 +536,6 @@ onMounted(() => {
                                 color="primary"
                                 :loading="loading"
                                 :disabled="loading"
-                                @click="Submit_Adjustment"
                                 >{{ labels.submit }}
                             </v-btn>
                         </v-col>
@@ -561,5 +543,5 @@ onMounted(() => {
                 </v-card-text>
             </v-card>
         </v-form>
-    </layout>
+    </Layout>
 </template>

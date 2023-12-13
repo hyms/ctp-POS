@@ -167,6 +167,9 @@ const getOperatorUnit = () => {
         { title: "Dividir (/)", value: "/" },
     ];
 };
+const formatDate = (date) => {
+    return moment(date).format("DD-MM-YYYY");
+};
 export default {
     formatNumber,
     print_pdf,
@@ -188,4 +191,5 @@ export default {
     reglamentPayment,
     getOperatorUnit,
     print_pos,
+    formatDate,
 };

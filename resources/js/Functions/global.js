@@ -30,6 +30,9 @@ const userPermision = (values) => {
 const currency = () => {
     return computed(() => usePage().props.currency);
 };
+const oldDay = () => {
+    return computed(() => usePage().props.day);
+};
 const rolesP = () => {
     const roles = computed(() => usePage().props.rolesP);
     return roles.value;
@@ -44,4 +47,5 @@ export default {
     rolesP,
     fullName,
     currency,
+    oldDay,
 };

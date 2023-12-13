@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import { router } from "@inertiajs/vue3";
@@ -10,7 +10,7 @@ import { api, globals, helpers, labels } from "@/helpers";
 const props = defineProps({
     errors: Object,
 });
-const enableDays = computed(() => usePage().props.day);
+const enableDays = globals.oldDay();
 
 const warehouses = ref([]);
 const adjustments = ref([]);
@@ -90,6 +90,7 @@ function loadData() {
         url: "/adjustments/list",
         loadingItem: loading,
         onSuccess: (data) => {
+            console.log(data);
             warehouses.value = data.warehouses;
             adjustments.value = data.adjustments;
         },
@@ -120,7 +121,7 @@ onMounted(() => {
                     <v-toolbar-title>Detalle de Ajuste</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn
-                        icon="mdi-close"
+                        icon="fas fa-times"
                         size="small"
                         variant="tonal"
                         @click="dialogDetail = false"
@@ -128,7 +129,7 @@ onMounted(() => {
                 </v-toolbar>
                 <v-card-text>
                     <v-row>
-                        <v-col cols="12" lg="5" md="12" sm="12">
+                        <v-col cols="12" md="5">
                             <v-card variant="outlined">
                                 <v-table hover>
                                     <tbody>
@@ -137,7 +138,7 @@ onMounted(() => {
                                             <td>Fecha</td>
                                             <td class="font-weight-bold">
                                                 {{
-                                                    helper.formatDate(
+                                                    helpers.formatDate(
                                                         adjustment.date
                                                     )
                                                 }}
@@ -161,7 +162,7 @@ onMounted(() => {
                                 </v-table>
                             </v-card>
                         </v-col>
-                        <v-col cols="12" lg="7" md="12" sm="12">
+                        <v-col cols="12" md="7">
                             <v-card variant="outlined">
                                 <v-table hover>
                                     <thead>
@@ -178,7 +179,7 @@ onMounted(() => {
                                             <td>{{ detail.code }}</td>
                                             <td>
                                                 {{
-                                                    helper.formatNumber(
+                                                    helpers.formatNumber(
                                                         detail.quantity,
                                                         2
                                                     )
@@ -197,13 +198,13 @@ onMounted(() => {
                             </v-card>
                         </v-col>
                     </v-row>
-                    <hr v-if="adjustment.note" class="mt-4 mb-4" />
-                    <v-row>
-                        <v-col md="12">
-                            <p>{{ adjustment.note }}</p>
-                        </v-col>
-                    </v-row>
                 </v-card-text>
+                <v-divider v-if="adjustment.note"></v-divider>
+                <v-card-actions>
+                    <v-row>
+                        <v-col cols="12">{{ adjustment.note }}</v-col></v-row
+                    >
+                </v-card-actions>
             </v-card>
         </v-dialog>
 
