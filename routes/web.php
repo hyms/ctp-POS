@@ -165,6 +165,7 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
     Route::prefix('expenses')->group(function () {
         //------------------------------- Expenses --------------------------\\
         Route::get('/', [ExpensesController::class, 'index']);
+        Route::get('/list', [ExpensesController::class, 'getTable']);
         Route::get('/create', [ExpensesController::class, 'create']);
         Route::get('/edit/{id}', [ExpensesController::class, 'edit']);
         Route::post('/', [ExpensesController::class, 'store']);

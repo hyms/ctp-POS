@@ -112,7 +112,6 @@ function loadData() {
         loadingItem: loading,
         snackbar,
         onSuccess: (data) => {
-            console.log(data);
             warehouses.value = data.warehouses;
             transfers.value = data.transfers;
         },

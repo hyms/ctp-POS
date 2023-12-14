@@ -2,8 +2,8 @@
 import { onMounted, ref, watch } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router } from "@inertiajs/vue3";
-import helper from "@/helpers";
-import labels from "@/labels";
+import { api, helpers, labels, rules } from "@/helpers";
+import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
     warehouses: Object,
@@ -14,9 +14,11 @@ const props = defineProps({
 const form = ref(null);
 const editmode = ref(false);
 const loading = ref(false);
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("info");
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
 
 const expenseForm = ref({
     date: new Date().toISOString().slice(0, 10),
@@ -39,58 +41,35 @@ async function Submit_Expense() {
 
 // ---------------------------Create Expense
 function Create_Expense() {
-    loading.value = true;
-    snackbar.value = false;
-
-    axios
-        .post("/expenses", {
+    api.post({
+        url: "/expenses",
+        params: {
             expense: expenseForm.value,
-        })
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbar.value.color = "success";
+        },
+        loadingItem: loading,
+        snackbar,
+        onSuccess: () => {
             snackbar.value.text = labels.success_message;
             router.visit("/expenses");
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbar.value.color = "error";
-            snackbar.value.text = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
+        },
+    });
 }
 
 //--------------------------------- Update Expense -------------------------\\
 function Update_Expense() {
-    loading.value = true;
-    snackbar.value = false;
     let id = expenseForm.value.id;
-    axios
-        .put(`/expenses/${id}`, {
+    api.put({
+        url: `/expenses/${id}`,
+        params: {
             expense: expenseForm.value,
-        })
-        .then(({ data }) => {
-            snackbar.value = true;
-            snackbar.value.color = "success";
+        },
+        loadingItem: loading,
+        snackbar,
+        onSuccess: () => {
             snackbar.value.text = labels.success_message;
             router.visit("/expenses");
-        })
-        .catch((error) => {
-            console.log(error);
-            snackbar.value = true;
-            snackbar.value.color = "error";
-            snackbar.value.text = error.response.data.message;
-        })
-        .finally(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 1000);
-        });
+        },
+    });
 }
 
 watch(
@@ -121,16 +100,20 @@ onMounted(() => {
 });
 </script>
 <template>
-    <Layout
-        :loading="loading"
-        :snackbar-view="snackbar"
-        :snackbar-color="snackbarColor"
-        :snackbar-text="snackbarText"
-    >
+    <Layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <v-card :loading="loading">
             <v-toolbar height="15"></v-toolbar>
             <v-card-text>
-                <v-form @submit.prevent="Submit_Expense" ref="form">
+                <v-form
+                    :disabled="loading"
+                    @submit.prevent="Submit_Expense"
+                    ref="form"
+                >
                     <v-row class="mt-3">
                         <!-- date  -->
                         <v-col lg="4" md="6" cols="12">
@@ -138,7 +121,7 @@ onMounted(() => {
                                 :label="labels.expense.date + ' *'"
                                 v-model="expenseForm.date"
                                 :placeholder="labels.expense.date"
-                                :rules="helper.required"
+                                :rules="rules.required"
                                 hide-details="auto"
                                 type="date"
                             >
@@ -149,13 +132,11 @@ onMounted(() => {
                         <v-col lg="4" md="6" cols="12">
                             <v-select
                                 v-model="expenseForm.warehouse_id"
-                                :items="warehouses"
+                                :items="helpers.toArraySelect(warehouses)"
                                 :label="labels.expense.warehouse_id"
-                                item-title="name"
-                                item-value="id"
                                 hide-details="auto"
                                 clearable
-                                :rules="helper.required"
+                                :rules="rules.required"
                             ></v-select>
                         </v-col>
 
@@ -163,13 +144,11 @@ onMounted(() => {
                         <v-col lg="4" md="6" cols="12">
                             <v-select
                                 v-model="expenseForm.category_id"
-                                :items="expense_category"
+                                :items="helpers.toArraySelect(expense_category)"
                                 :label="labels.expense.category_id"
-                                item-title="name"
-                                item-value="id"
                                 hide-details="auto"
                                 clearable
-                                :rules="helper.required"
+                                :rules="rules.required"
                             ></v-select>
                         </v-col>
 
@@ -180,8 +159,8 @@ onMounted(() => {
                                 v-model="expenseForm.amount"
                                 :placeholder="labels.expense.amount"
                                 :rules="
-                                    helper.required.concat(
-                                        helper.numberWithDecimal
+                                    rules.required.concat(
+                                        rules.numberWithDecimal
                                     )
                                 "
                                 hide-details="auto"
@@ -196,7 +175,7 @@ onMounted(() => {
                                 :label="labels.expense.details + ' *'"
                                 v-model="expenseForm.details"
                                 :placeholder="labels.expense.details"
-                                :rules="helper.required"
+                                :rules="rules.required"
                                 hide-details="auto"
                             ></v-textarea>
                         </v-col>
