@@ -4,9 +4,8 @@ import { router } from "@inertiajs/vue3";
 import Layout from "@/Layouts/Authenticated.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import printJS from "print-js";
-import helper from "@/helpers";
-import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
-import InvoiceDialog from "@/Components/InvoiceDialog.vue";
+import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
+import InvoiceDialog from "@/Components/dialogs/InvoiceDialog.vue";
 
 const props = defineProps({
     details: Object,

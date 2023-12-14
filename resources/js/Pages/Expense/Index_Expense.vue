@@ -82,29 +82,16 @@ function Delete_Expense(id) {
 function loadData() {
     api.get({
         url: "/expenses/list",
-        loadingItem: loading,
-        snackbar,
-        onSuccess: (data) => {
-            expenses.value = data.expenses;
-            Expenses_category.value = data.Expenses_category;
-            warehouses.value = data.warehouses;
-        },
-    });
-}
-
-function searchFilter() {
-    api.get({
-        url: "/expenses/list",
         params: {
             filter: form_filter.value,
         },
         loadingItem: loading,
         snackbar,
         onSuccess: (data) => {
-            menu.value = false;
             expenses.value = data.expenses;
             Expenses_category.value = data.Expenses_category;
             warehouses.value = data.warehouses;
+            menu.value = false;
         },
     });
 }
@@ -228,7 +215,7 @@ onMounted(() => {
                                 <v-btn
                                     variant="tonal"
                                     color="primary"
-                                    @click="searchFilter"
+                                    @click="loadData"
                                 >
                                     {{ labels.search }}
                                 </v-btn>

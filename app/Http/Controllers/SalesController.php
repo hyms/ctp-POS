@@ -34,6 +34,12 @@ class SalesController extends Controller
 
     public function index(request $request)
     {
+        Inertia::share('titlePage', 'Lista de Ordenes');
+        return Inertia::render('Sales/Index_Sale');
+    }
+
+    public function getTable(request $request)
+    {
 //        $this->authorizeForUser($request->user('api'), 'view', Sale::class);
 //        $role = Auth::user()->roles()->first();
 //        $view_records = Role::findOrFail($role->id)->inRole('record_view');
@@ -124,15 +130,14 @@ class SalesController extends Controller
             $data->add($item);
         }
 
-        $customers = client::where('deleted_at', '=', null)->get(['id', 'company_name as name']);
+        $customers = client::where('deleted_at', '=', null)->pluck('company_name','id');
 
         //get warehouses assigned to user
 
 
-        $sales_types = SalesType::where('deleted_at', '=', null)->get(['id', 'name']);
+        $sales_types = SalesType::where('deleted_at', '=', null)->pluck('name','id');
 
-        Inertia::share('titlePage', 'Lista de Ordenes');
-        return Inertia::render('Sales/Index_Sale', [
+        return response()->json([
             'sales' => $data,
             'sales_types' => $sales_types,
             'customers' => $customers,

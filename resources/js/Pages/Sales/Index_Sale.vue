@@ -1,26 +1,25 @@
 <script setup>
-import { computed, ref } from "vue";
+import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
-import DeleteDialog from "@/Components/buttons/DeleteDialog.vue";
-import { router, usePage } from "@inertiajs/vue3";
-import helper from "@/helpers";
-import labels from "@/labels";
-import Filter_form from "@/Pages/Sales/filter_form.vue";
-import InvoiceDialog from "@/Components/InvoiceDialog.vue";
-import api from "@/api";
+import { router } from "@inertiajs/vue3";
+import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
+import Snackbar from "@/Components/snackbar.vue";
+import { api, globals, helpers, labels } from "@/helpers";
 
 const props = defineProps({
-    sales: Object,
-    sales_types: Object,
-    customers: Object,
-    warehouses: Object,
-    filter_form: Object,
+    // filter_form: Object,
     errors: Object,
 });
-const enableDays = computed(() => usePage().props.day);
+const sales = ref([]);
+const sales_types = ref([]);
+const customers = ref([]);
+const warehouses = ref([]);
+const enableDays = globals.oldDay();
 const search = ref("");
+const menu = ref(false);
 const loading = ref(false);
+const loadingInvoice = ref(false);
 const snackbar = ref({
     view: false,
     color: "",
@@ -90,6 +89,15 @@ const Sale_id = ref("");
 const sale = ref({});
 
 const form = ref(null);
+const form_filter = ref({
+    start_date: "",
+    end_date: "",
+    sale_ref: "",
+    client: "",
+    sale_type: "",
+    statut: "",
+    status_payment: "",
+});
 
 //------------------------------ Print -------------------------\\
 function print_it() {
@@ -154,12 +162,12 @@ async function Submit_Payment() {
 
 //-------------------------------- Invoice POS ------------------------------\\
 function Invoice_POS(id) {
-    loading.value = true;
     dialogInvoice.value = false;
-    snackbar.value.view = false;
-    axios
-        .get("/sales_print_invoice/" + id)
-        .then(({ data }) => {
+    api.get({
+        url: "/sales_print_invoice/" + id,
+        loadingItem: loadingInvoice,
+        snackbar,
+        onSuccess: (data) => {
             invoice_pos.value = data;
             // payments_pos.value = data.payments;
             // pos_settings.value = data.pos_settings;
@@ -167,11 +175,8 @@ function Invoice_POS(id) {
             // if (response.data.pos_settings.is_printable) {
             //   setTimeout(() => print_it(), 1000);
             // }
-        })
-        .catch(() => {})
-        .finally(() => {
-            loading.value = false;
-        });
+        },
+    });
 }
 
 //-----------------------------  Invoice PDF ------------------------------\\
@@ -297,12 +302,9 @@ function Create_Payment() {
         },
         loadingItem: loading,
         snackbar,
-        Success: () => {
+        onSuccess: () => {
             snackbar.value.text = "Transaccion realizada con exito";
-            router.reload({
-                preserveState: true,
-                preserveScroll: true,
-            });
+            loadData();
             dialogAddPayment.value = false;
         },
     });
@@ -327,12 +329,9 @@ function Update_Payment() {
         },
         loadingItem: loading,
         snackbar,
-        Success: () => {
+        onSuccess: () => {
             snackbar.value.text = "Transaccion realizada con exito";
-            router.reload({
-                preserveState: true,
-                preserveScroll: true,
-            });
+            loadData();
             dialogAddPayment.value = false;
             dialogShowPayment.value = false;
         },
@@ -359,12 +358,9 @@ function Delete_Payment(item) {
 function Remove_Payment() {
     api.delete({
         url: "/payment_sale/" + sale.value.id,
-        Success: () => {
+        onSuccess: () => {
             snackbar.value.text = "Borrado exitoso";
-            router.reload({
-                preserveState: true,
-                preserveScroll: true,
-            });
+            loadData();
             dialogDeletePayment.value = false;
             dialogShowPayment.value = false;
         },
@@ -425,29 +421,46 @@ function Remove_Sale(id, sale_has_return) {
         });
     }
 }
+
+function loadData() {
+    api.get({
+        url: "/sales/list",
+        params: {
+            filter: form_filter.value,
+        },
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
+            sales.value = data.sales;
+            sales_types.value = data.sales_types;
+            customers.value = data.customers;
+            warehouses.value = data.warehouses;
+            menu.value = false;
+        },
+    });
+}
+
+onMounted(() => {
+    loadData();
+});
 </script>
 
 <template>
-    <layout
-        :snackbar-view="snackbar.view"
-        :snackbar-text="snackbar.text"
-        :snackbar-color="snackbar.color"
-    >
+    <Layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <!-- Modal Remove Sale -->
         <delete-dialog
-            :model="dialogDelete"
+            v-model="dialogDelete"
             :on-save="Remove_Sale"
-            :on-close="onCloseDelete"
         ></delete-dialog>
         <!-- Modal Remove Payment -->
         <delete-dialog
-            :model="dialogDeletePayment"
+            v-model="dialogDeletePayment"
             :on-save="Remove_Payment"
-            :on-close="
-                () => {
-                    dialogDeletePayment = false;
-                }
-            "
         ></delete-dialog>
         <!-- Modal Show Payments-->
         <v-dialog v-model="dialogShowPayment" width="800">
@@ -456,7 +469,7 @@ function Remove_Sale(id, sale_has_return) {
                     <v-toolbar-title>Pagos realizados</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn
-                        icon="mdi-close"
+                        icon="fas fa-times"
                         size="small"
                         density="comfortable"
                         variant="tonal"
@@ -537,7 +550,7 @@ function Remove_Sale(id, sale_has_return) {
                                                         enableDays
                                                     )
                                                 "
-                                                icon="mdi-close"
+                                                icon="fas fa-times"
                                                 class="mx-1 rounded"
                                             >
                                             </v-btn>
@@ -679,32 +692,34 @@ function Remove_Sale(id, sale_has_return) {
             </v-card>
         </v-dialog>
         <!-- Modal Show Invoice POS-->
-        <invoice-dialog
-            :model="dialogInvoice"
-            :invoice_pos="invoice_pos"
-        ></invoice-dialog>
+        <!--        <invoice-dialog-->
+        <!--            :model="dialogInvoice"-->
+        <!--            :invoice_pos="invoice_pos"-->
+        <!--            :loading="loadingInvoice"-->
+        <!--        ></invoice-dialog>-->
 
         <v-row align="center" class="mb-3">
             <v-spacer></v-spacer>
             <v-col cols="auto" class="text-right">
-                <filter_form
-                    :filter_form="filter_form"
-                    :customers="customers"
-                    :sales_types="sales_types"
-                ></filter_form>
+                <!--                <filter_form-->
+                <!--                    :filter_form="filter_form"-->
+                <!--                    :customers="customers"-->
+                <!--                    :sales_types="sales_types"-->
+                <!--                ></filter_form>-->
                 <ExportBtn
                     :data="sales"
                     :fields="jsonFields"
                     name-file="Productos"
                 ></ExportBtn>
                 <v-btn
+                    v-if="globals.userPermision(['Sales_add'])"
                     color="primary"
                     class="ma-1"
                     variant="flat"
                     prepend-icon="fas fa-plus"
                     @click="router.visit('/sales/create')"
                 >
-                    Añadir
+                    {{ labels.add }}
                 </v-btn>
             </v-col>
         </v-row>
@@ -714,24 +729,23 @@ function Remove_Sale(id, sale_has_return) {
                 :items="sales"
                 :search="search"
                 hover
-                no-data-text="No existen datos a mostrar"
+                :no-data-text="labels.no_data_table"
                 :loading="loading"
-                loading-text="Cargando..."
             >
                 <template v-slot:item.statut="{ item }">
                     <v-chip
-                        :color="helper.statutSaleColor(item.statut)"
+                        :color="helpers.statutSaleColor(item.statut)"
                         variant="tonal"
                         size="x-small"
-                        >{{ helper.statutSale(item.statut) }}
+                        >{{ helpers.statutSale(item.statut) }}
                     </v-chip>
                 </template>
                 <template v-slot:item.payment_status="{ item }">
                     <v-chip
-                        :color="helper.statusPaymentColor(item.payment_status)"
+                        :color="helpers.statusPaymentColor(item.payment_status)"
                         variant="tonal"
                         size="x-small"
-                        >{{ helper.statusPayment(item.payment_status) }}
+                        >{{ helpers.statusPayment(item.payment_status) }}
                     </v-chip>
                 </template>
                 <template v-slot:item.Ref="{ item }">
@@ -740,7 +754,11 @@ function Remove_Sale(id, sale_has_return) {
                         size="x-small"
                         color="default"
                         :text="item.Ref"
-                        @click="router.visit('/sales/detail/' + item.id)"
+                        @click="
+                            globals.userPermision(['Sales_view'])
+                                ? router.visit('/sales/detail/' + item.id)
+                                : ''
+                        "
                     ></v-btn>
                 </template>
                 <template v-slot:item.actions="{ item }">
@@ -749,7 +767,7 @@ function Remove_Sale(id, sale_has_return) {
                             <v-btn
                                 v-bind="props"
                                 class="ma-1"
-                                icon="mdi-dots-vertical"
+                                icon="fas fa-ellipsis-v"
                                 color="primary"
                                 size="x-small"
                                 variant="elevated"
@@ -758,6 +776,7 @@ function Remove_Sale(id, sale_has_return) {
                         </template>
                         <v-list density="compact">
                             <v-list-item
+                                v-if="globals.userPermision(['Sales_view'])"
                                 @click="
                                     router.visit('/sales/detail/' + item.id)
                                 "
@@ -768,10 +787,11 @@ function Remove_Sale(id, sale_has_return) {
                                 </v-list-item-title>
                             </v-list-item>
                             <v-list-item
+                                v-if="globals.userPermision(['Sales_edit'])"
                                 @click="router.visit('/sales/edit/' + item.id)"
-                                prepend-icon="mdi-pen"
+                                prepend-icon="fas fa-pen"
                                 :disabled="
-                                    helper.maxEnableButtons(
+                                    helpers.maxEnableButtons(
                                         item.updated_at,
                                         enableDays
                                     )
@@ -782,18 +802,26 @@ function Remove_Sale(id, sale_has_return) {
                                 </v-list-item-title>
                             </v-list-item>
                             <v-list-item
+                                v-if="
+                                    globals.userPermision([
+                                        'payment_sales_view',
+                                    ])
+                                "
                                 @click="Show_Payments(item.id, item)"
-                                prepend-icon="mdi-basket"
+                                prepend-icon="fas fa-shopping-basket"
                             >
                                 <v-list-item-title>
                                     Ver Pagos
                                 </v-list-item-title>
                             </v-list-item>
-                            <!--                                  v-if="currentUserPermissions.includes('payment_sales_add')"-->
                             <v-list-item
+                                v-if="
+                                    globals.userPermision([
+                                        'payment_sales_add',
+                                    ]) && item.payment_status != 'paid'
+                                "
                                 @click="New_Payment(item)"
                                 prepend-icon="mdi-currency-usd"
-                                v-if="item.payment_status != 'paid'"
                             >
                                 <v-list-item-title>
                                     Añadir Pago
@@ -822,10 +850,11 @@ function Remove_Sale(id, sale_has_return) {
                             <!--                  {{$t('DownloadPdf')}}-->
                             <!--                </v-dropdown-item>-->
                             <v-list-item
+                                v-if="globals.userPermision(['Sales_delete'])"
                                 @click="Delete_Item(item)"
                                 prepend-icon="fas fa-trash"
                                 :disabled="
-                                    helper.maxEnableButtons(
+                                    helpers.maxEnableButtons(
                                         item.updated_at,
                                         enableDays
                                     )
@@ -840,7 +869,7 @@ function Remove_Sale(id, sale_has_return) {
                 </template>
             </v-data-table>
         </v-card>
-    </layout>
+    </Layout>
 </template>
 <style>
 .total {

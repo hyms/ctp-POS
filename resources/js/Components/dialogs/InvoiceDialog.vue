@@ -1,19 +1,24 @@
 <script setup>
-import {helpers,labels} from "@/helpers";
+import { helpers, labels } from "@/helpers";
 
 const props = defineProps({
     modelValue: Boolean,
     invoice_pos: Object,
+    loading: { type: Boolean, default: false },
 });
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(["update:modelValue"]);
 function updateValue(value) {
-    emit('update:modelValue', value)
+    emit("update:modelValue", value);
 }
 </script>
 <template>
     <!-- Modal Show Invoice POS-->
-    <v-dialog :model-value="modelValue" max-width="350" @update:modelValue="updateValue">
-        <v-card>
+    <v-dialog
+        :model-value="modelValue"
+        max-width="350"
+        @update:modelValue="updateValue"
+    >
+        <v-card :loading="loading">
             <v-card-text>
                 <div id="invoice-POS">
                     <div class="info">
@@ -65,9 +70,20 @@ function updateValue(value) {
                                     {{ detail_invoice.name }}
                                     <br />
                                     <span>
-                                    {{ helpers.formatNumber(detail_invoice.quantity,2) }}
+                                        {{
+                                            helpers.formatNumber(
+                                                detail_invoice.quantity,
+                                                2
+                                            )
+                                        }}
                                         {{ detail_invoice.unit_sale }} x
-                                        {{ helpers.formatNumber(detail_invoice.total / detail_invoice.quantity, 2) }}
+                                        {{
+                                            helpers.formatNumber(
+                                                detail_invoice.total /
+                                                    detail_invoice.quantity,
+                                                2
+                                            )
+                                        }}
                                     </span>
                                 </td>
                                 <td
@@ -76,7 +92,12 @@ function updateValue(value) {
                                         vertical-align: bottom;
                                     "
                                 >
-                                    {{helpers.formatNumber(detail_invoice.total,2)}}
+                                    {{
+                                        helpers.formatNumber(
+                                            detail_invoice.total,
+                                            2
+                                        )
+                                    }}
                                 </td>
                             </tr>
 
@@ -87,8 +108,18 @@ function updateValue(value) {
                                 <td colspan="3" class="total">Impuesto</td>
                                 <td style="text-align: right" class="total">
                                     {{ invoice_pos.symbol }}
-                                    {{helpers.formatNumber(invoice_pos.sale.taxe,2)}}
-                                    ({{helpers.formatNumber(invoice_pos.sale.tax_rate,2)}}%)
+                                    {{
+                                        helpers.formatNumber(
+                                            invoice_pos.sale.taxe,
+                                            2
+                                        )
+                                    }}
+                                    ({{
+                                        helpers.formatNumber(
+                                            invoice_pos.sale.tax_rate,
+                                            2
+                                        )
+                                    }}%)
                                 </td>
                             </tr>
 
@@ -99,7 +130,11 @@ function updateValue(value) {
                                 <td colspan="3" class="total">Descuento</td>
                                 <td style="text-align: right" class="total">
                                     {{ invoice_pos.symbol }}
-                                    {{ helpers.formatNumber(invoice_pos.sale.discount,2)
+                                    {{
+                                        helpers.formatNumber(
+                                            invoice_pos.sale.discount,
+                                            2
+                                        )
                                     }}
                                 </td>
                             </tr>
@@ -108,7 +143,12 @@ function updateValue(value) {
                                 <td colspan="3" class="total">Total</td>
                                 <td style="text-align: right" class="total">
                                     {{ invoice_pos.symbol }}
-                                    {{helpers.formatNumber(invoice_pos.sale.GrandTotal,2)}}
+                                    {{
+                                        helpers.formatNumber(
+                                            invoice_pos.sale.GrandTotal,
+                                            2
+                                        )
+                                    }}
                                 </td>
                             </tr>
 
@@ -121,7 +161,12 @@ function updateValue(value) {
                                 <td colspan="3" class="total">Pagado</td>
                                 <td style="text-align: right" class="total">
                                     {{ invoice_pos.symbol }}
-                                    {{helpers.formatNumber(invoice_pos.sale.paid_amount,2)}}
+                                    {{
+                                        helpers.formatNumber(
+                                            invoice_pos.sale.paid_amount,
+                                            2
+                                        )
+                                    }}
                                 </td>
                             </tr>
 
