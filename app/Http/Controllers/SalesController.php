@@ -40,14 +40,19 @@ class SalesController extends Controller
 
     public function getTable(request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'view', Sale::class);
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+        if (!helpers::checkPermission('Sales_view')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $filter = collect($request->get('filter'));
         $warehouses = helpers::getWarehouses(auth()->user());
         $Sales = Sale::with('facture', 'client', 'warehouse', 'user', 'userpos', 'sales_type')
             ->where('deleted_at', '=', null)
+            ->where(function ($query) {
+                if (helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })
             ->whereIn('warehouse_id', $warehouses->pluck('id'))
             ->orderBy('updated_at', 'desc');
         if ($filter->count() > 0) {
@@ -151,7 +156,9 @@ class SalesController extends Controller
     public function store(Request $request)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'create', Sale::class);
+        if (!helpers::checkPermission('Sales_add')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         request()->validate([
             'client_id' => 'required',
@@ -283,7 +290,9 @@ class SalesController extends Controller
 
     public function update(Request $request, $id)
     {
-//        $this->authorizeForUser($request->user('api'), 'update', Sale::class);
+        if (!helpers::checkPermission('Sales_edit')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         request()->validate([
             'warehouse_id' => 'required',
@@ -421,7 +430,9 @@ class SalesController extends Controller
 
     public function destroy(Request $request, $id)
     {
-//        $this->authorizeForUser($request->user('api'), 'delete', Sale::class);
+        if (!helpers::checkPermission('Sales_delete')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         DB::transaction(function () use ($id, $request) {
 //            $role = Auth::user()->roles()->first();
@@ -486,6 +497,11 @@ class SalesController extends Controller
 //        $view_records = Role::findOrFail($role->id)->inRole('record_view');
         $sale_data = Sale::with(['details.product.unitSale', 'client'])
             ->where('deleted_at', '=', null)
+            ->where(function ($query) {
+                if (helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })
             ->findOrFail($id);
 
         $details = collect();
@@ -599,6 +615,11 @@ class SalesController extends Controller
 
         $sale = Sale::with(['details.product.unitSale', 'warehouse', 'client'])
             ->where('deleted_at', '=', null)
+            ->where(function ($query) {
+                if (helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })
             ->findOrFail($id);
 
         $item['id'] = $sale->id;
@@ -688,11 +709,11 @@ class SalesController extends Controller
 
         $payments = PaymentSale::with('sale')
             ->where('sale_id', $id)
-//            ->where(function ($query) use ($view_records) {
-//                if (!$view_records) {
-//                    return $query->where('user_id', '=', Auth::user()->id);
-//                }
-//            })
+            ->where(function ($query) {
+                if (helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })
             ->orderBy('id', 'DESC')->get();
 
         $due = $Sale->GrandTotal - $Sale->paid_amount;
@@ -841,13 +862,13 @@ class SalesController extends Controller
 //            $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $Sale_data = Sale::with('details.product.unitSale')
                 ->where('deleted_at', '=', null)
+                ->where(function ($query) {
+                    if (helpers::checkPermission('record_view')) {
+                        return $query->where('user_id', '=', Auth::user()->id);
+                    }
+                })
                 ->findOrFail($id);
             $details = collect();
-            // Check If User Has Permission view All Records
-//            if (!$view_records) {
-//                // Check If User->id === sale->id
-//                $this->authorizeForUser($request->user('api'), 'check_record', $Sale_data);
-//            }
 
             $sale['client_id'] = '';
             if ($Sale_data->client_id) {

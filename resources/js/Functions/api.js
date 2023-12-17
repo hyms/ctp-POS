@@ -25,6 +25,10 @@ const global = (
     if (snackbar === undefined) {
         snackbar = snackbarDefault;
     }
+    snackbar.value.view = false;
+    snackbar.value.text = "";
+    snackbar.value.color = "";
+
     axios({
         method,
         url,

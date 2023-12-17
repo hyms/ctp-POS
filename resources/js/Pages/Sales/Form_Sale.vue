@@ -2,7 +2,8 @@
 import { onMounted, ref, watch } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router } from "@inertiajs/vue3";
-import helper from "@/helpers";
+import { api, globals, helpers, rules } from "@/helpers";
+import Snackbar from "@/Components/snackbar.vue";
 import SelectClient from "@/Components/select_client.vue";
 
 const props = defineProps({
@@ -13,14 +14,17 @@ const props = defineProps({
     details: { type: Object, default: null },
     errors: Object,
 });
-
+const currency = globals.currency();
 const editmode = ref(false);
 const form = ref(null);
 const loading = ref(false);
 const loadingFilter = ref(false);
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("info");
+const loadingProduct = ref(false);
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
 const search_input = ref("");
 
 const client = ref({});
@@ -92,8 +96,8 @@ const product = ref({
 function Selected_PaymentStatus(value) {
     if (value == "paid") {
         let payment_amount = GrandTotal.value.toFixed(2);
-        payment.value.amount = helper.formatNumber(payment_amount, 2);
-        payment.value.received_amount = helper.formatNumber(payment_amount, 2);
+        payment.value.amount = helpers.formatNumber(payment_amount, 2);
+        payment.value.received_amount = helpers.formatNumber(payment_amount, 2);
     } else {
         payment.value.amount = 0;
         payment.value.received_amount = 0;
@@ -103,16 +107,16 @@ function Selected_PaymentStatus(value) {
 //---------- keyup paid Amount
 
 function Verified_paidAmount() {
-    snackbar.value = false;
+    snackbar.value.view = false;
     if (isNaN(payment.value.amount)) {
         payment.value.amount = 0;
     } else if (payment.value.amount > payment.value.received_amount) {
-        snackbar.value = true;
+        snackbar.value.view = true;
         snackbar.value.text = "Pago es mayor al monto recibido";
         snackbar.value.color = "warning";
         payment.value.amount = 0;
     } else if (payment.value.amount > GrandTotal.value) {
-        snackbar.value = true;
+        snackbar.value.view = true;
         snackbar.value.text = "Pago es mayor al monto total";
         snackbar.value.color = "warning";
         payment.value.amount = 0;
@@ -129,10 +133,10 @@ function Verified_Received_Amount() {
 
 //--- Submit Validate Create Sale
 async function Submit_Sale() {
-    snackbar.value = false;
+    snackbar.value.view = false;
     const validate = await form.value.validate();
     if (!validate.valid) {
-        snackbar.value = true;
+        snackbar.value.view = true;
         snackbar.value.text = "llene el formulario correctamente";
         snackbar.value.color = "error";
     } else {
@@ -146,9 +150,14 @@ async function Submit_Sale() {
 
 //---------------------- get_units ------------------------------\\
 function get_units(value) {
-    axios
-        .get("/get_units?id=" + value)
-        .then(({ data }) => (units.value = data));
+    api.get({
+        url: "/get_units?id=" + value,
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
+            units.value = data;
+        },
+    });
 }
 
 //------ Show Modal Update Detail Product
@@ -172,7 +181,6 @@ function Modal_Updat_Detail(item) {
 //------ Submit Update Detail Product
 
 function Update_Detail() {
-    loading.value = true;
     for (let i = 0; i < details.value.length; i++) {
         if (details.value[i].detail_id === detail.value.detail_id) {
             // this.convert_unit();
@@ -246,7 +254,6 @@ function Update_Detail() {
         }
     }
     Calcul_Total();
-
     //form_Update_Detail
 }
 
@@ -255,7 +262,6 @@ function Update_Detail() {
 function getResultValue(val) {
     search_input.value = val;
     loadingFilter.value = true;
-
     if (
         saleForm.value.warehouse_id !== "" &&
         saleForm.value.warehouse_id != null
@@ -276,13 +282,13 @@ function getResultValue(val) {
 //------------------------- Submit Search Product//
 
 function SearchProduct(result) {
-    snackbar.value = false;
+    snackbar.value.view = false;
     product.value = {};
     if (
         detailsForm.value.length > 0 &&
         detailsForm.value.some((detail) => detail.code === result.code)
     ) {
-        snackbar.value = true;
+        snackbar.value.view = true;
         snackbar.value.text = "Ya esta añadido";
         snackbar.value.color = "warning";
     } else {
@@ -311,12 +317,14 @@ function Selected_Warehouse(value) {
 
 function Get_Products_By_Warehouse(id) {
     products.value = [];
-    axios
-        .get("/get_Products_by_warehouse/" + id + "?stock=" + 0)
-        .then((response) => {
-            products.value = response.data;
-        })
-        .catch((error) => {});
+    api.get({
+        url: "/get_Products_by_warehouse/" + id + "?stock=" + 0,
+        loadingItem: loadingFilter,
+        snackbar,
+        onSuccess: (data) => {
+            products.value = data;
+        },
+    });
 }
 
 //----------------------------------------- Add Product to order list -------------------------\\
@@ -338,7 +346,7 @@ function Verified_Qty(detail, id) {
                 detailsForm.value[i].quantity = detail.stock;
             }
             if (detail.quantity > detail.stock) {
-                snackbar.value = true;
+                snackbar.value.view = true;
                 snackbar.value.text = "bajo stock";
                 snackbar.value.color = "warning";
                 detailsForm.value[i].quantity = detail.stock;
@@ -356,11 +364,11 @@ function increment(detail, id) {
     for (let i = 0; i < detailsForm.value.length; i++) {
         if (detailsForm.value[i].detail_id == id) {
             if (detail.quantity + 1 > detail.stock) {
-                snackbar.value = true;
+                snackbar.value.view = true;
                 snackbar.value.text = "bajo stock";
                 snackbar.value.color = "warning";
             } else {
-                helper.formatNumber(detailsForm.value[i].quantity++, 2);
+                helpers.formatNumber(detailsForm.value[i].quantity++, 2);
             }
         }
     }
@@ -374,11 +382,11 @@ function decrement(detail, id) {
         if (detailsForm.value[i].detail_id == id) {
             if (detail.quantity - 1 > 0) {
                 if (detail.quantity - 1 > detail.stock) {
-                    snackbar.value = true;
+                    snackbar.value.view = true;
                     snackbar.value.text = "bajo stock";
                     snackbar.value.color = "warning";
                 } else {
-                    helper.formatNumber(detailsForm.value[i].quantity--, 2);
+                    helpers.formatNumber(detailsForm.value[i].quantity--, 2);
                 }
             }
         }
@@ -405,8 +413,8 @@ function Calcul_Total() {
     GrandTotal.value = parseFloat(grand_total);
 
     // if (payment.value.status == "paid") {
-    // payment.value.received_amount = helper.formatNumber(GrandTotal.value, 2);
-    payment.value.amount = helper.formatNumber(GrandTotal.value, 2);
+    // payment.value.received_amount = helpers.formatNumber(GrandTotal.value, 2);
+    payment.value.amount = helpers.formatNumber(GrandTotal.value, 2);
     // }
 }
 
@@ -423,7 +431,7 @@ function delete_Product_Detail(id) {
 //-----------------------------------verified Order List ------------------------------\\
 function verifiedForm() {
     if (detailsForm.value.length <= 0) {
-        snackbar.value = true;
+        snackbar.value.view = true;
         snackbar.value.text = "debes añadir un producto";
         snackbar.value.color = "warning";
         return false;
@@ -439,7 +447,7 @@ function verifiedForm() {
         }
 
         if (count > 0) {
-            snackbar.value = true;
+            snackbar.value.view = true;
             snackbar.value.text = "Debes añadir cantidades";
             snackbar.value.color = "warning";
             return false;
@@ -452,10 +460,9 @@ function verifiedForm() {
 //--------------------------------- Create Sale -------------------------\\
 function Create_Sale() {
     if (verifiedForm()) {
-        loading.value = true;
-        snackbar.value = false;
-        axios
-            .post("/sales", {
+        api.post({
+            url: "/sales",
+            params: {
                 sales_type: saleForm.value.sales_type_id,
                 date: saleForm.value.date,
                 client_id: saleForm.value.client_id,
@@ -478,33 +485,27 @@ function Create_Sale() {
                     "0"
                     // GrandTotal.value - payment.value.amount
                 ).toFixed(2),
-            })
-            .then((response) => {
-                snackbar.value = true;
+            },
+            loadingItem: loading,
+            snackbar,
+            onSuccess: () => {
                 snackbar.value.text = "compra exitosa";
-                snackbar.value.color = "success";
                 router.visit("/sales");
-            })
-            .catch((error) => {
-                console.log(error);
-                snackbar.value = true;
+            },
+            onError: () => {
                 snackbar.value.text = "No se pudo procesar el pago";
-                snackbar.value.color = "error";
-            })
-            .finally(() => {
-                loading.value = false;
-            });
+            },
+        });
     }
 }
 
 //--------------------------------- Update Sale -------------------------\\
 function Update_Sale() {
     if (verifiedForm()) {
-        loading.value = true;
-        snackbar.value = false;
         let id = props.sale.id;
-        axios
-            .put(`/sales/${id}`, {
+        api.put({
+            url: `/sales/${id}`,
+            params: {
                 sales_type: saleForm.value.sales_type_id,
                 date: saleForm.value.date,
                 client_id: saleForm.value.client_id,
@@ -517,29 +518,17 @@ function Update_Sale() {
                 discount: saleForm.value.discount ? saleForm.value.discount : 0,
                 shipping: saleForm.value.shipping ? saleForm.value.shipping : 0,
                 details: detailsForm.value,
-            })
-            .then((response) => {
-                snackbar.value = true;
+            },
+            loadingItem: loading,
+            snackbar,
+            onSuccess: () => {
                 snackbar.value.text = "compra exitosa";
-                snackbar.value.color = "success";
-                router.visit("/sales", {
-                    onStart: () => {
-                        loading.value = true;
-                    },
-                    onFinish: () => {
-                        loading.value = false;
-                    },
-                });
-            })
-            .catch((error) => {
-                console.log(error);
-                snackbar.value = true;
+                router.visit("/sales");
+            },
+            onError: () => {
                 snackbar.value.text = "No se pudo procesar el pago";
-                snackbar.value.color = "error";
-            })
-            .finally(() => {
-                loading.value = false;
-            });
+            },
+        });
     }
 }
 
@@ -553,22 +542,28 @@ function Last_Detail_id() {
 //---------------------------------Get Product Details ------------------------\\
 
 function Get_Product_Details(product_id) {
-    axios.get("/product/" + product_id).then((response) => {
-        product.value.discount = 0;
-        product.value.DiscountNet = 0;
-        product.value.discount_Method = "2";
-        product.value.product_id = response.data.id;
-        product.value.name = response.data.name;
-        product.value.Net_price = response.data.Net_price;
-        product.value.Unit_price = response.data.Unit_price;
-        product.value.tax_method = response.data.tax_method;
-        product.value.tax_percent = response.data.tax_percent;
-        product.value.unitSale = response.data.unitSale;
-        product.value.fix_price = response.data.fix_price;
-        product.value.sale_unit_id = response.data.sale_unit_id;
-        product.value.imei_number = "";
-        add_product();
-        Calcul_Total();
+    snackbar.value.text = "";
+    api.get({
+        url: "/products/item/" + product_id,
+        snackbar,
+        loadingItem: loadingProduct,
+        onSuccess: (data) => {
+            product.value.discount = 0;
+            product.value.DiscountNet = 0;
+            product.value.discount_Method = "2";
+            product.value.product_id = data.id;
+            product.value.name = data.name;
+            product.value.Net_price = data.Net_price;
+            product.value.Unit_price = data.Unit_price;
+            product.value.tax_method = data.tax_method;
+            product.value.tax_percent = data.tax_percent;
+            product.value.unitSale = data.unitSale;
+            product.value.fix_price = data.fix_price;
+            product.value.sale_unit_id = data.sale_unit_id;
+            product.value.imei_number = "";
+            add_product();
+            Calcul_Total();
+        },
     });
 }
 
@@ -662,13 +657,14 @@ onMounted(() => {
 });
 </script>
 <template>
-    <layout
-        :snackbar-view="snackbar"
-        :snackbar-text="snackbarText"
-        :snackbar-color="snackbarColor"
-    >
-        <v-form ref="form">
-            <v-card>
+    <Layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
+        <v-form ref="form" :disabled="loading">
+            <v-card :loading="loading">
                 <v-toolbar height="15"></v-toolbar>
                 <v-card-text>
                     <v-row>
@@ -679,7 +675,7 @@ onMounted(() => {
                                 :label="saleLabel.date"
                                 hide-details="auto"
                                 type="date"
-                                :rules="helper.required"
+                                :rules="rules.required"
                             >
                             </v-text-field>
                         </v-col>
@@ -700,7 +696,7 @@ onMounted(() => {
                                 :label="saleLabel.warehouse_id"
                                 hide-details="auto"
                                 clearable
-                                :rules="helper.required"
+                                :rules="rules.required"
                                 :disabled="detailsForm.length > 0"
                             ></v-select>
                         </v-col>
@@ -727,156 +723,171 @@ onMounted(() => {
                         <!-- products  -->
                         <v-col cols="12">
                             <p class="text-h6">Productos *</p>
-                            <v-table hover class="border rounded">
-                                <thead>
-                                    <tr class="bg-secondary">
-                                        <th class="text-white text-center">
-                                            #
-                                        </th>
-                                        <th class="text-white text-center">
-                                            Producto
-                                        </th>
-                                        <th class="text-white text-center">
-                                            Precio x Unidad
-                                        </th>
-                                        <th class="text-white text-center">
-                                            En Stock
-                                        </th>
-                                        <th class="text-white text-center">
-                                            Cantidad
-                                        </th>
-                                        <th class="text-white text-center">
-                                            Descuento
-                                        </th>
-                                        <th class="text-white text-center">
-                                            Sub Total
-                                        </th>
-                                        <th class="text-white text-center"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-if="detailsForm.length <= 0">
-                                        <td colspan="8">
-                                            No hay datos disponibles
-                                        </td>
-                                    </tr>
-                                    <tr v-for="detail in detailsForm">
-                                        <td>
-                                            {{ detail.detail_id }}
-                                        </td>
-                                        <td>
-                                            <v-chip color="primary" size="small"
-                                                >{{ detail.code }}
-                                            </v-chip>
+                            <v-card :loading="loadingProduct" color="primary">
+                                <v-table hover>
+                                    <thead>
+                                        <tr class="bg-secondary">
+                                            <th class="text-white text-center">
+                                                #
+                                            </th>
+                                            <th class="text-white text-center">
+                                                Producto
+                                            </th>
+                                            <th class="text-white text-center">
+                                                Precio x Unidad
+                                            </th>
+                                            <th class="text-white text-center">
+                                                En Stock
+                                            </th>
+                                            <th class="text-white text-center">
+                                                Cantidad
+                                            </th>
+                                            <th class="text-white text-center">
+                                                Descuento
+                                            </th>
+                                            <th class="text-white text-center">
+                                                Sub Total
+                                            </th>
+                                            <th
+                                                class="text-white text-center"
+                                            ></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-if="detailsForm.length <= 0">
+                                            <td colspan="8">
+                                                No hay datos disponibles
+                                            </td>
+                                        </tr>
+                                        <tr v-for="detail in detailsForm">
+                                            <td>
+                                                {{ detail.detail_id }}
+                                            </td>
+                                            <td>
+                                                <v-chip
+                                                    color="primary"
+                                                    size="small"
+                                                    >{{ detail.code }}
+                                                </v-chip>
 
-                                            {{ detail.name }}
-                                        </td>
-                                        <td>
-                                            <v-text-field
-                                                class="my-1"
-                                                hide-details="auto"
-                                                :rules="helper.number"
-                                                v-model="detail.Net_price"
-                                                @keyup="Calcul_Total"
-                                            >
-                                                <template v-slot:prepend>
-                                                    Bs
-                                                </template>
-                                            </v-text-field>
-                                        </td>
-                                        <td>
-                                            <v-chip color="default" size="small"
-                                                >{{ detail.stock }}
-                                                {{ detail.unitSale }}
-                                            </v-chip>
-                                        </td>
-                                        <td>
-                                            <div class="quantity">
+                                                {{ detail.name }}
+                                            </td>
+                                            <td>
                                                 <v-text-field
+                                                    class="my-1"
                                                     hide-details="auto"
-                                                    :rules="helper.number"
-                                                    v-model="detail.quantity"
-                                                    @keyup="
-                                                        Verified_Qty(
-                                                            detail,
+                                                    :rules="rules.number"
+                                                    v-model="detail.Net_price"
+                                                    @keyup="Calcul_Total"
+                                                >
+                                                    <template v-slot:prepend>
+                                                        {{ currency }}
+                                                    </template>
+                                                </v-text-field>
+                                            </td>
+                                            <td>
+                                                <v-chip
+                                                    color="default"
+                                                    size="small"
+                                                    >{{ detail.stock }}
+                                                    {{ detail.unitSale }}
+                                                </v-chip>
+                                            </td>
+                                            <td>
+                                                <div class="quantity">
+                                                    <v-text-field
+                                                        class="my-1"
+                                                        hide-details="auto"
+                                                        :rules="rules.number"
+                                                        v-model="
+                                                            detail.quantity
+                                                        "
+                                                        @keyup="
+                                                            Verified_Qty(
+                                                                detail,
+                                                                detail.detail_id
+                                                            )
+                                                        "
+                                                        :min="0.0"
+                                                        :max="detail.current"
+                                                    >
+                                                        <template v-slot:append>
+                                                            <v-icon
+                                                                color="secundary"
+                                                                @click="
+                                                                    increment(
+                                                                        detail,
+                                                                        detail.detail_id
+                                                                    )
+                                                                "
+                                                            >
+                                                                fas
+                                                                fa-plus-square
+                                                            </v-icon>
+                                                        </template>
+                                                        <template
+                                                            v-slot:prepend
+                                                        >
+                                                            <v-icon
+                                                                color="secundary"
+                                                                @click="
+                                                                    decrement(
+                                                                        detail,
+                                                                        detail.detail_id
+                                                                    )
+                                                                "
+                                                            >
+                                                                fas
+                                                                fa-minus-square
+                                                            </v-icon>
+                                                        </template>
+                                                    </v-text-field>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {{ currency }}
+                                                {{
+                                                    helpers.formatNumber(
+                                                        detail.DiscountNet *
+                                                            detail.quantity,
+                                                        2
+                                                    )
+                                                }}
+                                            </td>
+                                            <td>
+                                                {{ currency }}
+                                                {{ detail.subtotal.toFixed(2) }}
+                                            </td>
+                                            <td>
+                                                <!--                    <v-btn-->
+                                                <!--                        class="ma-1 rounded"-->
+                                                <!--                        color="success"-->
+                                                <!--                        icon="mdi-pen"-->
+                                                <!--                        size="small"-->
+                                                <!--                        density="comfortable"-->
+                                                <!--                        variant="elevated"-->
+                                                <!--                        @click="Modal_Updat_Detail(detail)"-->
+                                                <!--                    >-->
+                                                <!--                    </v-btn>-->
+                                                <v-btn
+                                                    class="ma-1 rounded"
+                                                    color="error"
+                                                    icon="fas fa-trash"
+                                                    size="small"
+                                                    density="comfortable"
+                                                    variant="elevated"
+                                                    @click="
+                                                        delete_Product_Detail(
                                                             detail.detail_id
                                                         )
                                                     "
-                                                    :min="0.0"
-                                                    :max="detail.current"
                                                 >
-                                                    <template v-slot:append>
-                                                        <v-icon
-                                                            color="secundary"
-                                                            @click="
-                                                                increment(
-                                                                    detail,
-                                                                    detail.detail_id
-                                                                )
-                                                            "
-                                                        >
-                                                            mdi-plus-box
-                                                        </v-icon>
-                                                    </template>
-                                                    <template v-slot:prepend>
-                                                        <v-icon
-                                                            color="secundary"
-                                                            @click="
-                                                                decrement(
-                                                                    detail,
-                                                                    detail.detail_id
-                                                                )
-                                                            "
-                                                        >
-                                                            mdi-minus-box
-                                                        </v-icon>
-                                                    </template>
-                                                </v-text-field>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            Bs
-                                            {{
-                                                helper.formatNumber(
-                                                    detail.DiscountNet *
-                                                        detail.quantity,
-                                                    2
-                                                )
-                                            }}
-                                        </td>
-                                        <td>
-                                            Bs
-                                            {{ detail.subtotal.toFixed(2) }}
-                                        </td>
-                                        <td>
-                                            <!--                    <v-btn-->
-                                            <!--                        class="ma-1 rounded"-->
-                                            <!--                        color="success"-->
-                                            <!--                        icon="mdi-pen"-->
-                                            <!--                        size="small"-->
-                                            <!--                        density="comfortable"-->
-                                            <!--                        variant="elevated"-->
-                                            <!--                        @click="Modal_Updat_Detail(detail)"-->
-                                            <!--                    >-->
-                                            <!--                    </v-btn>-->
-                                            <v-btn
-                                                class="ma-1 rounded"
-                                                color="error"
-                                                icon="fas fa-trash"
-                                                size="small"
-                                                density="comfortable"
-                                                variant="elevated"
-                                                @click="
-                                                    delete_Product_Detail(
-                                                        detail.detail_id
-                                                    )
-                                                "
-                                            >
-                                            </v-btn>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </v-table>
+                                                </v-btn>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </v-table>
+                            </v-card>
                         </v-col>
                         <v-col
                             cols="12"
@@ -904,7 +915,8 @@ onMounted(() => {
                                     <tr>
                                         <td class="font-weight-bold">Total</td>
                                         <td class="font-weight-bold">
-                                            Bs {{ GrandTotal.toFixed(2) }}
+                                            {{ currency }}
+                                            {{ GrandTotal.toFixed(2) }}
                                         </td>
                                     </tr>
                                 </tbody>
@@ -917,7 +929,7 @@ onMounted(() => {
                             <v-text-field
                                 :label="saleLabel.discount"
                                 hide-details="auto"
-                                :rules="helper.number"
+                                :rules="rules.number"
                                 v-model="saleForm.discount"
                                 @keyup="keyup_Discount()"
                             ></v-text-field>
@@ -929,7 +941,7 @@ onMounted(() => {
                                 hide-details="auto"
                                 type="text"
                                 label="A pagar"
-                                :rules="helper.numberWithDecimal"
+                                :rules="rules.numberWithDecimal"
                                 @keyup="change_payment_status()"
                             ></v-text-field>
                         </v-col>
@@ -941,7 +953,7 @@ onMounted(() => {
                         <!--                  type="text"-->
                         <!--                  label="Monto Recibido"-->
                         <!--                  readonly-->
-                        <!--                  :rules="helper.numberWithDecimal"-->
+                        <!--                  :rules="rules.numberWithDecimal"-->
                         <!--                  @keyup="change_payment_status()"-->
                         <!--              ></v-text-field>-->
                         <!--            </v-col>-->
@@ -953,7 +965,7 @@ onMounted(() => {
                                 variant="outlined"
                                 clearable
                                 hide-details="auto"
-                                :items="helper.statutSale()"
+                                :items="helpers.statutSale()"
                                 :label="saleLabel.statut"
                             ></v-select>
                         </v-col>
@@ -966,7 +978,7 @@ onMounted(() => {
                                 hide-details="auto"
                                 :items="sales_types"
                                 :label="saleLabel.sales_type_id + ' *'"
-                                :rules="helper.required"
+                                :rules="rules.required"
                             ></v-select>
                         </v-col>
 
@@ -976,7 +988,7 @@ onMounted(() => {
                                 v-model="payment.Reglement"
                                 variant="outlined"
                                 hide-details="auto"
-                                :items="helper.reglamentPayment()"
+                                :items="helpers.reglamentPayment()"
                                 label="Tipo de Pago"
                             ></v-select>
                         </v-col>
@@ -1013,5 +1025,5 @@ onMounted(() => {
                 </v-card-text>
             </v-card>
         </v-form>
-    </layout>
+    </Layout>
 </template>

@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from "vue";
-import {helpers,labels,labelsNew,api} from "@/helpers";
+import { api, helpers, labels, labelsNew } from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
@@ -64,7 +64,7 @@ function Create_Client() {
         },
         loadingItem: loading,
         snackbar: snackbar,
-        Success: () => {
+        onSuccess: () => {
             snackbar.value.text = labels.success_message;
             Get_Client_Without_Paginate();
             dialogCustomer.value = false;
@@ -98,7 +98,7 @@ function Get_Client_Without_Paginate() {
     api.get({
         url: "/get_clients_without_paginate",
         loadingItem: loading,
-        Success: (data) => {
+        onSuccess: (data) => {
             clients.value = data;
         },
     });
@@ -118,7 +118,7 @@ onMounted(() => {
     <v-dialog v-model="dialogCustomer" width="800" v-if="props.enableForm">
         <v-card>
             <v-toolbar>
-                <v-toolbar-title>{{labelsNew.AddCustomer}}</v-toolbar-title>
+                <v-toolbar-title>{{ labelsNew.AddCustomer }}</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn
                     icon="mdi-close"

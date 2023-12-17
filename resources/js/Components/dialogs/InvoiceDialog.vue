@@ -241,9 +241,9 @@ function updateValue(value) {
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
-                    prepend-icon="mdi-printer"
+                    prepend-icon="fas fa-file-pdf"
                     @click="
-                        helper.print_pdf('invoice-POS', invoice_pos.sale.ref)
+                        helpers.print_pdf('invoice-POS', invoice_pos.sale.ref)
                     "
                     color="primary"
                     variant="outlined"
@@ -251,8 +251,8 @@ function updateValue(value) {
                     {{ labels.print }} PDF
                 </v-btn>
                 <v-btn
-                    prepend-icon="mdi-printer"
-                    @click="helper.print_pos('invoice-POS')"
+                    prepend-icon="fas fa-print"
+                    @click="helpers.print_pos('invoice-POS')"
                     color="primary"
                     variant="outlined"
                 >

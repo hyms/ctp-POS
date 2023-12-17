@@ -5,7 +5,8 @@ import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import { router } from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
 import Snackbar from "@/Components/snackbar.vue";
-import { api, globals, helpers, labels } from "@/helpers";
+import { api, globals, helpers, labels, rules } from "@/helpers";
+import InvoiceDialog from "@/Components/dialogs/InvoiceDialog.vue";
 
 const props = defineProps({
     // filter_form: Object,
@@ -54,7 +55,15 @@ const jsonFields = ref({
     Deuda: "due",
     "Estado Pago": "payment_status",
 });
-
+const formFilterLabel = ref({
+    start_date: "Fecha desde",
+    end_date: "Fecha hasta",
+    sale_ref: "Codigo Orden",
+    client: "Cliente",
+    sale_type: "Tipo de orden",
+    statut: "Estado",
+    status_payment: "Estado de pago",
+});
 const pos_settings = ref({});
 const EditPaymentMode = ref(false);
 const shipment = ref({});
@@ -358,6 +367,7 @@ function Delete_Payment(item) {
 function Remove_Payment() {
     api.delete({
         url: "/payment_sale/" + sale.value.id,
+        loadingItem: loading,
         onSuccess: () => {
             snackbar.value.text = "Borrado exitoso";
             loadData();
@@ -410,12 +420,9 @@ function Remove_Sale(id, sale_has_return) {
             url: "/sales/" + id,
             loadingItem: loading,
             snackbar,
-            Success: () => {
+            onSuccess: () => {
                 snackbar.value.text = "Borrado exitoso";
-                router.reload({
-                    preserveState: true,
-                    preserveScroll: true,
-                });
+                loadData();
                 dialogDelete.value = false;
             },
         });
@@ -499,7 +506,7 @@ onMounted(() => {
                                         <td>
                                             Bs
                                             {{
-                                                helper.formatNumber(
+                                                helpers.formatNumber(
                                                     payment.montant,
                                                     2
                                                 )
@@ -507,7 +514,7 @@ onMounted(() => {
                                         </td>
                                         <td>
                                             {{
-                                                helper.getReglamentPayment(
+                                                helpers.getReglamentPayment(
                                                     payment.Reglement
                                                 )[0].title
                                             }}
@@ -529,7 +536,7 @@ onMounted(() => {
                                                 color="success"
                                                 @click="Edit_Payment(payment)"
                                                 :disabled="
-                                                    helper.maxEnableButtons(
+                                                    helpers.maxEnableButtons(
                                                         payment.updated_at,
                                                         enableDays
                                                     )
@@ -545,7 +552,7 @@ onMounted(() => {
                                                 color="error"
                                                 @click="Delete_Payment(payment)"
                                                 :disabled="
-                                                    helper.maxEnableButtons(
+                                                    helpers.maxEnableButtons(
                                                         payment.updated_at,
                                                         enableDays
                                                     )
@@ -578,7 +585,7 @@ onMounted(() => {
                                     :label="labels.payment.date + ' *'"
                                     v-model="payment.date"
                                     :placeholder="labels.payment.date"
-                                    :rules="helper.required"
+                                    :rules="rules.required"
                                     hide-details="auto"
                                 >
                                 </v-text-field>
@@ -600,8 +607,8 @@ onMounted(() => {
                             <v-col md="4" sm="6" cols="12">
                                 <v-select
                                     v-model="payment.Reglement"
-                                    :items="helper.reglamentPayment()"
-                                    :rules="helper.required"
+                                    :items="helpers.reglamentPayment()"
+                                    :rules="rules.required"
                                     :label="labels.payment.role"
                                     item-title="title"
                                     item-value="value"
@@ -628,8 +635,8 @@ onMounted(() => {
                                     v-model="payment.montant"
                                     :placeholder="labels.payment.montant"
                                     :rules="
-                                        helper.required.concat(
-                                            helper.numberWithDecimal
+                                        rules.required.concat(
+                                            rules.numberWithDecimal
                                         )
                                     "
                                     hide-details="auto"
@@ -692,20 +699,146 @@ onMounted(() => {
             </v-card>
         </v-dialog>
         <!-- Modal Show Invoice POS-->
-        <!--        <invoice-dialog-->
-        <!--            :model="dialogInvoice"-->
-        <!--            :invoice_pos="invoice_pos"-->
-        <!--            :loading="loadingInvoice"-->
-        <!--        ></invoice-dialog>-->
+        <invoice-dialog
+            v-model="dialogInvoice"
+            :invoice_pos="invoice_pos"
+            :loading="loadingInvoice"
+        ></invoice-dialog>
 
         <v-row align="center" class="mb-3">
             <v-spacer></v-spacer>
             <v-col cols="auto" class="text-right">
-                <!--                <filter_form-->
-                <!--                    :filter_form="filter_form"-->
-                <!--                    :customers="customers"-->
-                <!--                    :sales_types="sales_types"-->
-                <!--                ></filter_form>-->
+                <v-menu
+                    v-model="menu"
+                    :close-on-content-click="false"
+                    location="bottom"
+                >
+                    <template v-slot:activator="{ props }">
+                        <v-btn
+                            color="primary"
+                            variant="outlined"
+                            size="small"
+                            elevation="1"
+                            class="mr-2 my-1"
+                            v-bind="props"
+                            append-icon="fas fa-search"
+                        >
+                            Filtros
+                        </v-btn>
+                    </template>
+
+                    <v-card max-width="500">
+                        <v-form @submit.prevent="loadData()">
+                            <v-card-text>
+                                <v-row>
+                                    <v-col cols="12" sm="6">
+                                        <v-text-field
+                                            v-model="form_filter.start_date"
+                                            variant="outlined"
+                                            clearable
+                                            hide-details="auto"
+                                            type="date"
+                                            :label="formFilterLabel.start_date"
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12" sm="6">
+                                        <v-text-field
+                                            v-model="form_filter.end_date"
+                                            variant="outlined"
+                                            clearable
+                                            hide-details="auto"
+                                            type="date"
+                                            :label="formFilterLabel.end_date"
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12" sm="6">
+                                        <v-text-field
+                                            v-model="form_filter.sale_ref"
+                                            variant="outlined"
+                                            clearable
+                                            hide-details="auto"
+                                            type="text"
+                                            :label="formFilterLabel.sale_ref"
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12" sm="6">
+                                        <v-autocomplete
+                                            v-model="form_filter.client"
+                                            variant="outlined"
+                                            clearable
+                                            hide-details="auto"
+                                            :items="
+                                                helpers.toArraySelect(customers)
+                                            "
+                                            :label="formFilterLabel.client"
+                                            :loading="loading"
+                                        ></v-autocomplete>
+                                    </v-col>
+                                    <v-col cols="12" sm="6">
+                                        <v-select
+                                            v-model="form_filter.sale_type"
+                                            variant="outlined"
+                                            clearable
+                                            hide-details="auto"
+                                            :items="
+                                                helpers.toArraySelect(
+                                                    sales_types
+                                                )
+                                            "
+                                            :label="formFilterLabel.sale_type"
+                                            :loading="loading"
+                                        ></v-select>
+                                    </v-col>
+                                    <v-col cols="12" sm="6">
+                                        <v-select
+                                            v-model="form_filter.statut"
+                                            variant="outlined"
+                                            clearable
+                                            hide-details="auto"
+                                            :items="helpers.statutSale()"
+                                            :label="formFilterLabel.statut"
+                                        ></v-select>
+                                    </v-col>
+                                    <v-col cols="12" sm="6">
+                                        <v-select
+                                            v-model="form_filter.status_payment"
+                                            item-text="text"
+                                            item-value="value"
+                                            variant="outlined"
+                                            clearable
+                                            hide-details="auto"
+                                            :items="helpers.statusPayment()"
+                                            :label="
+                                                formFilterLabel.status_payment
+                                            "
+                                        ></v-select>
+                                    </v-col>
+                                </v-row>
+                            </v-card-text>
+                            <v-divider></v-divider>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn
+                                    variant="text"
+                                    size="small"
+                                    color="error"
+                                    @click="menu = false"
+                                >
+                                    Cancelar
+                                </v-btn>
+                                <v-btn
+                                    type="submit"
+                                    variant="tonal"
+                                    size="small"
+                                    color="primary"
+                                    :loading="loading"
+                                >
+                                    Buscar
+                                </v-btn>
+                            </v-card-actions>
+                        </v-form>
+                    </v-card>
+                </v-menu>
                 <ExportBtn
                     :data="sales"
                     :fields="jsonFields"
@@ -754,11 +887,7 @@ onMounted(() => {
                         size="x-small"
                         color="default"
                         :text="item.Ref"
-                        @click="
-                            globals.userPermision(['Sales_view'])
-                                ? router.visit('/sales/detail/' + item.id)
-                                : ''
-                        "
+                        @click="router.visit('/sales/detail/' + item.id)"
                     ></v-btn>
                 </template>
                 <template v-slot:item.actions="{ item }">
@@ -776,7 +905,6 @@ onMounted(() => {
                         </template>
                         <v-list density="compact">
                             <v-list-item
-                                v-if="globals.userPermision(['Sales_view'])"
                                 @click="
                                     router.visit('/sales/detail/' + item.id)
                                 "
@@ -821,7 +949,7 @@ onMounted(() => {
                                     ]) && item.payment_status != 'paid'
                                 "
                                 @click="New_Payment(item)"
-                                prepend-icon="mdi-currency-usd"
+                                prepend-icon="fas fa-dollar-sign"
                             >
                                 <v-list-item-title>
                                     Añadir Pago
@@ -845,10 +973,15 @@ onMounted(() => {
                                 </v-list-item-title>
                             </v-list-item>
 
-                            <!--                <v-dropdown-item title="PDF" @click="Invoice_PDF(props.row , props.row.id)">-->
-                            <!--                  <i class="nav-icon i-File-TXT font-weight-bold mr-2"></i>-->
-                            <!--                  {{$t('DownloadPdf')}}-->
-                            <!--                </v-dropdown-item>-->
+                            <!--                            <v-dropdown-item-->
+                            <!--                                title="PDF"-->
+                            <!--                                @click="Invoice_PDF(props.row, props.row.id)"-->
+                            <!--                            >-->
+                            <!--                                <i-->
+                            <!--                                    class="nav-icon i-File-TXT font-weight-bold mr-2"-->
+                            <!--                                ></i>-->
+                            <!--                                {{ $t("DownloadPdf") }}-->
+                            <!--                            </v-dropdown-item>-->
                             <v-list-item
                                 v-if="globals.userPermision(['Sales_delete'])"
                                 @click="Delete_Item(item)"

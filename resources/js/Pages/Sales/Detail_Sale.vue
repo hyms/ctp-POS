@@ -2,18 +2,21 @@
 import { onMounted, ref } from "vue";
 import { router } from "@inertiajs/vue3";
 import Layout from "@/Layouts/Authenticated.vue";
-import Snackbar from "@/Components/snackbar.vue";
 import printJS from "print-js";
 import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
 import InvoiceDialog from "@/Components/dialogs/InvoiceDialog.vue";
+import Snackbar from "@/Components/snackbar.vue";
+import { api, globals, helpers } from "@/helpers";
 
 const props = defineProps({
     details: Object,
     sale: Object,
     company: Object,
 });
+const currency = globals.currency();
 
 const loading = ref(false);
+const loadingInvoice = ref(false);
 const snackbar = ref(false);
 const snackbarText = ref("");
 const snackbarColor = ref("info");
@@ -67,54 +70,37 @@ function Delete_Sale() {
 }
 
 function Remove_Sale() {
-    snackbar.value = false;
-    loading.value = true;
-    if (props.sale.sale_has_return == "yes") {
-        snackbar.value = true;
+    snackbar.value.view = false;
+    if (sale_has_return == "yes") {
+        snackbar.value.view = true;
         snackbar.value.color = "error";
         snackbar.value.text = "Existe una devolucion en la transaccion";
     } else {
-        axios
-            .delete("/sales/" + props.sale.id)
-            .then(({ data }) => {
-                snackbar.value = true;
-                snackbar.value.color = "success";
+        api.delete({
+            url: "/sales/" + props.sale.id,
+            loadingItem: loading,
+            snackbar,
+            onSuccess: () => {
                 snackbar.value.text = "Borrado exitoso";
                 router.visit("/sales/");
                 dialogDelete.value = false;
-            })
-            .catch((error) => {
-                console.log(error);
-                snackbar.value = true;
-                snackbar.value.color = "error";
-                snackbar.value.text = error.response.data.message;
-            })
-            .finally(() => {
-                setTimeout(() => {
-                    loading.value = false;
-                }, 1000);
-            });
+            },
+        });
     }
 }
 
 //-------------------------------- Invoice POS ------------------------------\\
 function Invoice_POS(id) {
-    loading.value = true;
     dialogInvoice.value = false;
-    snackbar.value = false;
-    axios
-        .get("/sales_print_invoice/" + id)
-        .then(({ data }) => {
+    api.get({
+        url: "/sales_print_invoice/" + id,
+        loadingItem: loadingInvoice,
+        snackbar,
+        onSuccess: (data) => {
             invoice_pos.value = data;
             dialogInvoice.value = true;
-            // if (response.data.pos_settings.is_printable) {
-            //   setTimeout(() => print_it(), 1000);
-            // }
-        })
-        .catch(() => {})
-        .finally(() => {
-            loading.value = false;
-        });
+        },
+    });
 }
 
 onMounted(() => {});
@@ -122,14 +108,13 @@ onMounted(() => {});
 <template>
     <Layout :loading="loading">
         <snackbar
-            v-model="snackbar"
-            :snackbarColor="snackbarColor"
-            :snackbarText="snackbarText"
-        >
-        </snackbar>
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <!-- Modal Remove Sale -->
         <delete-dialog
-            :model="dialogDelete"
+            v-model="dialogDelete"
             :on-save="Remove_Sale"
             :on-close="
                 () => {
@@ -151,7 +136,7 @@ onMounted(() => {});
                     color="success"
                     size="small"
                     @click="router.visit('/sales/edit/' + sale.id)"
-                    prepend-icon="mdi-pencil-box-outline"
+                    prepend-icon="fas fa-pen"
                 >
                     Editar Venta
                 </v-btn>
@@ -178,7 +163,7 @@ onMounted(() => {});
                     @click="print_POS()"
                     color="info"
                     size="small"
-                    prepend-icon="mdi-clipboard-outline"
+                    prepend-icon="fas fa-file-invoice-dollar"
                 >
                     Imprimir Comprobante
                 </v-btn>
@@ -188,7 +173,7 @@ onMounted(() => {});
                     @click="Delete_Sale()"
                     color="error"
                     size="small"
-                    prepend-icon="mdi-close-circle"
+                    prepend-icon="fas fa-times"
                 >
                     Borrar
                 </v-btn>
@@ -313,9 +298,9 @@ onMounted(() => {});
                                                     ({{ detail.name }})
                                                 </td>
                                                 <td>
-                                                    Bs
+                                                    {{ currency }}
                                                     {{
-                                                        helper.formatNumber(
+                                                        helpers.formatNumber(
                                                             detail.Net_price,
                                                             3
                                                         )
@@ -323,7 +308,7 @@ onMounted(() => {});
                                                 </td>
                                                 <td>
                                                     {{
-                                                        helper.formatNumber(
+                                                        helpers.formatNumber(
                                                             detail.quantity,
                                                             2
                                                         )
@@ -331,16 +316,16 @@ onMounted(() => {});
                                                     {{ detail.unit_sale }}
                                                 </td>
                                                 <td>
-                                                    Bs
+                                                    {{ currency }}
                                                     {{
-                                                        helper.formatNumber(
+                                                        helpers.formatNumber(
                                                             detail.price,
                                                             2
                                                         )
                                                     }}
                                                 </td>
                                                 <td>
-                                                    Bs
+                                                    {{ currency }}
                                                     {{
                                                         detail.total.toFixed(2)
                                                     }}
@@ -366,7 +351,7 @@ onMounted(() => {});
                                                 Total
                                             </td>
                                             <td class="font-weight-bold">
-                                                Bs
+                                                {{ currency }}
                                                 {{ sale.GrandTotal }}
                                             </td>
                                         </tr>
@@ -375,7 +360,7 @@ onMounted(() => {});
                                                 Pagado
                                             </td>
                                             <td class="font-weight-bold">
-                                                Bs
+                                                {{ currency }}
                                                 {{ sale.paid_amount }}
                                             </td>
                                         </tr>
@@ -384,7 +369,7 @@ onMounted(() => {});
                                                 Deuda
                                             </td>
                                             <td class="font-weight-bold">
-                                                Bs {{ sale.due }}
+                                                {{ currency }} {{ sale.due }}
                                             </td>
                                         </tr>
                                     </tbody>
