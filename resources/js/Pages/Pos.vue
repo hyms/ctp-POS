@@ -1,13 +1,13 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Pos.vue";
-import { global, labels } from "@/helpers";
+import { api, globals, helpers, labels, rules } from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
 import MenuUser from "@/Components/Menu_user.vue";
-import InvoiceDialog from "@/Components/InvoiceDialog.vue";
+import InvoiceDialog from "@/Components/dialogs/InvoiceDialog.vue";
 import SelectClient from "@/Components/select_client.vue";
 
-const currency = global.currency();
+const currency = globals.currency();
 
 const props = defineProps({
     defaultWarehouse: Object,
@@ -22,6 +22,9 @@ const form = ref(null);
 const formAddPayment = ref(null);
 const formUpdateDetail = ref(null);
 const loading = ref(false);
+const loadingProducts = ref(false);
+const loadingUnits = ref(false);
+const loadingInvoice = ref(false);
 const snackbar = ref({
     view: false,
     color: "",
@@ -116,15 +119,13 @@ const product = ref({
     imei_number: "",
 });
 const sound = ref("/audio/Beep.wav");
-const audio = ref(new Audio("/audio/Beep.wav"));
+// const audio = ref(new Audio("/audio/Beep.wav"));
 
 //--- Submit Validate Create Sale
 async function Submit_Pos() {
     snackbar.value.view = false;
     const validate = await form.value.validate();
     if (!validate.valid) {
-        snackbar.value = true;
-        snackbar.value.color = "error";
         if (sale.value.client_id == "" || sale.value.client_id === null) {
             snackbar.value.text = labels.no_select_client;
         } else if (
@@ -135,6 +136,8 @@ async function Submit_Pos() {
         } else {
             snackbar.value.text = labels.no_fill_data;
         }
+        snackbar.value.view = true;
+        snackbar.value.color = "error";
     } else {
         if (verifiedForm()) {
             created();
@@ -152,7 +155,7 @@ async function submit_Update_Detail() {
 
 //------ Validate Form Submit_Payment
 async function Submit_Payment() {
-    snackbar.value = false;
+    snackbar.value.view = false;
     const validate = await formAddPayment.value.validate();
     if (validate.valid) {
         if (payment.value.amount > payment.value.received_amount) {
@@ -180,16 +183,20 @@ function Selected_Warehouse(value) {
 
 //------------------------------------ Get Products By Warehouse -------------------------\\
 function Get_Products_By_Warehouse(id) {
-    axios
-        .get(
-            "/get_Products_by_warehouse/" + id + "?stock=" + 1 + "&is_sale=" + 1
-        )
-        .then((response) => {
-            products_pos.value = response.data;
-        })
-        .catch((error) => {
-            console.log(error);
-        });
+    api.get({
+        url:
+            "/get_Products_by_warehouse/" +
+            id +
+            "?stock=" +
+            1 +
+            "&is_sale=" +
+            1,
+        loadingItem: loadingProducts,
+        snackbar,
+        onSuccess: (data) => {
+            products_pos.value = data;
+        },
+    });
 }
 
 //----------------------------------------- Add Detail of Sale -------------------------\\
@@ -216,9 +223,14 @@ function order_detail_id() {
 
 //---------------------- get_units ------------------------------\\
 function get_units(value) {
-    axios
-        .get("/get_units?id=" + value)
-        .then(({ data }) => (units.value = data));
+    api.get({
+        url: "/get_units?id=" + value,
+        loadingItem: loadingUnits,
+        snackbar,
+        onSuccess: (data) => {
+            units.value = data;
+        },
+    });
 }
 
 //------ Show Modal Update Detail Product
@@ -347,30 +359,23 @@ function verifiedForm() {
 
 //-------------------------------- Invoice POS ------------------------------\\
 function Invoice_POS(id) {
-    loading.value = true;
     dialogInvoice.value = false;
-    snackbar.value.view = false;
-    axios
-        .get("/sales_print_invoice/" + id)
-        .then(({ data }) => {
+    api.get({
+        url: "/sales_print_invoice/" + id,
+        loadingItem: loadingInvoice,
+        snackbar,
+        onSuccess: (data) => {
             invoice_pos.value = data;
             dialogInvoice.value = true;
-            // if (response.data.pos_settings.is_printable) {
-            //   setTimeout(() => print_it(), 1000);
-            // }
-        })
-        .catch(() => {})
-        .finally(() => {
-            loading.value = false;
-        });
+        },
+    });
 }
 
 //----------------------------------Create POS ------------------------------\\
 function CreatePOS() {
-    loading.value = true;
-
-    axios
-        .post("/pos/create_pos", {
+    api.post({
+        url: "/pos/create_pos",
+        params: {
             client_id: sale.value.client_id,
             warehouse_id: sale.value.warehouse_id,
             tax_rate: sale.value.tax_rate ? sale.value.tax_rate : 0,
@@ -390,47 +395,49 @@ function CreatePOS() {
             change: parseFloat(
                 payment.value.received_amount - payment.value.amount
             ).toFixed(2),
-        })
-        .then((response) => {
-            if (response.data.success === true) {
+        },
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
+            if (data.success === true) {
                 // Complete the animation of theprogress bar.
-                Invoice_POS(response.data.id);
+                Invoice_POS(data.id);
                 dialogAddPayment.value = false;
                 Reset_Pos();
             }
-        })
-        .catch((error) => {
-            snackbar.value = true;
-            snackbar.value.text = labels.error_message;
-            snackbar.value.color = "error";
-            console.log(error);
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+        },
+    });
 }
 
 //---------------------------------Get Product Details ------------------------\\
 function Get_Product_Details(product_item, product_id) {
-    axios.get("/product/" + product_id).then((response) => {
-        product.value.discount = 0;
-        product.value.DiscountNet = 0;
-        product.value.discount_Method = "2";
-        product.value.product_id = response.data.id;
-        product.value.name = response.data.name;
-        product.value.Net_price = response.data.Net_price;
-        product.value.Total_price = response.data.Total_price;
-        product.value.Unit_price = response.data.Unit_price;
-        product.value.taxe = response.data.tax_price;
-        product.value.tax_method = response.data.tax_method;
-        product.value.tax_percent = response.data.tax_percent;
-        product.value.unitSale = response.data.unitSale;
-        product.value.product_variant_id = product_item.product_variant_id;
-        product.value.code = product_item.code;
-        product.value.fix_price = response.data.fix_price;
-        product.value.sale_unit_id = response.data.sale_unit_id;
-        add_product(product_item.code);
-        CalculTotal();
+    api.get({
+        url: "/products/item/" + product_id,
+        loadingItem: loadingProducts,
+        snackbar,
+        onSuccess: (data) => {
+            {
+                product.value.discount = 0;
+                product.value.DiscountNet = 0;
+                product.value.discount_Method = "2";
+                product.value.product_id = data.id;
+                product.value.name = data.name;
+                product.value.Net_price = data.Net_price;
+                product.value.Total_price = data.Total_price;
+                product.value.Unit_price = data.Unit_price;
+                product.value.taxe = data.tax_price;
+                product.value.tax_method = data.tax_method;
+                product.value.tax_percent = data.tax_percent;
+                product.value.unitSale = data.unitSale;
+                product.value.product_variant_id =
+                    product_item.product_variant_id;
+                product.value.code = product_item.code;
+                product.value.fix_price = data.fix_price;
+                product.value.sale_unit_id = data.sale_unit_id;
+                add_product(product_item.code);
+                CalculTotal();
+            }
+        },
     });
 }
 
@@ -466,7 +473,7 @@ function Verified_Qty(detail, id) {
                 details.value[i].quantity = detail.current;
             }
             if (detail.quantity > detail.current) {
-                snackbar.value = true;
+                snackbar.value.view = true;
                 snackbar.value.text = labels.low_qty;
                 snackbar.value.color = "error";
                 details.value[i].quantity = detail.current;
@@ -480,11 +487,11 @@ function Verified_Qty(detail, id) {
 
 //----------------------------------- Increment QTY with barcode scanner ------------------------------\\
 function increment_qty_scanner(code) {
-    snackbar.value = false;
+    snackbar.value.view = false;
     for (let i = 0; i < details.value.length; i++) {
         if (details.value[i].code === code) {
             if (details.value[i].quantity + 1 > details.value[i].current) {
-                snackbar.value = true;
+                snackbar.value.view = true;
                 snackbar.value.text = labels.low_qty;
                 snackbar.value.color = "error";
             } else {
@@ -497,11 +504,11 @@ function increment_qty_scanner(code) {
 
 //----------------------------------- Increment QTY ------------------------------\\
 function increment(detail_item, id) {
-    snackbar.value = false;
+    snackbar.value.view = false;
     for (let i = 0; i < details.value.length; i++) {
         if (details.value[i].detail_id == id) {
             if (detail_item.quantity + 1 > detail_item.current) {
-                snackbar.value = true;
+                snackbar.value.view = true;
                 snackbar.value.text = labels.low_qty;
                 snackbar.value.color = "error";
             } else {
@@ -514,14 +521,14 @@ function increment(detail_item, id) {
 
 //----------------------------------- decrement QTY ------------------------------\\
 function decrement(detail_item, id) {
-    snackbar.value = false;
+    snackbar.value.view = false;
     for (let i = 0; i < details.value.length; i++) {
         if (details.value[i].detail_id == id) {
             if (
                 detail_item.quantity - 1 > detail_item.current ||
                 detail_item.quantity - 1 < 1
             ) {
-                snackbar.value = true;
+                snackbar.value.view = true;
                 snackbar.value.text = labels.low_qty;
                 snackbar.value.color = "error";
             } else {
@@ -647,7 +654,7 @@ function SearchProduct(result) {
 
 // Search Products
 // function search() {
-//   snackbar.value = false;
+//   snackbar.value.view = false;
 //   if (search_input.value.length < 1) {
 //     return product_filter.value = [];
 //   }
@@ -666,7 +673,7 @@ function SearchProduct(result) {
 //       });
 //     }
 //   } else {
-//     snackbar.value = true;
+//     snackbar.value.view = true;
 //     snackbar.value.text = labels.no_select_warehouse;
 //     snackbar.value.color = "warning";
 //   }
@@ -705,34 +712,29 @@ function getAllCategory() {
 //------------------------------- Get Products with Filters ------------------------------\\
 function getProducts(page = 1) {
     // Start the progress bar.
-    axios
-        .get(
+    api.get({
+        url:
             "/pos/get_products_pos?page=" +
-                page +
-                "&category_id=" +
-                category_id.value +
-                "&warehouse_id=" +
-                sale.value.warehouse_id +
-                "&stock=" +
-                1
-        )
-        .then((response) => {
-            products_pos.value = response.data.products;
-            // console.log(products_pos.value)
-            // product.value_totalRows = response.data.totalRows;
-            // product.value_paginatePerPage();
-            // Complete the animation of theprogress bar.
-        })
-        .catch((response) => {
-            // Complete the animation of theprogress bar.
-        });
+            page +
+            "&category_id=" +
+            category_id.value +
+            "&warehouse_id=" +
+            sale.value.warehouse_id +
+            "&stock=" +
+            1,
+        loadingItem: loadingProducts,
+        snackbar,
+        onSuccess: (data) => {
+            products_pos.value = data.products;
+        },
+    });
 }
 
 //-------------------- Created Function -----\\
 
 function created() {
-    payment.value.amount = helper.formatNumber(GrandTotal.value, 2);
-    payment.value.received_amount = helper.formatNumber(GrandTotal.value, 2);
+    payment.value.amount = helpers.formatNumber(GrandTotal.value, 2);
+    payment.value.received_amount = helpers.formatNumber(GrandTotal.value, 2);
     payment.value.Reglement = "cash";
     dialogAddPayment.value = true;
 }
@@ -745,24 +747,24 @@ onMounted(() => {
 });
 </script>
 <template>
-    <Layout :loading="loading">
+    <Layout>
         <snackbar
-            v-model="snackbar"
-            :snackbarColor="snackbarColor"
-            :snackbarText="snackbarText"
+            v-model="snackbar.view"
+            :color="snackbar.color"
+            :text="snackbar.text"
         >
         </snackbar>
         <v-row>
             <!-- Card Left Panel Details Sale-->
             <v-col lg="5" md="6" cols="12">
-                <v-card class="card-order">
+                <v-card class="card-order" :loading="loading">
                     <v-toolbar>
                         <v-btn
-                            icon="mdi-arrow-left-bold"
+                            icon="fas fa-chevron-left"
                             variant="tonal"
                             color="primary"
                             density="comfortable"
-                            @click="helper.linkVisit('/')"
+                            @click="helpers.linkVisit('/')"
                         ></v-btn>
 
                         <v-spacer></v-spacer>
@@ -791,7 +793,7 @@ onMounted(() => {
                                         item-value="id"
                                         hide-details="auto"
                                         clearable
-                                        :rules="helper.required"
+                                        :rules="rules.required"
                                     >
                                     </v-autocomplete>
                                 </v-col>
@@ -862,7 +864,7 @@ onMounted(() => {
                                                     <td>
                                                         {{ currency }}
                                                         {{
-                                                            helper.formatNumber(
+                                                            helpers.formatNumber(
                                                                 detail_item.Total_price,
                                                                 2
                                                             )
@@ -875,7 +877,7 @@ onMounted(() => {
                                                             class="my-1"
                                                             hide-details="auto"
                                                             :rules="
-                                                                helper.number
+                                                                rules.number
                                                             "
                                                             v-model="
                                                                 detail_item.quantity
@@ -902,7 +904,7 @@ onMounted(() => {
                                                                             detail_item.detail_id
                                                                         )
                                                                     "
-                                                                    icon="mdi-plus-box"
+                                                                    icon="fas fa-plus-square"
                                                                 ></v-icon>
                                                             </template>
                                                             <template
@@ -916,7 +918,7 @@ onMounted(() => {
                                                                             detail_item.detail_id
                                                                         )
                                                                     "
-                                                                    icon="mdi-minus-box"
+                                                                    icon="fas fa-minus-square"
                                                                 ></v-icon>
                                                             </template>
                                                         </v-text-field>
@@ -1022,7 +1024,7 @@ onMounted(() => {
                                         <v-btn
                                             @click="Reset_Pos()"
                                             color="error"
-                                            prepend-icon="mdi-replay"
+                                            prepend-icon="fas fa-redo-alt"
                                             block
                                         >
                                             Reiniciar
@@ -1033,7 +1035,7 @@ onMounted(() => {
                                             type="submit"
                                             color="success"
                                             block
-                                            prepend-icon="mdi-cart"
+                                            prepend-icon="fas fa-shopping-cart"
                                         >
                                             Pagar Ahora
                                         </v-btn>
@@ -1257,6 +1259,7 @@ onMounted(() => {
                                     :search="searchProducts"
                                     :page="products_pos_page"
                                     :items-per-page="products_pos.length"
+                                    :loading="loadingProducts"
                                 >
                                     <template v-slot:header>
                                         <div class="mb-3">
@@ -1316,7 +1319,7 @@ onMounted(() => {
                                                             class="ma-1"
                                                             >{{ currency }}
                                                             {{
-                                                                helper.formatNumber(
+                                                                helpers.formatNumber(
                                                                     item.raw
                                                                         .Net_price,
                                                                     2
@@ -1329,7 +1332,7 @@ onMounted(() => {
                                                             class="ma-1"
                                                         >
                                                             {{
-                                                                helper.formatNumber(
+                                                                helpers.formatNumber(
                                                                     item.raw
                                                                         .qte_sale,
                                                                     2
@@ -1365,7 +1368,7 @@ onMounted(() => {
                         <v-toolbar-title>{{ labels.add_pay }}</v-toolbar-title>
                         <v-spacer></v-spacer>
                         <v-btn
-                            icon="mdi-close"
+                            icon="fas fa-times"
                             size="small"
                             variant="tonal"
                             @click="dialogAddPayment = false"
@@ -1499,8 +1502,8 @@ onMounted(() => {
                                 <v-col lg="4" md="4" cols="12">
                                     <v-select
                                         v-model="payment.Reglement"
-                                        :items="helper.reglamentPayment()"
-                                        :rules="helper.required"
+                                        :items="helpers.reglamentPayment()"
+                                        :rules="rules.required"
                                         :label="labels.payment.role"
                                         item-title="title"
                                         item-value="value"
@@ -1516,7 +1519,7 @@ onMounted(() => {
                                         :label="
                                             labels.sale.sales_type_id + ' *'
                                         "
-                                        :rules="helper.required"
+                                        :rules="rules.required"
                                         item-value="id"
                                         item-title="name"
                                     ></v-select>
@@ -1528,7 +1531,7 @@ onMounted(() => {
                                         v-model="sale.statut"
                                         clearable
                                         hide-details="auto"
-                                        :items="helper.statutSale()"
+                                        :items="helpers.statutSale()"
                                         :label="labels.sale.statut"
                                     ></v-select>
                                 </v-col>

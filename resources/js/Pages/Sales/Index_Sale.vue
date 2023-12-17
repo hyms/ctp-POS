@@ -530,6 +530,11 @@ onMounted(() => {
                                             <!--                    >-->
                                             <!--                    </v-btn>-->
                                             <v-btn
+                                                v-if="
+                                                    globals.userPermision([
+                                                        'payment_sales_edit',
+                                                    ])
+                                                "
                                                 title="Editar"
                                                 size="small"
                                                 density="comfortable"
@@ -546,6 +551,11 @@ onMounted(() => {
                                             >
                                             </v-btn>
                                             <v-btn
+                                                v-if="
+                                                    globals.userPermision([
+                                                        'payment_sales_delete',
+                                                    ])
+                                                "
                                                 title="Borrar"
                                                 size="small"
                                                 density="comfortable"

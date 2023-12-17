@@ -422,6 +422,7 @@ onMounted(() => {
         <v-spacer></v-spacer>
         <full-screen></full-screen>
         <v-btn
+            v-if="globals.userPermision(['Pos_view'])"
             color="primary"
             variant="flat"
             prepend-icon="fas fa-shopping-cart"

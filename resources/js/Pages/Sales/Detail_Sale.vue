@@ -131,6 +131,7 @@ onMounted(() => {});
         <v-row>
             <v-col cols="12" class="mb-5">
                 <v-btn
+                    v-if="globals.userPermision(['Sales_edit'])"
                     class="mr-1"
                     v-if="sale.sale_has_return == 'no'"
                     color="success"
@@ -168,6 +169,7 @@ onMounted(() => {});
                     Imprimir Comprobante
                 </v-btn>
                 <v-btn
+                    v-if="globals.userPermision(['Sales_delete'])"
                     class="mr-1"
                     v-if="sale.sale_has_return == 'no'"
                     @click="Delete_Sale()"

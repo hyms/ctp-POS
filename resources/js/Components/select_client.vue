@@ -121,7 +121,7 @@ onMounted(() => {
                 <v-toolbar-title>{{ labelsNew.AddCustomer }}</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn
-                    icon="mdi-close"
+                    icon="fas fa-times"
                     size="small"
                     density="comfortable"
                     variant="tonal"
@@ -249,8 +249,7 @@ onMounted(() => {
         <template v-slot:append v-if="props.enableForm">
             <v-btn
                 color="primary"
-                icon="mdi-account-plus"
-                density="comfortable"
+                icon="fas fa-user-plus"
                 class="rounded"
                 @click="New_Client()"
             ></v-btn>
