@@ -360,6 +360,7 @@ function verifiedForm() {
 //-------------------------------- Invoice POS ------------------------------\\
 function Invoice_POS(id) {
     dialogInvoice.value = false;
+    console.log(id);
     api.get({
         url: "/sales_print_invoice/" + id,
         loadingItem: loadingInvoice,
@@ -1357,7 +1358,7 @@ onMounted(() => {
 
             <!-- Modal Show Invoice POS-->
             <invoice-dialog
-                :model="dialogInvoice"
+                v-model="dialogInvoice"
                 :invoice_pos="invoice_pos"
             ></invoice-dialog>
 

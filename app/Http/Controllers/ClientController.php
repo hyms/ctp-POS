@@ -3,18 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\PaymentSale;
+use App\Models\PaymentSaleReturns;
+use App\Models\Sale;
+use App\Models\SaleReturn;
 use App\Models\Setting;
 use App\utils\helpers;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
-use App\Models\SaleReturn;
-use App\Models\PaymentSaleReturns;
-use App\Models\Sale;
-use App\Models\PaymentSale;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ClientController extends Controller
@@ -173,7 +172,7 @@ class ClientController extends Controller
 
     public function Get_Clients_Without_Paginate()
     {
-        $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
+        $clients = Client::where('deleted_at', '=', null)->pluck('company_name','id');
         return response()->json($clients);
     }
 

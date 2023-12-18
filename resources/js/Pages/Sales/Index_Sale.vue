@@ -365,6 +365,8 @@ function Delete_Payment(item) {
 }
 
 function Remove_Payment() {
+    console.log(sale.value.id);
+
     api.delete({
         url: "/payment_sale/" + sale.value.id,
         loadingItem: loading,
@@ -417,7 +419,7 @@ function Remove_Sale(id, sale_has_return) {
         snackbar.value.text = "Existe una devolucion en la transaccion";
     } else {
         api.delete({
-            url: "/sales/" + id,
+            url: "/sales/" + sale.value.id,
             loadingItem: loading,
             snackbar,
             onSuccess: () => {

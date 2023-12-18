@@ -49,7 +49,7 @@ class SalesController extends Controller
         $Sales = Sale::with('facture', 'client', 'warehouse', 'user', 'userpos', 'sales_type')
             ->where('deleted_at', '=', null)
             ->where(function ($query) {
-                if (helpers::checkPermission('record_view')) {
+                if (!helpers::checkPermission('record_view')) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             })
@@ -498,7 +498,7 @@ class SalesController extends Controller
         $sale_data = Sale::with(['details.product.unitSale', 'client'])
             ->where('deleted_at', '=', null)
             ->where(function ($query) {
-                if (helpers::checkPermission('record_view')) {
+                if (!helpers::checkPermission('record_view')) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             })
@@ -616,7 +616,7 @@ class SalesController extends Controller
         $sale = Sale::with(['details.product.unitSale', 'warehouse', 'client'])
             ->where('deleted_at', '=', null)
             ->where(function ($query) {
-                if (helpers::checkPermission('record_view')) {
+                if (!helpers::checkPermission('record_view')) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             })
@@ -710,7 +710,7 @@ class SalesController extends Controller
         $payments = PaymentSale::with('sale')
             ->where('sale_id', $id)
             ->where(function ($query) {
-                if (helpers::checkPermission('record_view')) {
+                if (!helpers::checkPermission('record_view')) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             })
@@ -863,7 +863,7 @@ class SalesController extends Controller
             $Sale_data = Sale::with('details.product.unitSale')
                 ->where('deleted_at', '=', null)
                 ->where(function ($query) {
-                    if (helpers::checkPermission('record_view')) {
+                    if (!helpers::checkPermission('record_view')) {
                         return $query->where('user_id', '=', Auth::user()->id);
                     }
                 })

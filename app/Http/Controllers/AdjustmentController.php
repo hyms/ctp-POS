@@ -38,7 +38,7 @@ class AdjustmentController extends Controller
             ->where('deleted_at', '=', null)
             ->whereIn('warehouse_id', $warehouses->map(function ($item,$key) { return $key; }))
             ->where(function ($query) {
-                if (helpers::checkPermission('record_view')) {
+                if (!helpers::checkPermission('record_view')) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             });
@@ -204,7 +204,7 @@ class AdjustmentController extends Controller
         }
         DB::transaction(function () use ($id, $request) {
             $current_adjustment = Adjustment::where(function ($query) {
-                    if (helpers::checkPermission('record_view')) {
+                    if (!helpers::checkPermission('record_view')) {
                         return $query->where('user_id', '=', Auth::user()->id);
                     }
                 })->findOrFail($id);
@@ -260,7 +260,7 @@ class AdjustmentController extends Controller
         $Adjustment_data = Adjustment::with('details.product')
             ->where('deleted_at', '=', null)
             ->where(function ($query) {
-                if (helpers::checkPermission('record_view')) {
+                if (!helpers::checkPermission('record_view')) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             })->findOrFail($id);

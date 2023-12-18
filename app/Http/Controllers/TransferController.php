@@ -42,7 +42,7 @@ class TransferController extends Controller
             ->where('deleted_at', '=', null)
             ->whereIn('from_warehouse_id', $warehouses->pluck('id'))
             ->where(function ($query) {
-                if (helpers::checkPermission('record_view')) {
+                if (!helpers::checkPermission('record_view')) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             });

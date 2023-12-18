@@ -37,7 +37,7 @@ class ExpensesController extends Controller
             ->where('deleted_at', '=', null)
             ->whereIn('warehouse_id', $warehouses->pluck('id'))
             ->where(function ($query) {
-                if (helpers::checkPermission('record_view')) {
+                if (!helpers::checkPermission('record_view')) {
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             });

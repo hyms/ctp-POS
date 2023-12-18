@@ -99,7 +99,7 @@ function Get_Client_Without_Paginate() {
         url: "/get_clients_without_paginate",
         loadingItem: loading,
         onSuccess: (data) => {
-            clients.value = data;
+            clients.value = helpers.toArraySelect(data);
         },
     });
 }
@@ -239,8 +239,6 @@ onMounted(() => {
         :items="clients"
         :label="labels.sale.client_id"
         @update:modelValue="updateValue"
-        item-title="name"
-        item-value="id"
         hide-details="auto"
         :rules="helpers.required"
         :loading="loading"
