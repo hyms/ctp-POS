@@ -24,6 +24,7 @@ use App\Http\Controllers\SalesTypeController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TransferController;
 use App\Http\Controllers\UnitsController;
+use App\Http\Controllers\UpgradeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Http\Request;
@@ -41,9 +42,9 @@ use Inertia\Inertia;
 |
 */
 
-//Route::get('/upgrade', [UpgradeController::class, 'index'])->name('upgrade');
-//Route::post('/upgrade', [UpgradeController::class, 'upgrade'])->name('upgrade');
-//Route::post('/upgrade-perms', [UpgradeController::class, 'setPermissions'])->name('upgrade');
+Route::get('/upgrade', [UpgradeController::class, 'index'])->name('upgrade');
+Route::post('/upgrade', [UpgradeController::class, 'upgrade'])->name('upgrade');
+Route::post('/upgrade-perms', [UpgradeController::class, 'setPermissions'])->name('upgrade');
 
 Route::get('/', [DashboardController::class, 'index']
 )->middleware(['auth', 'verified','auth.session'])->name('dashboard');

@@ -2,15 +2,14 @@
 import { computed, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
-import { router, usePage } from "@inertiajs/vue3";
-import helper from "@/helpers";
-import labels from "@/labels";
+import { router } from "@inertiajs/vue3";
+import { globals, helpers, labels } from "@/helpers";
 
 const props = defineProps({
     report: Object,
     client_id: Number,
 });
-const currency = computed(() => usePage().props.currency);
+const currency = globals.currency();
 
 const loading = ref(false);
 const tab = ref(null);
@@ -234,7 +233,7 @@ const tabVal = computed({
                                 >
                                     {{ currency }}
                                     {{
-                                        helper.formatNumber(
+                                        helpers.formatNumber(
                                             report.total_amount,
                                             2
                                         )
@@ -265,7 +264,7 @@ const tabVal = computed({
                                 >
                                     {{ currency }}
                                     {{
-                                        helper.formatNumber(
+                                        helpers.formatNumber(
                                             report.total_paid,
                                             2
                                         )
@@ -293,7 +292,7 @@ const tabVal = computed({
                                     class="text-primary text-24 line-height-1 mb-2"
                                 >
                                     {{ currency }}
-                                    {{ helper.formatNumber(report.due, 2) }}
+                                    {{ helpers.formatNumber(report.due, 2) }}
                                 </p>
                             </v-col>
                         </v-row>
@@ -341,23 +340,25 @@ const tabVal = computed({
                         >
                             <template v-slot:item.statut="{ item }">
                                 <v-chip
-                                    :color="helper.statutSaleColor(item.statut)"
+                                    :color="
+                                        helpers.statutSaleColor(item.statut)
+                                    "
                                     variant="tonal"
                                     size="x-small"
-                                    >{{ helper.statutSale(item.statut) }}
+                                    >{{ helpers.statutSale(item.statut) }}
                                 </v-chip>
                             </template>
                             <template v-slot:item.payment_status="{ item }">
                                 <v-chip
                                     :color="
-                                        helper.statusPaymentColor(
+                                        helpers.statusPaymentColor(
                                             item.payment_status
                                         )
                                     "
                                     variant="tonal"
                                     size="x-small"
                                     >{{
-                                        helper.statusPayment(
+                                        helpers.statusPayment(
                                             item.payment_status
                                         )
                                     }}

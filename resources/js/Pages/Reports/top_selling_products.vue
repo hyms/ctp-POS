@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router, usePage } from "@inertiajs/vue3";
-import labels from "@/labels";
+import { labels } from "@/helpers";
 
 const props = defineProps({
     products: Object,

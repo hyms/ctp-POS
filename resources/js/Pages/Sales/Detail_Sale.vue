@@ -131,9 +131,11 @@ onMounted(() => {});
         <v-row>
             <v-col cols="12" class="mb-5">
                 <v-btn
-                    v-if="globals.userPermision(['Sales_edit'])"
+                    v-if="
+                        globals.userPermision(['Sales_edit']) &&
+                        sale.sale_has_return == 'no'
+                    "
                     class="mr-1"
-                    v-if="sale.sale_has_return == 'no'"
                     color="success"
                     size="small"
                     @click="router.visit('/sales/edit/' + sale.id)"
@@ -169,9 +171,11 @@ onMounted(() => {});
                     Imprimir Comprobante
                 </v-btn>
                 <v-btn
-                    v-if="globals.userPermision(['Sales_delete'])"
+                    v-if="
+                        globals.userPermision(['Sales_delete']) &&
+                        sale.sale_has_return == 'no'
+                    "
                     class="mr-1"
-                    v-if="sale.sale_has_return == 'no'"
                     @click="Delete_Sale()"
                     color="error"
                     size="small"

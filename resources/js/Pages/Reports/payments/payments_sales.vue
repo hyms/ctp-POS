@@ -3,8 +3,7 @@ import { computed, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import { router, usePage } from "@inertiajs/vue3";
-import helper from "@/helpers";
-import labels from "@/labels";
+import { helpers, labels } from "@/helpers";
 
 const props = defineProps({
     payments: Object,
@@ -163,7 +162,7 @@ function Payments_Sales() {
                                     <v-col cols="12" sm="6">
                                         <v-select
                                             v-model="form.Reg"
-                                            :items="helper.reglamentPayment()"
+                                            :items="helpers.reglamentPayment()"
                                             :label="labels.payment.Reglement"
                                             item-title="title"
                                             item-value="value"
@@ -229,7 +228,7 @@ function Payments_Sales() {
                 class="text-center"
             >
                 <template v-slot:item.Reglement="{ item }">
-                    {{ helper.getReglamentPayment(item.Reglement)[0]?.title }}
+                    {{ helpers.getReglamentPayment(item.Reglement)[0]?.title }}
                 </template>
                 <template v-slot:tfoot>
                     <tr>

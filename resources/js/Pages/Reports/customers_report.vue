@@ -3,8 +3,7 @@ import { ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import { router } from "@inertiajs/vue3";
-import helper from "@/helpers";
-import labels from "@/labels";
+import { helpers, labels } from "@/helpers";
 
 const props = defineProps({
     report: Object,
@@ -126,7 +125,7 @@ function Get_Client_Report(page) {
                         icon="fas fa-eye"
                         size="x-small"
                         variant="outlined"
-                        @click="helper.linkVisit('/report/client/' + item.id)"
+                        @click="helpers.linkVisit('/report/client/' + item.id)"
                     >
                     </v-btn>
                 </template>

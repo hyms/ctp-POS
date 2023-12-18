@@ -1,6 +1,6 @@
 <script setup>
 import Guest from "@/Layouts/Guest.vue";
-import helpers from "@/helpers";
+import { helpers } from "@/helpers";
 
 const history = window.history;
 </script>

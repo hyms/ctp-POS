@@ -3,7 +3,7 @@ import { computed, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import { usePage } from "@inertiajs/vue3";
-import labels from "@/labels";
+import { labels } from "@/helpers";
 
 const props = defineProps({
     customers: Object,

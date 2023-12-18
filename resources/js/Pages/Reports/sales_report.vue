@@ -3,8 +3,7 @@ import { computed, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import { router, usePage } from "@inertiajs/vue3";
-import helper from "@/helpers";
-import labels from "@/labels";
+import { helpers, labels } from "@/helpers";
 
 const props = defineProps({
     customers: Object,
@@ -204,7 +203,7 @@ function Get_Sales(page) {
                                     <v-col cols="12" sm="6">
                                         <v-select
                                             v-model="form.status"
-                                            :items="helper.statutSale()"
+                                            :items="helpers.statutSale()"
                                             :label="labels.sale.statut"
                                             variant="outlined"
                                             hide-details="auto"
@@ -214,7 +213,7 @@ function Get_Sales(page) {
                                     <v-col cols="12" sm="6">
                                         <v-select
                                             v-model="form.Payment"
-                                            :items="helper.statusPayment()"
+                                            :items="helpers.statusPayment()"
                                             :label="labels.sale.payment_status"
                                             variant="outlined"
                                             hide-details="auto"
@@ -265,25 +264,25 @@ function Get_Sales(page) {
                 >
                     <template v-slot:item.Reglement="{ item }">
                         {{
-                            helper.getReglamentPayment(item.Reglement)[0].title
+                            helpers.getReglamentPayment(item.Reglement)[0].title
                         }}
                     </template>
                     <template v-slot:item.statut="{ item }">
                         <v-chip
-                            :color="helper.statutSaleColor(item.statut)"
+                            :color="helpers.statutSaleColor(item.statut)"
                             variant="tonal"
                             size="x-small"
-                            >{{ helper.statutSale(item.statut) }}
+                            >{{ helpers.statutSale(item.statut) }}
                         </v-chip>
                     </template>
                     <template v-slot:item.payment_status="{ item }">
                         <v-chip
                             :color="
-                                helper.statusPaymentColor(item.payment_status)
+                                helpers.statusPaymentColor(item.payment_status)
                             "
                             variant="tonal"
                             size="x-small"
-                            >{{ helper.statusPayment(item.payment_status) }}
+                            >{{ helpers.statusPayment(item.payment_status) }}
                         </v-chip>
                     </template>
                 </v-data-table>
