@@ -28,6 +28,12 @@ class PaymentSalesController extends Controller
 
     public function index(request $request)
     {
+        Inertia::share('titlePage', 'Pagos de Ventas');
+        return Inertia::render('Reports/payments/payments_sales');
+    }
+
+    public function getTable(request $request)
+    {
 //        $this->authorizeForUser($request->user('api'), 'Reports_payments_Sales', PaymentSale::class);
 
 //        $role = Auth::user()->roles()->first();
@@ -66,26 +72,26 @@ class PaymentSalesController extends Controller
             ->get();
 
         foreach ($Payments as $Payment) {
-
-            $item['date'] = $Payment->date;
-            $item['Ref'] = $Payment->Ref;
-            $item['Ref_Sale'] = $Payment['sale']?->Ref;
-            $item['client_name'] = $Payment['sale']?->client?->company_name;
-            $item['Reglement'] = $Payment->Reglement;
-            $item['montant'] = $Payment->montant;
-            // $item['montant'] = number_format($Payment->montant, 2, '.', '');
-            $data->add($item);
+            $data->add([
+            'date' => $Payment->date,
+            'Ref' => $Payment->Ref,
+            'Ref_Sale' => $Payment['sale']?->Ref,
+            'client_name' => $Payment['sale']?->client?->company_name,
+            'Reglement' => $Payment->Reglement,
+            'montant' => $Payment->montant,
+            // $item['montant'] = number_format($Payment->montant, 2, '.', ''),
+            ]);
         }
 
-        $clients = Client::where('deleted_at', '=', null)->get(['id', 'company_name as name']);
-        $sales = Sale::whereIn('id', $Payments->pluck('sale_id'))->get(['Ref', 'id']);
+        $clients = Client::where('deleted_at', '=', null)->pluck('company_name','id');
+        $sales = Sale::whereIn('id', $Payments->pluck('sale_id'))->pluck('Ref', 'id');
 
-        Inertia::share('titlePage', 'Pagos de Ventas');
-        return Inertia::render('Reports/payments/payments_sales', [
-            'payments' => $data,
-            'sales' => $sales,
-            'clients' => $clients,
-        ]);
+        return response()->json(
+            [
+                'payments' => $data,
+                'sales' => $sales,
+                'clients' => $clients,
+            ]);
 
     }
 
