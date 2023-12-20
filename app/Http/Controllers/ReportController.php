@@ -82,8 +82,9 @@ class ReportController extends Controller
 
     public function Client_Report(request $request)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
+        if (!helpers::checkPermission('Reports_customers')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $data = collect();
 
@@ -134,15 +135,16 @@ class ReportController extends Controller
 //        return Inertia::render('Reports/customers_report', [
 //            'report' => $data,
 //        ]);
-  return response()->json(['report' => $data]);
+        return response()->json(['report' => $data]);
     }
 
     //----------------- Customers Report By ID-----------------------\\
 
     public function Client_Report_detail(request $request, $id)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
+        if (!helpers::checkPermission('Reports_customers')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $client = Client::where('deleted_at', '=', null)->findOrFail($id);
 
@@ -169,8 +171,9 @@ class ReportController extends Controller
 
     public function Provider_Report_detail(request $request, $id)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'Reports_suppliers', Provider::class);
+        if (!helpers::checkPermission('Reports_suppliers')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $provider = Provider::where('deleted_at', '=', null)->findOrFail($id);
 
@@ -194,18 +197,16 @@ class ReportController extends Controller
 
     public function Sales_Client(request $request)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
-
-//        $Role = Auth::user()->roles()->first();
-//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+        if (!helpers::checkPermission('Reports_customers')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $sales = Sale::where('deleted_at', '=', null)->with('client', 'warehouse')
-//            ->where(function ($query) use ($ShowRecord) {
-//                if (!$ShowRecord) {
-//                    return $query->where('user_id', '=', Auth::user()->id);
-//                }
-//            })
+            ->where(function ($query) {
+                if (!helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })
             ->where('client_id', $request->get('id'));
         // Search With Multiple Param
 //            ->where(function ($query) use ($request) {
@@ -233,20 +234,20 @@ class ReportController extends Controller
 
         $data = collect();
         foreach ($sales as $sale) {
-            $item['id'] = $sale->id;
-            $item['date'] = $sale->date;
-            $item['Ref'] = $sale->Ref;
-            $item['warehouse_name'] = $sale['warehouse']?->name;
-            $item['client_name'] = $sale['client']?->company_name;
-            $item['client_code'] = $sale['client']?->code;
-            $item['statut'] = $sale->statut;
-            $item['GrandTotal'] = $sale->GrandTotal;
-            $item['paid_amount'] = $sale->paid_amount;
-            $item['due'] = $sale->GrandTotal - $sale->paid_amount;
-            $item['payment_status'] = $sale->payment_statut;
-            $item['shipping_status'] = $sale->shipping_status;
-
-            $data->add($item);
+            $data->add([
+                'id' => $sale->id,
+                'date' => $sale->date,
+                'Ref' => $sale->Ref,
+                'warehouse_name' => $sale['warehouse']?->name,
+                'client_name' => $sale['client']?->company_name,
+                'client_code' => $sale['client']?->code,
+                'statut' => $sale->statut,
+                'GrandTotal' => $sale->GrandTotal,
+                'paid_amount' => $sale->paid_amount,
+                'due' => $sale->GrandTotal - $sale->paid_amount,
+                'payment_status' => $sale->payment_statut,
+                'shipping_status' => $sale->shipping_status,
+            ]);
         }
         return response()->json([
             'sales' => $data,
@@ -258,17 +259,16 @@ class ReportController extends Controller
 
     public function Payments_Client(request $request)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
-//        $Role = Auth::user()->roles()->first();
-//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
+        if (!helpers::checkPermission('Reports_customers')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $payments = DB::table('payment_sales')
-//            ->where(function ($query) use ($ShowRecord) {
-//                if (!$ShowRecord) {
-//                    return $query->where('payment_sales.user_id', '=', Auth::user()->id);
-//                }
-//            })
+            ->where(function ($query) {
+                if (!helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })
             ->where('payment_sales.deleted_at', '=', null)
             ->join('sales', 'payment_sales.sale_id', '=', 'sales.id')
             ->where('sales.client_id', $request->id)
@@ -300,7 +300,9 @@ class ReportController extends Controller
     public function Quotations_Client(request $request)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
+        if (!helpers::checkPermission('Reports_customers')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
 //        $perPage = $request->limit;
 //        $pageStart = \Request::get('page', 1);
@@ -314,11 +316,11 @@ class ReportController extends Controller
         $Quotations = Quotation::with('client', 'warehouse')
             ->where('deleted_at', '=', null)
             ->where('client_id', $request->id)
-//            ->where(function ($query) use ($ShowRecord) {
-//                if (!$ShowRecord) {
-//                    return $query->where('user_id', '=', Auth::user()->id);
-//                }
-//            })
+            ->where(function ($query) {
+                if (!helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })
             //Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
@@ -348,16 +350,16 @@ class ReportController extends Controller
             ->get();
 
         foreach ($Quotations as $Quotation) {
+            $data->add([
+            'id' => $Quotation->id,
+            'date' => $Quotation->date,
+            'Ref' => $Quotation->Ref,
+            'statut' => $Quotation->statut,
+            'warehouse_name' => $Quotation['warehouse']->name,
+            'client_name' => $Quotation['client']->name,
+            'GrandTotal' => $Quotation->GrandTotal,
 
-            $item['id'] = $Quotation->id;
-            $item['date'] = $Quotation->date;
-            $item['Ref'] = $Quotation->Ref;
-            $item['statut'] = $Quotation->statut;
-            $item['warehouse_name'] = $Quotation['warehouse']->name;
-            $item['client_name'] = $Quotation['client']->name;
-            $item['GrandTotal'] = $Quotation->GrandTotal;
-
-            $data->add($item);
+            ]);
         }
 
         return response()->json([
@@ -371,7 +373,9 @@ class ReportController extends Controller
     public function Returns_Client(request $request)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
+        if (!helpers::checkPermission('Reports_customers')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
 //        $perPage = $request->limit;
 //        $pageStart = \Request::get('page', 1);
@@ -451,7 +455,9 @@ class ReportController extends Controller
 
     public function Report_Purchases(request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'ReportPurchases', Purchase::class);
+        if (!helpers::checkPermission('ReportPurchases')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
 //        $perPage = $request->limit;
 //        $pageStart = \Request::get('page', 1);
@@ -558,8 +564,9 @@ class ReportController extends Controller
 
     public function Report_Sales(request $request)
     {
-//            $this->authorizeForUser($request->user('api'), 'Reports_sales', Sale::class);
-
+ if (!helpers::checkPermission('Reports_sales')) {
+     return response()->json(['message' => "No tiene permisos"], 406);
+ }
         $data = collect();
         $filter = collect($request->get('filter'));
         if (empty($filter->get('startDate'))) {
@@ -618,19 +625,20 @@ class ReportController extends Controller
         //get warehouses assigned to user
         $user_auth = auth()->user();
         $warehouses = helpers::getWarehouses($user_auth);
-        return response()->json( [
-                'sales' => $data,
-                'customers' => $customers,
-                'warehouses' => $warehouses
-            ]);
+        return response()->json([
+            'sales' => $data,
+            'customers' => $customers,
+            'warehouses' => $warehouses
+        ]);
     }
 
     //----------------- Providers Report -----------------------\\
 
     public function Providers_Report(request $request)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'Reports_suppliers', Provider::class);
+        if (!helpers::checkPermission('Reports_suppliers')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
         $perPage = $request->limit;
         $pageStart = \Request::get('page', 1);
@@ -708,8 +716,9 @@ class ReportController extends Controller
 
     public function Purchases_Provider(request $request)
     {
-
-        $this->authorizeForUser($request->user('api'), 'Reports_suppliers', Provider::class);
+        if (!helpers::checkPermission('Reports_suppliers')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
         $perPage = $request->limit;
         $pageStart = \Request::get('page', 1);
@@ -782,7 +791,9 @@ class ReportController extends Controller
     public function Payments_Provider(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'Reports_suppliers', Provider::class);
+       if (!helpers::checkPermission('Reports_suppliers')) {
+           return response()->json(['message' => "No tiene permisos"], 406);
+       }
 
         // How many items do you want to display.
         $perPage = $request->limit;
@@ -836,7 +847,9 @@ class ReportController extends Controller
     public function Returns_Provider(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'Reports_suppliers', Provider::class);
+        if (!helpers::checkPermission('Reports_suppliers')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         // How many items do you want to display.
         $perPage = $request->limit;
@@ -916,8 +929,9 @@ class ReportController extends Controller
 
     public function ToProviders(Request $request)
     {
-
-        $this->authorizeForUser($request->user('api'), 'Reports_suppliers', Provider::class);
+        if (!helpers::checkPermission('Reports_suppliers')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $results = DB::table('purchases')->where('purchases.deleted_at', '=', null)
             ->join('providers', 'purchases.provider_id', '=', 'providers.id')
@@ -941,8 +955,9 @@ class ReportController extends Controller
 
     public function Warehouse_Report(request $request)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
+        if (!helpers::checkPermission('WarehouseStock')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $data['sales'] = Sale::where('deleted_at', '=', null)
             ->where(function ($query) use ($request) {
@@ -987,8 +1002,9 @@ class ReportController extends Controller
 
     public function Sales_Warehouse(request $request)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
+        if (!helpers::checkPermission('WarehouseStock')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
 //        $perPage = $request->limit;
 //        $pageStart = \Request::get('page', 1);
@@ -1061,8 +1077,9 @@ class ReportController extends Controller
 
     public function Quotations_Warehouse(request $request)
     {
-
-        $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
+        if (!helpers::checkPermission('WarehouseStock')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
         $perPage = $request->limit;
         $pageStart = \Request::get('page', 1);
@@ -1129,8 +1146,9 @@ class ReportController extends Controller
 
     public function Returns_Sale_Warehouse(request $request)
     {
-
-        $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
+        if (!helpers::checkPermission('WarehouseStock')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
         $perPage = $request->limit;
         $pageStart = \Request::get('page', 1);
@@ -1209,8 +1227,9 @@ class ReportController extends Controller
 
     public function Returns_Purchase_Warehouse(request $request)
     {
-
-        $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
+        if (!helpers::checkPermission('WarehouseStock')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
         $perPage = $request->limit;
         $pageStart = \Request::get('page', 1);
@@ -1289,8 +1308,9 @@ class ReportController extends Controller
 
     public function Expenses_Warehouse(request $request)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
+        if (!helpers::checkPermission('WarehouseStock')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
 //        $perPage = $request->limit;
 //        $pageStart = \Request::get('page', 1);
@@ -1359,7 +1379,9 @@ class ReportController extends Controller
 
     public function Warhouse_Count_Stock(Request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
+        if (!helpers::checkPermission('WarehouseStock')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $stock_count = product_warehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
             ->join('warehouses', 'product_warehouse.warehouse_id', '=', 'warehouses.id')
@@ -1420,8 +1442,9 @@ class ReportController extends Controller
 
     public function ProfitAndLoss(request $request)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'Reports_profit', Client::class);
+        if (!helpers::checkPermission('Reports_profit')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $role = Auth::user()->roles()->first();
 //        $view_records = Role::findOrFail($role->id)->inRole('record_view');
@@ -1784,8 +1807,9 @@ class ReportController extends Controller
 
     public function report_top_customers(request $request)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'Top_customers', Client::class);
+        if (!helpers::checkPermission('Top_customers')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $role = Auth::user()->roles()->first();
 //        $view_records = Role::findOrFail($role->id)->inRole('record_view');
@@ -1842,8 +1866,9 @@ class ReportController extends Controller
 
     public function users_Report(request $request)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
+        if (!helpers::checkPermission('users_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         // How many items do you want to display.
 //        $perPage = $request->limit;
@@ -1924,7 +1949,9 @@ class ReportController extends Controller
     public function get_sales_by_user(request $request)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
+        if (!helpers::checkPermission('users_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
 //        $perPage = $request->limit;
 //        $pageStart = \Request::get('page', 1);
@@ -1999,7 +2026,9 @@ class ReportController extends Controller
     public function get_quotations_by_user(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
+        if (!helpers::checkPermission('users_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
         $perPage = $request->limit;
         $pageStart = \Request::get('page', 1);
@@ -2070,7 +2099,9 @@ class ReportController extends Controller
     public function get_purchases_by_user(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
+        if (!helpers::checkPermission('users_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
         $perPage = $request->limit;
         $pageStart = \Request::get('page', 1);
@@ -2144,7 +2175,9 @@ class ReportController extends Controller
     public function get_sales_return_by_user(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
+        if (!helpers::checkPermission('users_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
         $perPage = $request->limit;
         $pageStart = \Request::get('page', 1);
@@ -2217,7 +2250,9 @@ class ReportController extends Controller
     public function get_purchase_return_by_user(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
+        if (!helpers::checkPermission('users_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         // How many items do you want to display.
         $perPage = $request->limit;
@@ -2292,7 +2327,9 @@ class ReportController extends Controller
     public function get_transfer_by_user(request $request)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
+if (!helpers::checkPermission('users_report')) {
+    return response()->json(['message' => "No tiene permisos"], 406);
+}
 
         // How many items do you want to display.
 //        $perPage = $request->limit;
@@ -2365,7 +2402,9 @@ class ReportController extends Controller
     public function get_adjustment_by_user(request $request)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'users_report', User::class);
+        if (!helpers::checkPermission('users_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         // How many items do you want to display.
 //        $perPage = $request->limit;
@@ -2429,8 +2468,9 @@ class ReportController extends Controller
 
     public function stock_Report(request $request)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
+        if (!helpers::checkPermission('stock_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         // How many items do you want to display.
 //        $perPage = $request->limit;
@@ -2509,7 +2549,9 @@ class ReportController extends Controller
     public function get_sales_by_product(request $request)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
+        if (!helpers::checkPermission('stock_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
 //        $perPage = $request->limit;
 //        $pageStart = \Request::get('page', 1);
@@ -2519,7 +2561,7 @@ class ReportController extends Controller
         $Role = Auth::user()->roles()->first();
 //        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $sale_details_data = SaleDetail::with('product', 'sale', 'sale.client', 'sale.warehouse','sale.sales_type')
+        $sale_details_data = SaleDetail::with('product', 'sale', 'sale.client', 'sale.warehouse', 'sale.sales_type')
 //            ->where(function ($query) use ($ShowRecord) {
 //                if (!$ShowRecord) {
 //                    return $query->whereHas('sale', function ($q) use ($request) {
@@ -2612,7 +2654,9 @@ class ReportController extends Controller
     public function get_quotations_by_product(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
+        if (!helpers::checkPermission('stock_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
         $perPage = $request->limit;
         $pageStart = \Request::get('page', 1);
@@ -2713,7 +2757,9 @@ class ReportController extends Controller
     public function get_purchases_by_product(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
+        if (!helpers::checkPermission('stock_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
         $perPage = $request->limit;
         $pageStart = \Request::get('page', 1);
@@ -2814,7 +2860,9 @@ class ReportController extends Controller
     public function get_purchase_return_by_product(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
+        if (!helpers::checkPermission('stock_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
         $perPage = $request->limit;
         $pageStart = \Request::get('page', 1);
@@ -2915,7 +2963,9 @@ class ReportController extends Controller
     public function get_sales_return_by_product(request $request)
     {
 
-        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
+        if (!helpers::checkPermission('stock_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
         $perPage = $request->limit;
         $pageStart = \Request::get('page', 1);
@@ -3016,7 +3066,9 @@ class ReportController extends Controller
     public function get_transfer_by_product(request $request)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
+        if (!helpers::checkPermission('stock_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
 //        $perPage = $request->limit;
 //        $pageStart = \Request::get('page', 1);
@@ -3104,7 +3156,9 @@ class ReportController extends Controller
     public function get_adjustment_by_product(request $request)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
+        if (!helpers::checkPermission('stock_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
 //        $perPage = $request->limit;
 //        $pageStart = \Request::get('page', 1);
@@ -3185,8 +3239,9 @@ class ReportController extends Controller
 
     public function download_report_client_pdf(Request $request, $id)
     {
-
-        $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
+        if (!helpers::checkPermission('Reports_customers')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $helpers = new helpers();
         $client = Client::where('deleted_at', '=', null)->findOrFail($id);
@@ -3258,8 +3313,9 @@ class ReportController extends Controller
 
     public function download_report_provider_pdf(Request $request, $id)
     {
-
-        $this->authorizeForUser($request->user('api'), 'Reports_suppliers', Provider::class);
+        if (!helpers::checkPermission('Reports_suppliers')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $helpers = new helpers();
         $provider = Provider::where('deleted_at', '=', null)->findOrFail($id);
@@ -3329,7 +3385,9 @@ class ReportController extends Controller
 
     public function product_report(request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'product_report', Product::class);
+        if (!helpers::checkPermission('product_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $Role = Auth::user()->roles()->first();
 //        $view_records = Role::findOrFail($Role->id)->inRole('record_view');
@@ -3543,8 +3601,9 @@ class ReportController extends Controller
 
     public function sale_products_details(request $request)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'product_report', Product::class);
+ if (!helpers::checkPermission('product_report')) {
+     return response()->json(['message' => "No tiene permisos"], 406);
+ }
         // How many items do you want to display.
 //        $perPage = $request->limit;
 //        $pageStart = \Request::get('page', 1);
@@ -3696,8 +3755,9 @@ class ReportController extends Controller
 
     public function product_sales_report(request $request)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'product_sales_report', Sale::class);
+        if (!helpers::checkPermission('product_sales_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $role = Auth::user()->roles()->first();
 //        $view_records = Role::findOrFail($role->id)->inRole('record_view');
         // How many items do you want to display.
@@ -3839,8 +3899,9 @@ class ReportController extends Controller
 
     public function product_purchases_report(request $request)
     {
-
-        $this->authorizeForUser($request->user('api'), 'product_purchases_report', Purchase::class);
+        if (!helpers::checkPermission('product_purchases_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $role = Auth::user()->roles()->first();
         $view_records = Role::findOrFail($role->id)->inRole('record_view');
         // How many items do you want to display.

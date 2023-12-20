@@ -86,6 +86,12 @@ function Get_Client_Report(page) {
         }
     );
 }
+function loaddata() {
+    router.get(
+        "/report/client/list",
+        { filter: form.value }
+    );
+}
 </script>
 <template>
     <layout>
