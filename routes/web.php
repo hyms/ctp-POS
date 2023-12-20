@@ -47,47 +47,47 @@ Route::post('/upgrade', [UpgradeController::class, 'upgrade'])->name('upgrade');
 Route::post('/upgrade-perms', [UpgradeController::class, 'setPermissions'])->name('upgrade');
 
 Route::get('/', [DashboardController::class, 'index']
-)->middleware(['auth', 'verified','auth.session'])->name('dashboard');
+)->middleware(['auth', 'verified', 'auth.session'])->name('dashboard');
 Route::get('/dashboard_data', [DashboardController::class, 'dashboard_data']
-)->middleware(['auth', 'verified','auth.session'])->name('dashboard');
+)->middleware(['auth', 'verified', 'auth.session'])->name('dashboard');
 require __DIR__ . '/auth.php';
 
 
 Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], function () {
 
     //------------------------------- Users --------------------------\\
-     Route::prefix('users')->group(function () {
-         Route::get('/', [UserController::class, 'index']);
-         Route::get('/list', [UserController::class, 'getTable']);
-         Route::get('/edit/{id}', [UserController::class, 'edit']);
-         Route::post('/', [UserController::class, 'store']);
-         Route::put('/{id}', [UserController::class, 'update']);
-     });
-     Route::get('get_user_auth', [UserController::class, 'GetUserAuth']);
-     Route::post('users_switch_activated/{id}', [UserController::class, 'IsActivated']);
-     Route::get('profile', [UserController::class, 'GetInfoProfile']);
-     Route::put('update_user_profile/{id}', [UserController::class, 'updateProfile']);
-     //------------------------------------------------------------------\\
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'index']);
+        Route::get('/list', [UserController::class, 'getTable']);
+        Route::get('/edit/{id}', [UserController::class, 'edit']);
+        Route::post('/', [UserController::class, 'store']);
+        Route::put('/{id}', [UserController::class, 'update']);
+    });
+    Route::get('get_user_auth', [UserController::class, 'GetUserAuth']);
+    Route::post('users_switch_activated/{id}', [UserController::class, 'IsActivated']);
+    Route::get('profile', [UserController::class, 'GetInfoProfile']);
+    Route::put('update_user_profile/{id}', [UserController::class, 'updateProfile']);
+    //------------------------------------------------------------------\\
 
     //------------------------------- WAREHOUSES --------------------------\\
- Route::prefix('warehouses')->group(function () {
-     Route::get('/', [WarehouseController::class, 'index']);
-     Route::get('/list', [WarehouseController::class, 'getTable']);
-     Route::post('/', [WarehouseController::class, 'store']);
-     Route::put('/{id}', [WarehouseController::class, 'update']);
-     Route::delete('/{id}', [WarehouseController::class, 'destroy']);
- });
- //------------------------------------------------------------------\\
+    Route::prefix('warehouses')->group(function () {
+        Route::get('/', [WarehouseController::class, 'index']);
+        Route::get('/list', [WarehouseController::class, 'getTable']);
+        Route::post('/', [WarehouseController::class, 'store']);
+        Route::put('/{id}', [WarehouseController::class, 'update']);
+        Route::delete('/{id}', [WarehouseController::class, 'destroy']);
+    });
+    //------------------------------------------------------------------\\
 
     //------------------------------- sales type --------------------------\\
-     Route::prefix('sales_types')->group(function () {
-         Route::get('/', [SalesTypeController::class, 'index']);
-         Route::get('/list', [SalesTypeController::class, 'getTable']);
-         Route::post('/', [SalesTypeController::class, 'store']);
-         Route::put('/{id}', [SalesTypeController::class, 'update']);
-         Route::delete('/{id}', [SalesTypeController::class, 'destroy']);
-     });
-     //------------------------------------------------------------------\\
+    Route::prefix('sales_types')->group(function () {
+        Route::get('/', [SalesTypeController::class, 'index']);
+        Route::get('/list', [SalesTypeController::class, 'getTable']);
+        Route::post('/', [SalesTypeController::class, 'store']);
+        Route::put('/{id}', [SalesTypeController::class, 'update']);
+        Route::delete('/{id}', [SalesTypeController::class, 'destroy']);
+    });
+    //------------------------------------------------------------------\\
 
     //------------------------------- CLIENTS --------------------------\\
     Route::prefix('clients')->group(function () {
@@ -105,42 +105,42 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
     //------------------------------------------------------------------\\
 
     //------------------------------- PRODUCTS --------------------------\\
-     Route::prefix('products')->group(function () {
-         Route::get('/', [ProductsController::class, 'index']);
-         Route::get('/create', [ProductsController::class, 'create']);
-         Route::get('/item/{id}', [ProductsController::class, 'show']);
-         Route::get('/edit/{id}', [ProductsController::class, 'edit']);
-         Route::get('/list', [ProductsController::class, 'getTable']);
-         Route::post('/', [ProductsController::class, 'store']);
-         Route::put('/{id}', [ProductsController::class, 'update']);
-         Route::delete('/{id}', [ProductsController::class, 'destroy']);
-         Route::post('/import/csv', [ProductsController::class, 'import_products']);
-         Route::get('/detail/{id}', [ProductsController::class, 'Get_Products_Details']);
-     });
-     Route::get('get_Products_by_warehouse/{id}', [ProductsController::class, 'Products_by_Warehouse']);
-     Route::get('get_products_stock_alerts', [ProductsController::class, 'Products_Alert']);
-     //------------------------------------------------------------------\\
+    Route::prefix('products')->group(function () {
+        Route::get('/', [ProductsController::class, 'index']);
+        Route::get('/create', [ProductsController::class, 'create']);
+        Route::get('/item/{id}', [ProductsController::class, 'show']);
+        Route::get('/edit/{id}', [ProductsController::class, 'edit']);
+        Route::get('/list', [ProductsController::class, 'getTable']);
+        Route::post('/', [ProductsController::class, 'store']);
+        Route::put('/{id}', [ProductsController::class, 'update']);
+        Route::delete('/{id}', [ProductsController::class, 'destroy']);
+        Route::post('/import/csv', [ProductsController::class, 'import_products']);
+        Route::get('/detail/{id}', [ProductsController::class, 'Get_Products_Details']);
+    });
+    Route::get('get_Products_by_warehouse/{id}', [ProductsController::class, 'Products_by_Warehouse']);
+    Route::get('get_products_stock_alerts', [ProductsController::class, 'Products_Alert']);
+    //------------------------------------------------------------------\\
 
     Route::prefix('products')->group(function () {
         //------------------------------- Category --------------------------\\
-         Route::prefix('categories')->group(function () {
-             Route::get('/', [CategorieController::class, 'index']);
-             Route::get('/list', [CategorieController::class, 'getTable']);
-             Route::post('/', [CategorieController::class, 'store']);
-             Route::put('/{id}', [CategorieController::class, 'update']);
-             Route::delete('/{id}', [CategorieController::class, 'destroy']);
-         });
-         //------------------------------------------------------------------\\
+        Route::prefix('categories')->group(function () {
+            Route::get('/', [CategorieController::class, 'index']);
+            Route::get('/list', [CategorieController::class, 'getTable']);
+            Route::post('/', [CategorieController::class, 'store']);
+            Route::put('/{id}', [CategorieController::class, 'update']);
+            Route::delete('/{id}', [CategorieController::class, 'destroy']);
+        });
+        //------------------------------------------------------------------\\
 
         //------------------------------- Units --------------------------\\
-         Route::prefix('units')->group(function () {
-             Route::get('/', [UnitsController::class, 'index']);
-             Route::get('/list', [UnitsController::class, 'getTable']);
-             Route::post('/', [UnitsController::class, 'store']);
-             Route::put('/{id}', [UnitsController::class, 'update']);
-             Route::delete('/{id}', [UnitsController::class, 'destroy']);
-         });
-         //------------------------------------------------------------------\\
+        Route::prefix('units')->group(function () {
+            Route::get('/', [UnitsController::class, 'index']);
+            Route::get('/list', [UnitsController::class, 'getTable']);
+            Route::post('/', [UnitsController::class, 'store']);
+            Route::put('/{id}', [UnitsController::class, 'update']);
+            Route::delete('/{id}', [UnitsController::class, 'destroy']);
+        });
+        //------------------------------------------------------------------\\
     });
     //------------------------------- Units --------------------------\\
     Route::get('get_sub_units_by_base', [UnitsController::class, 'Get_Units_SubBase']);
@@ -204,14 +204,14 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
     //------------------------------------------------------------------\\
 
 //------------------------------- Payments  Sales --------------------------\\
-Route::prefix('payment_sale')->group(function () {
-    Route::get('/', [PaymentSalesController::class, 'index']);
-    Route::get('/list', [PaymentSalesController::class, 'getTable']);
-    Route::post('/', [PaymentSalesController::class, 'store']);
-    Route::put('/{id}', [PaymentSalesController::class, 'update']);
-    Route::delete('/{id}', [PaymentSalesController::class, 'destroy']);
-});
-Route::get('payment_sale_get_number', [PaymentSalesController::class, 'getNumberOrder']);
+    Route::prefix('payment_sale')->group(function () {
+        Route::get('/', [PaymentSalesController::class, 'index']);
+        Route::get('/list', [PaymentSalesController::class, 'getTable']);
+        Route::post('/', [PaymentSalesController::class, 'store']);
+        Route::put('/{id}', [PaymentSalesController::class, 'update']);
+        Route::delete('/{id}', [PaymentSalesController::class, 'destroy']);
+    });
+    Route::get('payment_sale_get_number', [PaymentSalesController::class, 'getNumberOrder']);
 //------------------------------------------------------------------\\
 
     //------------------------------- Transfers --------------------------\\
@@ -262,7 +262,11 @@ Route::get('payment_sale_get_number', [PaymentSalesController::class, 'getNumber
 
     //-------------------------- Reports ---------------------------
     Route::prefix('report')->group(function () {
-        Route::get("/client", [ReportController::class, 'Client_Report']);
+        Route::get("/client", function (request $request) {
+            Inertia::share('titlePage', 'Reporte de Clientes');
+            return Inertia::render('Reports/customers_report');
+        });
+        Route::get("/client/list", [ReportController::class, 'Client_Report']);
         Route::get("/client/{id}", [ReportController::class, "Client_Report_detail"]);
         Route::get("/client_sales", [ReportController::class, "Sales_Client"]);
         Route::get("/client_payments", [ReportController::class, "Payments_Client"]);
@@ -273,19 +277,27 @@ Route::get('payment_sale_get_number', [PaymentSalesController::class, 'getNumber
         Route::get("/provider_purchases", [ReportController::class, "Purchases_Provider"]);
         Route::get("/provider_payments", [ReportController::class, "Payments_Provider"]);
         Route::get("/provider_returns", [ReportController::class, "Returns_Provider"]);
-        Route::get("/sales", [ReportController::class, "Report_Sales"]);
+        Route::get("/sales", function (request $request) {
+            Inertia::share('titlePage', 'Reporte de Ventas');
+            return Inertia::render('Reports/sales_report');
+        });
+        Route::get("/sales/list", [ReportController::class, "Report_Sales"]);
         Route::get("/purchases", [ReportController::class, "Report_Purchases"]);
         Route::get("/get_last_sales", [ReportController::class, "Get_last_Sales"]);
-        Route::get("/stock_alert", [ReportController::class, "Products_Alert"]);
-        Route::get("/payment_chart", [ReportController::class, "Payment_chart"]);
-        Route::get("/warehouse_report", [ReportController::class, "Warehouse_Report"]);
+//        Route::get("/stock_alert", [ReportController::class, "Products_Alert"]);
+//        Route::get("/payment_chart", [ReportController::class, "Payment_chart"]);
+        Route::get("/warehouse_report", function (request $request) {
+            Inertia::share('titlePage', 'Reporte de Agencias');
+            return Inertia::render('Reports/warehouse_report');
+        });
+        Route::get("/warehouse_report/list", [ReportController::class, "Warehouse_Report"]);
         Route::get("/sales_warehouse", [ReportController::class, "Sales_Warehouse"]);
         Route::get("/quotations_warehouse", [ReportController::class, "Quotations_Warehouse"]);
         Route::get("/returns_sale_warehouse", [ReportController::class, "Returns_Sale_Warehouse"]);
         Route::get("/returns_purchase_warehouse", [ReportController::class, "Returns_Purchase_Warehouse"]);
         Route::get("/expenses_warehouse", [ReportController::class, "Expenses_Warehouse"]);
         Route::get("/warhouse_count_stock", [ReportController::class, "Warhouse_Count_Stock"]);
-        Route::get("/report_today", [ReportController::class, "report_today"]);
+//        Route::get("/report_today", [ReportController::class, "report_today"]);
         Route::get("/count_quantity_alert", [ReportController::class, "count_quantity_alert"]);
         Route::get("/profit_and_loss", [ReportController::class, "ProfitAndLoss"]);
         Route::get("/report_dashboard", [ReportController::class, "report_dashboard"]);
@@ -296,11 +308,19 @@ Route::get('payment_sale_get_number', [PaymentSalesController::class, 'getNumber
         Route::get("/product_sales_report", [ReportController::class, "product_sales_report"]);
         Route::get("/product_purchases_report", [ReportController::class, "product_purchases_report"]);
 
-        Route::get("/users", [ReportController::class, "users_Report"]);
-        Route::get("/stock", [ReportController::class, "stock_Report"]);
-        Route::get("/stock_detail/{id}", function (request $request){
-            Inertia::share('titlePage','Detalle Producto');
-            return Inertia::render('Reports/detail_stock_report',['id',$request->get('id')]);
+        Route::get("/users", function (request $request) {
+            Inertia::share('titlePage', 'Reporte de Usuarios');
+            return Inertia::render('Reports/users_report');
+        });
+        Route::get("/users/list", [ReportController::class, "users_Report"]);
+        Route::get("/stock", function (request $request) {
+            Inertia::share('titlePage', 'Reporte de Stock');
+            return Inertia::render("Reports/stock_report");
+        });
+        Route::get("/stock/list", [ReportController::class, "stock_Report"]);
+        Route::get("/stock_detail/{id}", function (request $request) {
+            Inertia::share('titlePage', 'Detalle Producto');
+            return Inertia::render('Reports/detail_stock_report', ['id', $request->get('id')]);
         });
         Route::get("/get_sales_by_user", [ReportController::class, "get_sales_by_user"]);
         Route::get("/get_quotations_by_user", [ReportController::class, "get_quotations_by_user"]);
@@ -331,18 +351,18 @@ Route::get('payment_sale_get_number', [PaymentSalesController::class, 'getNumber
     Route::get('pdf', [\App\Http\Controllers\PDFController::class, 'printHtml']);
 
     //------------------------------- Permission Groups user -----------\\
-     Route::prefix('roles')->group(function () {
-         Route::get('/', [PermissionsController::class,'index']);
-         Route::post('/', [PermissionsController::class,'store']);
-         Route::put('/{id}', [PermissionsController::class,'update']);
-         Route::delete('/{id}', [PermissionsController::class,'destroy']);
-         Route::get('/list', [PermissionsController::class,'getTable']);
-         Route::get('/create', [PermissionsController::class,'create']);
-         Route::get('/edit/{id}', [PermissionsController::class,'edit']);
-         Route::get('/all', [PermissionsController::class,'getRoleswithoutpaginate']);
-         //    Route::resource('roles/check/create_page', [PermissionsController::class,'Check_Create_Page']);
-     });
-     //------------------------------------------------------------------\\
+    Route::prefix('roles')->group(function () {
+        Route::get('/', [PermissionsController::class, 'index']);
+        Route::post('/', [PermissionsController::class, 'store']);
+        Route::put('/{id}', [PermissionsController::class, 'update']);
+        Route::delete('/{id}', [PermissionsController::class, 'destroy']);
+        Route::get('/list', [PermissionsController::class, 'getTable']);
+        Route::get('/create', [PermissionsController::class, 'create']);
+        Route::get('/edit/{id}', [PermissionsController::class, 'edit']);
+        Route::get('/all', [PermissionsController::class, 'getRoleswithoutpaginate']);
+        //    Route::resource('roles/check/create_page', [PermissionsController::class,'Check_Create_Page']);
+    });
+    //------------------------------------------------------------------\\
 });
 /*
 

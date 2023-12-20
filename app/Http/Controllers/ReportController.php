@@ -130,11 +130,11 @@ class ReportController extends Controller
             $data->add($item);
         }
 
-        Inertia::share('titlePage', 'Reporte de Clientes');
-        return Inertia::render('Reports/customers_report', [
-            'report' => $data,
-        ]);
-
+//        Inertia::share('titlePage', 'Reporte de Clientes');
+//        return Inertia::render('Reports/customers_report', [
+//            'report' => $data,
+//        ]);
+  return response()->json(['report' => $data]);
     }
 
     //----------------- Customers Report By ID-----------------------\\
@@ -618,15 +618,11 @@ class ReportController extends Controller
         //get warehouses assigned to user
         $user_auth = auth()->user();
         $warehouses = helpers::getWarehouses($user_auth);
-
-        Inertia::share('titlePage', 'Reporte de Ventas');
-        return Inertia::render('Reports/sales_report',
-            [
+        return response()->json( [
                 'sales' => $data,
                 'customers' => $customers,
                 'warehouses' => $warehouses
-            ]
-        );
+            ]);
     }
 
     //----------------- Providers Report -----------------------\\
