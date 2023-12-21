@@ -1,20 +1,28 @@
 <script setup>
-import { computed, ref } from "vue";
+import { inject, onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
-import { router, usePage } from "@inertiajs/vue3";
-import { helpers, labels } from "@/helpers";
+import Snackbar from "@/Components/snackbar.vue";
+import { api, globals, helpers, labels } from "@/helpers";
+
+const moment = inject("moment");
 
 const props = defineProps({
-    customers: Object,
-    warehouses: Object,
-    sales: Object,
+    errors: Object,
 });
-const currency = computed(() => usePage().props.currency);
+const customers = ref([]);
+const warehouses = ref([]);
+const sales = ref([]);
+const currency = globals.currency();
 const loading = ref(false);
 const menu = ref(false);
 const search = ref("");
 const clientFilter = ref([]);
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
 const form = ref({
     startDate: "",
     endDate: "",
@@ -89,26 +97,33 @@ function querySelections(v) {
 
 //----------------------------------------- Get all Sales ------------------------------\\
 function Get_Sales(page) {
-    router.get(
-        "/report/sales",
-        { filter: form.value },
-        {
-            preserveState: true,
-            onStart: (page) => {
-                loading.value = true;
-            },
-            onSuccess: (page) => {
-                menu.value = false;
-            },
-            onFinish: (visit) => {
-                loading.value = false;
-            },
-        }
-    );
+    api.get({
+        url: "/report/sales/list",
+        params: { filter: form.value },
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
+            customers.value = helpers.toArraySelect(data.customers);
+            warehouses.value = helpers.toArraySelect(data.warehouses);
+            sales.value = data.sales;
+            menu.value = false;
+        },
+    });
 }
+onMounted(() => {
+    Get_Sales();
+    form.value.startDate = moment().format("YYYY-MM-DD");
+    form.value.endDate = moment().format("YYYY-MM-DD");
+});
 </script>
+
 <template>
     <layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <v-row align="center" class="mb-3">
             <v-col cols="12" sm="6">
                 <v-text-field
@@ -178,13 +193,10 @@ function Get_Sales(page) {
                                     <v-col cols="12" sm="6">
                                         <v-autocomplete
                                             v-model="form.client"
-                                            @update:search="querySelections"
-                                            item-title="name"
-                                            item-value="id"
                                             variant="outlined"
                                             clearable
                                             hide-details="auto"
-                                            :items="clientFilter"
+                                            :items="customers"
                                             :label="labels.sale.client_id"
                                         ></v-autocomplete>
                                     </v-col>
@@ -193,8 +205,6 @@ function Get_Sales(page) {
                                             v-model="form.warehouse"
                                             :items="warehouses"
                                             :label="labels.sale.warehouse_id"
-                                            item-value="id"
-                                            item-title="name"
                                             variant="outlined"
                                             hide-details="auto"
                                             clearable

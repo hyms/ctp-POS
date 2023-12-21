@@ -1,19 +1,24 @@
 <script setup>
-import { ref } from "vue";
+import { inject, onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
-import { router } from "@inertiajs/vue3";
-import { helpers, labels } from "@/helpers";
+import Snackbar from "@/Components/snackbar.vue";
+import { api, helpers, labels } from "@/helpers";
 
+const moment = inject("moment");
 const props = defineProps({
-    report: Object,
+    errors: Object,
 });
-
+const report = ref([]);
 const loading = ref(false);
 const menu = ref(false);
 const search = ref("");
 // const clients = ref([]);
-
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
 const fields = ref([
     { title: "Nombre", key: "name" },
     { title: "Telefono", key: "phone" },
@@ -69,32 +74,26 @@ function sumCount4(rowObj) {
 //--------------------------- Get Customer Report -------------\\
 
 function Get_Client_Report(page) {
-    router.get(
-        "/report/client",
-        { filter: form.value },
-        {
-            preserveState: true,
-            onStart: (page) => {
-                loading.value = true;
-            },
-            onSuccess: (page) => {
-                menu.value = false;
-            },
-            onFinish: (visit) => {
-                loading.value = false;
-            },
-        }
-    );
+    api.get({
+        url: "/report/client/list",
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
+            report.value = data.report;
+        },
+    });
 }
-function loaddata() {
-    router.get(
-        "/report/client/list",
-        { filter: form.value }
-    );
-}
+onMounted(() => {
+    Get_Client_Report();
+});
 </script>
 <template>
     <layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <v-row align="center" class="mb-3">
             <v-col cols="12" sm="6">
                 <v-text-field

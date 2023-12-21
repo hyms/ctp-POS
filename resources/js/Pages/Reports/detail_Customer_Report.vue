@@ -3,14 +3,18 @@ import { computed, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import { router } from "@inertiajs/vue3";
-import { globals, helpers, labels } from "@/helpers";
+import { api, globals, helpers, labels } from "@/helpers";
 
 const props = defineProps({
     report: Object,
     client_id: Number,
 });
 const currency = globals.currency();
-
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
 const loading = ref(false);
 const tab = ref(null);
 const search_sales = ref("");
@@ -91,30 +95,28 @@ const fields_payments_export = ref({
 
 //--------------------------- Get sales By Customer -------------\\
 function Get_Sales() {
-    loading.value = true;
-    axios
-        .get("/report/client_sales", { params: { id: props.client_id } })
-        .then((response) => {
-            sales.value = response.data.sales;
-        })
-        .catch((response) => {})
-        .finally(() => {
-            loading.value = false;
-        });
+    api.get({
+        url: "/report/client_sales",
+        params: { id: props.client_id },
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
+            sales.value = data.sales;
+        },
+    });
 }
 
 //--------------------------- Get Payments By Customer -------------\\
 function Get_Payments() {
-    loading.value = true;
-    axios
-        .get("/report/client_payments", { params: { id: props.client_id } })
-        .then((response) => {
-            payments.value = response.data.payments;
-        })
-        .catch((response) => {})
-        .finally(() => {
-            loading.value = false;
-        });
+    api.get({
+        url: "/report/client_payments",
+        params: { id: props.client_id },
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
+            payments.value = data.payments;
+        },
+    });
 }
 
 //
@@ -197,7 +199,7 @@ const tabVal = computed({
                             <v-col cols="6" class="text-right">
                                 <v-icon
                                     color="primary"
-                                    icon="mdi-cart-outline"
+                                    icon="fas fa-shopping-cart"
                                     size="68"
                                 ></v-icon>
                             </v-col>
@@ -220,7 +222,7 @@ const tabVal = computed({
                             <v-col cols="6" class="text-right">
                                 <v-icon
                                     color="primary"
-                                    icon="mdi-hand-coin-outline"
+                                    icon="fas fa-hand-holding-usd"
                                     size="68"
                                 ></v-icon>
                             </v-col>
@@ -251,7 +253,7 @@ const tabVal = computed({
                             <v-col cols="6" class="text-right">
                                 <v-icon
                                     color="primary"
-                                    icon="mdi-cash-multiple"
+                                    icon="fas fa-money-check-alt"
                                     size="68"
                                 ></v-icon>
                             </v-col>
@@ -282,7 +284,7 @@ const tabVal = computed({
                             <v-col cols="6" class="text-right">
                                 <v-icon
                                     color="primary"
-                                    icon="mdi-cash-clock"
+                                    icon="fas fa-search-dollar"
                                     size="68"
                                 ></v-icon>
                             </v-col>

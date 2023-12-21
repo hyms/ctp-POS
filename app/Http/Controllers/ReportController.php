@@ -30,8 +30,6 @@ use App\Models\Transfer;
 use App\Models\TransferDetail;
 use App\Models\Unit;
 use App\Models\User;
-use App\Models\UserWarehouse;
-use App\Models\Warehouse;
 use App\utils\helpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -351,13 +349,13 @@ class ReportController extends Controller
 
         foreach ($Quotations as $Quotation) {
             $data->add([
-            'id' => $Quotation->id,
-            'date' => $Quotation->date,
-            'Ref' => $Quotation->Ref,
-            'statut' => $Quotation->statut,
-            'warehouse_name' => $Quotation['warehouse']->name,
-            'client_name' => $Quotation['client']->name,
-            'GrandTotal' => $Quotation->GrandTotal,
+                'id' => $Quotation->id,
+                'date' => $Quotation->date,
+                'Ref' => $Quotation->Ref,
+                'statut' => $Quotation->statut,
+                'warehouse_name' => $Quotation['warehouse']->name,
+                'client_name' => $Quotation['client']->name,
+                'GrandTotal' => $Quotation->GrandTotal,
 
             ]);
         }
@@ -564,9 +562,9 @@ class ReportController extends Controller
 
     public function Report_Sales(request $request)
     {
- if (!helpers::checkPermission('Reports_sales')) {
-     return response()->json(['message' => "No tiene permisos"], 406);
- }
+        if (!helpers::checkPermission('Reports_sales')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $data = collect();
         $filter = collect($request->get('filter'));
         if (empty($filter->get('startDate'))) {
@@ -578,7 +576,7 @@ class ReportController extends Controller
 
         $Sales = Sale::select('sales.*')
             ->with('facture', 'client', 'warehouse', 'details', 'details.product')
-//            ->join('clients', 'sales.client_id', '=', 'clients.id')
+            ->join('clients', 'sales.client_id', '=', 'clients.id')
             ->where('sales.deleted_at', '=', null);
 //                ->whereBetween('sales.date', array($request->from, $request->to));
 
@@ -596,35 +594,35 @@ class ReportController extends Controller
         $Sales = $Sales->orderByDesc('date')->get();
         foreach ($Sales as $Sale) {
             foreach ($Sale['details'] as $datail) {
-                $item['id'] = $Sale['id'];
-                $item['date'] = $Sale['date'];
-                $item['Ref'] = $Sale['Ref'];
-                $item['statut'] = $Sale['statut'];
-                $item['discount'] = $Sale['discount'];
-                $item['shipping'] = $Sale['shipping'];
-                $item['warehouse_name'] = $Sale['warehouse']['name'];
-                $item['client_name'] = $Sale['client']?->company_name;
-                $item['client_email'] = $Sale['client']?->email;
-                $item['client_tele'] = $Sale['client']?->phone;
-                $item['client_code'] = $Sale['client']?->code;
-                $item['client_adr'] = $Sale['client']?->adresse;
-                $item['product'] = $datail['product']?->name;
-                $item['qty'] = $datail?->quantity;
-                $item['price'] = $datail?->price;
-                $item['GrandTotal'] = $Sale['GrandTotal'];
-                $item['paid_amount'] = $Sale['paid_amount'];
-                $item['due'] = $Sale['GrandTotal'] - $Sale['paid_amount'];
-                $item['payment_status'] = $Sale['payment_statut'];
-
-                $data->add($item);
+                $data->add([
+                    'id' => $Sale['id'],
+                    'date' => $Sale['date'],
+                    'Ref' => $Sale['Ref'],
+                    'statut' => $Sale['statut'],
+                    'discount' => $Sale['discount'],
+                    'shipping' => $Sale['shipping'],
+                    'warehouse_name' => $Sale['warehouse']['name'],
+                    'client_name' => $Sale['client']?->company_name,
+                    'client_email' => $Sale['client']?->email,
+                    'client_tele' => $Sale['client']?->phone,
+                    'client_code' => $Sale['client']?->code,
+                    'client_adr' => $Sale['client']?->adresse,
+                    'product' => $datail['product']?->name,
+                    'qty' => $datail?->quantity,
+                    'price' => $datail?->price,
+                    'GrandTotal' => $Sale['GrandTotal'],
+                    'paid_amount' => $Sale['paid_amount'],
+                    'due' => $Sale['GrandTotal'] - $Sale['paid_amount'],
+                    'payment_status' => $Sale['payment_statut'],
+                ]);
             }
         }
 
-        $customers = Client::where('deleted_at', '=', null)->get(['id', 'company_name as name']);
+        $customers = Client::where('deleted_at', '=', null)->pluck('company_name','id');
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
-        $warehouses = helpers::getWarehouses($user_auth);
+        $warehouses = helpers::getWarehouses($user_auth)->pluck('name','id');
         return response()->json([
             'sales' => $data,
             'customers' => $customers,
@@ -791,9 +789,9 @@ class ReportController extends Controller
     public function Payments_Provider(request $request)
     {
 
-       if (!helpers::checkPermission('Reports_suppliers')) {
-           return response()->json(['message' => "No tiene permisos"], 406);
-       }
+        if (!helpers::checkPermission('Reports_suppliers')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         // How many items do you want to display.
         $perPage = $request->limit;
@@ -2327,9 +2325,9 @@ class ReportController extends Controller
     public function get_transfer_by_user(request $request)
     {
 
-if (!helpers::checkPermission('users_report')) {
-    return response()->json(['message' => "No tiene permisos"], 406);
-}
+        if (!helpers::checkPermission('users_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         // How many items do you want to display.
 //        $perPage = $request->limit;
@@ -3601,9 +3599,9 @@ if (!helpers::checkPermission('users_report')) {
 
     public function sale_products_details(request $request)
     {
- if (!helpers::checkPermission('product_report')) {
-     return response()->json(['message' => "No tiene permisos"], 406);
- }
+        if (!helpers::checkPermission('product_report')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         // How many items do you want to display.
 //        $perPage = $request->limit;
 //        $pageStart = \Request::get('page', 1);
