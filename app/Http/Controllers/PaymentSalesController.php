@@ -31,10 +31,9 @@ class PaymentSalesController extends Controller
 
     public function getTable(request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'Reports_payments_Sales', PaymentSale::class);
-
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+        if (!helpers::checkPermission('Reports_payments_Sales')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $data = collect();
         $filter = collect($request->get('filter'));
@@ -47,12 +46,12 @@ class PaymentSalesController extends Controller
 
         // Check If User Has Permission View  All Records
         $Payments = PaymentSale::with('sale', 'sale.client')
-            ->where('deleted_at', '=', null);
-//            ->where(function ($query) use ($view_records) {
-//                if (!$view_records) {
-//                    return $query->where('user_id', '=', Auth::user()->id);
-//                }
-//            })
+            ->where('deleted_at', '=', null)
+            ->where(function ($query) {
+                if (!helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            });
 
         $Payments = helpers::getFilter($filter,
             $Payments,
@@ -70,17 +69,17 @@ class PaymentSalesController extends Controller
 
         foreach ($Payments as $Payment) {
             $data->add([
-            'date' => $Payment->date,
-            'Ref' => $Payment->Ref,
-            'Ref_Sale' => $Payment['sale']?->Ref,
-            'client_name' => $Payment['sale']?->client?->company_name,
-            'Reglement' => $Payment->Reglement,
-            'montant' => $Payment->montant,
-            // $item['montant'] = number_format($Payment->montant, 2, '.', ''),
+                'date' => $Payment->date,
+                'Ref' => $Payment->Ref,
+                'Ref_Sale' => $Payment['sale']?->Ref,
+                'client_name' => $Payment['sale']?->client?->company_name,
+                'Reglement' => $Payment->Reglement,
+                'montant' => $Payment->montant,
+                // $item['montant'] = number_format($Payment->montant, 2, '.', ''),
             ]);
         }
 
-        $clients = Client::where('deleted_at', '=', null)->pluck('company_name','id');
+        $clients = Client::where('deleted_at', '=', null)->pluck('company_name', 'id');
 //        $sales = Sale::whereIn('id', $Payments->pluck('sale_id'))->pluck('Ref', 'id');
 
         return response()->json(
@@ -96,6 +95,7 @@ class PaymentSalesController extends Controller
 
     public function store(Request $request)
     {
+
 //        $this->authorizeForUser($request->user('api'), 'create', PaymentSale::class);
 
         DB::transaction(function () use ($request) {

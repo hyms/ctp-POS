@@ -184,6 +184,7 @@ function loadMenu() {
             "Reports_customers",
             "Reports_sales",
             "Reports_payments_Sales",
+            // 'Reports_payments_Purchases',
         ])
     ) {
         subItems = [];
@@ -194,6 +195,13 @@ function loadMenu() {
                 activate: ["/payment_sale"],
             });
         }
+        // if (globals.userPermision(["Reports_payments_Purchases"])) {
+        //     subItems.push({
+        //         label: "Pagos de compras",
+        //         url: "/payments_purchase",
+        //         activate: ["/payments_purchase"],
+        //     });
+        // }
         if (globals.userPermision(["Reports_sales"])) {
             subItems.push({
                 label: "Reporte de ventas",
@@ -201,6 +209,13 @@ function loadMenu() {
                 activate: ["/report/sales"],
             });
         }
+        // if (globals.userPermision(["Reports_purchase"])) {
+        //     subItems.push({
+        //         label: "Reporte de compras",
+        //         url: "/report/purchase_report",
+        //         activate: ["/report/purchase_report"],
+        //     });
+        // }
         if (globals.userPermision(["Reports_customers"])) {
             subItems.push({
                 label: "Reporte de Clientes",
@@ -208,16 +223,14 @@ function loadMenu() {
                 activate: ["/report/client"],
             });
         }
-        //subItems.push({
-        //    label: "Alerta de Productos",
-        //    url: "/report/quantity_alerts",
-        //    role: "admin",
-        //});
-        //subItems.push( {
-        //           label: "Reporte de Agencias",
-        //           url: "/report/warehouse_report",
-        //       role: "admin",
+        //  if (globals.userPermision(["Reports_profit"])) {
+        //     subItems.push({
+        //         label: "Perdidas y Ganancias",
+        //         url: "/report/profit_and_loss",
+        //         activate: ["/report/profit_and_loss"],
         //     });
+        // }
+
         if (globals.userPermision(["stock_report"])) {
             subItems.push({
                 label: "Reporte de Stock",
@@ -225,16 +238,27 @@ function loadMenu() {
                 activate: ["/report/stock"],
             });
         }
-        //subItems.push( {
-        //   label: "Reporte de Usuarios",
-        //   url: "/report/users_report",
-        //   role: "admin",
-        // });
+
+        if (globals.userPermision(["Warehouse_report"])) {
+            subItems.push({
+                label: "Reporte de agencias",
+                url: "/report/warehouse_report",
+                activate: ["/report/warehouse_report"],
+            });
+        }
+
         if (globals.userPermision(["product_report"])) {
             subItems.push({
                 label: "Top productos vendidos",
                 url: "/report/top_products",
                 activate: ["/report/top_products"],
+            });
+        }
+        if (globals.userPermision(["users_report"])) {
+            subItems.push({
+                label: "Reporte de usuarios",
+                url: "/report/users_report",
+                activate: ["/report/users_report"],
             });
         }
 

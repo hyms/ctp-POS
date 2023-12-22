@@ -1,4 +1,4 @@
-<script>
+<script setup>
 // import { mapActions, mapGetters } from "vuex";
 // import ECharts from "vue-echarts/components/ECharts.vue";
 // import jsPDF from "jspdf";
