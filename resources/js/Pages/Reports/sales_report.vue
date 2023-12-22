@@ -111,9 +111,9 @@ function Get_Sales(page) {
     });
 }
 onMounted(() => {
-    Get_Sales();
     form.value.startDate = moment().format("YYYY-MM-DD");
     form.value.endDate = moment().format("YYYY-MM-DD");
+    Get_Sales();
 });
 </script>
 

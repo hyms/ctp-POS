@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Mail\Payment_Sale;
 use App\Models\Client;
 use App\Models\PaymentSale;
-use App\Models\Role;
 use App\Models\Sale;
 use App\Models\Setting;
+use App\Models\sms_gateway;
 use App\utils\helpers;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -15,11 +15,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use App\Models\PaymentWithCreditCard;
 use Inertia\Inertia;
 use Nexmo\Client\Credentials\Basic;
-use Nwidart\Modules\Facades\Module;
-use App\Models\sms_gateway;
 
 class PaymentSalesController extends Controller
 {
@@ -84,12 +81,12 @@ class PaymentSalesController extends Controller
         }
 
         $clients = Client::where('deleted_at', '=', null)->pluck('company_name','id');
-        $sales = Sale::whereIn('id', $Payments->pluck('sale_id'))->pluck('Ref', 'id');
+//        $sales = Sale::whereIn('id', $Payments->pluck('sale_id'))->pluck('Ref', 'id');
 
         return response()->json(
             [
                 'payments' => $data,
-                'sales' => $sales,
+//                'sales' => $sales,
                 'clients' => $clients,
             ]);
 
