@@ -618,11 +618,11 @@ class ReportController extends Controller
             }
         }
 
-        $customers = Client::where('deleted_at', '=', null)->pluck('company_name','id');
+        $customers = Client::where('deleted_at', '=', null)->pluck('company_name', 'id');
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
-        $warehouses = helpers::getWarehouses($user_auth)->pluck('name','id');
+        $warehouses = helpers::getWarehouses($user_auth)->pluck('name', 'id');
         return response()->json([
             'sales' => $data,
             'customers' => $customers,
@@ -953,7 +953,7 @@ class ReportController extends Controller
 
     public function Warehouse_Report(request $request)
     {
-        if (!helpers::checkPermission('WarehouseStock')) {
+        if (!helpers::checkPermission('Warehouse_report')) {
             return response()->json(['message' => "No tiene permisos"], 406);
         }
 
@@ -971,23 +971,23 @@ class ReportController extends Controller
                 });
             })->count();
 
-        $data['ReturnPurchase'] = PurchaseReturn::where('deleted_at', '=', null)
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('warehouse_id'), function ($query) use ($request) {
-                    return $query->where('warehouse_id', $request->warehouse_id);
-                });
-            })->count();
-
-        $data['ReturnSale'] = SaleReturn::where('deleted_at', '=', null)
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('warehouse_id'), function ($query) use ($request) {
-                    return $query->where('warehouse_id', $request->warehouse_id);
-                });
-            })->count();
+//        $data['ReturnPurchase'] = PurchaseReturn::where('deleted_at', '=', null)
+//            ->where(function ($query) use ($request) {
+//                return $query->when($request->filled('warehouse_id'), function ($query) use ($request) {
+//                    return $query->where('warehouse_id', $request->warehouse_id);
+//                });
+//            })->count();
+//
+//        $data['ReturnSale'] = SaleReturn::where('deleted_at', '=', null)
+//            ->where(function ($query) use ($request) {
+//                return $query->when($request->filled('warehouse_id'), function ($query) use ($request) {
+//                    return $query->where('warehouse_id', $request->warehouse_id);
+//                });
+//            })->count();
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
-        $warehouses = helpers::getWarehouses($user_auth);
+        $warehouses = helpers::getWarehouses($user_auth)->pluck('name', 'id');
 
         return response()->json([
             'data' => $data,
@@ -1000,7 +1000,7 @@ class ReportController extends Controller
 
     public function Sales_Warehouse(request $request)
     {
-        if (!helpers::checkPermission('WarehouseStock')) {
+        if (!helpers::checkPermission('Warehouse_report')) {
             return response()->json(['message' => "No tiene permisos"], 406);
         }
         // How many items do you want to display.
@@ -1010,34 +1010,32 @@ class ReportController extends Controller
 //        $offSet = ($pageStart * $perPage) - $perPage;
         $data = collect();
 
-        $Role = Auth::user()->roles()->first();
-//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
-
         $sales = Sale::where('deleted_at', '=', null)->with('client', 'warehouse')
-//            ->where(function ($query) use ($ShowRecord) {
-//                if (!$ShowRecord) {
-//                    return $query->where('user_id', '=', Auth::user()->id);
-//                }
-//            })
+            ->where(function ($query) {
+                if (!helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('warehouse_id'), function ($query) use ($request) {
                     return $query->where('warehouse_id', $request->warehouse_id);
                 });
             })
             // Search With Multiple Param
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('search'), function ($query) use ($request) {
-                    return $query->where('Ref', 'LIKE', "%{$request->search}%")
-                        ->orWhere('statut', 'LIKE', "%{$request->search}%")
-                        ->orWhere('GrandTotal', $request->search)
-                        ->orWhere('payment_statut', 'like', "$request->search")
-                        ->orWhere(function ($query) use ($request) {
-                            return $query->whereHas('client', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        });
-                });
-            });
+//            ->where(function ($query) use ($request) {
+//                return $query->when($request->filled('search'), function ($query) use ($request) {
+//                    return $query->where('Ref', 'LIKE', "%{$request->search}%")
+//                        ->orWhere('statut', 'LIKE', "%{$request->search}%")
+//                        ->orWhere('GrandTotal', $request->search)
+//                        ->orWhere('payment_statut', 'like', "$request->search")
+//                        ->orWhere(function ($query) use ($request) {
+//                            return $query->whereHas('client', function ($q) use ($request) {
+//                                $q->where('name', 'LIKE', "%{$request->search}%");
+//                            });
+//                        });
+//                });
+//            })
+        ;
 
         $totalRows = $sales->count();
 //        if ($perPage == "-1") {
@@ -1048,22 +1046,22 @@ class ReportController extends Controller
 //            ->limit($perPage)
             ->orderBy('id', 'desc')
             ->get();
+        $data = $sales->map(function ($item, $key) {
+            return [
+                'id' => $item->id,
+                'date' => $item->date,
+                'Ref' => $item->Ref,
+                'client_name' => $item->client?->company_name,
+                'warehouse_name' => $item->warehouse?->name,
+                'statut' => $item->statut,
+                'GrandTotal' => $item->GrandTotal,
+                'paid_amount' => $item->paid_amount,
+                'due' => $item->GrandTotal - $item->paid_amount,
+                'payment_status' => $item->payment_statut,
+                'shipping_status' => $item->shipping_status,
+            ];
+        });
 
-        foreach ($sales as $sale) {
-            $item['id'] = $sale->id;
-            $item['date'] = $sale->date;
-            $item['Ref'] = $sale->Ref;
-            $item['client_name'] = $sale['client']->name;
-            $item['warehouse_name'] = $sale['warehouse']->name;
-            $item['statut'] = $sale->statut;
-            $item['GrandTotal'] = $sale->GrandTotal;
-            $item['paid_amount'] = $sale->paid_amount;
-            $item['due'] = $sale->GrandTotal - $sale->paid_amount;
-            $item['payment_status'] = $sale->payment_statut;
-            $item['shipping_status'] = $sale->shipping_status;
-
-            $data->add($item);
-        }
         return response()->json([
             'totalRows' => $totalRows,
             'sales' => $data,
@@ -1075,7 +1073,7 @@ class ReportController extends Controller
 
     public function Quotations_Warehouse(request $request)
     {
-        if (!helpers::checkPermission('WarehouseStock')) {
+        if (!helpers::checkPermission('Warehouse_report')) {
             return response()->json(['message' => "No tiene permisos"], 406);
         }
         // How many items do you want to display.
@@ -1144,7 +1142,7 @@ class ReportController extends Controller
 
     public function Returns_Sale_Warehouse(request $request)
     {
-        if (!helpers::checkPermission('WarehouseStock')) {
+        if (!helpers::checkPermission('Warehouse_report')) {
             return response()->json(['message' => "No tiene permisos"], 406);
         }
         // How many items do you want to display.
@@ -1225,7 +1223,7 @@ class ReportController extends Controller
 
     public function Returns_Purchase_Warehouse(request $request)
     {
-        if (!helpers::checkPermission('WarehouseStock')) {
+        if (!helpers::checkPermission('Warehouse_report')) {
             return response()->json(['message' => "No tiene permisos"], 406);
         }
         // How many items do you want to display.
@@ -1306,7 +1304,7 @@ class ReportController extends Controller
 
     public function Expenses_Warehouse(request $request)
     {
-        if (!helpers::checkPermission('WarehouseStock')) {
+        if (!helpers::checkPermission('Warehouse_report')) {
             return response()->json(['message' => "No tiene permisos"], 406);
         }
         // How many items do you want to display.
@@ -1316,35 +1314,32 @@ class ReportController extends Controller
 //        $offSet = ($pageStart * $perPage) - $perPage;
         $data = collect();
 
-        //  Check If User Has Permission Show All Records
-        $Role = Auth::user()->roles()->first();
-//        $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
-
         $Expenses = Expense::where('deleted_at', '=', null)
             ->with('expense_category', 'warehouse')
-//            ->where(function ($query) use ($ShowRecord) {
-//                if (!$ShowRecord) {
-//                    return $query->where('user_id', '=', Auth::user()->id);
-//                }
-//            })
+            ->where(function ($query) {
+                if (!helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('warehouse_id'), function ($query) use ($request) {
                     return $query->where('warehouse_id', $request->warehouse_id);
                 });
             })
             //Search With Multiple Param
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('search'), function ($query) use ($request) {
-                    return $query->where('Ref', 'LIKE', "%{$request->search}%")
-                        ->orWhere('date', 'LIKE', "%{$request->search}%")
-                        ->orWhere('details', 'LIKE', "%{$request->search}%")
-                        ->orWhere(function ($query) use ($request) {
-                            return $query->whereHas('expense_category', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        });
-                });
-            });
+//            ->where(function ($query) use ($request) {
+//                return $query->when($request->filled('search'), function ($query) use ($request) {
+//                    return $query->where('Ref', 'LIKE', "%{$request->search}%")
+//                        ->orWhere('date', 'LIKE', "%{$request->search}%")
+//                        ->orWhere('details', 'LIKE', "%{$request->search}%")
+//                        ->orWhere(function ($query) use ($request) {
+//                            return $query->whereHas('expense_category', function ($q) use ($request) {
+//                                $q->where('name', 'LIKE', "%{$request->search}%");
+//                            });
+//                        });
+//                });
+//            })
+        ;
 
         $totalRows = $Expenses->count();
 //        if ($perPage == "-1") {
@@ -1356,16 +1351,16 @@ class ReportController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        foreach ($Expenses as $Expense) {
-
-            $item['date'] = $Expense->date;
-            $item['Ref'] = $Expense->Ref;
-            $item['details'] = $Expense->details;
-            $item['amount'] = $Expense->amount;
-            $item['warehouse_name'] = $Expense['warehouse']->name;
-            $item['category_name'] = $Expense['expense_category']->name;
-            $data->add($item);
-        }
+        $data = $Expenses->map(function ($item, $key) {
+            return [
+                'date' => $item->date,
+                'Ref' => $item->Ref,
+                'details' => $item->details,
+                'amount' => $item->amount,
+                'warehouse_name' => $item['warehouse']->name,
+                'category_name' => $item['expense_category']->name
+            ];
+        });
 
         return response()->json([
             'totalRows' => $totalRows,
@@ -1377,7 +1372,7 @@ class ReportController extends Controller
 
     public function Warhouse_Count_Stock(Request $request)
     {
-        if (!helpers::checkPermission('WarehouseStock')) {
+        if (!helpers::checkPermission('Warehouse_report')) {
             return response()->json(['message' => "No tiene permisos"], 406);
         }
 
@@ -1387,9 +1382,9 @@ class ReportController extends Controller
             ->select(
                 DB::raw("count(DISTINCT products.id) as value"),
                 DB::raw("warehouses.name as name"),
-                DB::raw('(IFNULL(SUM(qte),0)) AS value1'),
+                DB::raw('(IFNULL(SUM(qty),0)) AS value1'),
             )
-            ->where('qte', '>', 0)
+            ->where('qty', '>', 0)
             ->groupBy('warehouses.name')
             ->get();
 
@@ -1397,24 +1392,25 @@ class ReportController extends Controller
             ->join('warehouses', 'product_warehouse.warehouse_id', '=', 'warehouses.id')
             ->where('product_warehouse.deleted_at', '=', null)
             ->select(
-                DB::raw("SUM(products.price * qte ) as price"),
-                DB::raw("SUM(products.cost * qte) as cost"),
+                DB::raw("SUM(products.price * qty ) as price"),
+                DB::raw("SUM(products.cost * qty) as cost"),
                 DB::raw("warehouses.name as name"),
             )
-            ->where('qte', '>', 0)
+            ->where('qty', '>', 0)
             ->groupBy('warehouses.name')
             ->get();
 
         $data = collect();
         foreach ($stock_value as $key => $value) {
-            $item['name'] = $value->name;
-            $item['value'] = $value->price;
-            $item['value1'] = $value->cost;
-            $data->add($item);
+            $data->add([
+                'name' => $value->name,
+                'value' => $value->price,
+                'value1' => $value->cost,
+            ]);
         }
 
         //get warehouses assigned to user
-        $warehouses = helpers::getWarehouses(auth()->user());
+        $warehouses = helpers::getWarehouses(auth()->user())->pluck('name');
 
         return response()->json([
             'stock_count' => $stock_count,
@@ -1430,7 +1426,7 @@ class ReportController extends Controller
     {
 
         $products_alerts = product_warehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
-            ->whereRaw('qte <= stock_alert')
+            ->whereRaw('qty <= stock_alert')
             ->count();
 
         return response()->json($products_alerts);
@@ -2526,7 +2522,7 @@ class ReportController extends Controller
                 ->get();
             $total_qty = 0;
             foreach ($product_warehouse_data as $product_warehouse) {
-                $total_qty += $product_warehouse->qte;
+                $total_qty += $product_warehouse->qty;
                 $item['quantity'] = $total_qty . ' ' . $product['unit']->ShortName;
             }
 

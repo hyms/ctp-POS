@@ -187,6 +187,10 @@ class UpgradeController extends Controller
                     'Reports_payments_Sale_Returns',
                     'Reports_payments_Purchases',
                     'Reports_payments_Sales',
+                    'users_report',
+                    'stock_report',
+                    'product_report',
+                    'product_sales_report',
                     'Pos_view',
                     'dashboard',
                 ]);

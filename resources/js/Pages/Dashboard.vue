@@ -183,9 +183,9 @@ function all_dashboard_data(warehouseId = null) {
                 tooltip: {
                     show: true,
                     backgroundColor: "rgba(0, 0, 0, .8)",
-                },
-                formatter: function (params) {
-                    return `${params.name}: (${params.value} ${labels.sales})`;
+                    formatter: function (params) {
+                        return `${params.name}: (${params.value} ${labels.sales})`;
+                    },
                 },
                 series: [
                     {
@@ -195,8 +195,8 @@ function all_dashboard_data(warehouseId = null) {
                         center: "50%",
 
                         data: product_report.value.original,
-                        itemStyle: {
-                            emphasis: {
+                        emphasis: {
+                            itemStyle: {
                                 shadowBlur: 10,
                                 shadowOffsetX: 0,
                                 shadowColor: "rgba(0, 0, 0, 0.5)",

@@ -196,14 +196,14 @@ const tabVal = computed({
                 <v-card class="mb-30 text-center">
                     <v-card-text>
                         <v-row align="center" no-gutters>
-                            <v-col cols="6" class="text-right">
+                            <v-col class="text-center">
                                 <v-icon
                                     color="primary"
                                     icon="fas fa-shopping-cart"
                                     size="68"
                                 ></v-icon>
                             </v-col>
-                            <v-col class="text-h6" cols="6">
+                            <v-col class="text-h6">
                                 <p class="text-disabled mt-2 mb-0">Ventas</p>
                                 <p
                                     class="text-primary text-24 line-height-1 mb-2"
@@ -219,14 +219,14 @@ const tabVal = computed({
                 <v-card class="mb-30 text-center">
                     <v-card-text>
                         <v-row align="center" no-gutters>
-                            <v-col cols="6" class="text-right">
+                            <v-col class="text-center">
                                 <v-icon
                                     color="primary"
                                     icon="fas fa-hand-holding-usd"
                                     size="68"
                                 ></v-icon>
                             </v-col>
-                            <v-col class="text-h6" cols="6">
+                            <v-col class="text-h6">
                                 <p class="text-disabled mt-2 mb-0">
                                     Monto Total
                                 </p>
@@ -250,7 +250,7 @@ const tabVal = computed({
                 <v-card class="mb-30 text-center">
                     <v-card-text>
                         <v-row align="center" no-gutters>
-                            <v-col cols="6" class="text-right">
+                            <v-col class="text-center">
                                 <v-icon
                                     color="primary"
                                     icon="fas fa-money-check-alt"
@@ -281,14 +281,14 @@ const tabVal = computed({
                 <v-card class="mb-30 text-center">
                     <v-card-text>
                         <v-row align="center" no-gutters>
-                            <v-col cols="6" class="text-right">
+                            <v-col class="text-center">
                                 <v-icon
                                     color="primary"
                                     icon="fas fa-search-dollar"
                                     size="68"
                                 ></v-icon>
                             </v-col>
-                            <v-col class="text-h6" cols="6">
+                            <v-col class="text-h6">
                                 <p class="text-disabled mt-2 mb-0">Deuda</p>
                                 <p
                                     class="text-primary text-24 line-height-1 mb-2"
