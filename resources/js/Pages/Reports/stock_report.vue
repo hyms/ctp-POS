@@ -1,20 +1,24 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
-import { router } from "@inertiajs/vue3";
-import { helpers, labels } from "@/helpers";
+import { api, helpers, labels } from "@/helpers";
+import Snackbar from "@/Components/snackbar.vue";
 
 const props = defineProps({
-    report: Object,
-    warehouses: Object,
+    errors: Object,
 });
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
+const report = ref([]);
+const warehouses = ref([]);
 const loading = ref(false);
 const menu = ref(false);
 const search = ref("");
-const formFilter = ref({
-    warehouse_id: "",
-});
+const warehouse_id = ref("");
 
 const fields = ref([
     { title: labels.product.code, key: "code" },
@@ -35,30 +39,56 @@ const jsonFields = ref({
 //--------------------------- Get Customer Report -------------\\
 
 function Get_Stock_Report(page = 1) {
-    router.get(
-        "report/stock",
-        {
+    api.get({
+        url: "/report/stock/list",
+        params: {
             page: page,
             SortField: "",
             SortType: "",
-            warehouse_id: formFilter.value.warehouse_id,
+            warehouse_id: warehouse_id,
             search: "",
             limit: "",
         },
-        {
-            only: ["report"],
-            onStart: () => {
-                loading.value = true;
-            },
-            onFinish: () => {
-                loading.value = false;
-            },
-        }
-    );
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
+            report.value = data.report;
+            warehouses.value = data.warehouses;
+        },
+    });
 }
+function Selected_Warehouse(value) {
+    warehouse_id.value = value;
+    if (value === null) {
+        warehouse_id.value = "";
+    }
+    Get_Stock_Report(1);
+}
+onMounted(() => {
+    Get_Stock_Report();
+});
 </script>
 <template>
     <layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
+        <v-row>
+            <v-col>
+                <v-col lg="3" md="6" cols="12">
+                    <v-select
+                        @update:modelValue="Selected_Warehouse"
+                        :model-value="warehouse_id"
+                        :items="helpers.toArraySelect(warehouses)"
+                        :label="labels.filter_by_warehouse"
+                        hide-details="auto"
+                        clearable
+                    ></v-select>
+                </v-col>
+            </v-col>
+        </v-row>
         <v-row align="center" class="mb-3">
             <v-col cols="12" sm="4">
                 <v-text-field
@@ -75,7 +105,7 @@ function Get_Stock_Report(page = 1) {
                 <ExportBtn
                     :data="report"
                     :fields="jsonFields"
-                    name-file="Clientes"
+                    name-file="reporte_stock"
                 ></ExportBtn>
             </v-col>
         </v-row>

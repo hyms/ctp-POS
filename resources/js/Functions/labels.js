@@ -129,6 +129,7 @@ export default {
     adjustment: {
         notes: "Detalle",
         warehouse_id: "Agencia",
+        product_id: "Producto",
         date: defaults.date,
         ref: defaults.code + " de Ajuste",
         items: "Items",

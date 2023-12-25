@@ -247,13 +247,13 @@ function loadMenu() {
             });
         }
 
-        if (globals.userPermision(["product_report"])) {
-            subItems.push({
-                label: "Top productos vendidos",
-                url: "/report/top_products",
-                activate: ["/report/top_products"],
-            });
-        }
+        // if (globals.userPermision(["product_report"])) {
+        //     subItems.push({
+        //         label: "Top productos vendidos",
+        //         url: "/report/top_products",
+        //         activate: ["/report/top_products"],
+        //     });
+        // }
         if (globals.userPermision(["users_report"])) {
             subItems.push({
                 label: "Reporte de usuarios",

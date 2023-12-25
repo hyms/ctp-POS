@@ -1,8 +1,14 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router } from "@inertiajs/vue3";
-import { helpers, labels } from "@/helpers";
+import { api, helpers, labels, labelsNew } from "@/helpers";
+
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
 
 const tab = ref(null);
 
@@ -24,13 +30,13 @@ const search_adjustments = ref("");
 //       search_return_purchases:"",
 
 const props = defineProps({
-    id: Number,
+    id: String,
+    errors: Object,
 });
 const loading = ref(false);
+const loadingTable = ref(false);
 const menu = ref(false);
-const formFilter = ref({
-    warehouse_id: "",
-});
+const warehouse_id = ref("");
 const product = ref({});
 const sales = ref([]);
 const transfers = ref([]);
@@ -265,39 +271,40 @@ const fields_transfers = ref([
 ]);
 const fields_adjustments = ref([
     { title: labels.adjustment.date, key: "date" },
-    { title: labels.adjustment.Ref, key: "Ref" },
-    { title: labels.adjustment.product, key: "product_name" },
-    { title: labels.warehouse.name, key: "warehouse_name" },
+    { title: labels.adjustment.ref, key: "Ref" },
+    { title: labels.adjustment.product_id, key: "product_name" },
+    { title: labels.adjustment.warehouse_id, key: "warehouse_name" },
 ]);
 
 //----------------------------------- Get Details Product ------------------------------\\
 function showDetails() {
-    axios
-        .get(`/get_product_detail/${props.id}`)
-        .then((response) => {
-            product.value = response.data;
-        })
-        .catch((response) => {});
+    api.get({
+        url: `/products/detail/${props.id}`,
+        params: { format: "json" },
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
+            product.value = data.product;
+        },
+    });
 }
 
 //--------------------------- get_sales_by_product -------------\\
 function Get_Sales(page = 1) {
-    loading.value = true;
-    axios
-        .get(
-            "/report/get_sales_by_product?page=" +
-                page +
-                "&limit=" +
-                "&search=" +
-                "&id=" +
-                props.id
-        )
-        .then(({ data }) => {
+    api.get({
+        url: "/report/get_sales_by_product",
+        params: {
+            page,
+            limit: "",
+            search: "",
+            id: props.id,
+        },
+        loadingItem: loadingTable,
+        snackbar,
+        onSuccess: (data) => {
             sales.value = data.sales;
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+        },
+    });
 }
 
 //     //--------------------------- Get Purchases By product -------------\\
@@ -352,40 +359,38 @@ function Get_Sales(page = 1) {
 //
 //--------------------------- Get Transfers By product -------------\\
 function Get_Transfers(page = 1) {
-    axios
-        .get(
-            "/report/get_transfer_by_product?page=" +
-                page +
-                "&limit=" +
-                "&search=" +
-                "&id=" +
-                props.id
-        )
-        .then(({ data }) => {
+    api.get({
+        url: "/report/get_transfer_by_product",
+        params: {
+            page,
+            limit: "",
+            search: "",
+            id: props.id,
+        },
+        loadingItem: loadingTable,
+        snackbar,
+        onSuccess: (data) => {
             transfers.value = data.transfers;
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+        },
+    });
 }
 
 //--------------------------- Get adjustment By product -------------\\
 function Get_adjustments(page = 1) {
-    axios
-        .get(
-            "/report/get_adjustment_by_product?page=" +
-                page +
-                "&limit=" +
-                "&search=" +
-                "&id=" +
-                props.id
-        )
-        .then(({ data }) => {
+    api.get({
+        url: "/report/get_adjustment_by_product",
+        params: {
+            page,
+            limit: "",
+            search: "",
+            id: props.id,
+        },
+        loadingItem: loadingTable,
+        snackbar,
+        onSuccess: (data) => {
             adjustments.value = data.adjustments;
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+        },
+    });
 }
 
 //
@@ -455,9 +460,71 @@ const tabVal = computed({
         tab.value = val;
     },
 });
+onMounted(() => {
+    showDetails();
+});
 </script>
 <template>
     <layout>
+        <v-card :loading="loading">
+            <v-card-title class="text-center">{{ product.name }}</v-card-title>
+            <v-card-text>
+                <v-row>
+                    <!-- Warehouse Quantity -->
+                    <v-col cols="12" md="5" class="mt-2">
+                        <v-table hover density="compact">
+                            <thead>
+                                <tr>
+                                    <th>{{ labelsNew.warehouse }}</th>
+                                    <th>{{ labelsNew.Quantity }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="PROD_W in product.CountQTY">
+                                    <td>{{ PROD_W.mag }}</td>
+                                    <td>
+                                        {{
+                                            helpers.formatNumber(PROD_W.qty, 2)
+                                        }}
+                                        {{ product.unit }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </v-table>
+                    </v-col>
+                    <!-- Warehouse Variants Quantity -->
+                    <v-col
+                        cols="12"
+                        md="7"
+                        v-if="product.is_variant == 'yes'"
+                        class="mt-2"
+                    >
+                        <v-table hover density="compact">
+                            <thead>
+                                <tr>
+                                    <th>{{ labelsNew.warehouse }}</th>
+                                    <th>{{ labelsNew.Variant }}</th>
+                                    <th>{{ labelsNew.Quantity }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="PROD_V in product.CountQTY_variants">
+                                    <td>{{ PROD_V.mag }}</td>
+                                    <td>{{ PROD_V.variant }}</td>
+                                    <td>
+                                        {{
+                                            helpers.formatNumber(PROD_V.qty, 2)
+                                        }}
+                                        {{ product.unit }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </v-table>
+                    </v-col>
+                </v-row>
+            </v-card-text>
+        </v-card>
+
         <v-card>
             <v-tabs v-model="tabVal" color="primary">
                 <v-tab value="sales">Ventas</v-tab>
@@ -493,7 +560,7 @@ const tabVal = computed({
                             :search="search_sales"
                             hover
                             :no-data-text="labels.no_data_table"
-                            :loading="loading"
+                            :loading="loadingTable"
                         >
                             <template v-slot:item.statut="{ item }">
                                 <v-chip
@@ -528,7 +595,9 @@ const tabVal = computed({
                                     color="default"
                                     :text="item.Ref"
                                     @click="
-                                        router.visit('/sales/detail/' + item.id)
+                                        router.visit(
+                                            '/sales/detail/' + item.sale_id
+                                        )
                                     "
                                 ></v-btn>
                             </template>

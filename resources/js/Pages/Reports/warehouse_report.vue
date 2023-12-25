@@ -218,9 +218,10 @@ function Selected_Warehouse(value) {
 //------------------------------ Show Reports -------------------------\\
 function Get_Reports() {
     api.get({
-        url:
-            "/report/warehouse_report/list?warehouse_id=" +
-            Filter_warehouse.value,
+        url: "/report/warehouse_report/list",
+        params: {
+            warehouse_id: Filter_warehouse.value,
+        },
         loadingItem: loading,
         snackbar,
         onSuccess: (data) => {
@@ -233,14 +234,13 @@ function Get_Reports() {
 //--------------------------- Get sales By warehouse -------------\\
 function Get_Sales(page) {
     api.get({
-        url:
-            "/report/sales_warehouse?page=" +
-            page +
-            "&limit=" +
-            "&warehouse_id=" +
-            Filter_warehouse.value +
-            "&search=" +
-            search_sale.value,
+        url: "/report/sales_warehouse",
+        params: {
+            page,
+            limit: "",
+            warehouse_id: Filter_warehouse.value,
+            search: search_sale.value,
+        },
         loadingItem: loadingTable,
         snackbar,
         onSuccess: (data) => {
@@ -312,14 +312,13 @@ function Get_Sales(page) {
 //--------------------------- Get Expenses By warehouse -------------\\
 function Get_Expenses(page) {
     api.get({
-        url:
-            "/report/expenses_warehouse?page=" +
-            page +
-            "&limit=" +
-            "&warehouse_id=" +
-            Filter_warehouse.value +
-            "&search=" +
-            search_expense.value,
+        url: "/report/expenses_warehouse",
+        params: {
+            page,
+            limit: "",
+            warehouse_id: Filter_warehouse.value,
+            search: search_expense.value,
+        },
         loadingItem: loadingTable,
         snackbar,
         onSuccess: (data) => {
@@ -435,8 +434,6 @@ function report_with_echart() {
 onMounted(() => {
     report_with_echart();
     Get_Reports();
-    //
-    1;
     // Get_Quotations(1);
     // Get_Returns_Sale(1);
     // Get_Returns_Purchase(1);

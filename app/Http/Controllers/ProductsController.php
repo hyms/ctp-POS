@@ -444,6 +444,13 @@ class ProductsController extends Controller
 //            }
 //        }
 
+        if($request->filled('format')){
+            if($request->get('format')=='json'){
+                return response()->json([
+                    'product' => $item,
+                ]);
+            }
+        }
         Inertia::share('titlePage', 'Detalles del producto');
         return Inertia::render('Products/Detail_Product', [
             'product' => $item,

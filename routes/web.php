@@ -318,9 +318,9 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
             return Inertia::render("Reports/stock_report");
         });
         Route::get("/stock/list", [ReportController::class, "stock_Report"]);
-        Route::get("/stock_detail/{id}", function (request $request) {
+        Route::get("/stock_detail/{id}", function ($id,request $request) {
             Inertia::share('titlePage', 'Detalle Producto');
-            return Inertia::render('Reports/detail_stock_report', ['id', $request->get('id')]);
+            return Inertia::render('Reports/detail_stock_report', ['id'=> $id]);
         });
         Route::get("/get_sales_by_user", [ReportController::class, "get_sales_by_user"]);
         Route::get("/get_quotations_by_user", [ReportController::class, "get_quotations_by_user"]);
