@@ -257,7 +257,7 @@ function loadMenu() {
         if (globals.userPermision(["users_report"])) {
             subItems.push({
                 label: "Reporte de usuarios",
-                url: "/report/users_report",
+                url: "/report/users",
                 activate: ["/report/users_report"],
             });
         }

@@ -434,7 +434,7 @@ export default {
     pointofsales: "puntos de venta",
     CustomUpload: "Subida personalizada",
     pointofsaleManagement: "gestión punto de venta",
-    Adjustment: "Ajustamiento",
+    Adjustment: "Ajuste Stock",
     Updat: "Actualizar",
     Reset: "Reiniciar",
     print: "impresión",

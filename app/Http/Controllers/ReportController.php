@@ -1892,20 +1892,20 @@ class ReportController extends Controller
                 ->where('user_id', $user->id)
                 ->count();
 
-            $item['total_quotations'] = DB::table('quotations')
-                ->where('deleted_at', '=', null)
-                ->where('user_id', $user->id)
-                ->count();
-
-            $item['total_return_sales'] = DB::table('sale_returns')
-                ->where('deleted_at', '=', null)
-                ->where('user_id', $user->id)
-                ->count();
-
-            $item['total_return_purchases'] = DB::table('purchase_returns')
-                ->where('deleted_at', '=', null)
-                ->where('user_id', $user->id)
-                ->count();
+//            $item['total_quotations'] = DB::table('quotations')
+//                ->where('deleted_at', '=', null)
+//                ->where('user_id', $user->id)
+//                ->count();
+//
+//            $item['total_return_sales'] = DB::table('sale_returns')
+//                ->where('deleted_at', '=', null)
+//                ->where('user_id', $user->id)
+//                ->count();
+//
+//            $item['total_return_purchases'] = DB::table('purchase_returns')
+//                ->where('deleted_at', '=', null)
+//                ->where('user_id', $user->id)
+//                ->count();
 
             $item['total_transfers'] = DB::table('transfers')
                 ->where('deleted_at', '=', null)
