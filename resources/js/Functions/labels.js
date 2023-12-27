@@ -180,6 +180,7 @@ export default {
     this_week_sales_purchases: "Ventas de la semana",
     top_selling_products: "Productos más vendidos",
     top_customers: "Top 5 mejores clientes",
+    top_expenses: "Top gastos mes",
     stock_alert: "Alerta de stock",
     sales: "Ventas",
 

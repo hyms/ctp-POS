@@ -1,7 +1,8 @@
 <script setup>
 import { inject, onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
-import { globals, helpers, labels } from "@/helpers";
+import { api, globals, helpers, labels, labelsNew } from "@/helpers";
+import Snackbar from "@/Components/snackbar.vue";
 import VChart from "vue-echarts";
 
 import { use } from "echarts/core";
@@ -26,7 +27,11 @@ use([
 const props = defineProps({
     errors: Object,
 });
-
+const snackbar = ref({
+    view: false,
+    color: "",
+    text: "",
+});
 const moment = inject("moment");
 
 const warehouses = ref([]);
@@ -52,6 +57,7 @@ const echartSales = ref({});
 const echartProduct = ref({});
 const echartCustomer = ref({});
 const echartPayment = ref({});
+const echartExpense = ref({});
 
 const columns_sales = ref([
     { title: labels.sale.Ref, key: "Ref" },
@@ -78,35 +84,28 @@ const columns_products = ref([
 
 //---------------------- Event Select Warehouse ------------------------------\\
 function Selected_Warehouse(value) {
-    // warehouse_id.value = value;
+    warehouse_id.value = value;
+    all_dashboard_data(value);
 }
 
 //---------------------------------- Report Dashboard With Echart
 function all_dashboard_data(warehouseId = null) {
-    loading.value = true;
-    axios
-        .get("/dashboard_data", { params: { warehouse_id: warehouseId } })
-        .then(({ data }) => {
-            warehouses.value = data["warehouses"];
-            customers.value = data["customers"];
-            product_report.value = data["product_report"];
-            report_dashboard.value = data["report_dashboard"];
-            sales_report.value = data["sales_report"];
-            // all_dashboard_data();
+    api.get({
+        url: "/dashboard_data",
+        params: { warehouse_id: warehouseId },
+        loadingItem: loading,
+        snackbar,
+        onSuccess: (data) => {
+            warehouses.value = data.warehouses;
+            // customers.value = data["customers"];
+            // product_report.value = data["product_report"];
+            // report_dashboard.value = data["report_dashboard"];
+            // sales_report.value = data["sales_report"];
 
-            //  router.on("success", (event) => {
-            //    let url = event.detail.page.url.split('?');
-            //    if (url.length > 1) {
-            //      let url_query = url[1].split('=');
-            //      if (url_query.length > 1) {
-            //        warehouse_id.value = warehouses.find(value => value.id == url_query[1] && url_query[1] != "");
-            //      }
-            //    }
-            //  });
-            report_today.value = report_dashboard.value.original.report;
-            stock_alerts.value = report_dashboard.value.original.stock_alert;
-            products.value = report_dashboard.value.original.products;
-            sales.value = report_dashboard.value.original.last_sales;
+            report_today.value = data.report_dashboard.original.report;
+            stock_alerts.value = data.report_dashboard.original.stock_alert;
+            products.value = data.report_dashboard.original.products;
+            sales.value = data.report_dashboard.original.last_sales;
             const dark_heading = "#c2c6dc";
 
             echartCustomer.value = {
@@ -114,12 +113,10 @@ function all_dashboard_data(warehouseId = null) {
                 tooltip: {
                     show: true,
                     backgroundColor: "rgba(0, 0, 0, .8)",
+                    formatter: function (params) {
+                        return `${params.name}: (${params.data.value} ${labels.sales}) (${params.percent}%)`;
+                    },
                 },
-
-                formatter: function (params) {
-                    return `${params.name}: (${params.data.value} ${labels.sales}) (${params.percent}%)`;
-                },
-
                 series: [
                     {
                         name: "Top Customers",
@@ -127,9 +124,9 @@ function all_dashboard_data(warehouseId = null) {
                         radius: "50%",
                         center: "50%",
 
-                        data: customers.value.original,
-                        itemStyle: {
-                            emphasis: {
+                        data: data.customers.original,
+                        emphasis: {
+                            itemStyle: {
                                 shadowBlur: 10,
                                 shadowOffsetX: 0,
                                 shadowColor: "rgba(0, 0, 0, 0.5)",
@@ -138,46 +135,46 @@ function all_dashboard_data(warehouseId = null) {
                     },
                 ],
             };
-            // echartPayment.value = {
-            //   tooltip: {
-            //     trigger: "axis"
-            //   },
-            //   legend: {
-            //     data: ["Payment sent", "Payment received"]
-            //   },
-            //   grid: {
-            //     left: "3%",
-            //     right: "4%",
-            //     bottom: "3%",
-            //     containLabel: true
-            //   },
-            //   toolbox: {
-            //     feature: {
-            //       saveAsImage: {}
-            //     }
-            //   },
-            //   xAxis: {
-            //     type: "category",
-            //     boundaryGap: false,
-            //     data: responseData.payments.original.days
-            //   },
-            //   yAxis: {
-            //     type: "value"
-            //   },
-            //   series: [
-            //     {
-            //       name: "Payment sent",
-            //       type: "line",
-            //       data: responseData.payments.original.payment_sent
-            //     },
-            //     {
-            //       name: "Payment received",
-            //       type: "line",
-            //       data: responseData.payments.original.payment_received
-            //     }
-            //   ]
-            // };
-
+            echartPayment.value = {
+                tooltip: {
+                    trigger: "axis",
+                },
+                legend: {
+                    data: ["Pago enviado", "Pago Recibido"],
+                },
+                grid: {
+                    left: "3%",
+                    right: "4%",
+                    bottom: "3%",
+                    containLabel: true,
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {},
+                    },
+                },
+                xAxis: {
+                    type: "category",
+                    boundaryGap: false,
+                    data: data.payments.original.days,
+                },
+                yAxis: {
+                    type: "value",
+                },
+                series: [
+                    {
+                        name: "Pago enviado",
+                        type: "line",
+                        data: data.payments.original.payment_sent,
+                    },
+                    {
+                        name: "Pago Recibido",
+                        type: "line",
+                        data: data.payments.original.payment_received,
+                    },
+                ],
+            };
+            // console.log(echartPayment.value);
             echartProduct.value = {
                 color: ["#3c858d", "#05828e", "#588d93", "#8fa8ab", "#0E3B42"],
                 tooltip: {
@@ -194,7 +191,7 @@ function all_dashboard_data(warehouseId = null) {
                         radius: "50%",
                         center: "50%",
 
-                        data: product_report.value.original,
+                        data: data.product_report.original,
                         emphasis: {
                             itemStyle: {
                                 shadowBlur: 10,
@@ -227,7 +224,7 @@ function all_dashboard_data(warehouseId = null) {
                 xAxis: [
                     {
                         type: "category",
-                        data: sales_report.value.original.days,
+                        data: data.sales_report.original.days,
                         axisTick: {
                             alignWithLabel: true,
                         },
@@ -276,13 +273,13 @@ function all_dashboard_data(warehouseId = null) {
                 series: [
                     {
                         name: labels.sales,
-                        data: sales_report.value.original.data,
+                        data: data.sales_report.original.data,
                         label: { show: true, color: "#5e8592" },
                         type: "bar",
                         color: "#3c858d",
                         smooth: true,
-                        itemStyle: {
-                            emphasis: {
+                        emphasis: {
+                            itemStyle: {
                                 shadowBlur: 10,
                                 shadowOffsetX: 0,
                                 shadowOffsetY: -2,
@@ -310,10 +307,8 @@ function all_dashboard_data(warehouseId = null) {
                     // }
                 ],
             };
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+        },
+    });
 }
 
 onMounted(() => {
@@ -323,7 +318,12 @@ onMounted(() => {
 </script>
 
 <template>
-    <Layout>
+    <layout>
+        <snackbar
+            v-model="snackbar.view"
+            :text="snackbar.text"
+            :color="snackbar.color"
+        ></snackbar>
         <!--                <v-card>-->
         <!--                    <v-card-title-->
         <!--                        ><h4>Bienvenido a tu Tablero</h4></v-card-title-->
@@ -352,13 +352,11 @@ onMounted(() => {
                         {{ labels.this_week_sales_purchases }}
                     </v-card-title>
                     <v-card-text>
-                        <div class="chart-wrapper">
-                            <v-chart
-                                v-if="!loading"
-                                :option="echartSales"
-                                :autoresize="true"
-                            ></v-chart>
-                        </div>
+                        <v-chart
+                            class="chart-wrapper"
+                            :option="echartSales"
+                            :autoresize="true"
+                        ></v-chart>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -368,26 +366,24 @@ onMounted(() => {
                         {{ labels.top_customers }} ({{ CurrentMonth }})
                     </v-card-title>
                     <v-card-text>
-                        <div class="chart-wrapper">
-                            <!--              <v-chart v-if="!loading" :option="echartProduct" :autoresize="true"></v-chart>-->
-                            <v-chart
-                                v-if="!loading"
-                                :option="echartCustomer"
-                                :autoresize="true"
-                            ></v-chart>
-                        </div>
+                        <!--              <v-chart v-if="!loading" :option="echartProduct" :autoresize="true"></v-chart>-->
+                        <v-chart
+                            class="chart-wrapper"
+                            :option="echartCustomer"
+                            :autoresize="true"
+                        ></v-chart>
                     </v-card-text>
                 </v-card>
             </v-col>
         </v-row>
-        <v-row v-if="globals.rolePermision(['Admin'])">
+        <v-row>
             <!-- Stock Alert -->
             <v-col cols="12" md="8">
                 <v-card :loading="loading">
                     <v-card-title>
                         {{ labels.stock_alert }}
                     </v-card-title>
-                    <v-data-table
+                    <v-data-table-virtual
                         :headers="columns_stock"
                         :items="stock_alerts"
                         hover
@@ -398,7 +394,7 @@ onMounted(() => {
                                 >{{ item.stock_alert }}
                             </v-chip>
                         </template>
-                    </v-data-table>
+                    </v-data-table-virtual>
                 </v-card>
             </v-col>
 
@@ -407,13 +403,46 @@ onMounted(() => {
                     <v-card-title>
                         {{ labels.top_selling_products }} ({{ CurrentMonth }})
                     </v-card-title>
-                    <v-data-table
+                    <v-data-table-virtual
                         :headers="columns_products"
                         :items="products"
                         hover
                         :no-data-text="labels.no_data_table"
                     >
-                    </v-data-table>
+                    </v-data-table-virtual>
+                </v-card>
+            </v-col>
+        </v-row>
+        <v-row>
+            <!-- Stock Alert -->
+            <v-col cols="12" md="8">
+                <v-card :loading="loading">
+                    <v-card-title>
+                        {{ labelsNew.Payment_Sent_Received }}
+                    </v-card-title>
+                    <v-card-text>
+                        <v-chart
+                            class="chart-wrapper"
+                            :option="echartPayment"
+                            :autoresize="true"
+                        ></v-chart>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+
+            <v-col cols="12" md="4">
+                <v-card :loading="loading">
+                    <v-card-title>
+                        {{ labels.top_expenses }}
+                    </v-card-title>
+                    <v-card-text>
+                        <!--              <v-chart v-if="!loading" :option="echartProduct" :autoresize="true"></v-chart>-->
+                        <v-chart
+                            class="chart-wrapper"
+                            :option="echartExpense"
+                            :autoresize="true"
+                        ></v-chart>
+                    </v-card-text>
                 </v-card>
             </v-col>
         </v-row>
@@ -424,7 +453,7 @@ onMounted(() => {
                     <v-card-title>
                         {{ labels.recent_sales }}
                     </v-card-title>
-                    <v-data-table
+                    <v-data-table-virtual
                         :headers="columns_sales"
                         :items="sales"
                         hover
@@ -452,11 +481,11 @@ onMounted(() => {
                                 }}
                             </v-chip>
                         </template>
-                    </v-data-table>
+                    </v-data-table-virtual>
                 </v-card>
             </v-col>
         </v-row>
-    </Layout>
+    </layout>
 </template>
 <style scoped>
 .chart-wrapper {
