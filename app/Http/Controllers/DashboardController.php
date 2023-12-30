@@ -39,6 +39,7 @@ class DashboardController extends Controller
 //        $datapurchases = $this->PurchasesChart($warehouse_id, $array_warehouses_id);
         $Payment_chart = $this->Payment_chart($warehouse_id, $array_warehouses_id);
         $TopCustomers = $this->TopCustomers($warehouse_id, $array_warehouses_id);
+        $TopExpenses = $this->TopExpenses($warehouse_id, $array_warehouses_id);
         $Top_Products_Year = $this->Top_Products_Year($warehouse_id, $array_warehouses_id);
         $report_dashboard = $this->report_dashboard($warehouse_id, $array_warehouses_id);
 
@@ -49,6 +50,7 @@ class DashboardController extends Controller
 //            'purchases' => $datapurchases,
             'payments' => $Payment_chart,
             'customers' => $TopCustomers,
+            'expenses' => $TopExpenses,
             'product_report' => $Top_Products_Year,
             'report_dashboard' => $report_dashboard,
         ]);
@@ -181,6 +183,35 @@ class DashboardController extends Controller
             ->groupBy('clients.company_name')
             ->orderBy('value', 'desc')
             ->take(5)
+            ->get();
+
+        return response()->json($data);
+    }
+
+    public function TopExpenses($warehouse_id, $array_warehouses_id)
+    {
+
+        $data = Expense::whereBetween('date', [
+            Carbon::now()->startOfMonth(),
+            Carbon::now()->endOfMonth(),
+        ])->where('expenses.deleted_at', '=', null)
+            ->where(function ($query) {
+                if (!helpers::checkPermission('record_view')) {
+                    return $query->where('expenses.user_id', '=', Auth::user()->id);
+                }
+            })
+            ->where(function ($query) use ($warehouse_id, $array_warehouses_id) {
+                if ($warehouse_id !== 0) {
+                    return $query->where('expenses.warehouse_id', $warehouse_id);
+                } else {
+                    return $query->whereIn('expenses.warehouse_id', $array_warehouses_id);
+                }
+            })
+            ->join('expense_categories', 'expenses.expense_category_id', '=', 'expense_categories.id')
+            ->select(DB::raw('expense_categories.name'), DB::raw("sum(expenses.amount) as value"))
+            ->groupBy('expense_categories.name')
+            ->orderBy('value', 'desc')
+            ->take(10)
             ->get();
 
         return response()->json($data);

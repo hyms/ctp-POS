@@ -11,6 +11,7 @@ import { BarChart, LineChart, PieChart } from "echarts/charts";
 import {
     GridComponent,
     LegendComponent,
+    ToolboxComponent,
     TooltipComponent,
 } from "echarts/components";
 
@@ -22,6 +23,7 @@ use([
     TooltipComponent,
     GridComponent,
     CanvasRenderer,
+    ToolboxComponent,
 ]);
 
 const props = defineProps({
@@ -33,6 +35,7 @@ const snackbar = ref({
     text: "",
 });
 const moment = inject("moment");
+const currency = globals.currency();
 
 const warehouses = ref([]);
 const customers = ref({});
@@ -125,6 +128,33 @@ function all_dashboard_data(warehouseId = null) {
                         center: "50%",
 
                         data: data.customers.original,
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: "rgba(0, 0, 0, 0.5)",
+                            },
+                        },
+                    },
+                ],
+            };
+            echartExpense.value = {
+                color: ["#3c858d", "#05828e", "#588d93", "#8fa8ab", "#0E3B42"],
+                tooltip: {
+                    show: true,
+                    backgroundColor: "rgba(0, 0, 0, .8)",
+                    formatter: function (params) {
+                        return `${params.name}: (${params.data.value} ${currency.value}) (${params.percent}%)`;
+                    },
+                },
+                series: [
+                    {
+                        name: "Top Expenses",
+                        type: "pie",
+                        radius: "50%",
+                        center: "50%",
+
+                        data: data.expenses.original,
                         emphasis: {
                             itemStyle: {
                                 shadowBlur: 10,
@@ -433,7 +463,7 @@ onMounted(() => {
             <v-col cols="12" md="4">
                 <v-card :loading="loading">
                     <v-card-title>
-                        {{ labels.top_expenses }}
+                        {{ labels.top_expenses }} ({{ CurrentMonth }})
                     </v-card-title>
                     <v-card-text>
                         <!--              <v-chart v-if="!loading" :option="echartProduct" :autoresize="true"></v-chart>-->

@@ -181,6 +181,7 @@ export default {
     top_selling_products: "Productos más vendidos",
     top_customers: "Top 5 mejores clientes",
     top_expenses: "Top gastos mes",
+    expenses: "gastos",
     stock_alert: "Alerta de stock",
     sales: "Ventas",
 
