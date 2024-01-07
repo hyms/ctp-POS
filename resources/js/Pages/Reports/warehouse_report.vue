@@ -551,7 +551,7 @@ onMounted(() => {
                                             :search="search_sale"
                                             hover
                                             :no-data-text="labels.no_data_table"
-                                            :loading="loading"
+                                            :loading="loadingTable"
                                         >
                                             <template
                                                 v-slot:item.statut="{ item }"
@@ -629,7 +629,7 @@ onMounted(() => {
                                             :search="search_expense"
                                             hover
                                             :no-data-text="labels.no_data_table"
-                                            :loading="loading"
+                                            :loading="loadingTable"
                                         >
                                         </v-data-table>
                                     </v-window-item>

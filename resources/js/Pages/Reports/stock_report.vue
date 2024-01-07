@@ -45,7 +45,7 @@ function Get_Stock_Report(page = 1) {
             page: page,
             SortField: "",
             SortType: "",
-            warehouse_id: warehouse_id,
+            warehouse_id: warehouse_id.value,
             search: "",
             limit: "",
         },

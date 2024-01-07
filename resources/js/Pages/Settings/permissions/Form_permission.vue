@@ -15,7 +15,7 @@ const props = defineProps({
 
 const loading = ref(false);
 const editmode = ref(false);
-const permissions = ref([]);
+const permissions = ref({});
 const permissionsList = ref([]);
 const role = ref({
     name: "",
@@ -29,7 +29,7 @@ function Submit_Permission(success) {
         snackbar.value.color = "error";
         snackbar.value.view = true;
     } else {
-        if (editmode.value === false) {
+        if (editmode.value === true) {
             Update_Permission(role.value.id);
         } else {
             Create_Permission();
@@ -70,7 +70,7 @@ function Create_Permission() {
 }
 
 function resetForm() {
-    permissions.value = [];
+    permissions.value = {};
     role.value = {
         name: "",
         description: "",
@@ -475,6 +475,7 @@ onMounted(() => {
     if (props.roleItem != null) {
         role.value = props.roleItem;
         permissions.value = props.permissionsItem;
+        editmode.value = true;
     }
 });
 </script>
