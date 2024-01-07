@@ -54,7 +54,10 @@ function updateValue(value) {
                                         invoice_pos.pos_settings.show_customer
                                     "
                                     >Cliente :
-                                    {{ invoice_pos.sale.client_name }} <br
+                                    <span class="font-weight-bold total">{{
+                                        invoice_pos.sale.client_name
+                                    }}</span>
+                                    <br
                                 /></span>
                                 <span
                                     >Agencia : {{ invoice_pos.sale.warehouse }}
@@ -67,7 +70,9 @@ function updateValue(value) {
                         <tbody>
                             <tr v-for="detail_invoice in invoice_pos.details">
                                 <td colspan="3">
-                                    {{ detail_invoice.name }}
+                                    <span class="font-weight-bold total">{{
+                                        detail_invoice.name
+                                    }}</span>
                                     <br />
                                     <span>
                                         {{
