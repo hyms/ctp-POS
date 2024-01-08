@@ -42,7 +42,7 @@ const sales = ref([]);
 const saleForm = ref({
     id: "",
     date: new Date().toISOString().slice(0, 10),
-    statut: "completed",
+    statut: "pending",
     notes: "",
     client_id: "",
     warehouse_id: "",

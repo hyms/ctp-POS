@@ -190,7 +190,7 @@ function loadMenu() {
         subItems = [];
         if (globals.userPermision(["Reports_payments_Sales"])) {
             subItems.push({
-                label: "Pagos de ventas",
+                label: "Reporte de Pagos Ventas",
                 url: "/payment_sale",
                 activate: ["/payment_sale"],
             });

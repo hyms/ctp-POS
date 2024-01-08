@@ -11,7 +11,7 @@ const reglaments = [
 const salesStatus = [
     { title: "Completado", value: "completed", color: "primary" },
     { title: "Pendiente", value: "pending", color: "secondary" },
-    { title: "Ordenado", value: "ordered", color: "info" },
+    // { title: "Entregado", value: "ordered", color: "info" },
 ];
 const paymentStatus = [
     { title: "Pagado", value: "paid", color: "success" },
