@@ -1,25 +1,26 @@
 import "./bootstrap";
-
-import "@mdi/font/css/materialdesignicons.css";
-import {createApp, h} from "vue";
-// import "vuetify/styles";
-import {createVuetify} from "vuetify";
+import { createApp, h } from "vue";
+import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import * as labs from "vuetify/labs/components";
-import {es} from "vuetify/locale";
-import moment from "moment";
-import 'typeface-roboto/index.css';
+import { es } from "vuetify/locale";
+import { aliases, fa } from "vuetify/iconsets/fa-svg";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import { far } from "@fortawesome/free-regular-svg-icons";
+import moment from "moment/moment";
+import "moment/locale/es";
 
+import "typeface-roboto/index.css";
+
+import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
+
+// import 'vuetify/_styles.scss'
 import "@/../css/main.scss";
-// import "@/../css/app.css";
 
-import {resolvePageComponent} from "laravel-vite-plugin/inertia-helpers";
-// import 'vuetify/dist/vuetify.min.css'
-
-moment.locale("es");
-
-import {createInertiaApp} from "@inertiajs/vue3";
+import { createInertiaApp } from "@inertiajs/vue3";
 
 const customLight = {
     colors: {
@@ -34,6 +35,7 @@ const customLight = {
         warning: "#ffc340",
     },
 };
+
 const vuetify = createVuetify({
     components: {
         ...components,
@@ -43,10 +45,14 @@ const vuetify = createVuetify({
     locale: {
         locale: "es",
         fallback: "es",
-        messages: {es},
+        messages: { es },
     },
     icons: {
-        defaultSet: "mdi",
+        defaultSet: "fa",
+        aliases,
+        sets: {
+            fa,
+        },
     },
     theme: {
         defaultTheme: "customLight",
@@ -55,20 +61,31 @@ const vuetify = createVuetify({
         },
     },
     defaults: {
-        VBtn: {size: 'small'},
-        VCard: {density: 'compact'},
-        VTable: {density: 'compact'},
-        VTextarea: {density: 'compact', variant: 'outlined', color: 'primary'},
-        VTextField: {density: 'compact', variant: 'outlined', color: 'primary'},
-        VCheckbox: {density: 'compact', color: 'primary'},
-        VSelect: {density: 'compact', variant: 'outlined', color: 'primary'},
-        VAutocomplete: {density: 'compact', variant: 'outlined', color: 'primary'},
-        VDataTable: {density: 'compact'},
-        VSwitch: {density: 'compact', color: 'primary'},
-        VToolbar: {density: 'comfortable'},
+        VBtn: { size: "small" },
+        VCard: { density: "compact" },
+        VTable: { density: "compact" },
+        VTextarea: {
+            density: "compact",
+            variant: "outlined",
+            color: "primary",
+        },
+        VTextField: {
+            density: "compact",
+            variant: "outlined",
+            color: "primary",
+        },
+        VCheckbox: { density: "compact", color: "primary" },
+        VSelect: { density: "compact", variant: "outlined", color: "primary" },
+        VAutocomplete: {
+            density: "compact",
+            variant: "outlined",
+            color: "primary",
+        },
+        VDataTable: { density: "compact" },
+        VSwitch: { density: "compact", color: "primary" },
+        VToolbar: { density: "comfortable" },
     },
 });
-
 
 createInertiaApp({
     resolve: (name) =>
@@ -76,11 +93,16 @@ createInertiaApp({
             `./Pages/${name}.vue`,
             import.meta.glob("./Pages/**/*.vue")
         ),
-    setup({el, App, props, plugin}) {
-        createApp({render: () => h(App, props)})
+    setup: ({ el, App, props, plugin }) => {
+        moment.locale("es");
+        const app = createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(vuetify)
-            .mount(el);
+            .provide("moment", moment);
+        app.component("font-awesome-icon", FontAwesomeIcon);
+        library.add(fas); // Include needed solid icons
+        library.add(far); // Include needed regular icons
+        app.mount(el);
     },
     progress: {
         color: "#007b89",

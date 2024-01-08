@@ -3,17 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable,SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable,SoftDeletes,HasRoles;
 
     protected $table = 'users';
     public static string $tables = 'users';
@@ -41,15 +39,11 @@ class User extends Authenticatable
         'is_all_warehouses' => 'integer',
     ];
 
-    public function getNameAttribute(): string
+    public function getFullNameAttribute(): string
     {
-        return $this->nombre . ' ' . $this->apellido;
+        return $this->firstname . ' ' . $this->lastname;
     }
 
-    public function Sucursales(): HasOne
-    {
-        return $this->hasOne(Sucursal::class,'id','sucursal');
-    }
 
     public static function getRole(int $id = null): array|string
     {
@@ -66,24 +60,6 @@ class User extends Authenticatable
 
         $first = $roles->firstWhere('value', '=', $id);
         return $first['text']??'';
-    }
-
-    public function roles()
-    {
-        return $this->belongsToMany(Role::class);
-    }
-
-    public function assignRole(Role $role)
-    {
-        return $this->roles()->save($role);
-    }
-
-    public function hasRole($role)
-    {
-        if (is_string($role)) {
-            return $this->roles->contains('name', $role);
-        }
-        return !!$role->intersect($this->roles)->count();
     }
 
     public function assignedWarehouses()

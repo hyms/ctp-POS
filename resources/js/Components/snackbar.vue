@@ -1,24 +1,38 @@
 <script setup>
 const props = defineProps({
-  snackbarView: Boolean,
-  snackbarColor: String,
-  snackbarText: String,
+    modelValue: Boolean,
+    color: {
+        type: String,
+        default: "",
+    },
+    text: {
+        type: String,
+        default: "",
+    },
 });
-</script>
+const emit = defineEmits(["update:modelValue"]);
 
+function updateValue(value) {
+    emit("update:modelValue", value);
+}
+</script>
 <template>
-  <v-snackbar
-      :model-value="snackbarView"
-      :color="snackbarColor"
-      :location="'top right'"
-      :timeout="5000"
-      elevation="5"
-      @input="$emit('update:modelValue', $event.target.value)"
-      :close-on-content-click="true"
-  >
-    {{ snackbarText }}
-    <template v-slot:actions>
-      <v-btn icon="mdi-close" size="x-small" variant="tonal"></v-btn>
-    </template>
-  </v-snackbar>
+    <v-snackbar
+        :color="color"
+        :model-value="modelValue"
+        :location="'top right'"
+        :timeout="5000"
+        @update:modelValue="updateValue"
+        elevation="5"
+    >
+        <div v-html="text"></div>
+        <template v-slot:actions>
+            <v-btn
+                icon="fas fa-times"
+                size="x-small"
+                variant="tonal"
+                @click="updateValue(false)"
+            ></v-btn>
+        </template>
+    </v-snackbar>
 </template>

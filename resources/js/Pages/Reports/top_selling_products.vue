@@ -1,267 +1,114 @@
-<script>
-// import NProgress from "nprogress";
-// import { mapGetters } from "vuex";
-// import DateRangePicker from 'vue2-daterange-picker'
-// //you need to import the CSS manually
-// import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
-// import moment from 'moment'
-// import jsPDF from "jspdf";
-// import "jspdf-autotable";
-//
-// export default {
-//   metaInfo: {
-//     title: "Top Selling Products"
-//   },
-//   components: { DateRangePicker },
-//   data() {
-//     return {
-//       isLoading: true,
-//       serverParams: {
-//         sort: {
-//           field: "id",
-//           type: "desc"
-//         },
-//         page: 1,
-//         perPage: 10
-//       },
-//       limit: "10",
-//       totalRows: "",
-//       products: [],
-//       search_products:"",
-//       today_mode: true,
-//       startDate: "",
-//       endDate: "",
-//       dateRange: {
-//        startDate: "",
-//        endDate: ""
-//       },
-//       locale:{
-//           //separator between the two ranges apply
-//           Label: "Apply",
-//           cancelLabel: "Cancel",
-//           weekLabel: "W",
-//           customRangeLabel: "Custom Range",
-//           daysOfWeek: moment.weekdaysMin(),
-//           //array of days - see moment documenations for details
-//           monthNames: moment.monthsShort(), //array of month names - see moment documenations for details
-//           firstDay: 1 //ISO first day of week - see moment documenations for details
-//         },
-//     };
-//   },
-//
-//   computed: {
-//     ...mapGetters(["currentUser"]),
-//     columns() {
-//       return [
-//         {
-//           label: this.$t("ProductCode"),
-//           field: "code",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("ProductName"),
-//           field: "name",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//         {
-//           label: this.$t("TotalSales"),
-//           field: "total_sales",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         },
-//
-//         {
-//           label: this.$t("TotalAmount"),
-//           field: "total",
-//           tdClass: "text-left",
-//           thClass: "text-left",
-//           sortable: false
-//         }
-//       ];
-//     }
-//   },
-//
-//   methods: {
-//
-//
-//     onSearch_products(value) {
-//       this.search_products = value.searchTerm;
-//       this.Get_top_products(1);
-//     },
-//
-//     //----------------------------------- Export PDF ------------------------------\\
-//     export_PDF() {
-//       var self = this;
-//       let pdf = new jsPDF("p", "pt");
-//       let columns = [
-//         { title: "Product Code", dataKey: "code" },
-//         { title: "Product Name", dataKey: "name" },
-//         { title: "Total Sales", dataKey: "total_sales" },
-//         { title: "Total Amount", dataKey: "total" },
-//       ];
-//       pdf.autoTable(columns, self.products);
-//       pdf.text("Top Selling Products", 40, 25);
-//       pdf.save("Top_Selling_Products.pdf");
-//     },
-//
-//     //---- update Params Table
-//     updateParams(newProps) {
-//       this.serverParams = Object.assign({}, this.serverParams, newProps);
-//     },
-//
-//     //---- Event Page Change
-//     onPageChange({ currentPage }) {
-//       if (this.serverParams.page !== currentPage) {
-//         this.updateParams({ page: currentPage });
-//         this.Get_top_products(currentPage);
-//       }
-//     },
-//
-//     //---- Event Per Page Change
-//     onPerPageChange({ currentPerPage }) {
-//       if (this.limit !== currentPerPage) {
-//         this.limit = currentPerPage;
-//         this.updateParams({ page: 1, perPage: currentPerPage });
-//         this.Get_top_products(1);
-//       }
-//     },
-//
-//      //----------------------------- Submit Date Picker -------------------\\
-//     Submit_filter_dateRange() {
-//       var self = this;
-//       self.startDate =  self.dateRange.startDate.toJSON().slice(0, 10);
-//       self.endDate = self.dateRange.endDate.toJSON().slice(0, 10);
-//       self.Get_top_products(1);
-//     },
-//
-//
-//     get_data_loaded() {
-//       var self = this;
-//       if (self.today_mode) {
-//         let today = new Date()
-//
-//         self.startDate = today.getFullYear();
-//         self.endDate = new Date().toJSON().slice(0, 10);
-//
-//         self.dateRange.startDate = today.getFullYear();
-//         self.dateRange.endDate = new Date().toJSON().slice(0, 10);
-//
-//       }
-//     },
-//
-//     //----------------------------- Get_top_products------------------\\
-//     Get_top_products(page) {
-//       // Start the progress bar.
-//       NProgress.start();
-//       NProgress.set(0.1);
-//       this.get_data_loaded();
-//
-//       axios
-//         .get(
-//           "report/top_products?page=" +
-//             page +
-//             "&limit=" +
-//             this.limit +
-//             "&to=" +
-//             this.endDate +
-//             "&from=" +
-//             this.startDate +
-//             "&search=" +
-//             this.search_products
-//         )
-//         .then(response => {
-//           this.products = response.data.products;
-//           this.totalRows = response.data.totalRows;
-//           // Complete the animation of theprogress bar.
-//           NProgress.done();
-//           this.isLoading = false;
-//           this.today_mode = false;
-//         })
-//         .catch(response => {
-//           // Complete the animation of theprogress bar.
-//           NProgress.done();
-//           setTimeout(() => {
-//             this.isLoading = false;
-//             this.today_mode = false;
-//           }, 500);
-//         });
-//     }
-//   }, //end Methods
-//
-//   //----------------------------- Created function------------------- \\
-//
-//   created: function() {
-//     this.Get_top_products(1);
-//   }
-// };
+<script setup>
+import { computed, ref } from "vue";
+import Layout from "@/Layouts/Authenticated.vue";
+import { router, usePage } from "@inertiajs/vue3";
+import { labels } from "@/helpers";
+
+const props = defineProps({
+    products: Object,
+});
+const loading = ref(false);
+const search = ref("");
+
+const filterForm = ref({
+    from: "",
+    to: "",
+});
+const currency = computed(() => usePage().props.currency);
+
+const fields = ref([
+    { title: labels.product.code, key: "code" },
+    { title: labels.product.name, key: "name" },
+    { title: "Vendidos (Total)", key: "total_sales" },
+    { title: "Monto Total", key: "total" },
+]);
+
+//----------------------------- Get_top_products------------------\\
+function Get_top_products(page = 1) {
+    router.get(
+        "/report/top_products",
+        {
+            page: page,
+            limit: "",
+            to: filterForm.value.to,
+            from: filterForm.value.from,
+            search: "",
+        },
+        {
+            only: [props.products],
+            onStart: () => {
+                loading.value = true;
+            },
+            onFinish: (visit) => {
+                loading.value = false;
+            },
+        }
+    );
+}
 </script>
 <template>
-  <!--  <div class="main-content">-->
-  <!--    <breadcumb :page="$t('Top_Selling_Products')" :folder="$t('Reports')"/>-->
-  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
-  <!--    <b-col md="12" class="text-center" v-if="!isLoading">-->
-  <!--        <date-range-picker -->
-  <!--          v-model="dateRange" -->
-  <!--          :startDate="startDate" -->
-  <!--          :endDate="endDate" -->
-  <!--           @update="Submit_filter_dateRange"-->
-  <!--          :locale-data="locale" > -->
-
-  <!--          <template v-slot:input="picker" style="min-width: 350px;">-->
-  <!--              {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}-->
-  <!--          </template>        -->
-  <!--        </date-range-picker>-->
-  <!--      </b-col>-->
-
-  <!--      <vue-good-table-->
-  <!--        v-if="!isLoading"-->
-  <!--        mode="remote"-->
-  <!--        :columns="columns"-->
-  <!--        :totalRows="totalRows"-->
-  <!--        :rows="products"-->
-  <!--        @on-page-change="onPageChange"-->
-  <!--        @on-per-page-change="onPerPageChange"-->
-  <!--        @on-search="onSearch_products"-->
-  <!--          :search-options="{-->
-  <!--            placeholder: $t('Search_this_table'),-->
-  <!--            enabled: true,-->
-  <!--        }"-->
-  <!--        :pagination-options="{-->
-  <!--        enabled: true,-->
-  <!--        mode: 'records',-->
-  <!--        nextLabel: 'next',-->
-  <!--        prevLabel: 'prev',-->
-  <!--      }"-->
-  <!--        styleClass="mt-5 table-hover tableOne vgt-table"-->
-  <!--      >-->
-  <!--      <div slot="table-actions" class="mt-2 mb-3">-->
-  <!--        <b-button @click="export_PDF()" size="sm" variant="outline-success ripple m-1">-->
-  <!--          <i class="i-File-Copy"></i> PDF-->
-  <!--        </b-button>-->
-
-  <!--         <vue-excel-xlsx-->
-  <!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
-  <!--              :data="products"-->
-  <!--              :columns="columns"-->
-  <!--              :file-name="'product_report'"-->
-  <!--              :file-type="'xlsx'"-->
-  <!--              :sheet-name="'product_report'"-->
-  <!--              >-->
-  <!--              <i class="i-File-Excel"></i> EXCEL-->
-  <!--          </vue-excel-xlsx>-->
-
-  <!--      </div>-->
-  <!--        <template slot="table-row" slot-scope="props">-->
-  <!--          <div v-if="props.column.field == 'total'">-->
-  <!--            <span>{{currentUser.currency}} {{props.row.total}}</span>-->
-  <!--          </div>-->
-  <!--        </template>-->
-  <!--      </vue-good-table>-->
-  <!--      &lt;!&ndash; </b-card> &ndash;&gt;-->
-  <!--    </div>-->
+    <layout>
+        <v-row align="center" class="mb-3">
+            <v-col cols="12" sm="4">
+                <v-text-field
+                    v-model="search"
+                    prepend-icon="fas fa-search"
+                    hide-details
+                    :label="labels.search"
+                    single-line
+                    variant="underlined"
+                ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6">
+                <v-row>
+                    <v-col cols="12" sm="6">
+                        <v-text-field
+                            v-model="filterForm.from"
+                            variant="outlined"
+                            clearable
+                            hide-details="auto"
+                            type="date"
+                            :label="labels.start_date"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                        <v-text-field
+                            v-model="filterForm.to"
+                            variant="outlined"
+                            clearable
+                            hide-details="auto"
+                            type="date"
+                            :label="labels.end_date"
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
+            </v-col>
+            <v-col cols="12" sm="2">
+                <v-btn
+                    type="submit"
+                    variant="tonal"
+                    size="small"
+                    color="primary"
+                    @click="Get_top_products"
+                >
+                    {{ labels.search }}
+                </v-btn>
+            </v-col>
+        </v-row>
+        <v-card>
+            <v-data-table
+                :headers="fields"
+                :items="products"
+                :search="search"
+                hover
+                :no-data-text="labels.no_data_table"
+                :loading="loading"
+                class="text-center"
+            >
+                <template v-slot:item.total="{ item }">
+                    <span>{{ currency }} {{ item.total }}</span>
+                </template>
+            </v-data-table>
+        </v-card>
+    </layout>
 </template>

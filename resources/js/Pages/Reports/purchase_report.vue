@@ -1,177 +1,177 @@
 <template>
-  <!--  <div class="main-content">-->
-  <!--    <breadcumb :page="$t('PurchasesReport')" :folder="$t('Reports')"/>-->
+    <!--  <div class="main-content">-->
+    <!--    <breadcumb :page="$t('PurchasesReport')" :folder="$t('Reports')"/>-->
 
-  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+    <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
 
-  <!--     <b-col md="12" class="text-center" v-if="!isLoading">-->
-  <!--        <date-range-picker -->
-  <!--          v-model="dateRange" -->
-  <!--          :startDate="startDate" -->
-  <!--          :endDate="endDate" -->
-  <!--           @update="Submit_filter_dateRange"-->
-  <!--          :locale-data="locale" > -->
+    <!--     <b-col md="12" class="text-center" v-if="!isLoading">-->
+    <!--        <date-range-picker -->
+    <!--          v-model="dateRange" -->
+    <!--          :startDate="startDate" -->
+    <!--          :endDate="endDate" -->
+    <!--           @update="Submit_filter_dateRange"-->
+    <!--          :locale-data="locale" > -->
 
-  <!--          <template v-slot:input="picker" style="min-width: 350px;">-->
-  <!--              {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}-->
-  <!--          </template>        -->
-  <!--        </date-range-picker>-->
-  <!--      </b-col>-->
+    <!--          <template v-slot:input="picker" style="min-width: 350px;">-->
+    <!--              {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}-->
+    <!--          </template>        -->
+    <!--        </date-range-picker>-->
+    <!--      </b-col>-->
 
-  <!--    <b-card class="wrapper" v-if="!isLoading">-->
-  <!--      <vue-good-table-->
-  <!--        mode="remote"-->
-  <!--        :columns="columns"-->
-  <!--        :totalRows="totalRows"-->
-  <!--        :rows="rows"-->
-  <!--        :group-options="{-->
-  <!--          enabled: true,-->
-  <!--          headerPosition: 'bottom',-->
-  <!--        }"-->
-  <!--        @on-page-change="onPageChange"-->
-  <!--        @on-per-page-change="onPerPageChange"-->
-  <!--        @on-sort-change="onSortChange"-->
-  <!--        @on-search="onSearch"-->
-  <!--        :search-options="{-->
-  <!--        placeholder: $t('Search_this_table'),-->
-  <!--        enabled: true,-->
-  <!--      }"-->
-  <!--        :pagination-options="{-->
-  <!--        enabled: true,-->
-  <!--        mode: 'records',-->
-  <!--        nextLabel: 'next',-->
-  <!--        prevLabel: 'prev',-->
-  <!--      }"-->
-  <!--        :styleClass="'order-table vgt-table'"-->
-  <!--      >-->
-  <!--        <div slot="table-actions" class="mt-2 mb-3">-->
-  <!--          <b-button variant="outline-info ripple m-1" size="sm" v-b-toggle.sidebar-right>-->
-  <!--            <i class="i-Filter-2"></i>-->
-  <!--            {{ $t("Filter") }}-->
-  <!--          </b-button>-->
-  <!--          <b-button @click="Purchase_PDF()" size="sm" variant="outline-success ripple m-1">-->
-  <!--            <i class="i-File-Copy"></i> PDF-->
-  <!--          </b-button>-->
-  <!--          <vue-excel-xlsx-->
-  <!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
-  <!--              :data="purchases"-->
-  <!--              :columns="columns"-->
-  <!--              :file-name="'purchases_report'"-->
-  <!--              :file-type="'xlsx'"-->
-  <!--              :sheet-name="'purchases_report'"-->
-  <!--              >-->
-  <!--              <i class="i-File-Excel"></i> EXCEL-->
-  <!--          </vue-excel-xlsx>-->
-  <!--        </div>-->
+    <!--    <b-card class="wrapper" v-if="!isLoading">-->
+    <!--      <vue-good-table-->
+    <!--        mode="remote"-->
+    <!--        :columns="columns"-->
+    <!--        :totalRows="totalRows"-->
+    <!--        :rows="rows"-->
+    <!--        :group-options="{-->
+    <!--          enabled: true,-->
+    <!--          headerPosition: 'bottom',-->
+    <!--        }"-->
+    <!--        @on-page-change="onPageChange"-->
+    <!--        @on-per-page-change="onPerPageChange"-->
+    <!--        @on-sort-change="onSortChange"-->
+    <!--        @on-search="onSearch"-->
+    <!--        :search-options="{-->
+    <!--        placeholder: $t('Search_this_table'),-->
+    <!--        enabled: true,-->
+    <!--      }"-->
+    <!--        :pagination-options="{-->
+    <!--        enabled: true,-->
+    <!--        mode: 'records',-->
+    <!--        nextLabel: 'next',-->
+    <!--        prevLabel: 'prev',-->
+    <!--      }"-->
+    <!--        :styleClass="'order-table vgt-table'"-->
+    <!--      >-->
+    <!--        <div slot="table-actions" class="mt-2 mb-3">-->
+    <!--          <b-button variant="outline-info ripple m-1" size="sm" v-b-toggle.sidebar-right>-->
+    <!--            <i class="i-Filter-2"></i>-->
+    <!--            {{ $t("Filter") }}-->
+    <!--          </b-button>-->
+    <!--          <b-button @click="Purchase_PDF()" size="sm" variant="outline-success ripple m-1">-->
+    <!--            <i class="i-File-Copy"></i> PDF-->
+    <!--          </b-button>-->
+    <!--          <vue-excel-xlsx-->
+    <!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
+    <!--              :data="purchases"-->
+    <!--              :columns="columns"-->
+    <!--              :file-name="'purchases_report'"-->
+    <!--              :file-type="'xlsx'"-->
+    <!--              :sheet-name="'purchases_report'"-->
+    <!--              >-->
+    <!--              <i class="i-File-Excel"></i> EXCEL-->
+    <!--          </vue-excel-xlsx>-->
+    <!--        </div>-->
 
-  <!--        <template slot="table-row" slot-scope="props">-->
-  <!--          <div v-if="props.column.field == 'statut'">-->
-  <!--            <span-->
-  <!--              v-if="props.row.statut == 'received'"-->
-  <!--              class="badge badge-outline-success"-->
-  <!--            >{{$t('Received')}}</span>-->
-  <!--            <span-->
-  <!--              v-else-if="props.row.statut == 'pending'"-->
-  <!--              class="badge badge-outline-info"-->
-  <!--            >{{$t('Pending')}}</span>-->
-  <!--            <span v-else class="badge badge-outline-warning">{{$t('Ordered')}}</span>-->
-  <!--          </div>-->
+    <!--        <template slot="table-row" slot-scope="props">-->
+    <!--          <div v-if="props.column.field == 'statut'">-->
+    <!--            <span-->
+    <!--              v-if="props.row.statut == 'received'"-->
+    <!--              class="badge badge-outline-success"-->
+    <!--            >{{$t('Received')}}</span>-->
+    <!--            <span-->
+    <!--              v-else-if="props.row.statut == 'pending'"-->
+    <!--              class="badge badge-outline-info"-->
+    <!--            >{{$t('Pending')}}</span>-->
+    <!--            <span v-else class="badge badge-outline-warning">{{$t('Ordered')}}</span>-->
+    <!--          </div>-->
 
-  <!--          <div v-else-if="props.column.field == 'payment_status'">-->
-  <!--            <span-->
-  <!--              v-if="props.row.payment_status == 'paid'"-->
-  <!--              class="badge badge-outline-success"-->
-  <!--            >{{$t('Paid')}}</span>-->
-  <!--            <span-->
-  <!--              v-else-if="props.row.payment_status == 'partial'"-->
-  <!--              class="badge badge-outline-primary"-->
-  <!--            >{{$t('partial')}}</span>-->
-  <!--            <span v-else class="badge badge-outline-warning">{{$t('Unpaid')}}</span>-->
-  <!--          </div>-->
-  <!--        </template>-->
-  <!--      </vue-good-table>-->
-  <!--    </b-card>-->
+    <!--          <div v-else-if="props.column.field == 'payment_status'">-->
+    <!--            <span-->
+    <!--              v-if="props.row.payment_status == 'paid'"-->
+    <!--              class="badge badge-outline-success"-->
+    <!--            >{{$t('Paid')}}</span>-->
+    <!--            <span-->
+    <!--              v-else-if="props.row.payment_status == 'partial'"-->
+    <!--              class="badge badge-outline-primary"-->
+    <!--            >{{$t('partial')}}</span>-->
+    <!--            <span v-else class="badge badge-outline-warning">{{$t('Unpaid')}}</span>-->
+    <!--          </div>-->
+    <!--        </template>-->
+    <!--      </vue-good-table>-->
+    <!--    </b-card>-->
 
-  <!--    &lt;!&ndash; Sidebar Filter &ndash;&gt;-->
-  <!--    <b-sidebar id="sidebar-right" :title="$t('Filter')" bg-variant="white" right shadow>-->
-  <!--      <div class="px-3 py-2">-->
-  <!--        <b-row>-->
-  <!--          &lt;!&ndash; Reference &ndash;&gt;-->
-  <!--          <b-col md="12">-->
-  <!--            <b-form-group :label="$t('Reference')">-->
-  <!--              <b-form-input label="Reference" :placeholder="$t('Reference')" v-model="Filter_Ref"></b-form-input>-->
-  <!--            </b-form-group>-->
-  <!--          </b-col>-->
+    <!--    &lt;!&ndash; Sidebar Filter &ndash;&gt;-->
+    <!--    <b-sidebar id="sidebar-right" :title="$t('Filter')" bg-variant="white" right shadow>-->
+    <!--      <div class="px-3 py-2">-->
+    <!--        <b-row>-->
+    <!--          &lt;!&ndash; Reference &ndash;&gt;-->
+    <!--          <b-col md="12">-->
+    <!--            <b-form-group :label="$t('Reference')">-->
+    <!--              <b-form-input label="Reference" :placeholder="$t('Reference')" v-model="Filter_Ref"></b-form-input>-->
+    <!--            </b-form-group>-->
+    <!--          </b-col>-->
 
-  <!--          &lt;!&ndash; Supplier  &ndash;&gt;-->
-  <!--          <b-col md="12">-->
-  <!--            <b-form-group :label="$t('Supplier')">-->
-  <!--              <v-select-->
-  <!--                :reduce="label => label.value"-->
-  <!--                :placeholder="$t('Choose_Supplier')"-->
-  <!--                v-model="Filter_Supplier"-->
-  <!--                :options="suppliers.map(suppliers => ({label: suppliers.name, value: suppliers.id}))"-->
-  <!--              />-->
-  <!--            </b-form-group>-->
-  <!--          </b-col>-->
+    <!--          &lt;!&ndash; Supplier  &ndash;&gt;-->
+    <!--          <b-col md="12">-->
+    <!--            <b-form-group :label="$t('Supplier')">-->
+    <!--              <v-select-->
+    <!--                :reduce="label => label.value"-->
+    <!--                :placeholder="$t('Choose_Supplier')"-->
+    <!--                v-model="Filter_Supplier"-->
+    <!--                :options="suppliers.map(suppliers => ({label: suppliers.name, value: suppliers.id}))"-->
+    <!--              />-->
+    <!--            </b-form-group>-->
+    <!--          </b-col>-->
 
-  <!--           &lt;!&ndash; warehouse &ndash;&gt;-->
-  <!--          <b-col md="12">-->
-  <!--            <b-form-group :label="$t('warehouse')">-->
-  <!--              <v-select-->
-  <!--                v-model="Filter_warehouse"-->
-  <!--                :reduce="label => label.value"-->
-  <!--                :placeholder="$t('Choose_Warehouse')"-->
-  <!--                :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
-  <!--              />-->
-  <!--            </b-form-group>-->
-  <!--          </b-col>-->
+    <!--           &lt;!&ndash; warehouse &ndash;&gt;-->
+    <!--          <b-col md="12">-->
+    <!--            <b-form-group :label="$t('warehouse')">-->
+    <!--              <v-select-->
+    <!--                v-model="Filter_warehouse"-->
+    <!--                :reduce="label => label.value"-->
+    <!--                :placeholder="$t('Choose_Warehouse')"-->
+    <!--                :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"-->
+    <!--              />-->
+    <!--            </b-form-group>-->
+    <!--          </b-col>-->
 
-  <!--          &lt;!&ndash; Status  &ndash;&gt;-->
-  <!--          <b-col md="12">-->
-  <!--            <b-form-group :label="$t('Status')">-->
-  <!--              <select v-model="Filter_status" type="text" class="form-control">-->
-  <!--                <option value selected>All</option>-->
-  <!--                <option value="received">Received</option>-->
-  <!--                <option value="pending">Pending</option>-->
-  <!--                <option value="ordered">Ordered</option>-->
-  <!--              </select>-->
-  <!--            </b-form-group>-->
-  <!--          </b-col>-->
+    <!--          &lt;!&ndash; Status  &ndash;&gt;-->
+    <!--          <b-col md="12">-->
+    <!--            <b-form-group :label="$t('Status')">-->
+    <!--              <select v-model="Filter_status" type="text" class="form-control">-->
+    <!--                <option value selected>All</option>-->
+    <!--                <option value="received">Received</option>-->
+    <!--                <option value="pending">Pending</option>-->
+    <!--                <option value="ordered">Ordered</option>-->
+    <!--              </select>-->
+    <!--            </b-form-group>-->
+    <!--          </b-col>-->
 
-  <!--          &lt;!&ndash; Payment Status  &ndash;&gt;-->
-  <!--          <b-col md="12">-->
-  <!--            <b-form-group :label="$t('PaymentStatus')">-->
-  <!--              <select v-model="Filter_Payment" type="text" class="form-control">-->
-  <!--                <option value selected>All</option>-->
-  <!--                <option value="paid">Paid</option>-->
-  <!--                <option value="partial">partial</option>-->
-  <!--                <option value="unpaid">UnPaid</option>-->
-  <!--              </select>-->
-  <!--            </b-form-group>-->
-  <!--          </b-col>-->
+    <!--          &lt;!&ndash; Payment Status  &ndash;&gt;-->
+    <!--          <b-col md="12">-->
+    <!--            <b-form-group :label="$t('PaymentStatus')">-->
+    <!--              <select v-model="Filter_Payment" type="text" class="form-control">-->
+    <!--                <option value selected>All</option>-->
+    <!--                <option value="paid">Paid</option>-->
+    <!--                <option value="partial">partial</option>-->
+    <!--                <option value="unpaid">UnPaid</option>-->
+    <!--              </select>-->
+    <!--            </b-form-group>-->
+    <!--          </b-col>-->
 
-  <!--          <b-col md="6" sm="12">-->
-  <!--            <b-button-->
-  <!--              @click="Get_Purchases(serverParams.page)"-->
-  <!--              variant="primary ripple m-1"-->
-  <!--              size="sm"-->
-  <!--              block-->
-  <!--            >-->
-  <!--              <i class="i-Filter-2"></i>-->
-  <!--              {{ $t("Filter") }}-->
-  <!--            </b-button>-->
-  <!--          </b-col>-->
-  <!--          <b-col md="6" sm="12">-->
-  <!--            <b-button @click="Reset_Filter()" variant="danger ripple m-1" size="sm" block>-->
-  <!--              <i class="i-Power-2"></i>-->
-  <!--              {{ $t("Reset") }}-->
-  <!--            </b-button>-->
-  <!--          </b-col>-->
-  <!--        </b-row>-->
-  <!--      </div>-->
-  <!--    </b-sidebar>-->
-  <!--  </div>-->
+    <!--          <b-col md="6" sm="12">-->
+    <!--            <b-button-->
+    <!--              @click="Get_Purchases(serverParams.page)"-->
+    <!--              variant="primary ripple m-1"-->
+    <!--              size="sm"-->
+    <!--              block-->
+    <!--            >-->
+    <!--              <i class="i-Filter-2"></i>-->
+    <!--              {{ $t("Filter") }}-->
+    <!--            </b-button>-->
+    <!--          </b-col>-->
+    <!--          <b-col md="6" sm="12">-->
+    <!--            <b-button @click="Reset_Filter()" variant="danger ripple m-1" size="sm" block>-->
+    <!--              <i class="i-Power-2"></i>-->
+    <!--              {{ $t("Reset") }}-->
+    <!--            </b-button>-->
+    <!--          </b-col>-->
+    <!--        </b-row>-->
+    <!--      </div>-->
+    <!--    </b-sidebar>-->
+    <!--  </div>-->
 </template>
 
 <script>

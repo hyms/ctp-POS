@@ -1,703 +1,703 @@
 <template>
-  <!--  <div class="main-content">-->
-  <!--    <breadcumb :page="$t('SuppliersManagement')" :folder="$t('Suppliers')"/>-->
-  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
-  <!--    <div v-else>-->
-  <!--      <vue-good-table-->
-  <!--        mode="remote"-->
-  <!--        :columns="columns"-->
-  <!--        :totalRows="totalRows"-->
-  <!--        :rows="providers"-->
-  <!--        @on-page-change="onPageChange"-->
-  <!--        @on-per-page-change="onPerPageChange"-->
-  <!--        @on-sort-change="onSortChange"-->
-  <!--        @on-search="onSearch"-->
-  <!--        :search-options="{-->
-  <!--        enabled: true,-->
-  <!--        placeholder: $t('Search_this_table'),  -->
-  <!--      }"-->
-  <!--        :select-options="{ -->
-  <!--          enabled: true ,-->
-  <!--          clearSelectionText: '',-->
-  <!--        }"-->
-  <!--        @on-selected-rows-change="selectionChanged"-->
-  <!--        :pagination-options="{-->
-  <!--        enabled: true,-->
-  <!--        mode: 'records',-->
-  <!--        nextLabel: 'next',-->
-  <!--        prevLabel: 'prev',-->
-  <!--      }"-->
-  <!--        :styleClass="showDropdown?'tableOne table-hover vgt-table full-height':'tableOne table-hover vgt-table non-height'"-->
-  <!--      >-->
-  <!--        <div slot="selected-row-actions">-->
-  <!--          <button class="btn btn-danger btn-sm" @click="delete_by_selected()">{{$t('Del')}}</button>-->
-  <!--        </div>-->
-  <!--        <div slot="table-actions" class="mt-2 mb-3">-->
-  <!--          <b-button variant="outline-info m-1" size="sm" v-b-toggle.sidebar-right>-->
-  <!--            <i class="i-Filter-2"></i>-->
-  <!--            {{ $t("Filter") }}-->
-  <!--          </b-button>-->
-  <!--          <b-button @click="Providers_PDF()" size="sm" variant="outline-success m-1">-->
-  <!--            <i class="i-File-Copy"></i> PDF-->
-  <!--          </b-button>-->
-  <!--          <vue-excel-xlsx-->
-  <!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
-  <!--              :data="providers"-->
-  <!--              :columns="columns"-->
-  <!--              :file-name="'providers'"-->
-  <!--              :file-type="'xlsx'"-->
-  <!--              :sheet-name="'providers'"-->
-  <!--              >-->
-  <!--              <i class="i-File-Excel"></i> EXCEL-->
-  <!--          </vue-excel-xlsx>-->
-  <!--          <b-button-->
-  <!--            @click="Show_import_providers()"-->
-  <!--            size="sm"-->
-  <!--            variant="info m-1"-->
-  <!--            v-if="currentUserPermissions && currentUserPermissions.includes('Suppliers_import')"-->
-  <!--          >-->
-  <!--            <i class="i-Download"></i>-->
-  <!--            {{ $t("Import_Suppliers") }}-->
-  <!--          </b-button>-->
-  <!--          <b-button-->
-  <!--            @click="New_Provider()"-->
-  <!--            size="sm"-->
-  <!--            variant="btn btn-primary btn-icon m-1"-->
-  <!--            v-if="currentUserPermissions && currentUserPermissions.includes('Suppliers_add')"-->
-  <!--          >-->
-  <!--            <i class="i-Add"></i>-->
-  <!--            {{$t('Add')}}-->
-  <!--          </b-button>-->
-  <!--        </div>-->
+    <!--  <div class="main-content">-->
+    <!--    <breadcumb :page="$t('SuppliersManagement')" :folder="$t('Suppliers')"/>-->
+    <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+    <!--    <div v-else>-->
+    <!--      <vue-good-table-->
+    <!--        mode="remote"-->
+    <!--        :columns="columns"-->
+    <!--        :totalRows="totalRows"-->
+    <!--        :rows="providers"-->
+    <!--        @on-page-change="onPageChange"-->
+    <!--        @on-per-page-change="onPerPageChange"-->
+    <!--        @on-sort-change="onSortChange"-->
+    <!--        @on-search="onSearch"-->
+    <!--        :search-options="{-->
+    <!--        enabled: true,-->
+    <!--        placeholder: $t('Search_this_table'),  -->
+    <!--      }"-->
+    <!--        :select-options="{ -->
+    <!--          enabled: true ,-->
+    <!--          clearSelectionText: '',-->
+    <!--        }"-->
+    <!--        @on-selected-rows-change="selectionChanged"-->
+    <!--        :pagination-options="{-->
+    <!--        enabled: true,-->
+    <!--        mode: 'records',-->
+    <!--        nextLabel: 'next',-->
+    <!--        prevLabel: 'prev',-->
+    <!--      }"-->
+    <!--        :styleClass="showDropdown?'tableOne table-hover vgt-table full-height':'tableOne table-hover vgt-table non-height'"-->
+    <!--      >-->
+    <!--        <div slot="selected-row-actions">-->
+    <!--          <button class="btn btn-danger btn-sm" @click="delete_by_selected()">{{$t('Del')}}</button>-->
+    <!--        </div>-->
+    <!--        <div slot="table-actions" class="mt-2 mb-3">-->
+    <!--          <b-button variant="outline-info m-1" size="sm" v-b-toggle.sidebar-right>-->
+    <!--            <i class="i-Filter-2"></i>-->
+    <!--            {{ $t("Filter") }}-->
+    <!--          </b-button>-->
+    <!--          <b-button @click="Providers_PDF()" size="sm" variant="outline-success m-1">-->
+    <!--            <i class="i-File-Copy"></i> PDF-->
+    <!--          </b-button>-->
+    <!--          <vue-excel-xlsx-->
+    <!--              class="btn btn-sm btn-outline-danger ripple m-1"-->
+    <!--              :data="providers"-->
+    <!--              :columns="columns"-->
+    <!--              :file-name="'providers'"-->
+    <!--              :file-type="'xlsx'"-->
+    <!--              :sheet-name="'providers'"-->
+    <!--              >-->
+    <!--              <i class="i-File-Excel"></i> EXCEL-->
+    <!--          </vue-excel-xlsx>-->
+    <!--          <b-button-->
+    <!--            @click="Show_import_providers()"-->
+    <!--            size="sm"-->
+    <!--            variant="info m-1"-->
+    <!--            v-if="currentUserPermissions && currentUserPermissions.includes('Suppliers_import')"-->
+    <!--          >-->
+    <!--            <i class="i-Download"></i>-->
+    <!--            {{ $t("Import_Suppliers") }}-->
+    <!--          </b-button>-->
+    <!--          <b-button-->
+    <!--            @click="New_Provider()"-->
+    <!--            size="sm"-->
+    <!--            variant="btn btn-primary btn-icon m-1"-->
+    <!--            v-if="currentUserPermissions && currentUserPermissions.includes('Suppliers_add')"-->
+    <!--          >-->
+    <!--            <i class="i-Add"></i>-->
+    <!--            {{$t('Add')}}-->
+    <!--          </b-button>-->
+    <!--        </div>-->
 
-  <!--        <template slot="table-row" slot-scope="props">-->
-  <!--          <span v-if="props.column.field == 'actions'">-->
-  <!--            <div>-->
-  <!--              <b-dropdown-->
-  <!--                id="dropdown-right"-->
-  <!--                variant="link"-->
-  <!--                text="right align"-->
-  <!--                toggle-class="text-decoration-none"-->
-  <!--                size="lg"-->
-  <!--                right-->
-  <!--                no-caret-->
-  <!--              >-->
-  <!--                <template v-slot:button-content class="_r_btn border-0">-->
-  <!--                  <span class="_dot _r_block-dot bg-dark"></span>-->
-  <!--                  <span class="_dot _r_block-dot bg-dark"></span>-->
-  <!--                  <span class="_dot _r_block-dot bg-dark"></span>-->
-  <!--                </template>-->
+    <!--        <template slot="table-row" slot-scope="props">-->
+    <!--          <span v-if="props.column.field == 'actions'">-->
+    <!--            <div>-->
+    <!--              <b-dropdown-->
+    <!--                id="dropdown-right"-->
+    <!--                variant="link"-->
+    <!--                text="right align"-->
+    <!--                toggle-class="text-decoration-none"-->
+    <!--                size="lg"-->
+    <!--                right-->
+    <!--                no-caret-->
+    <!--              >-->
+    <!--                <template v-slot:button-content class="_r_btn border-0">-->
+    <!--                  <span class="_dot _r_block-dot bg-dark"></span>-->
+    <!--                  <span class="_dot _r_block-dot bg-dark"></span>-->
+    <!--                  <span class="_dot _r_block-dot bg-dark"></span>-->
+    <!--                </template>-->
 
-  <!--                <b-dropdown-item-->
-  <!--                  v-if="props.row.due > 0 && currentUserPermissions && currentUserPermissions.includes('pay_supplier_due')"-->
-  <!--                  @click="Pay_due(props.row)"-->
-  <!--                >-->
-  <!--                  <i class="nav-icon i-Dollar font-weight-bold mr-2"></i>-->
-  <!--                  {{$t('pay_all_purchase_due_at_a_time')}}-->
-  <!--                </b-dropdown-item>-->
+    <!--                <b-dropdown-item-->
+    <!--                  v-if="props.row.due > 0 && currentUserPermissions && currentUserPermissions.includes('pay_supplier_due')"-->
+    <!--                  @click="Pay_due(props.row)"-->
+    <!--                >-->
+    <!--                  <i class="nav-icon i-Dollar font-weight-bold mr-2"></i>-->
+    <!--                  {{$t('pay_all_purchase_due_at_a_time')}}-->
+    <!--                </b-dropdown-item>-->
 
-  <!--                 <b-dropdown-item-->
-  <!--                  v-if="props.row.return_Due > 0 && currentUserPermissions && currentUserPermissions.includes('pay_purchase_return_due')"-->
-  <!--                  @click="Pay_return_due(props.row)"-->
-  <!--                >-->
-  <!--                  <i class="nav-icon i-Dollar font-weight-bold mr-2"></i>-->
-  <!--                  {{$t('pay_all_purchase_return_due_at_a_time')}}-->
-  <!--                </b-dropdown-item>-->
+    <!--                 <b-dropdown-item-->
+    <!--                  v-if="props.row.return_Due > 0 && currentUserPermissions && currentUserPermissions.includes('pay_purchase_return_due')"-->
+    <!--                  @click="Pay_return_due(props.row)"-->
+    <!--                >-->
+    <!--                  <i class="nav-icon i-Dollar font-weight-bold mr-2"></i>-->
+    <!--                  {{$t('pay_all_purchase_return_due_at_a_time')}}-->
+    <!--                </b-dropdown-item>-->
 
-  <!--                <b-dropdown-item-->
-  <!--                  @click="showDetails(props.row)"-->
-  <!--                >-->
-  <!--                  <i class="nav-icon i-Eye font-weight-bold mr-2"></i>-->
-  <!--                  {{$t('Provider_details')}}-->
-  <!--                </b-dropdown-item>-->
+    <!--                <b-dropdown-item-->
+    <!--                  @click="showDetails(props.row)"-->
+    <!--                >-->
+    <!--                  <i class="nav-icon i-Eye font-weight-bold mr-2"></i>-->
+    <!--                  {{$t('Provider_details')}}-->
+    <!--                </b-dropdown-item>-->
 
-  <!--                <b-dropdown-item-->
-  <!--                 v-if="currentUserPermissions && currentUserPermissions.includes('Suppliers_edit')"-->
-  <!--                  @click="Edit_Provider(props.row)"-->
-  <!--                >-->
-  <!--                  <i class="nav-icon i-Edit font-weight-bold mr-2"></i>-->
-  <!--                  {{$t('Edit_Provider')}}-->
-  <!--                </b-dropdown-item>-->
+    <!--                <b-dropdown-item-->
+    <!--                 v-if="currentUserPermissions && currentUserPermissions.includes('Suppliers_edit')"-->
+    <!--                  @click="Edit_Provider(props.row)"-->
+    <!--                >-->
+    <!--                  <i class="nav-icon i-Edit font-weight-bold mr-2"></i>-->
+    <!--                  {{$t('Edit_Provider')}}-->
+    <!--                </b-dropdown-item>-->
 
-  <!--                <b-dropdown-item-->
-  <!--                  title="Delete"-->
-  <!--                  v-if="currentUserPermissions.includes('Suppliers_delete')"-->
-  <!--                  @click="Remove_Provider(props.row.id)"-->
-  <!--                >-->
-  <!--                  <i class="nav-icon i-Close-Window font-weight-bold mr-2"></i>-->
-  <!--                  {{$t('Delete_Provider')}}-->
-  <!--                </b-dropdown-item>-->
-  <!--                </b-dropdown>-->
-  <!--            </div>-->
-  <!--          </span>-->
+    <!--                <b-dropdown-item-->
+    <!--                  title="Delete"-->
+    <!--                  v-if="currentUserPermissions.includes('Suppliers_delete')"-->
+    <!--                  @click="Remove_Provider(props.row.id)"-->
+    <!--                >-->
+    <!--                  <i class="nav-icon i-Close-Window font-weight-bold mr-2"></i>-->
+    <!--                  {{$t('Delete_Provider')}}-->
+    <!--                </b-dropdown-item>-->
+    <!--                </b-dropdown>-->
+    <!--            </div>-->
+    <!--          </span>-->
 
-  <!--        </template>-->
-  <!--      </vue-good-table>-->
-  <!--    </div>-->
+    <!--        </template>-->
+    <!--      </vue-good-table>-->
+    <!--    </div>-->
 
-  <!--    &lt;!&ndash; Multiple Filters  &ndash;&gt;-->
-  <!--    <b-sidebar id="sidebar-right" :title="$t('Filter')" bg-variant="white" right shadow>-->
-  <!--      <div class="px-3 py-2">-->
-  <!--        <b-row>-->
-  <!--          &lt;!&ndash; Code Provider   &ndash;&gt;-->
-  <!--          <b-col md="12">-->
-  <!--            <b-form-group :label="$t('SupplierCode')">-->
-  <!--              <b-form-input label="Code" :placeholder="$t('SearchByCode')" v-model="Filter_Code"></b-form-input>-->
-  <!--            </b-form-group>-->
-  <!--          </b-col>-->
+    <!--    &lt;!&ndash; Multiple Filters  &ndash;&gt;-->
+    <!--    <b-sidebar id="sidebar-right" :title="$t('Filter')" bg-variant="white" right shadow>-->
+    <!--      <div class="px-3 py-2">-->
+    <!--        <b-row>-->
+    <!--          &lt;!&ndash; Code Provider   &ndash;&gt;-->
+    <!--          <b-col md="12">-->
+    <!--            <b-form-group :label="$t('SupplierCode')">-->
+    <!--              <b-form-input label="Code" :placeholder="$t('SearchByCode')" v-model="Filter_Code"></b-form-input>-->
+    <!--            </b-form-group>-->
+    <!--          </b-col>-->
 
-  <!--          &lt;!&ndash; Name Provider   &ndash;&gt;-->
-  <!--          <b-col md="12">-->
-  <!--            <b-form-group :label="$t('SupplierName')">-->
-  <!--              <b-form-input label="Name" :placeholder="$t('SearchByName')" v-model="Filter_Name"></b-form-input>-->
-  <!--            </b-form-group>-->
-  <!--          </b-col>-->
+    <!--          &lt;!&ndash; Name Provider   &ndash;&gt;-->
+    <!--          <b-col md="12">-->
+    <!--            <b-form-group :label="$t('SupplierName')">-->
+    <!--              <b-form-input label="Name" :placeholder="$t('SearchByName')" v-model="Filter_Name"></b-form-input>-->
+    <!--            </b-form-group>-->
+    <!--          </b-col>-->
 
-  <!--          &lt;!&ndash; Phone Provider   &ndash;&gt;-->
-  <!--          <b-col md="12">-->
-  <!--            <b-form-group :label="$t('Phone')">-->
-  <!--              <b-form-input label="Phone" :placeholder="$t('SearchByPhone')" v-model="Filter_Phone"></b-form-input>-->
-  <!--            </b-form-group>-->
-  <!--          </b-col>-->
+    <!--          &lt;!&ndash; Phone Provider   &ndash;&gt;-->
+    <!--          <b-col md="12">-->
+    <!--            <b-form-group :label="$t('Phone')">-->
+    <!--              <b-form-input label="Phone" :placeholder="$t('SearchByPhone')" v-model="Filter_Phone"></b-form-input>-->
+    <!--            </b-form-group>-->
+    <!--          </b-col>-->
 
-  <!--          &lt;!&ndash; Email Provider   &ndash;&gt;-->
-  <!--          <b-col md="12">-->
-  <!--            <b-form-group :label="$t('Email')">-->
-  <!--              <b-form-input label="Email" :placeholder="$t('SearchByEmail')" v-model="Filter_Email"></b-form-input>-->
-  <!--            </b-form-group>-->
-  <!--          </b-col>-->
+    <!--          &lt;!&ndash; Email Provider   &ndash;&gt;-->
+    <!--          <b-col md="12">-->
+    <!--            <b-form-group :label="$t('Email')">-->
+    <!--              <b-form-input label="Email" :placeholder="$t('SearchByEmail')" v-model="Filter_Email"></b-form-input>-->
+    <!--            </b-form-group>-->
+    <!--          </b-col>-->
 
-  <!--          <b-col md="6" sm="12">-->
-  <!--            <b-button-->
-  <!--              @click="Get_Providers(serverParams.page)"-->
-  <!--              variant="primary m-1"-->
-  <!--              size="sm"-->
-  <!--              block-->
-  <!--            >-->
-  <!--              <i class="i-Filter-2"></i>-->
-  <!--              {{ $t("Filter") }}-->
-  <!--            </b-button>-->
-  <!--          </b-col>-->
-  <!--          <b-col md="6" sm="12">-->
-  <!--            <b-button @click="Reset_Filter()" variant="danger m-1" size="sm" block>-->
-  <!--              <i class="i-Power-2"></i>-->
-  <!--              {{ $t("Reset") }}-->
-  <!--            </b-button>-->
-  <!--          </b-col>-->
-  <!--        </b-row>-->
-  <!--      </div>-->
-  <!--    </b-sidebar>-->
+    <!--          <b-col md="6" sm="12">-->
+    <!--            <b-button-->
+    <!--              @click="Get_Providers(serverParams.page)"-->
+    <!--              variant="primary m-1"-->
+    <!--              size="sm"-->
+    <!--              block-->
+    <!--            >-->
+    <!--              <i class="i-Filter-2"></i>-->
+    <!--              {{ $t("Filter") }}-->
+    <!--            </b-button>-->
+    <!--          </b-col>-->
+    <!--          <b-col md="6" sm="12">-->
+    <!--            <b-button @click="Reset_Filter()" variant="danger m-1" size="sm" block>-->
+    <!--              <i class="i-Power-2"></i>-->
+    <!--              {{ $t("Reset") }}-->
+    <!--            </b-button>-->
+    <!--          </b-col>-->
+    <!--        </b-row>-->
+    <!--      </div>-->
+    <!--    </b-sidebar>-->
 
-  <!--    &lt;!&ndash; Add & Edit Provider &ndash;&gt;-->
-  <!--    <validation-observer ref="Create_Provider">-->
-  <!--      <b-modal hide-footer size="lg" id="New_Provider" :title="editmode?$t('Edit'):$t('Add')">-->
-  <!--        <b-form @submit.prevent="Submit_Provider">-->
-  <!--          <b-row>-->
-  <!--            &lt;!&ndash; Provider Name &ndash;&gt;-->
-  <!--            <b-col md="6" sm="12">-->
-  <!--              <validation-provider-->
-  <!--                name="Name Provider"-->
-  <!--                :rules="{ required: true}"-->
-  <!--                v-slot="validationContext"-->
-  <!--              >-->
-  <!--                <b-form-group :label="$t('SupplierName') + ' ' + '*'">-->
-  <!--                  <b-form-input-->
-  <!--                    :state="getValidationState(validationContext)"-->
-  <!--                    aria-describedby="name-feedback"-->
-  <!--                    label="name"-->
-  <!--                    v-model="provider.name"-->
-  <!--                    :placeholder="$t('SupplierName')"-->
-  <!--                  ></b-form-input>-->
-  <!--                  <b-form-invalid-feedback id="name-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
-  <!--                </b-form-group>-->
-  <!--              </validation-provider>-->
-  <!--            </b-col>-->
+    <!--    &lt;!&ndash; Add & Edit Provider &ndash;&gt;-->
+    <!--    <validation-observer ref="Create_Provider">-->
+    <!--      <b-modal hide-footer size="lg" id="New_Provider" :title="editmode?$t('Edit'):$t('Add')">-->
+    <!--        <b-form @submit.prevent="Submit_Provider">-->
+    <!--          <b-row>-->
+    <!--            &lt;!&ndash; Provider Name &ndash;&gt;-->
+    <!--            <b-col md="6" sm="12">-->
+    <!--              <validation-provider-->
+    <!--                name="Name Provider"-->
+    <!--                :rules="{ required: true}"-->
+    <!--                v-slot="validationContext"-->
+    <!--              >-->
+    <!--                <b-form-group :label="$t('SupplierName') + ' ' + '*'">-->
+    <!--                  <b-form-input-->
+    <!--                    :state="getValidationState(validationContext)"-->
+    <!--                    aria-describedby="name-feedback"-->
+    <!--                    label="name"-->
+    <!--                    v-model="provider.name"-->
+    <!--                    :placeholder="$t('SupplierName')"-->
+    <!--                  ></b-form-input>-->
+    <!--                  <b-form-invalid-feedback id="name-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
+    <!--                </b-form-group>-->
+    <!--              </validation-provider>-->
+    <!--            </b-col>-->
 
-  <!--             &lt;!&ndash; Provider Email &ndash;&gt;-->
-  <!--            <b-col md="6" sm="12">-->
-  <!--                <b-form-group :label="$t('Email')">-->
-  <!--                  <b-form-input-->
-  <!--                    label="email"-->
-  <!--                    v-model="provider.email"-->
-  <!--                    :placeholder="$t('Email')"-->
-  <!--                  ></b-form-input>-->
-  <!--                </b-form-group>-->
-  <!--            </b-col>-->
+    <!--             &lt;!&ndash; Provider Email &ndash;&gt;-->
+    <!--            <b-col md="6" sm="12">-->
+    <!--                <b-form-group :label="$t('Email')">-->
+    <!--                  <b-form-input-->
+    <!--                    label="email"-->
+    <!--                    v-model="provider.email"-->
+    <!--                    :placeholder="$t('Email')"-->
+    <!--                  ></b-form-input>-->
+    <!--                </b-form-group>-->
+    <!--            </b-col>-->
 
-  <!--            &lt;!&ndash; Provider Phone &ndash;&gt;-->
-  <!--            <b-col md="6" sm="12">-->
-  <!--                <b-form-group :label="$t('Phone')">-->
-  <!--                  <b-form-input-->
-  <!--                    label="Phone"-->
-  <!--                    v-model="provider.phone"-->
-  <!--                    :placeholder="$t('Phone')"-->
-  <!--                  ></b-form-input>-->
-  <!--                </b-form-group>-->
-  <!--            </b-col>-->
+    <!--            &lt;!&ndash; Provider Phone &ndash;&gt;-->
+    <!--            <b-col md="6" sm="12">-->
+    <!--                <b-form-group :label="$t('Phone')">-->
+    <!--                  <b-form-input-->
+    <!--                    label="Phone"-->
+    <!--                    v-model="provider.phone"-->
+    <!--                    :placeholder="$t('Phone')"-->
+    <!--                  ></b-form-input>-->
+    <!--                </b-form-group>-->
+    <!--            </b-col>-->
 
-  <!--            &lt;!&ndash; Provider Country &ndash;&gt;-->
-  <!--            <b-col md="6" sm="12">-->
-  <!--                <b-form-group :label="$t('Country')">-->
-  <!--                  <b-form-input-->
-  <!--                    label="Country"-->
-  <!--                    v-model="provider.country"-->
-  <!--                    :placeholder="$t('Country')"-->
-  <!--                  ></b-form-input>-->
-  <!--                </b-form-group>-->
-  <!--            </b-col>-->
+    <!--            &lt;!&ndash; Provider Country &ndash;&gt;-->
+    <!--            <b-col md="6" sm="12">-->
+    <!--                <b-form-group :label="$t('Country')">-->
+    <!--                  <b-form-input-->
+    <!--                    label="Country"-->
+    <!--                    v-model="provider.country"-->
+    <!--                    :placeholder="$t('Country')"-->
+    <!--                  ></b-form-input>-->
+    <!--                </b-form-group>-->
+    <!--            </b-col>-->
 
-  <!--            &lt;!&ndash; Provider City &ndash;&gt;-->
-  <!--            <b-col md="6" sm="12">-->
-  <!--                <b-form-group :label="$t('City')">-->
-  <!--                  <b-form-input-->
-  <!--                    label="City"-->
-  <!--                    v-model="provider.city"-->
-  <!--                    :placeholder="$t('City')"-->
-  <!--                  ></b-form-input>-->
-  <!--                </b-form-group>-->
-  <!--            </b-col>-->
+    <!--            &lt;!&ndash; Provider City &ndash;&gt;-->
+    <!--            <b-col md="6" sm="12">-->
+    <!--                <b-form-group :label="$t('City')">-->
+    <!--                  <b-form-input-->
+    <!--                    label="City"-->
+    <!--                    v-model="provider.city"-->
+    <!--                    :placeholder="$t('City')"-->
+    <!--                  ></b-form-input>-->
+    <!--                </b-form-group>-->
+    <!--            </b-col>-->
 
-  <!--            &lt;!&ndash; Provider Tax_Number &ndash;&gt;-->
-  <!--            <b-col md="6" sm="12">-->
-  <!--                <b-form-group :label="$t('Tax_Number')">-->
-  <!--                  <b-form-input-->
-  <!--                    label="Tax_Number"-->
-  <!--                    v-model="provider.tax_number"-->
-  <!--                    :placeholder="$t('Tax_Number')"-->
-  <!--                  ></b-form-input>-->
-  <!--                </b-form-group>-->
-  <!--            </b-col>-->
+    <!--            &lt;!&ndash; Provider Tax_Number &ndash;&gt;-->
+    <!--            <b-col md="6" sm="12">-->
+    <!--                <b-form-group :label="$t('Tax_Number')">-->
+    <!--                  <b-form-input-->
+    <!--                    label="Tax_Number"-->
+    <!--                    v-model="provider.tax_number"-->
+    <!--                    :placeholder="$t('Tax_Number')"-->
+    <!--                  ></b-form-input>-->
+    <!--                </b-form-group>-->
+    <!--            </b-col>-->
 
-  <!--            &lt;!&ndash; Provider Adress &ndash;&gt;-->
-  <!--            <b-col md="12" sm="12">-->
-  <!--                <b-form-group :label="$t('Adress')">-->
-  <!--                  <textarea-->
-  <!--                    label="Adress"-->
-  <!--                    class="form-control"-->
-  <!--                    rows="4"-->
-  <!--                    v-model="provider.adresse"-->
-  <!--                    :placeholder="$t('Adress')"-->
-  <!--                 ></textarea>-->
-  <!--                </b-form-group>-->
-  <!--            </b-col>-->
+    <!--            &lt;!&ndash; Provider Adress &ndash;&gt;-->
+    <!--            <b-col md="12" sm="12">-->
+    <!--                <b-form-group :label="$t('Adress')">-->
+    <!--                  <textarea-->
+    <!--                    label="Adress"-->
+    <!--                    class="form-control"-->
+    <!--                    rows="4"-->
+    <!--                    v-model="provider.adresse"-->
+    <!--                    :placeholder="$t('Adress')"-->
+    <!--                 ></textarea>-->
+    <!--                </b-form-group>-->
+    <!--            </b-col>-->
 
-  <!--            <b-col md="12" class="mt-3">-->
-  <!--                <b-button variant="primary" type="submit"  :disabled="SubmitProcessing">{{$t('submit')}}</b-button>-->
-  <!--                  <div v-once class="typo__p" v-if="SubmitProcessing">-->
-  <!--                    <div class="spinner sm spinner-primary mt-3"></div>-->
-  <!--                  </div>-->
-  <!--            </b-col>-->
+    <!--            <b-col md="12" class="mt-3">-->
+    <!--                <b-button variant="primary" type="submit"  :disabled="SubmitProcessing">{{$t('submit')}}</b-button>-->
+    <!--                  <div v-once class="typo__p" v-if="SubmitProcessing">-->
+    <!--                    <div class="spinner sm spinner-primary mt-3"></div>-->
+    <!--                  </div>-->
+    <!--            </b-col>-->
 
-  <!--          </b-row>-->
-  <!--        </b-form>-->
-  <!--      </b-modal>-->
-  <!--    </validation-observer>-->
+    <!--          </b-row>-->
+    <!--        </b-form>-->
+    <!--      </b-modal>-->
+    <!--    </validation-observer>-->
 
-  <!--    &lt;!&ndash; Modal Pay_due&ndash;&gt;-->
-  <!--    <validation-observer ref="ref_pay_due">-->
-  <!--      <b-modal-->
-  <!--        hide-footer-->
-  <!--        size="md"-->
-  <!--        id="modal_Pay_due"-->
-  <!--        title="Pay Due"-->
-  <!--      >-->
-  <!--        <b-form @submit.prevent="Submit_Payment_Purchase_due">-->
-  <!--          <b-row>-->
-  <!--          -->
-  <!--            &lt;!&ndash; Paying Amount  &ndash;&gt;-->
-  <!--            <b-col lg="6" md="12" sm="12">-->
-  <!--              <validation-provider-->
-  <!--                name="Amount"-->
-  <!--                :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
-  <!--                v-slot="validationContext"-->
-  <!--              >-->
-  <!--                <b-form-group :label="$t('Paying_Amount') + ' ' + '*'">-->
-  <!--                  <b-form-input-->
-  <!--                   @keyup="Verified_paidAmount(payment.amount)"-->
-  <!--                    label="Amount"-->
-  <!--                    :placeholder="$t('Paying_Amount')"-->
-  <!--                    v-model.number="payment.amount"-->
-  <!--                    :state="getValidationState(validationContext)"-->
-  <!--                    aria-describedby="Amount-feedback"-->
-  <!--                  ></b-form-input>-->
-  <!--                  <b-form-invalid-feedback id="Amount-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
-  <!--                  <span class="badge badge-danger">{{$t('Due')}} : {{currentUser.currency}} {{payment.due}}</span>-->
-  <!--                </b-form-group>-->
-  <!--              </validation-provider>-->
-  <!--            </b-col>-->
+    <!--    &lt;!&ndash; Modal Pay_due&ndash;&gt;-->
+    <!--    <validation-observer ref="ref_pay_due">-->
+    <!--      <b-modal-->
+    <!--        hide-footer-->
+    <!--        size="md"-->
+    <!--        id="modal_Pay_due"-->
+    <!--        title="Pay Due"-->
+    <!--      >-->
+    <!--        <b-form @submit.prevent="Submit_Payment_Purchase_due">-->
+    <!--          <b-row>-->
+    <!--          -->
+    <!--            &lt;!&ndash; Paying Amount  &ndash;&gt;-->
+    <!--            <b-col lg="6" md="12" sm="12">-->
+    <!--              <validation-provider-->
+    <!--                name="Amount"-->
+    <!--                :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
+    <!--                v-slot="validationContext"-->
+    <!--              >-->
+    <!--                <b-form-group :label="$t('Paying_Amount') + ' ' + '*'">-->
+    <!--                  <b-form-input-->
+    <!--                   @keyup="Verified_paidAmount(payment.amount)"-->
+    <!--                    label="Amount"-->
+    <!--                    :placeholder="$t('Paying_Amount')"-->
+    <!--                    v-model.number="payment.amount"-->
+    <!--                    :state="getValidationState(validationContext)"-->
+    <!--                    aria-describedby="Amount-feedback"-->
+    <!--                  ></b-form-input>-->
+    <!--                  <b-form-invalid-feedback id="Amount-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
+    <!--                  <span class="badge badge-danger">{{$t('Due')}} : {{currentUser.currency}} {{payment.due}}</span>-->
+    <!--                </b-form-group>-->
+    <!--              </validation-provider>-->
+    <!--            </b-col>-->
 
-  <!--            &lt;!&ndash; Payment choice &ndash;&gt;-->
-  <!--            <b-col lg="6" md="12" sm="12">-->
-  <!--              <validation-provider name="Payment choice" :rules="{ required: true}">-->
-  <!--                <b-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice')+ ' ' + '*'">-->
-  <!--                  <v-select-->
-  <!--                    :class="{'is-invalid': !!errors.length}"-->
-  <!--                    :state="errors[0] ? false : (valid ? true : null)"-->
-  <!--                    v-model="payment.Reglement"-->
-  <!--                    :reduce="label => label.value"-->
-  <!--                    :placeholder="$t('PleaseSelect')"-->
-  <!--                    :options="-->
-  <!--                          [-->
-  <!--                          {label: 'Cash', value: 'Cash'},-->
-  <!--                          {label: 'credit card', value: 'credit card'},-->
-  <!--                          {label: 'TPE', value: 'tpe'},-->
-  <!--                          {label: 'cheque', value: 'cheque'},-->
-  <!--                          {label: 'Western Union', value: 'Western Union'},-->
-  <!--                          {label: 'bank transfer', value: 'bank transfer'},-->
-  <!--                          {label: 'other', value: 'other'},-->
-  <!--                          ]"-->
-  <!--                  ></v-select>-->
-  <!--                  <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>-->
-  <!--                </b-form-group>-->
-  <!--              </validation-provider>-->
-  <!--            </b-col>-->
+    <!--            &lt;!&ndash; Payment choice &ndash;&gt;-->
+    <!--            <b-col lg="6" md="12" sm="12">-->
+    <!--              <validation-provider name="Payment choice" :rules="{ required: true}">-->
+    <!--                <b-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice')+ ' ' + '*'">-->
+    <!--                  <v-select-->
+    <!--                    :class="{'is-invalid': !!errors.length}"-->
+    <!--                    :state="errors[0] ? false : (valid ? true : null)"-->
+    <!--                    v-model="payment.Reglement"-->
+    <!--                    :reduce="label => label.value"-->
+    <!--                    :placeholder="$t('PleaseSelect')"-->
+    <!--                    :options="-->
+    <!--                          [-->
+    <!--                          {label: 'Cash', value: 'Cash'},-->
+    <!--                          {label: 'credit card', value: 'credit card'},-->
+    <!--                          {label: 'TPE', value: 'tpe'},-->
+    <!--                          {label: 'cheque', value: 'cheque'},-->
+    <!--                          {label: 'Western Union', value: 'Western Union'},-->
+    <!--                          {label: 'bank transfer', value: 'bank transfer'},-->
+    <!--                          {label: 'other', value: 'other'},-->
+    <!--                          ]"-->
+    <!--                  ></v-select>-->
+    <!--                  <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>-->
+    <!--                </b-form-group>-->
+    <!--              </validation-provider>-->
+    <!--            </b-col>-->
 
-  <!--            &lt;!&ndash; Note &ndash;&gt;-->
-  <!--            <b-col lg="12" md="12" sm="12" class="mt-3">-->
-  <!--              <b-form-group :label="$t('Please_provide_any_details')">-->
-  <!--                <b-form-textarea id="textarea" v-model="payment.notes" rows="3" max-rows="6"></b-form-textarea>-->
-  <!--              </b-form-group>-->
-  <!--            </b-col>-->
+    <!--            &lt;!&ndash; Note &ndash;&gt;-->
+    <!--            <b-col lg="12" md="12" sm="12" class="mt-3">-->
+    <!--              <b-form-group :label="$t('Please_provide_any_details')">-->
+    <!--                <b-form-textarea id="textarea" v-model="payment.notes" rows="3" max-rows="6"></b-form-textarea>-->
+    <!--              </b-form-group>-->
+    <!--            </b-col>-->
 
-  <!--            <b-col md="12" class="mt-3">-->
-  <!--              <b-button-->
-  <!--                variant="primary"-->
-  <!--                type="submit"-->
-  <!--                :disabled="paymentProcessing"-->
-  <!--              >{{$t('submit')}}</b-button>-->
-  <!--              <div v-once class="typo__p" v-if="paymentProcessing">-->
-  <!--                <div class="spinner sm spinner-primary mt-3"></div>-->
-  <!--              </div>-->
-  <!--            </b-col>-->
+    <!--            <b-col md="12" class="mt-3">-->
+    <!--              <b-button-->
+    <!--                variant="primary"-->
+    <!--                type="submit"-->
+    <!--                :disabled="paymentProcessing"-->
+    <!--              >{{$t('submit')}}</b-button>-->
+    <!--              <div v-once class="typo__p" v-if="paymentProcessing">-->
+    <!--                <div class="spinner sm spinner-primary mt-3"></div>-->
+    <!--              </div>-->
+    <!--            </b-col>-->
 
-  <!--          </b-row>-->
-  <!--        </b-form>-->
-  <!--      </b-modal>-->
-  <!--    </validation-observer>-->
+    <!--          </b-row>-->
+    <!--        </b-form>-->
+    <!--      </b-modal>-->
+    <!--    </validation-observer>-->
 
-  <!--    &lt;!&ndash; Modal Pay_return_Due&ndash;&gt;-->
-  <!--    <validation-observer ref="ref_pay_return_due">-->
-  <!--      <b-modal-->
-  <!--        hide-footer-->
-  <!--        size="md"-->
-  <!--        id="modal_Pay_return_due"-->
-  <!--        title="Pay Purchase Return Due"-->
-  <!--      >-->
-  <!--        <b-form @submit.prevent="Submit_Payment_purchase_return_due">-->
-  <!--          <b-row>-->
-  <!--          -->
-  <!--            &lt;!&ndash; Paying Amount &ndash;&gt;-->
-  <!--            <b-col lg="6" md="12" sm="12">-->
-  <!--              <validation-provider-->
-  <!--                name="Amount"-->
-  <!--                :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
-  <!--                v-slot="validationContext"-->
-  <!--              >-->
-  <!--                <b-form-group :label="$t('Paying_Amount') + ' ' + '*'">-->
-  <!--                  <b-form-input-->
-  <!--                   @keyup="Verified_return_paidAmount(payment_return.amount)"-->
-  <!--                    label="Amount"-->
-  <!--                    :placeholder="$t('Paying_Amount')"-->
-  <!--                    v-model.number="payment_return.amount"-->
-  <!--                    :state="getValidationState(validationContext)"-->
-  <!--                    aria-describedby="Amount-feedback"-->
-  <!--                  ></b-form-input>-->
-  <!--                  <b-form-invalid-feedback id="Amount-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
-  <!--                  <span class="badge badge-danger">{{$t('Due')}} : {{currentUser.currency}} {{payment_return.return_Due}}</span>-->
-  <!--                </b-form-group>-->
-  <!--              </validation-provider>-->
-  <!--            </b-col>-->
+    <!--    &lt;!&ndash; Modal Pay_return_Due&ndash;&gt;-->
+    <!--    <validation-observer ref="ref_pay_return_due">-->
+    <!--      <b-modal-->
+    <!--        hide-footer-->
+    <!--        size="md"-->
+    <!--        id="modal_Pay_return_due"-->
+    <!--        title="Pay Purchase Return Due"-->
+    <!--      >-->
+    <!--        <b-form @submit.prevent="Submit_Payment_purchase_return_due">-->
+    <!--          <b-row>-->
+    <!--          -->
+    <!--            &lt;!&ndash; Paying Amount &ndash;&gt;-->
+    <!--            <b-col lg="6" md="12" sm="12">-->
+    <!--              <validation-provider-->
+    <!--                name="Amount"-->
+    <!--                :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
+    <!--                v-slot="validationContext"-->
+    <!--              >-->
+    <!--                <b-form-group :label="$t('Paying_Amount') + ' ' + '*'">-->
+    <!--                  <b-form-input-->
+    <!--                   @keyup="Verified_return_paidAmount(payment_return.amount)"-->
+    <!--                    label="Amount"-->
+    <!--                    :placeholder="$t('Paying_Amount')"-->
+    <!--                    v-model.number="payment_return.amount"-->
+    <!--                    :state="getValidationState(validationContext)"-->
+    <!--                    aria-describedby="Amount-feedback"-->
+    <!--                  ></b-form-input>-->
+    <!--                  <b-form-invalid-feedback id="Amount-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
+    <!--                  <span class="badge badge-danger">{{$t('Due')}} : {{currentUser.currency}} {{payment_return.return_Due}}</span>-->
+    <!--                </b-form-group>-->
+    <!--              </validation-provider>-->
+    <!--            </b-col>-->
 
-  <!--            &lt;!&ndash; Payment choice &ndash;&gt;-->
-  <!--            <b-col lg="6" md="12" sm="12">-->
-  <!--              <validation-provider name="Payment choice" :rules="{ required: true}">-->
-  <!--                <b-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice')+ ' ' + '*'">-->
-  <!--                  <v-select-->
-  <!--                    :class="{'is-invalid': !!errors.length}"-->
-  <!--                    :state="errors[0] ? false : (valid ? true : null)"-->
-  <!--                    v-model="payment_return.Reglement"-->
-  <!--                    :reduce="label => label.value"-->
-  <!--                    :placeholder="$t('PleaseSelect')"-->
-  <!--                    :options="-->
-  <!--                          [-->
-  <!--                          {label: 'Cash', value: 'Cash'},-->
-  <!--                          {label: 'credit card', value: 'credit card'},-->
-  <!--                          {label: 'TPE', value: 'tpe'},-->
-  <!--                          {label: 'cheque', value: 'cheque'},-->
-  <!--                          {label: 'Western Union', value: 'Western Union'},-->
-  <!--                          {label: 'bank transfer', value: 'bank transfer'},-->
-  <!--                          {label: 'other', value: 'other'},-->
-  <!--                          ]"-->
-  <!--                  ></v-select>-->
-  <!--                  <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>-->
-  <!--                </b-form-group>-->
-  <!--              </validation-provider>-->
-  <!--            </b-col>-->
+    <!--            &lt;!&ndash; Payment choice &ndash;&gt;-->
+    <!--            <b-col lg="6" md="12" sm="12">-->
+    <!--              <validation-provider name="Payment choice" :rules="{ required: true}">-->
+    <!--                <b-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice')+ ' ' + '*'">-->
+    <!--                  <v-select-->
+    <!--                    :class="{'is-invalid': !!errors.length}"-->
+    <!--                    :state="errors[0] ? false : (valid ? true : null)"-->
+    <!--                    v-model="payment_return.Reglement"-->
+    <!--                    :reduce="label => label.value"-->
+    <!--                    :placeholder="$t('PleaseSelect')"-->
+    <!--                    :options="-->
+    <!--                          [-->
+    <!--                          {label: 'Cash', value: 'Cash'},-->
+    <!--                          {label: 'credit card', value: 'credit card'},-->
+    <!--                          {label: 'TPE', value: 'tpe'},-->
+    <!--                          {label: 'cheque', value: 'cheque'},-->
+    <!--                          {label: 'Western Union', value: 'Western Union'},-->
+    <!--                          {label: 'bank transfer', value: 'bank transfer'},-->
+    <!--                          {label: 'other', value: 'other'},-->
+    <!--                          ]"-->
+    <!--                  ></v-select>-->
+    <!--                  <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>-->
+    <!--                </b-form-group>-->
+    <!--              </validation-provider>-->
+    <!--            </b-col>-->
 
-  <!--            &lt;!&ndash; Note &ndash;&gt;-->
-  <!--            <b-col lg="12" md="12" sm="12" class="mt-3">-->
-  <!--              <b-form-group :label="$t('Please_provide_any_details')">-->
-  <!--                <b-form-textarea id="textarea" v-model="payment_return.notes" rows="3" max-rows="6"></b-form-textarea>-->
-  <!--              </b-form-group>-->
-  <!--            </b-col>-->
+    <!--            &lt;!&ndash; Note &ndash;&gt;-->
+    <!--            <b-col lg="12" md="12" sm="12" class="mt-3">-->
+    <!--              <b-form-group :label="$t('Please_provide_any_details')">-->
+    <!--                <b-form-textarea id="textarea" v-model="payment_return.notes" rows="3" max-rows="6"></b-form-textarea>-->
+    <!--              </b-form-group>-->
+    <!--            </b-col>-->
 
-  <!--            <b-col md="12" class="mt-3">-->
-  <!--              <b-button-->
-  <!--                variant="primary"-->
-  <!--                type="submit"-->
-  <!--                :disabled="payment_return_Processing"-->
-  <!--              >{{$t('submit')}}</b-button>-->
-  <!--              <div v-once class="typo__p" v-if="payment_return_Processing">-->
-  <!--                <div class="spinner sm spinner-primary mt-3"></div>-->
-  <!--              </div>-->
-  <!--            </b-col>-->
+    <!--            <b-col md="12" class="mt-3">-->
+    <!--              <b-button-->
+    <!--                variant="primary"-->
+    <!--                type="submit"-->
+    <!--                :disabled="payment_return_Processing"-->
+    <!--              >{{$t('submit')}}</b-button>-->
+    <!--              <div v-once class="typo__p" v-if="payment_return_Processing">-->
+    <!--                <div class="spinner sm spinner-primary mt-3"></div>-->
+    <!--              </div>-->
+    <!--            </b-col>-->
 
-  <!--          </b-row>-->
-  <!--        </b-form>-->
-  <!--      </b-modal>-->
-  <!--    </validation-observer>-->
+    <!--          </b-row>-->
+    <!--        </b-form>-->
+    <!--      </b-modal>-->
+    <!--    </validation-observer>-->
 
-  <!--     &lt;!&ndash; Modal Show Customer_Invoice&ndash;&gt;-->
-  <!--    <b-modal hide-footer size="sm" scrollable id="Show_invoice" :title="$t('Provider_Credit_Note')">-->
-  <!--        <div id="invoice-POS">-->
-  <!--          <div style="max-width:400px;margin:0px auto">-->
-  <!--          <div class="info" >-->
-  <!--            <h2 class="text-center">{{company_info.CompanyName}}</h2>-->
+    <!--     &lt;!&ndash; Modal Show Customer_Invoice&ndash;&gt;-->
+    <!--    <b-modal hide-footer size="sm" scrollable id="Show_invoice" :title="$t('Provider_Credit_Note')">-->
+    <!--        <div id="invoice-POS">-->
+    <!--          <div style="max-width:400px;margin:0px auto">-->
+    <!--          <div class="info" >-->
+    <!--            <h2 class="text-center">{{company_info.CompanyName}}</h2>-->
 
-  <!--            <p>-->
-  <!--                <span>{{$t('date')}} : {{payment.date}} <br></span>-->
-  <!--                <span >{{$t('Adress')}} : {{company_info.CompanyAdress}} <br></span>-->
-  <!--                <span >{{$t('Phone')}} : {{company_info.CompanyPhone}} <br></span>-->
-  <!--                <span >{{$t('Customer')}} : {{payment.provider_name}} <br></span>-->
-  <!--              </p>-->
-  <!--          </div>-->
+    <!--            <p>-->
+    <!--                <span>{{$t('date')}} : {{payment.date}} <br></span>-->
+    <!--                <span >{{$t('Adress')}} : {{company_info.CompanyAdress}} <br></span>-->
+    <!--                <span >{{$t('Phone')}} : {{company_info.CompanyPhone}} <br></span>-->
+    <!--                <span >{{$t('Customer')}} : {{payment.provider_name}} <br></span>-->
+    <!--              </p>-->
+    <!--          </div>-->
 
-  <!--           <table-->
-  <!--                class="change mt-3"-->
-  <!--                style=" font-size: 10px;"-->
-  <!--              >-->
-  <!--                <thead>-->
-  <!--                  <tr style="background: #eee; ">-->
-  <!--                    <th style="text-align: left;" colspan="1">{{$t('PayeBy')}}:</th>-->
-  <!--                    <th style="text-align: center;" colspan="2">{{$t('Amount')}}:</th>-->
-  <!--                    <th style="text-align: right;" colspan="1">{{$t('Due')}}:</th>-->
-  <!--                  </tr>-->
-  <!--                </thead>-->
+    <!--           <table-->
+    <!--                class="change mt-3"-->
+    <!--                style=" font-size: 10px;"-->
+    <!--              >-->
+    <!--                <thead>-->
+    <!--                  <tr style="background: #eee; ">-->
+    <!--                    <th style="text-align: left;" colspan="1">{{$t('PayeBy')}}:</th>-->
+    <!--                    <th style="text-align: center;" colspan="2">{{$t('Amount')}}:</th>-->
+    <!--                    <th style="text-align: right;" colspan="1">{{$t('Due')}}:</th>-->
+    <!--                  </tr>-->
+    <!--                </thead>-->
 
-  <!--                <tbody>-->
-  <!--                  <tr>-->
-  <!--                    <td style="text-align: left;" colspan="1">{{payment.Reglement}}</td>-->
-  <!--                    <td-->
-  <!--                      style="text-align: center;"-->
-  <!--                      colspan="2"-->
-  <!--                    >{{formatNumber(payment.amount ,2)}}</td>-->
-  <!--                    <td-->
-  <!--                      style="text-align: right;"-->
-  <!--                      colspan="1"-->
-  <!--                    >{{formatNumber(payment.due - payment.amount ,2)}}</td>-->
-  <!--                  </tr>-->
-  <!--                </tbody>-->
-  <!--              </table>-->
-  <!--          </div>-->
-  <!--        </div>-->
-  <!--      <button @click="print_it()" class="btn btn-outline-primary">-->
-  <!--        <i class="i-Billing"></i>-->
-  <!--        {{$t('print')}}-->
-  <!--      </button>-->
-  <!--    </b-modal>-->
+    <!--                <tbody>-->
+    <!--                  <tr>-->
+    <!--                    <td style="text-align: left;" colspan="1">{{payment.Reglement}}</td>-->
+    <!--                    <td-->
+    <!--                      style="text-align: center;"-->
+    <!--                      colspan="2"-->
+    <!--                    >{{formatNumber(payment.amount ,2)}}</td>-->
+    <!--                    <td-->
+    <!--                      style="text-align: right;"-->
+    <!--                      colspan="1"-->
+    <!--                    >{{formatNumber(payment.due - payment.amount ,2)}}</td>-->
+    <!--                  </tr>-->
+    <!--                </tbody>-->
+    <!--              </table>-->
+    <!--          </div>-->
+    <!--        </div>-->
+    <!--      <button @click="print_it()" class="btn btn-outline-primary">-->
+    <!--        <i class="i-Billing"></i>-->
+    <!--        {{$t('print')}}-->
+    <!--      </button>-->
+    <!--    </b-modal>-->
 
-  <!--     &lt;!&ndash; Modal Show_invoice_return&ndash;&gt;-->
-  <!--    <b-modal hide-footer size="sm" scrollable id="Show_invoice_return" :title="$t('Purchase_return_due')">-->
-  <!--         <div id="invoice-POS-return">-->
-  <!--          <div style="max-width:400px;margin:0px auto">-->
-  <!--          <div class="info" >-->
-  <!--            <h2 class="text-center">{{company_info.CompanyName}}</h2>-->
+    <!--     &lt;!&ndash; Modal Show_invoice_return&ndash;&gt;-->
+    <!--    <b-modal hide-footer size="sm" scrollable id="Show_invoice_return" :title="$t('Purchase_return_due')">-->
+    <!--         <div id="invoice-POS-return">-->
+    <!--          <div style="max-width:400px;margin:0px auto">-->
+    <!--          <div class="info" >-->
+    <!--            <h2 class="text-center">{{company_info.CompanyName}}</h2>-->
 
-  <!--            <p>-->
-  <!--                <span>{{$t('date')}} : {{payment_return.date}} <br></span>-->
-  <!--                <span >{{$t('Adress')}} : {{company_info.CompanyAdress}} <br></span>-->
-  <!--                <span >{{$t('Phone')}} : {{company_info.CompanyPhone}} <br></span>-->
-  <!--                <span >{{$t('Customer')}} : {{payment_return.provider_name}} <br></span>-->
-  <!--              </p>-->
-  <!--          </div>-->
+    <!--            <p>-->
+    <!--                <span>{{$t('date')}} : {{payment_return.date}} <br></span>-->
+    <!--                <span >{{$t('Adress')}} : {{company_info.CompanyAdress}} <br></span>-->
+    <!--                <span >{{$t('Phone')}} : {{company_info.CompanyPhone}} <br></span>-->
+    <!--                <span >{{$t('Customer')}} : {{payment_return.provider_name}} <br></span>-->
+    <!--              </p>-->
+    <!--          </div>-->
 
-  <!--           <table-->
-  <!--                class="change mt-3"-->
-  <!--                style=" font-size: 10px;"-->
-  <!--              >-->
-  <!--                <thead>-->
-  <!--                  <tr style="background: #eee; ">-->
-  <!--                    <th style="text-align: left;" colspan="1">{{$t('PayeBy')}}:</th>-->
-  <!--                    <th style="text-align: center;" colspan="2">{{$t('Amount')}}:</th>-->
-  <!--                    <th style="text-align: right;" colspan="1">{{$t('Due')}}:</th>-->
-  <!--                  </tr>-->
-  <!--                </thead>-->
+    <!--           <table-->
+    <!--                class="change mt-3"-->
+    <!--                style=" font-size: 10px;"-->
+    <!--              >-->
+    <!--                <thead>-->
+    <!--                  <tr style="background: #eee; ">-->
+    <!--                    <th style="text-align: left;" colspan="1">{{$t('PayeBy')}}:</th>-->
+    <!--                    <th style="text-align: center;" colspan="2">{{$t('Amount')}}:</th>-->
+    <!--                    <th style="text-align: right;" colspan="1">{{$t('Due')}}:</th>-->
+    <!--                  </tr>-->
+    <!--                </thead>-->
 
-  <!--                <tbody>-->
-  <!--                  <tr>-->
-  <!--                    <td style="text-align: left;" colspan="1">{{payment_return.Reglement}}</td>-->
-  <!--                    <td-->
-  <!--                      style="text-align: center;"-->
-  <!--                      colspan="2"-->
-  <!--                    >{{formatNumber(payment_return.amount ,2)}}</td>-->
-  <!--                    <td-->
-  <!--                      style="text-align: right;"-->
-  <!--                      colspan="1"-->
-  <!--                    >{{formatNumber(payment_return.return_Due - payment_return.amount ,2)}}</td>-->
-  <!--                  </tr>-->
-  <!--                </tbody>-->
-  <!--              </table>-->
-  <!--          </div>-->
-  <!--        </div>-->
-  <!--      <button @click="print_return_due()" class="btn btn-outline-primary">-->
-  <!--        <i class="i-Billing"></i>-->
-  <!--        {{$t('print')}}-->
-  <!--      </button>-->
-  <!--    </b-modal>-->
+    <!--                <tbody>-->
+    <!--                  <tr>-->
+    <!--                    <td style="text-align: left;" colspan="1">{{payment_return.Reglement}}</td>-->
+    <!--                    <td-->
+    <!--                      style="text-align: center;"-->
+    <!--                      colspan="2"-->
+    <!--                    >{{formatNumber(payment_return.amount ,2)}}</td>-->
+    <!--                    <td-->
+    <!--                      style="text-align: right;"-->
+    <!--                      colspan="1"-->
+    <!--                    >{{formatNumber(payment_return.return_Due - payment_return.amount ,2)}}</td>-->
+    <!--                  </tr>-->
+    <!--                </tbody>-->
+    <!--              </table>-->
+    <!--          </div>-->
+    <!--        </div>-->
+    <!--      <button @click="print_return_due()" class="btn btn-outline-primary">-->
+    <!--        <i class="i-Billing"></i>-->
+    <!--        {{$t('print')}}-->
+    <!--      </button>-->
+    <!--    </b-modal>-->
 
-  <!--    &lt;!&ndash; Show details Provider &ndash;&gt;-->
-  <!--    <b-modal ok-only size="md" id="showDetails" :title="$t('SupplierDetails')">-->
-  <!--      <b-row>-->
-  <!--        <b-col lg="12" md="12" sm="12" class="mt-3">-->
-  <!--          <table class="table table-striped table-md">-->
-  <!--            <tbody>-->
-  <!--              <tr>-->
-  <!--                &lt;!&ndash; Provider Code &ndash;&gt;-->
-  <!--                <td>{{$t('SupplierCode')}}</td>-->
-  <!--                <th>{{provider.code}}</th>-->
-  <!--              </tr>-->
-  <!--              <tr>-->
-  <!--                &lt;!&ndash; Provider Name &ndash;&gt;-->
-  <!--                <td>{{$t('SupplierName')}}</td>-->
-  <!--                <th>{{provider.name}}</th>-->
-  <!--              </tr>-->
-  <!--              <tr>-->
-  <!--                &lt;!&ndash; Provider Phone &ndash;&gt;-->
-  <!--                <td>{{$t('Phone')}}</td>-->
-  <!--                <th>{{provider.phone}}</th>-->
-  <!--              </tr>-->
-  <!--              <tr>-->
-  <!--                &lt;!&ndash; Provider Email &ndash;&gt;-->
-  <!--                <td>{{$t('Email')}}</td>-->
-  <!--                <th>{{provider.email}}</th>-->
-  <!--              </tr>-->
-  <!--              <tr>-->
-  <!--                &lt;!&ndash; Provider country &ndash;&gt;-->
-  <!--                <td>{{$t('Country')}}</td>-->
-  <!--                <th>{{provider.country}}</th>-->
-  <!--              </tr>-->
-  <!--              <tr>-->
-  <!--                &lt;!&ndash; Provider City &ndash;&gt;-->
-  <!--                <td>{{$t('City')}}</td>-->
-  <!--                <th>{{provider.city}}</th>-->
-  <!--              </tr>-->
-  <!--              <tr>-->
-  <!--                &lt;!&ndash; Provider Adress &ndash;&gt;-->
-  <!--                <td>{{$t('Adress')}}</td>-->
-  <!--                <th>{{provider.adresse}}</th>-->
-  <!--              </tr>-->
-  <!--              <tr>-->
-  <!--                &lt;!&ndash; Provider Tax_Number &ndash;&gt;-->
-  <!--                <td>{{$t('Tax_Number')}}</td>-->
-  <!--                <th>{{provider.tax_number}}</th>-->
-  <!--              </tr>-->
-  <!--               <tr>-->
-  <!--                &lt;!&ndash; Total_Purchase_Due &ndash;&gt;-->
-  <!--                <td>{{$t('Total_Purchase_Due')}}</td>-->
-  <!--                <th>{{currentUser.currency}} {{provider.due}}</th>-->
-  <!--              </tr>-->
+    <!--    &lt;!&ndash; Show details Provider &ndash;&gt;-->
+    <!--    <b-modal ok-only size="md" id="showDetails" :title="$t('SupplierDetails')">-->
+    <!--      <b-row>-->
+    <!--        <b-col lg="12" md="12" sm="12" class="mt-3">-->
+    <!--          <table class="table table-striped table-md">-->
+    <!--            <tbody>-->
+    <!--              <tr>-->
+    <!--                &lt;!&ndash; Provider Code &ndash;&gt;-->
+    <!--                <td>{{$t('SupplierCode')}}</td>-->
+    <!--                <th>{{provider.code}}</th>-->
+    <!--              </tr>-->
+    <!--              <tr>-->
+    <!--                &lt;!&ndash; Provider Name &ndash;&gt;-->
+    <!--                <td>{{$t('SupplierName')}}</td>-->
+    <!--                <th>{{provider.name}}</th>-->
+    <!--              </tr>-->
+    <!--              <tr>-->
+    <!--                &lt;!&ndash; Provider Phone &ndash;&gt;-->
+    <!--                <td>{{$t('Phone')}}</td>-->
+    <!--                <th>{{provider.phone}}</th>-->
+    <!--              </tr>-->
+    <!--              <tr>-->
+    <!--                &lt;!&ndash; Provider Email &ndash;&gt;-->
+    <!--                <td>{{$t('Email')}}</td>-->
+    <!--                <th>{{provider.email}}</th>-->
+    <!--              </tr>-->
+    <!--              <tr>-->
+    <!--                &lt;!&ndash; Provider country &ndash;&gt;-->
+    <!--                <td>{{$t('Country')}}</td>-->
+    <!--                <th>{{provider.country}}</th>-->
+    <!--              </tr>-->
+    <!--              <tr>-->
+    <!--                &lt;!&ndash; Provider City &ndash;&gt;-->
+    <!--                <td>{{$t('City')}}</td>-->
+    <!--                <th>{{provider.city}}</th>-->
+    <!--              </tr>-->
+    <!--              <tr>-->
+    <!--                &lt;!&ndash; Provider Adress &ndash;&gt;-->
+    <!--                <td>{{$t('Adress')}}</td>-->
+    <!--                <th>{{provider.adresse}}</th>-->
+    <!--              </tr>-->
+    <!--              <tr>-->
+    <!--                &lt;!&ndash; Provider Tax_Number &ndash;&gt;-->
+    <!--                <td>{{$t('Tax_Number')}}</td>-->
+    <!--                <th>{{provider.tax_number}}</th>-->
+    <!--              </tr>-->
+    <!--               <tr>-->
+    <!--                &lt;!&ndash; Total_Purchase_Due &ndash;&gt;-->
+    <!--                <td>{{$t('Total_Purchase_Due')}}</td>-->
+    <!--                <th>{{currentUser.currency}} {{provider.due}}</th>-->
+    <!--              </tr>-->
 
-  <!--               <tr>-->
-  <!--                &lt;!&ndash; Total_Purchase_Return_Due &ndash;&gt;-->
-  <!--                <td>{{$t('Total_Purchase_Return_Due')}}</td>-->
-  <!--                <th>{{currentUser.currency}} {{provider.return_Due}}</th>-->
-  <!--              </tr>-->
-  <!--            </tbody>-->
-  <!--          </table>-->
-  <!--        </b-col>-->
-  <!--      </b-row>-->
-  <!--    </b-modal>-->
+    <!--               <tr>-->
+    <!--                &lt;!&ndash; Total_Purchase_Return_Due &ndash;&gt;-->
+    <!--                <td>{{$t('Total_Purchase_Return_Due')}}</td>-->
+    <!--                <th>{{currentUser.currency}} {{provider.return_Due}}</th>-->
+    <!--              </tr>-->
+    <!--            </tbody>-->
+    <!--          </table>-->
+    <!--        </b-col>-->
+    <!--      </b-row>-->
+    <!--    </b-modal>-->
 
-  <!--    &lt;!&ndash; Modal Show Import Providers &ndash;&gt;-->
-  <!--    <b-modal-->
-  <!--      ok-only-->
-  <!--      ok-title="Cancel"-->
-  <!--      size="md"-->
-  <!--      id="importProviders"-->
-  <!--      :title="$t('Import_Suppliers')"-->
-  <!--     >-->
-  <!--      <b-form @submit.prevent="Submit_import" enctype="multipart/form-data">-->
-  <!--        <b-row>-->
-  <!--          &lt;!&ndash; File &ndash;&gt;-->
-  <!--          <b-col md="12" sm="12" class="mb-3">-->
-  <!--            <b-form-group>-->
-  <!--              <input type="file" @change="onFileSelected" label="Choose File">-->
-  <!--              <b-form-invalid-feedback-->
-  <!--                id="File-feedback"-->
-  <!--                class="d-block"-->
-  <!--              >{{$t('field_must_be_in_csv_format')}}</b-form-invalid-feedback>-->
-  <!--            </b-form-group>-->
-  <!--          </b-col>-->
+    <!--    &lt;!&ndash; Modal Show Import Providers &ndash;&gt;-->
+    <!--    <b-modal-->
+    <!--      ok-only-->
+    <!--      ok-title="Cancel"-->
+    <!--      size="md"-->
+    <!--      id="importProviders"-->
+    <!--      :title="$t('Import_Suppliers')"-->
+    <!--     >-->
+    <!--      <b-form @submit.prevent="Submit_import" enctype="multipart/form-data">-->
+    <!--        <b-row>-->
+    <!--          &lt;!&ndash; File &ndash;&gt;-->
+    <!--          <b-col md="12" sm="12" class="mb-3">-->
+    <!--            <b-form-group>-->
+    <!--              <input type="file" @change="onFileSelected" label="Choose File">-->
+    <!--              <b-form-invalid-feedback-->
+    <!--                id="File-feedback"-->
+    <!--                class="d-block"-->
+    <!--              >{{$t('field_must_be_in_csv_format')}}</b-form-invalid-feedback>-->
+    <!--            </b-form-group>-->
+    <!--          </b-col>-->
 
-  <!--          <b-col md="6" sm="12">-->
-  <!--            <b-button type="submit" variant="primary" :disabled="ImportProcessing" size="sm" block>{{ $t("submit") }}</b-button>-->
-  <!--              <div v-once class="typo__p" v-if="ImportProcessing">-->
-  <!--                <div class="spinner sm spinner-primary mt-3"></div>-->
-  <!--              </div>-->
-  <!--          </b-col>-->
+    <!--          <b-col md="6" sm="12">-->
+    <!--            <b-button type="submit" variant="primary" :disabled="ImportProcessing" size="sm" block>{{ $t("submit") }}</b-button>-->
+    <!--              <div v-once class="typo__p" v-if="ImportProcessing">-->
+    <!--                <div class="spinner sm spinner-primary mt-3"></div>-->
+    <!--              </div>-->
+    <!--          </b-col>-->
 
-  <!--          <b-col md="6" sm="12">-->
-  <!--            <b-button-->
-  <!--              :href="'/import/exemples/import_providers.csv'"-->
-  <!--              variant="info"-->
-  <!--              size="sm"-->
-  <!--              block-->
-  <!--            >{{ $t("Download_exemple") }}</b-button>-->
-  <!--          </b-col>-->
+    <!--          <b-col md="6" sm="12">-->
+    <!--            <b-button-->
+    <!--              :href="'/import/exemples/import_providers.csv'"-->
+    <!--              variant="info"-->
+    <!--              size="sm"-->
+    <!--              block-->
+    <!--            >{{ $t("Download_exemple") }}</b-button>-->
+    <!--          </b-col>-->
 
-  <!--          <b-col md="12" sm="12">-->
-  <!--            <table class="table table-bordered table-sm mt-4">-->
-  <!--              <tbody>-->
-  <!--                <tr>-->
-  <!--                  <td>{{$t('Name')}}</td>-->
-  <!--                  <th>-->
-  <!--                    <span class="badge badge-outline-success">{{$t('Field_is_required')}}</span>-->
-  <!--                  </th>-->
-  <!--                </tr>-->
+    <!--          <b-col md="12" sm="12">-->
+    <!--            <table class="table table-bordered table-sm mt-4">-->
+    <!--              <tbody>-->
+    <!--                <tr>-->
+    <!--                  <td>{{$t('Name')}}</td>-->
+    <!--                  <th>-->
+    <!--                    <span class="badge badge-outline-success">{{$t('Field_is_required')}}</span>-->
+    <!--                  </th>-->
+    <!--                </tr>-->
 
-  <!--                <tr>-->
-  <!--                  <td>{{$t('Phone')}}</td>-->
-  <!--                </tr>-->
+    <!--                <tr>-->
+    <!--                  <td>{{$t('Phone')}}</td>-->
+    <!--                </tr>-->
 
-  <!--                <tr>-->
-  <!--                  <td>{{$t('Email')}}</td>-->
-  <!--                  <th>-->
-  <!--                    <span class="badge badge-outline-success"></span>-->
-  <!--                  </th>-->
-  <!--                </tr>-->
+    <!--                <tr>-->
+    <!--                  <td>{{$t('Email')}}</td>-->
+    <!--                  <th>-->
+    <!--                    <span class="badge badge-outline-success"></span>-->
+    <!--                  </th>-->
+    <!--                </tr>-->
 
-  <!--                <tr>-->
-  <!--                  <td>{{$t('Country')}}</td>-->
-  <!--                </tr>-->
+    <!--                <tr>-->
+    <!--                  <td>{{$t('Country')}}</td>-->
+    <!--                </tr>-->
 
-  <!--                <tr>-->
-  <!--                  <td>{{$t('City')}}</td>-->
-  <!--                </tr>-->
+    <!--                <tr>-->
+    <!--                  <td>{{$t('City')}}</td>-->
+    <!--                </tr>-->
 
-  <!--                <tr>-->
-  <!--                  <td>{{$t('Adress')}}</td>-->
-  <!--                </tr>-->
-  <!--                 <tr>-->
-  <!--                  <td>{{$t('Tax_Number')}}</td>-->
-  <!--                </tr>-->
-  <!--              </tbody>-->
-  <!--            </table>-->
-  <!--          </b-col>-->
-  <!--        </b-row>-->
-  <!--      </b-form>-->
-  <!--    </b-modal>-->
+    <!--                <tr>-->
+    <!--                  <td>{{$t('Adress')}}</td>-->
+    <!--                </tr>-->
+    <!--                 <tr>-->
+    <!--                  <td>{{$t('Tax_Number')}}</td>-->
+    <!--                </tr>-->
+    <!--              </tbody>-->
+    <!--            </table>-->
+    <!--          </b-col>-->
+    <!--        </b-row>-->
+    <!--      </b-form>-->
+    <!--    </b-modal>-->
 
-  <!--  </div>-->
+    <!--  </div>-->
 </template>
 
 <script>

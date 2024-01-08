@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Unit;
+use App\utils\helpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,10 +13,17 @@ class UnitsController extends Controller
 {
 
     //-------------- show All Units -----------\\
-
     public function index(Request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'view', Unit::class);
+        Inertia::share('titlePage', 'Unidades');
+        return Inertia::render('Products/Units');
+    }
+
+    public function getTable(Request $request)
+    {
+        if (!helpers::checkPermission('unit')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $Units = Unit::where('deleted_at', '=', null)
             ->get();
 
@@ -42,12 +50,8 @@ class UnitsController extends Controller
         $Units_base = Unit::where('base_unit', null)
             ->where('deleted_at', null)
             ->orderBy('id', 'DESC')
-            ->get(['id', 'name'])
-            ->map(function ($item, $key) {
-                return ['value' => $item->id, 'title' => $item->name];
-            });
-        Inertia::share('titlePage', 'Unidades');
-        return Inertia::render('Products/Units', [
+            ->pluck('name', 'id');
+        return response()->json([
             'units' => $data,
             'units_base' => $Units_base,
         ]);
@@ -57,9 +61,7 @@ class UnitsController extends Controller
 
     public function store(Request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'create', Unit::class);
-
-        request()->validate([
+        $request->validate([
             'name' => 'required',
             'ShortName' => 'required',
         ]);
@@ -88,9 +90,7 @@ class UnitsController extends Controller
 
     public function update(Request $request, $id)
     {
-//        $this->authorizeForUser($request->user('api'), 'update', Unit::class);
-
-        request()->validate([
+        $request->validate([
             'name' => 'required',
             'ShortName' => 'required',
         ]);
@@ -121,8 +121,6 @@ class UnitsController extends Controller
 
     public function destroy(Request $request, $id)
     {
-//        $this->authorizeForUser($request->user('api'), 'delete', Unit::class);
-
         $Sub_Unit_exist = Unit::where('base_unit', $id)->where('deleted_at', null)->exists();
         if (!$Sub_Unit_exist) {
             Unit::whereId($id)->update([
@@ -145,7 +143,7 @@ class UnitsController extends Controller
                 return $query->where('id', $request->id)
                     ->orWhere('base_unit', $request->id);
             });
-        })->get();
+        })->get()->pluck('name', 'id');
 
         return response()->json($units);
     }

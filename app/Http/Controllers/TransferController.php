@@ -3,15 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\product_warehouse;
-use App\Models\Role;
-use App\Models\Unit;
+use App\Models\ProductVariant;
 use App\Models\Transfer;
 use App\Models\TransferDetail;
+use App\Models\Unit;
 use App\Models\Warehouse;
-use App\Models\User;
-use App\Models\UserWarehouse;
 use App\utils\helpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -26,21 +23,16 @@ class TransferController extends Controller
 
     public function index(request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'view', Transfer::class);
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+        Inertia::share('titlePage', 'Transferencias');
+        return Inertia::render('Transfers/index_transfer');
+    }
 
-        // How many items do you want to display.
-//        $perPage = $request->limit;
-//        $pageStart = Request::get('page', 1);
-        // Start displaying items from this number;
-//        $offSet = ($pageStart * $perPage) - $perPage;
-//        $order = $request->SortField;
-//        $dir = $request->SortType;
-//        $helpers = new helpers();
-        // Filter fields With Params to retrieve
-//        $columns = array(0 => 'Ref', 1 => 'from_warehouse_id', 2 => 'to_warehouse_id', 3 => 'statut');
-//        $param = array(0 => 'like', 1 => '=', 2 => '=', 3 => 'like');
+    public function getTable(request $request)
+    {
+        if (!helpers::checkPermission('transfer_view')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
+
         $data = collect();
         //get warehouses assigned to user
         $warehouses = helpers::getWarehouses(auth()->user());
@@ -49,31 +41,30 @@ class TransferController extends Controller
         $transfers = Transfer::with('from_warehouse', 'to_warehouse')
             ->where('deleted_at', '=', null)
             ->whereIn('from_warehouse_id', $warehouses->pluck('id'))
-//            ->where(function ($query) use ($view_records) {
-//                if (!$view_records) {
-//                    return $query->where('user_id', '=', Auth::user()->id);
-//                }
-//})
-        ;
+            ->where(function ($query) {
+                if (!helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            });
 
         $transfers = $transfers->orderByDesc('updated_at')
             ->get();
 
         foreach ($transfers as $transfer) {
-            $item['id'] = $transfer->id;
-            $item['date'] = $transfer->date;
-            $item['Ref'] = $transfer->Ref;
-            $item['from_warehouse'] = $transfer['from_warehouse']->name;
-            $item['to_warehouse'] = $transfer['to_warehouse']->name;
-            $item['GrandTotal'] = $transfer->GrandTotal;
-            $item['items'] = $transfer->items;
-            $item['statut'] = $transfer->statut;
-            $item['updated_at'] = Carbon::parse($transfer->updated_at)->format('Y-m-d');
-            $data->add($item);
+            $data->add([
+                'id' => $transfer->id,
+                'date' => $transfer->date,
+                'Ref' => $transfer->Ref,
+                'from_warehouse' => $transfer['from_warehouse']->name,
+                'to_warehouse' => $transfer['to_warehouse']->name,
+                'GrandTotal' => $transfer->GrandTotal,
+                'items' => $transfer->items,
+                'statut' => $transfer->statut,
+                'updated_at' => Carbon::parse($transfer->updated_at)->format('Y-m-d')
+            ]);
         }
 
-        Inertia::share('titlePage', 'Transferencias');
-        return Inertia::render('Transfers/index_transfer', [
+        return response()->json([
             'transfers' => $data,
             'warehouses' => $warehouses,
         ]);
@@ -83,12 +74,13 @@ class TransferController extends Controller
 
     public function store(Request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'create', Transfer::class);
-//
-//        request()->validate([
-//            'transfer.from_warehouse' => 'required',
-//            'transfer.to_warehouse' => 'required',
-//        ]);
+        if (!helpers::checkPermission('transfer_add')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
+        request()->validate([
+            'transfer.from_warehouse' => 'required',
+            'transfer.to_warehouse' => 'required',
+        ]);
 
         DB::transaction(function () use ($request) {
             $order = new Transfer;
@@ -140,15 +132,6 @@ class TransferController extends Controller
                             ->where('product_variant_id', $value['product_variant_id'])
                             ->first();
 
-                        if ($unit && $product_warehouse_to) {
-                            if ($unit->operator == '/') {
-                                $product_warehouse_to->qty += $value['quantity'] / $unit->operator_value;
-                            } else {
-                                $product_warehouse_to->qty += $value['quantity'] * $unit->operator_value;
-                            }
-                            $product_warehouse_to->save();
-                        }
-
                     } else {
 
                         //--------- eliminate the quantity ''from_warehouse''--------------\\
@@ -170,14 +153,14 @@ class TransferController extends Controller
                             ->where('warehouse_id', $request->transfer['to_warehouse'])
                             ->where('product_id', $value['product_id'])->first();
 
-                        if ($unit && $product_warehouse_to) {
-                            if ($unit->operator == '/') {
-                                $product_warehouse_to->qty += $value['quantity'] / $unit->operator_value;
-                            } else {
-                                $product_warehouse_to->qty += $value['quantity'] * $unit->operator_value;
-                            }
-                            $product_warehouse_to->save();
+                    }
+                    if ($unit && $product_warehouse_to) {
+                        if ($unit->operator == '/') {
+                            $product_warehouse_to->qty += $value['quantity'] / $unit->operator_value;
+                        } else {
+                            $product_warehouse_to->qty += $value['quantity'] * $unit->operator_value;
                         }
+                        $product_warehouse_to->save();
                     }
 
                 } elseif ($request->transfer['statut'] == "sent") {
@@ -232,23 +215,19 @@ class TransferController extends Controller
     public function update(Request $request, $id)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'update', Transfer::class);
-
-        request()->validate([
+        if (!helpers::checkPermission('transfer_edit')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
+        $request->validate([
             'transfer.to_warehouse' => 'required',
             'transfer.from_warehouse' => 'required',
         ]);
 
         DB::transaction(function () use ($request, $id) {
-//            $role = Auth::user()->roles()->first();
-//            $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $current_Transfer = Transfer::findOrFail($id);
-
-            // Check If User Has Permission view All Records
-//            if (!$view_records) {
-//                // Check If User->id === Transfer->id
-//                $this->authorizeForUser($request->user('api'), 'check_record', $current_Transfer);
-//            }
+            if (!helpers::checkPermission('check_record')) {
+                return response()->json(['message' => "No tiene permisos"], 406);
+            }
 
             $Old_Details = TransferDetail::where('transfer_id', $id)->get();
             $New_Details = collect($request['details']);
@@ -402,15 +381,6 @@ class TransferController extends Controller
                                 ->where('product_variant_id', $product_detail['product_variant_id'])
                                 ->first();
 
-                            if ($unit && $product_warehouse_to) {
-                                if ($unit->operator == '/') {
-                                    $product_warehouse_to->qty += $product_detail['quantity'] / $unit->operator_value;
-                                } else {
-                                    $product_warehouse_to->qty += $product_detail['quantity'] * $unit->operator_value;
-                                }
-                                $product_warehouse_to->save();
-                            }
-
                         } else {
 
                             //--------- eliminate the quantity ''from_warehouse''--------------\\
@@ -432,14 +402,14 @@ class TransferController extends Controller
                                 ->where('warehouse_id', $Trans['to_warehouse'])
                                 ->where('product_id', $product_detail['product_id'])->first();
 
-                            if ($unit && $product_warehouse_to) {
-                                if ($unit->operator == '/') {
-                                    $product_warehouse_to->qty += $product_detail['quantity'] / $unit->operator_value;
-                                } else {
-                                    $product_warehouse_to->qty += $product_detail['quantity'] * $unit->operator_value;
-                                }
-                                $product_warehouse_to->save();
+                        }
+                        if ($unit && $product_warehouse_to) {
+                            if ($unit->operator == '/') {
+                                $product_warehouse_to->qty += $product_detail['quantity'] / $unit->operator_value;
+                            } else {
+                                $product_warehouse_to->qty += $product_detail['quantity'] * $unit->operator_value;
                             }
+                            $product_warehouse_to->save();
                         }
 
                     } elseif ($Trans['statut'] == "sent") {
@@ -452,29 +422,20 @@ class TransferController extends Controller
                                 ->where('product_variant_id', $product_detail['product_variant_id'])
                                 ->first();
 
-                            if ($unit && $product_warehouse_from) {
-                                if ($unit->operator == '/') {
-                                    $product_warehouse_from->qty -= $product_detail['quantity'] / $unit->operator_value;
-                                } else {
-                                    $product_warehouse_from->qty -= $product_detail['quantity'] * $unit->operator_value;
-                                }
-                                $product_warehouse_from->save();
-                            }
-
                         } else {
 
                             $product_warehouse_from = product_warehouse::where('deleted_at', '=', null)
                                 ->where('warehouse_id', $Trans['from_warehouse'])
                                 ->where('product_id', $product_detail['product_id'])->first();
 
-                            if ($unit && $product_warehouse_from) {
-                                if ($unit->operator == '/') {
-                                    $product_warehouse_from->qty -= $product_detail['quantity'] / $unit->operator_value;
-                                } else {
-                                    $product_warehouse_from->qty -= $product_detail['quantity'] * $unit->operator_value;
-                                }
-                                $product_warehouse_from->save();
+                        }
+                        if ($unit && $product_warehouse_from) {
+                            if ($unit->operator == '/') {
+                                $product_warehouse_from->qty -= $product_detail['quantity'] / $unit->operator_value;
+                            } else {
+                                $product_warehouse_from->qty -= $product_detail['quantity'] * $unit->operator_value;
                             }
+                            $product_warehouse_from->save();
                         }
                     }
 
@@ -520,19 +481,18 @@ class TransferController extends Controller
 
     public function destroy(Request $request, $id)
     {
-//        $this->authorizeForUser($request->user('api'), 'delete', Transfer::class);
+        if (!helpers::checkPermission('transfer_delete')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }//        $this->authorizeForUser($request->user('api'), 'delete', Transfer::class);
 
         DB::transaction(function () use ($id, $request) {
-//            $role = Auth::user()->roles()->first();
-//            $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $current_Transfer = Transfer::findOrFail($id);
             $Old_Details = TransferDetail::where('transfer_id', $id)->get();
 
             // Check If User Has Permission view All Records
-//            if (!$view_records) {
-//                // Check If User->id === current_Transfer->id
-//                $this->authorizeForUser($request->user('api'), 'check_record', $current_Transfer);
-//            }
+            if (!helpers::checkPermission('check_record')) {
+                return response()->json(['message' => "No tiene permisos"], 406);
+            }
 
             // Init Data with old Parametre
             foreach ($Old_Details as $key => $value) {
@@ -665,19 +625,11 @@ class TransferController extends Controller
     public function edit(Request $request, $id)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'update', Transfer::class);
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
         $Transfer_data = Transfer::with('details.product.unit')
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
 
         $details = collect();
-        // Check If User Has Permission view All Records
-//        if (!$view_records) {
-//            // Check If User->id === Transfer->id
-//            $this->authorizeForUser($request->user('api'), 'check_record', $Transfer_data);
-//        }
         $transfer['from_warehouse'] = '';
         if ($Transfer_data->from_warehouse_id) {
             if (Warehouse::where('id', $Transfer_data->from_warehouse_id)
@@ -783,18 +735,16 @@ class TransferController extends Controller
             if ($detail->tax_method == '1') {
                 $data['Net_cost'] = $detail->cost - $data['DiscountNet'];
                 $data['taxe'] = $tax_cost;
-                $data['subtotal'] = ($data['Net_cost'] * $data['quantity']) + ($tax_cost * $data['quantity']);
             } else {
                 $data['Net_cost'] = ($detail->cost - $data['DiscountNet']) / (($detail->TaxNet / 100) + 1);
                 $data['taxe'] = $detail->cost - $data['Net_cost'] - $data['DiscountNet'];
-                $data['subtotal'] = ($data['Net_cost'] * $data['quantity']) + ($tax_cost * $data['quantity']);
             }
+            $data['subtotal'] = ($data['Net_cost'] * $data['quantity']) + ($tax_cost * $data['quantity']);
             $details->add($data);
         }
 
         //get warehouses assigned to user
-        $warehouses = helpers::getWarehouses(auth()->user());
-
+        $warehouses = helpers::getWarehouses(auth()->user())->pluck('name', 'id');;
 
         Inertia::share('titlePage', 'Editar Transferencia');
         return Inertia::render('Transfers/Form_Transfer', [
@@ -809,28 +759,20 @@ class TransferController extends Controller
     public function show(Request $request, $id)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'view', Transfer::class);
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
         $Transfer_data = Transfer::with('details.product.unit')
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
 
         $details = collect();
-        // Check If User Has Permission view All Records
-//        if (!$view_records) {
-//            // Check If User->id === Transfer->id
-//            $this->authorizeForUser($request->user('api'), 'check_record', $Transfer_data);
-//        }
-
-        $transfer['date'] = $Transfer_data->date;
-        $transfer['note'] = $Transfer_data->notes;
-        $transfer['Ref'] = $Transfer_data->Ref;
-        $transfer['from_warehouse'] = $Transfer_data['from_warehouse']->name;
-        $transfer['to_warehouse'] = $Transfer_data['to_warehouse']->name;
-        $transfer['items'] = $Transfer_data->items;
-        $transfer['statut'] = $Transfer_data->statut;
-        $transfer['GrandTotal'] = $Transfer_data->GrandTotal;
+        $transfer = collect();
+        $transfer->put('date', $Transfer_data->date);
+        $transfer->put('note', $Transfer_data->notes);
+        $transfer->put('Ref', $Transfer_data->Ref);
+        $transfer->put('from_warehouse', $Transfer_data['from_warehouse']->name);
+        $transfer->put('to_warehouse', $Transfer_data['to_warehouse']->name);
+        $transfer->put('items', $Transfer_data->items);
+        $transfer->put('statut', $Transfer_data->statut);
+        $transfer->put('GrandTotal', $Transfer_data->GrandTotal);
 
         foreach ($Transfer_data['details'] as $detail) {
 
@@ -873,10 +815,8 @@ class TransferController extends Controller
 
     public function create(Request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'create', Transfer::class);
-
         //get warehouses assigned to user
-        $warehouses = helpers::getWarehouses(auth()->user());
+        $warehouses = helpers::getWarehouses(auth()->user())->pluck('name', 'id');
 
         Inertia::share('titlePage', 'Crear Transferencia');
         return Inertia::render('Transfers/Form_Transfer', [

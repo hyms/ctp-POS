@@ -2,22 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\UserWarehouse;
 use App\Models\Adjustment;
 use App\Models\AdjustmentDetail;
-use App\Models\ProductVariant;
 use App\Models\product_warehouse;
-use App\Models\Role;
+use App\Models\ProductVariant;
+use App\Models\UserWarehouse;
 use App\Models\Warehouse;
 use App\utils\helpers;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
-use phpDocumentor\Reflection\Types\Collection;
 
 class AdjustmentController extends Controller
 {
@@ -26,35 +22,41 @@ class AdjustmentController extends Controller
 
     public function index(request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'view', Adjustment::class);
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+        Inertia::share('titlePage', 'Ajustes en stock');
+        return Inertia::render('Adjustment/Index_Adjustment');
+    }
+
+    public function getTable(request $request)
+    {
+        if (!helpers::checkPermission('adjustment_view')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 //get warehouses assigned to user
         $warehouses = $this->getWarehouses();
         // Check If User Has Permission View  All Records
         $Adjustments = Adjustment::with('warehouse')
             ->where('deleted_at', '=', null)
-            ->whereIn('warehouse_id', $warehouses->pluck('value'))
+            ->whereIn('warehouse_id', $warehouses->map(function ($item,$key) { return $key; }))
             ->where(function ($query) {
-                return $query->where('user_id', '=', Auth::user()->id);
-            })
-            ;
+                if (!helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            });
 
         $Adjustments = $Adjustments->orderByDesc('updated_at')->get();
         $data = collect();
         foreach ($Adjustments as $Adjustment) {
-            $item['id'] = $Adjustment->id;
-            $item['date'] = Carbon::parse($Adjustment->date)->format('d-m-Y');
-            $item['Ref'] = $Adjustment->Ref;
-            $item['warehouse_name'] = $Adjustment['warehouse']->name;
-            $item['items'] = $Adjustment->items;
-            $item['updated_at'] = Carbon::parse($Adjustment->updated_at)->format('Y-m-d');
-            $data->add($item);
+            $data->add([
+                'id' => $Adjustment->id,
+                'date' => Carbon::parse($Adjustment->date)->format('d-m-Y'),
+                'Ref' => $Adjustment->Ref,
+                'warehouse_name' => $Adjustment['warehouse']->name,
+                'items' => $Adjustment->items,
+                'updated_at' => Carbon::parse($Adjustment->updated_at)->format('Y-m-d'),
+            ]);
         }
 
-
-        Inertia::share('titlePage', 'Ajustes en stock');
-        return Inertia::render('Adjustment/Index_Adjustment', [
+        return response()->json([
             'adjustments' => $data,
             'warehouses' => $warehouses,
         ]);
@@ -65,10 +67,10 @@ class AdjustmentController extends Controller
 
     public function store(Request $request)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'create', Adjustment::class);
-
-        request()->validate([
+        if (!helpers::checkPermission('adjustment_add')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
+        $request->validate([
             'warehouse_id' => 'required',
         ]);
 
@@ -121,20 +123,13 @@ class AdjustmentController extends Controller
 
     public function update(Request $request, $id)
     {
-
-//        $this->authorizeForUser($request->user('api'), 'update', Adjustment::class);
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+        if (!helpers::checkPermission('adjustment_edit')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $current_adjustment = Adjustment::findOrFail($id);
 
-        // Check If User Has Permission view All Records
-//        if (!$view_records) {
-//            // Check If User->id === Adjustment->id
-//            $this->authorizeForUser($request->user('api'), 'check_record', $current_adjustment);
-//        }
-
-        request()->validate([
+        $request->validate([
             'warehouse_id' => 'required',
         ]);
 
@@ -204,19 +199,16 @@ class AdjustmentController extends Controller
 
     public function destroy(Request $request, $id)
     {
-//        $this->authorizeForUser($request->user('api'), 'delete', Adjustment::class);
-
+        if (!helpers::checkPermission('adjustment_delete')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         DB::transaction(function () use ($id, $request) {
-//            $role = Auth::user()->roles()->first();
-//            $view_records = Role::findOrFail($role->id)->inRole('record_view');
-            $current_adjustment = Adjustment::findOrFail($id);
+            $current_adjustment = Adjustment::where(function ($query) {
+                    if (!helpers::checkPermission('record_view')) {
+                        return $query->where('user_id', '=', Auth::user()->id);
+                    }
+                })->findOrFail($id);
             $old_adjustment_details = AdjustmentDetail::where('adjustment_id', $id)->get();
-
-            // Check If User Has Permission view All Records
-//            if (!$view_records) {
-//                // Check If User->id === current_adjustment->id
-//                $this->authorizeForUser($request->user('api'), 'check_record', $current_adjustment);
-//            }
 
             // Init Data with old Parametre
             foreach ($old_adjustment_details as $key => $value) {
@@ -254,8 +246,6 @@ class AdjustmentController extends Controller
 
     public function create(Request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'create', Adjustment::class);
-
         //get warehouses assigned to user
         $warehouses = $this->getWarehouses();
         Inertia::share('titlePage', 'Ajustes en stock');
@@ -267,18 +257,14 @@ class AdjustmentController extends Controller
     public function edit(Request $request, $id)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'update', Adjustment::class);
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
         $Adjustment_data = Adjustment::with('details.product')
             ->where('deleted_at', '=', null)
-            ->findOrFail($id);
+            ->where(function ($query) {
+                if (!helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })->findOrFail($id);
         $details = collect();
-        // Check If User Has Permission view All Records
-//        if (!$view_records) {
-//            // Check If User->id === Adjustment->id
-//            $this->authorizeForUser($request->user('api'), 'check_record', $Adjustment_data);
-//        }
         $adjustment['warehouse_id'] = '';
         if ($Adjustment_data->warehouse_id) {
             if (Warehouse::where('id', $Adjustment_data->warehouse_id)
@@ -348,18 +334,13 @@ class AdjustmentController extends Controller
     public function Adjustment_detail(Request $request, $id)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'view', Adjustment::class);
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
         $Adjustment_data = Adjustment::with('details.product.unit')
             ->where('deleted_at', '=', null)
-            ->findOrFail($id);
-        $details = array();
-        // Check If User Has Permission view All Records
-//        if (!$view_records) {
-//             Check If User->id === Adjustment->id
-//            $this->authorizeForUser($request->user('api'), 'check_record', $Adjustment_data);
-//        }
+            ->where(function ($query) {
+                if (!helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })->findOrFail($id);
 
         $Adjustment['Ref'] = $Adjustment_data->Ref;
         $Adjustment['date'] = $Adjustment_data->date;
@@ -418,15 +399,10 @@ class AdjustmentController extends Controller
     {
         $user_auth = auth()->user();
         if ($user_auth->is_all_warehouses) {
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name'])->map(function ($item, $key) {
-                return ['value' => $item->id, 'title' => $item->name];
-            });
+            $warehouses = Warehouse::where('deleted_at', '=', null)->pluck('name', 'id');
         } else {
             $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name'])
-                ->map(function ($item, $key) {
-                    return ['value' => $item->id, 'title' => $item->name];
-                });
+            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->pluck('name', 'id');
         }
         return $warehouses;
     }

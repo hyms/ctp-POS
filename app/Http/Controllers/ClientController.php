@@ -3,18 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\PaymentSale;
+use App\Models\PaymentSaleReturns;
+use App\Models\Sale;
+use App\Models\SaleReturn;
 use App\Models\Setting;
 use App\utils\helpers;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
-use App\Models\SaleReturn;
-use App\Models\PaymentSaleReturns;
-use App\Models\Sale;
-use App\Models\PaymentSale;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ClientController extends Controller
@@ -22,9 +21,16 @@ class ClientController extends Controller
 
     //------------- Get ALL Customers -------------\\
 
-    public function index(request $request)
+     public function index(request $request)
+     {
+         Inertia::share('titlePage', 'Clientes');
+         return Inertia::render('People/Clients');
+     }
+    public function getTable(request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'view', Client::class);
+        if(!helpers::checkPermission('Customers_view')){
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $clients = Client::where('deleted_at', '=', null)
             ->get();
@@ -69,8 +75,7 @@ class ClientController extends Controller
 
         $company_info = Setting::where('deleted_at', '=', null)->first();
 
-        Inertia::share('titlePage', 'Clientes');
-        return Inertia::render('People/Clients', [
+        return response()->json([
             'clients' => $data,
             'company_info' => $company_info,
         ]);
@@ -167,7 +172,7 @@ class ClientController extends Controller
 
     public function Get_Clients_Without_Paginate()
     {
-        $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
+        $clients = Client::where('deleted_at', '=', null)->pluck('company_name','id');
         return response()->json($clients);
     }
 

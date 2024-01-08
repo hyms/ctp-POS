@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\product_warehouse;
+use App\Models\ProductVariant;
 use App\Models\Warehouse;
+use App\utils\helpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,10 +21,16 @@ class WarehouseController extends Controller
     {
 //        $this->authorizeForUser($request->user('api'), 'view', Warehouse::class);
 
-        $warehouses = Warehouse::get();
         Inertia::share('titlePage', 'Almacenes');
-        return Inertia::render('Settings/Warehouses',
-            ['warehouses' => $warehouses]);
+        return Inertia::render('Settings/Warehouses');
+    }
+
+    public function getTable(Request $request){
+        if(!helpers::checkPermission('warehouse')){
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
+        $warehouses = Warehouse::get();
+        return response()->json(['warehouses' => $warehouses]);
     }
 
     //----------- Store new Warehouse --------------\\
@@ -79,7 +86,7 @@ class WarehouseController extends Controller
 
         }, 10);
 
-        return response()->json(['success' => true]);
+        return response()->json(['redirect' => '']);
     }
 
     //------------ function show -----------\\
@@ -107,7 +114,7 @@ class WarehouseController extends Controller
             'city' => $request['city'] ?? '',
             'email' => $request['email'] ?? '',
         ]);
-        return response()->json(['success' => true]);
+        return response()->json(['redirect' => '']);
     }
 
     //----------- Delete  Warehouse --------------\\
@@ -128,31 +135,7 @@ class WarehouseController extends Controller
 
         }, 10);
 
-        return response()->json(['success' => true]);
-    }
-
-    //-------------- Delete by selection  ---------------\\
-
-    public function delete_by_selection(Request $request)
-    {
-
-        $this->authorizeForUser($request->user('api'), 'delete', Warehouse::class);
-
-        \DB::transaction(function () use ($request) {
-            $selectedIds = $request->selectedIds;
-            foreach ($selectedIds as $warehouse_id) {
-                Warehouse::whereId($warehouse_id)->update([
-                    'deleted_at' => Carbon::now(),
-                ]);
-
-                product_warehouse::where('warehouse_id', $warehouse_id)->update([
-                    'deleted_at' => Carbon::now(),
-                ]);
-            }
-
-        }, 10);
-
-        return response()->json(['success' => true]);
+        return response()->json(['redirect' => '']);
     }
 
 }

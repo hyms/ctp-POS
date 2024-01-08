@@ -1,187 +1,186 @@
 <template>
-  <!--  <div class="main-content">-->
-  <!--    <breadcumb :page="$t('mail_settings')" :folder="$t('Settings')"/>-->
-  <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
+    <!--  <div class="main-content">-->
+    <!--    <breadcumb :page="$t('mail_settings')" :folder="$t('Settings')"/>-->
+    <!--    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>-->
 
+    <!--    &lt;!&ndash; mail_settings &ndash;&gt;-->
+    <!--    <validation-observer ref="form_config_mail" v-if="!isLoading">-->
+    <!--      <b-form @submit.prevent="Submit_config_mail">-->
+    <!--        <b-row class="mt-5">-->
+    <!--          <b-col lg="12" md="12" sm="12">-->
+    <!--            <b-card no-body :header="$t('mail_settings')">-->
+    <!--              <b-card-body>-->
+    <!--                <b-row>-->
 
-  <!--    &lt;!&ndash; mail_settings &ndash;&gt;-->
-  <!--    <validation-observer ref="form_config_mail" v-if="!isLoading">-->
-  <!--      <b-form @submit.prevent="Submit_config_mail">-->
-  <!--        <b-row class="mt-5">-->
-  <!--          <b-col lg="12" md="12" sm="12">-->
-  <!--            <b-card no-body :header="$t('mail_settings')">-->
-  <!--              <b-card-body>-->
-  <!--                <b-row>-->
+    <!--                   &lt;!&ndash; MAIL_MAILER  &ndash;&gt;-->
+    <!--                  <b-col lg="4" md="4" sm="12">-->
+    <!--                    <validation-provider-->
+    <!--                      name="MAIL_MAILER"-->
+    <!--                      :rules="{ required: true}"-->
+    <!--                      v-slot="validationContext"-->
+    <!--                    >-->
+    <!--                      <b-form-group label="MAIL_MAILER *">-->
+    <!--                        <b-form-input-->
+    <!--                          :state="getValidationState(validationContext)"-->
+    <!--                          aria-describedby="MAIL_MAILER-feedback"-->
+    <!--                          label="MAIL_MAILER"-->
+    <!--                          placeholder="MAIL_MAILER"-->
+    <!--                          v-model="server.mail_mailer"-->
+    <!--                        ></b-form-input>-->
+    <!--                        <b-form-invalid-feedback-->
+    <!--                          id="MAIL_MAILER-feedback"-->
+    <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
+    <!--                      </b-form-group>-->
+    <!--                      <p class="text-danger">Supported: "smtp", "sendmail", "mailgun", "ses","postmark", "log"</p>-->
+    <!--                    </validation-provider>-->
+    <!--                  </b-col>-->
 
-  <!--                   &lt;!&ndash; MAIL_MAILER  &ndash;&gt;-->
-  <!--                  <b-col lg="4" md="4" sm="12">-->
-  <!--                    <validation-provider-->
-  <!--                      name="MAIL_MAILER"-->
-  <!--                      :rules="{ required: true}"-->
-  <!--                      v-slot="validationContext"-->
-  <!--                    >-->
-  <!--                      <b-form-group label="MAIL_MAILER *">-->
-  <!--                        <b-form-input-->
-  <!--                          :state="getValidationState(validationContext)"-->
-  <!--                          aria-describedby="MAIL_MAILER-feedback"-->
-  <!--                          label="MAIL_MAILER"-->
-  <!--                          placeholder="MAIL_MAILER"-->
-  <!--                          v-model="server.mail_mailer"-->
-  <!--                        ></b-form-input>-->
-  <!--                        <b-form-invalid-feedback-->
-  <!--                          id="MAIL_MAILER-feedback"-->
-  <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
-  <!--                      </b-form-group>-->
-  <!--                      <p class="text-danger">Supported: "smtp", "sendmail", "mailgun", "ses","postmark", "log"</p>-->
-  <!--                    </validation-provider>-->
-  <!--                  </b-col>-->
+    <!--                  &lt;!&ndash; HOST  &ndash;&gt;-->
+    <!--                  <b-col lg="4" md="4" sm="12">-->
+    <!--                    <validation-provider-->
+    <!--                      name="HOST"-->
+    <!--                      :rules="{ required: true}"-->
+    <!--                      v-slot="validationContext"-->
+    <!--                    >-->
+    <!--                      <b-form-group label="MAIL_HOST *">-->
+    <!--                        <b-form-input-->
+    <!--                          :state="getValidationState(validationContext)"-->
+    <!--                          aria-describedby="HOST-feedback"-->
+    <!--                          label="HOST"-->
+    <!--                          placeholder="MAIL_HOST"-->
+    <!--                          v-model="server.host"-->
+    <!--                        ></b-form-input>-->
+    <!--                        <b-form-invalid-feedback-->
+    <!--                          id="HOST-feedback"-->
+    <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
+    <!--                      </b-form-group>-->
+    <!--                    </validation-provider>-->
+    <!--                  </b-col>-->
 
-  <!--                  &lt;!&ndash; HOST  &ndash;&gt;-->
-  <!--                  <b-col lg="4" md="4" sm="12">-->
-  <!--                    <validation-provider-->
-  <!--                      name="HOST"-->
-  <!--                      :rules="{ required: true}"-->
-  <!--                      v-slot="validationContext"-->
-  <!--                    >-->
-  <!--                      <b-form-group label="MAIL_HOST *">-->
-  <!--                        <b-form-input-->
-  <!--                          :state="getValidationState(validationContext)"-->
-  <!--                          aria-describedby="HOST-feedback"-->
-  <!--                          label="HOST"-->
-  <!--                          placeholder="MAIL_HOST"-->
-  <!--                          v-model="server.host"-->
-  <!--                        ></b-form-input>-->
-  <!--                        <b-form-invalid-feedback-->
-  <!--                          id="HOST-feedback"-->
-  <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
-  <!--                      </b-form-group>-->
-  <!--                    </validation-provider>-->
-  <!--                  </b-col>-->
+    <!--                  &lt;!&ndash; PORT  &ndash;&gt;-->
+    <!--                  <b-col lg="4" md="4" sm="12">-->
+    <!--                    <validation-provider-->
+    <!--                      name="PORT"-->
+    <!--                      :rules="{ required: true}"-->
+    <!--                      v-slot="validationContext"-->
+    <!--                    >-->
+    <!--                      <b-form-group label="MAIL_PORT *">-->
+    <!--                        <b-form-input-->
+    <!--                          :state="getValidationState(validationContext)"-->
+    <!--                          aria-describedby="PORT-feedback"-->
+    <!--                          label="PORT"-->
+    <!--                          placeholder="MAIL_PORT"-->
+    <!--                          v-model="server.port"-->
+    <!--                        ></b-form-input>-->
+    <!--                        <b-form-invalid-feedback-->
+    <!--                          id="PORT-feedback"-->
+    <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
+    <!--                      </b-form-group>-->
+    <!--                    </validation-provider>-->
+    <!--                  </b-col>-->
 
-  <!--                  &lt;!&ndash; PORT  &ndash;&gt;-->
-  <!--                  <b-col lg="4" md="4" sm="12">-->
-  <!--                    <validation-provider-->
-  <!--                      name="PORT"-->
-  <!--                      :rules="{ required: true}"-->
-  <!--                      v-slot="validationContext"-->
-  <!--                    >-->
-  <!--                      <b-form-group label="MAIL_PORT *">-->
-  <!--                        <b-form-input-->
-  <!--                          :state="getValidationState(validationContext)"-->
-  <!--                          aria-describedby="PORT-feedback"-->
-  <!--                          label="PORT"-->
-  <!--                          placeholder="MAIL_PORT"-->
-  <!--                          v-model="server.port"-->
-  <!--                        ></b-form-input>-->
-  <!--                        <b-form-invalid-feedback-->
-  <!--                          id="PORT-feedback"-->
-  <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
-  <!--                      </b-form-group>-->
-  <!--                    </validation-provider>-->
-  <!--                  </b-col>-->
+    <!--                  &lt;!&ndash; Sender Name  &ndash;&gt;-->
+    <!--                  <b-col lg="4" md="4" sm="12">-->
+    <!--                    <validation-provider-->
+    <!--                      name="sender"-->
+    <!--                      :rules="{ required: true}"-->
+    <!--                      v-slot="validationContext"-->
+    <!--                    >-->
+    <!--                      <b-form-group label="Sender Name *">-->
+    <!--                        <b-form-input-->
+    <!--                          :state="getValidationState(validationContext)"-->
+    <!--                          aria-describedby="sender-feedback"-->
+    <!--                          label="Sender"-->
+    <!--                          placeholder="Sender Name"-->
+    <!--                          v-model="server.sender_name"-->
+    <!--                        ></b-form-input>-->
+    <!--                        <b-form-invalid-feedback-->
+    <!--                          id="sender-feedback"-->
+    <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
+    <!--                      </b-form-group>-->
+    <!--                    </validation-provider>-->
+    <!--                  </b-col>-->
 
-  <!--                  &lt;!&ndash; Sender Name  &ndash;&gt;-->
-  <!--                  <b-col lg="4" md="4" sm="12">-->
-  <!--                    <validation-provider-->
-  <!--                      name="sender"-->
-  <!--                      :rules="{ required: true}"-->
-  <!--                      v-slot="validationContext"-->
-  <!--                    >-->
-  <!--                      <b-form-group label="Sender Name *">-->
-  <!--                        <b-form-input-->
-  <!--                          :state="getValidationState(validationContext)"-->
-  <!--                          aria-describedby="sender-feedback"-->
-  <!--                          label="Sender"-->
-  <!--                          placeholder="Sender Name"-->
-  <!--                          v-model="server.sender_name"-->
-  <!--                        ></b-form-input>-->
-  <!--                        <b-form-invalid-feedback-->
-  <!--                          id="sender-feedback"-->
-  <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
-  <!--                      </b-form-group>-->
-  <!--                    </validation-provider>-->
-  <!--                  </b-col>-->
+    <!--                  &lt;!&ndash; Username  &ndash;&gt;-->
+    <!--                  <b-col lg="4" md="4" sm="12">-->
+    <!--                    <validation-provider-->
+    <!--                      name="Username"-->
+    <!--                      :rules="{ required: true}"-->
+    <!--                      v-slot="validationContext"-->
+    <!--                    >-->
+    <!--                      <b-form-group label="MAIL_USERNAME *">-->
+    <!--                        <b-form-input-->
+    <!--                          :state="getValidationState(validationContext)"-->
+    <!--                          aria-describedby="Username-feedback"-->
+    <!--                          label="Username"-->
+    <!--                          placeholder="MAIL_USERNAME"-->
+    <!--                          v-model="server.username"-->
+    <!--                        ></b-form-input>-->
+    <!--                        <b-form-invalid-feedback-->
+    <!--                          id="Username-feedback"-->
+    <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
+    <!--                      </b-form-group>-->
+    <!--                    </validation-provider>-->
+    <!--                  </b-col>-->
 
-  <!--                  &lt;!&ndash; Username  &ndash;&gt;-->
-  <!--                  <b-col lg="4" md="4" sm="12">-->
-  <!--                    <validation-provider-->
-  <!--                      name="Username"-->
-  <!--                      :rules="{ required: true}"-->
-  <!--                      v-slot="validationContext"-->
-  <!--                    >-->
-  <!--                      <b-form-group label="MAIL_USERNAME *">-->
-  <!--                        <b-form-input-->
-  <!--                          :state="getValidationState(validationContext)"-->
-  <!--                          aria-describedby="Username-feedback"-->
-  <!--                          label="Username"-->
-  <!--                          placeholder="MAIL_USERNAME"-->
-  <!--                          v-model="server.username"-->
-  <!--                        ></b-form-input>-->
-  <!--                        <b-form-invalid-feedback-->
-  <!--                          id="Username-feedback"-->
-  <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
-  <!--                      </b-form-group>-->
-  <!--                    </validation-provider>-->
-  <!--                  </b-col>-->
+    <!--                  &lt;!&ndash; Password  &ndash;&gt;-->
+    <!--                  <b-col lg="4" md="4" sm="12">-->
+    <!--                    <validation-provider-->
+    <!--                      name="Password"-->
+    <!--                      :rules="{ required: true}"-->
+    <!--                      v-slot="validationContext"-->
+    <!--                    >-->
+    <!--                      <b-form-group label="MAIL_PASSWORD *">-->
+    <!--                        <b-form-input-->
+    <!--                          :state="getValidationState(validationContext)"-->
+    <!--                          aria-describedby="Password-feedback"-->
+    <!--                          label="Password"-->
+    <!--                          placeholder="MAIL_PASSWORD"-->
+    <!--                          v-model="server.password"-->
+    <!--                        ></b-form-input>-->
+    <!--                        <b-form-invalid-feedback-->
+    <!--                          id="Password-feedback"-->
+    <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
+    <!--                      </b-form-group>-->
+    <!--                    </validation-provider>-->
+    <!--                  </b-col>-->
 
-  <!--                  &lt;!&ndash; Password  &ndash;&gt;-->
-  <!--                  <b-col lg="4" md="4" sm="12">-->
-  <!--                    <validation-provider-->
-  <!--                      name="Password"-->
-  <!--                      :rules="{ required: true}"-->
-  <!--                      v-slot="validationContext"-->
-  <!--                    >-->
-  <!--                      <b-form-group label="MAIL_PASSWORD *">-->
-  <!--                        <b-form-input-->
-  <!--                          :state="getValidationState(validationContext)"-->
-  <!--                          aria-describedby="Password-feedback"-->
-  <!--                          label="Password"-->
-  <!--                          placeholder="MAIL_PASSWORD"-->
-  <!--                          v-model="server.password"-->
-  <!--                        ></b-form-input>-->
-  <!--                        <b-form-invalid-feedback-->
-  <!--                          id="Password-feedback"-->
-  <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
-  <!--                      </b-form-group>-->
-  <!--                    </validation-provider>-->
-  <!--                  </b-col>-->
+    <!--                  &lt;!&ndash; encryption  &ndash;&gt;-->
+    <!--                  <b-col lg="4" md="4" sm="12">-->
+    <!--                    <validation-provider-->
+    <!--                      name="encryption"-->
+    <!--                      :rules="{ required: true}"-->
+    <!--                      v-slot="validationContext"-->
+    <!--                    >-->
+    <!--                      <b-form-group label="MAIL_ENCRYPTION *">-->
+    <!--                        <b-form-input-->
+    <!--                          :state="getValidationState(validationContext)"-->
+    <!--                          aria-describedby="encryption-feedback"-->
+    <!--                          label="encryption"-->
+    <!--                          placeholder="MAIL_ENCRYPTION"-->
+    <!--                          v-model="server.encryption"-->
+    <!--                        ></b-form-input>-->
+    <!--                        <b-form-invalid-feedback-->
+    <!--                          id="encryption-feedback"-->
+    <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
+    <!--                      </b-form-group>-->
+    <!--                    </validation-provider>-->
+    <!--                  </b-col>-->
 
-  <!--                  &lt;!&ndash; encryption  &ndash;&gt;-->
-  <!--                  <b-col lg="4" md="4" sm="12">-->
-  <!--                    <validation-provider-->
-  <!--                      name="encryption"-->
-  <!--                      :rules="{ required: true}"-->
-  <!--                      v-slot="validationContext"-->
-  <!--                    >-->
-  <!--                      <b-form-group label="MAIL_ENCRYPTION *">-->
-  <!--                        <b-form-input-->
-  <!--                          :state="getValidationState(validationContext)"-->
-  <!--                          aria-describedby="encryption-feedback"-->
-  <!--                          label="encryption"-->
-  <!--                          placeholder="MAIL_ENCRYPTION"-->
-  <!--                          v-model="server.encryption"-->
-  <!--                        ></b-form-input>-->
-  <!--                        <b-form-invalid-feedback-->
-  <!--                          id="encryption-feedback"-->
-  <!--                        >{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
-  <!--                      </b-form-group>-->
-  <!--                    </validation-provider>-->
-  <!--                  </b-col>-->
+    <!--                  <b-col md="12">-->
+    <!--                    <b-form-group>-->
+    <!--                      <b-button variant="primary" type="submit">{{$t('submit')}}</b-button>-->
+    <!--                    </b-form-group>-->
+    <!--                  </b-col>-->
+    <!--                </b-row>-->
+    <!--              </b-card-body>-->
+    <!--            </b-card>-->
+    <!--          </b-col>-->
+    <!--        </b-row>-->
+    <!--      </b-form>-->
+    <!--    </validation-observer>-->
 
-  <!--                  <b-col md="12">-->
-  <!--                    <b-form-group>-->
-  <!--                      <b-button variant="primary" type="submit">{{$t('submit')}}</b-button>-->
-  <!--                    </b-form-group>-->
-  <!--                  </b-col>-->
-  <!--                </b-row>-->
-  <!--              </b-card-body>-->
-  <!--            </b-card>-->
-  <!--          </b-col>-->
-  <!--        </b-row>-->
-  <!--      </b-form>-->
-  <!--    </validation-observer>-->
-
-  <!--  </div>-->
+    <!--  </div>-->
 </template>
 
 <script>

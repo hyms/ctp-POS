@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Mail\Payment_Sale;
 use App\Models\Client;
 use App\Models\PaymentSale;
-use App\Models\Role;
 use App\Models\Sale;
 use App\Models\Setting;
+use App\Models\sms_gateway;
 use App\utils\helpers;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -15,11 +15,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use App\Models\PaymentWithCreditCard;
 use Inertia\Inertia;
 use Nexmo\Client\Credentials\Basic;
-use Nwidart\Modules\Facades\Module;
-use App\Models\sms_gateway;
 
 class PaymentSalesController extends Controller
 {
@@ -28,10 +25,15 @@ class PaymentSalesController extends Controller
 
     public function index(request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'Reports_payments_Sales', PaymentSale::class);
+        Inertia::share('titlePage', 'Pagos de Ventas');
+        return Inertia::render('Reports/payments/payments_sales');
+    }
 
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+    public function getTable(request $request)
+    {
+        if (!helpers::checkPermission('Reports_payments_Sales')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $data = collect();
         $filter = collect($request->get('filter'));
@@ -44,12 +46,12 @@ class PaymentSalesController extends Controller
 
         // Check If User Has Permission View  All Records
         $Payments = PaymentSale::with('sale', 'sale.client')
-            ->where('deleted_at', '=', null);
-//            ->where(function ($query) use ($view_records) {
-//                if (!$view_records) {
-//                    return $query->where('user_id', '=', Auth::user()->id);
-//                }
-//            })
+            ->where('deleted_at', '=', null)
+            ->where(function ($query) {
+                if (!helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            });
 
         $Payments = helpers::getFilter($filter,
             $Payments,
@@ -66,26 +68,26 @@ class PaymentSalesController extends Controller
             ->get();
 
         foreach ($Payments as $Payment) {
-
-            $item['date'] = $Payment->date;
-            $item['Ref'] = $Payment->Ref;
-            $item['Ref_Sale'] = $Payment['sale']?->Ref;
-            $item['client_name'] = $Payment['sale']?->client?->company_name;
-            $item['Reglement'] = $Payment->Reglement;
-            $item['montant'] = $Payment->montant;
-            // $item['montant'] = number_format($Payment->montant, 2, '.', '');
-            $data->add($item);
+            $data->add([
+                'date' => $Payment->date,
+                'Ref' => $Payment->Ref,
+                'Ref_Sale' => $Payment['sale']?->Ref,
+                'client_name' => $Payment['sale']?->client?->company_name,
+                'Reglement' => $Payment->Reglement,
+                'montant' => $Payment->montant,
+                // $item['montant'] = number_format($Payment->montant, 2, '.', ''),
+            ]);
         }
 
-        $clients = Client::where('deleted_at', '=', null)->get(['id', 'company_name as name']);
-        $sales = Sale::whereIn('id', $Payments->pluck('sale_id'))->get(['Ref', 'id']);
+        $clients = Client::where('deleted_at', '=', null)->pluck('company_name', 'id');
+//        $sales = Sale::whereIn('id', $Payments->pluck('sale_id'))->pluck('Ref', 'id');
 
-        Inertia::share('titlePage', 'Pagos de Ventas');
-        return Inertia::render('Reports/payments/payments_sales', [
-            'payments' => $data,
-            'sales' => $sales,
-            'clients' => $clients,
-        ]);
+        return response()->json(
+            [
+                'payments' => $data,
+//                'sales' => $sales,
+                'clients' => $clients,
+            ]);
 
     }
 
@@ -93,6 +95,7 @@ class PaymentSalesController extends Controller
 
     public function store(Request $request)
     {
+
 //        $this->authorizeForUser($request->user('api'), 'create', PaymentSale::class);
 
         DB::transaction(function () use ($request) {

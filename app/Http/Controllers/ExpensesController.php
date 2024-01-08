@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\UserWarehouse;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
-use App\Models\Role;
 use App\Models\Warehouse;
 use App\utils\helpers;
 use Carbon\Carbon;
@@ -22,12 +19,15 @@ class ExpensesController extends Controller
 
     public function index(request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'view', Expense::class);
+        Inertia::share('titlePage', 'Gastos');
+        return Inertia::render('Expense/Index_Expense');
+    }
 
-
-//        $helpers = new helpers();
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+    public function getTable(request $request)
+    {
+        if (!helpers::checkPermission('expense_view')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
         $filter = collect($request->get('filter'));
 //get warehouses assigned to user
@@ -35,8 +35,12 @@ class ExpensesController extends Controller
         // Check If User Has Permission View  All Records
         $Expenses = Expense::with('expense_category', 'warehouse')
             ->where('deleted_at', '=', null)
-            ->whereIn('warehouse_id', $warehouses->pluck('id'));
-
+            ->whereIn('warehouse_id', $warehouses->pluck('id'))
+            ->where(function ($query) {
+                if (!helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            });
         if ($filter->count() > 0) {
             $filterData = false;
             if (!empty($filter->get('start_date')) && $filter->get('end_date')) {
@@ -64,27 +68,25 @@ class ExpensesController extends Controller
         $Expenses = $Expenses->orderByDesc('updated_at')->get();
         $data = collect();
         foreach ($Expenses as $Expense) {
-
-            $item['id'] = $Expense->id;
-            $item['date'] = $Expense->date;
-            $item['Ref'] = $Expense->Ref;
-            $item['details'] = $Expense->details;
-            $item['amount'] = $Expense->amount;
-            $item['warehouse_name'] = $Expense['warehouse']->name;
-            $item['category_name'] = $Expense['expense_category']->name;
-            $item['updated_at'] = Carbon::parse($Expense->updated_at)->format('Y-m-d');
-            $data->add($item);
+            $data->add([
+                'id' => $Expense->id,
+                'date' => $Expense->date,
+                'Ref' => $Expense->Ref,
+                'details' => $Expense->details,
+                'amount' => $Expense->amount,
+                'warehouse_name' => $Expense['warehouse']->name,
+                'category_name' => $Expense['expense_category']->name,
+                'updated_at' => Carbon::parse($Expense->updated_at)->format('Y-m-d')
+            ]);
         }
 
-        $Expenses_category = ExpenseCategory::where('deleted_at', '=', null)->get(['id', 'name']);
+        $Expenses_category = ExpenseCategory::where('deleted_at', '=', null)->pluck('name','id');
 
-
-        Inertia::share('titlePage', 'Gastos');
-        return Inertia::render('Expense/Index_Expense', [
+       return response()->json([
             'expenses' => $data,
             'Expenses_category' => $Expenses_category,
-            'warehouses' => $warehouses,
-            'filter_form' => $filter
+            'warehouses' => $warehouses->pluck('name', 'id'),
+//            'filter_form' => $filter
         ]);
 
     }
@@ -93,9 +95,11 @@ class ExpensesController extends Controller
 
     public function store(Request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'create', Expense::class);
+        if (!helpers::checkPermission('expense_add')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
 
-        request()->validate([
+        $request->validate([
             'expense.date' => 'required',
             'expense.warehouse_id' => 'required',
             'expense.category_id' => 'required',
@@ -129,15 +133,14 @@ class ExpensesController extends Controller
     public function update(Request $request, $id)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'update', Expense::class);
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+        if (!helpers::checkPermission('expense_edit')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $expense = Expense::findOrFail($id);
 
         // Check If User Has Permission view All Records
-//        if (!$view_records) {
-//            // Check If User->id === expense->id
-//            $this->authorizeForUser($request->user('api'), 'check_record', $expense);
+//        if (!helpers::checkPermission('check_record')) {
+//            return response()->json(['message' => "No tiene permisos"], 406);
 //        }
 
         request()->validate([
@@ -163,15 +166,14 @@ class ExpensesController extends Controller
 
     public function destroy(Request $request, $id)
     {
-//        $this->authorizeForUser($request->user('api'), 'delete', Expense::class);
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+        if (!helpers::checkPermission('expense_delete')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
         $expense = Expense::findOrFail($id);
 
         // Check If User Has Permission view All Records
-//        if (!$view_records) {
-//            // Check If User->id === expense->id
-//            $this->authorizeForUser($request->user('api'), 'check_record', $expense);
+//        if (!helpers::checkPermission('check_record')) {
+//            return response()->json(['message' => "No tiene permisos"], 406);
 //        }
 
         $expense->update([
@@ -220,12 +222,9 @@ class ExpensesController extends Controller
     public function create(Request $request)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'create', Expense::class);
-
         //get warehouses assigned to user
-        $warehouses = helpers::getWarehouses(auth()->user());
-
-        $Expenses_category = ExpenseCategory::where('deleted_at', '=', null)->get(['id', 'name']);
+        $warehouses = helpers::getWarehouses(auth()->user())->pluck('name','id');
+        $Expenses_category = ExpenseCategory::where('deleted_at', '=', null)->pluck('name','id');
 
         Inertia::share('titlePage', 'Nuevo Gasto');
         return Inertia::render('Expense/Form_Expense', [
@@ -239,15 +238,11 @@ class ExpensesController extends Controller
     public function edit(Request $request, $id)
     {
 
-//        $this->authorizeForUser($request->user('api'), 'update', Expense::class);
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
         $Expense = Expense::where('deleted_at', '=', null)->findOrFail($id);
 
         // Check If User Has Permission view All Records
-//        if (!$view_records) {
-//             Check If User->id === Expense->id
-//            $this->authorizeForUser($request->user('api'), 'check_record', $Expense);
+//        if (!helpers::checkPermission('check_record')) {
+//            return response()->json(['message' => "No tiene permisos"], 406);
 //        }
         $data['warehouse_id'] = '';
         if ($Expense->warehouse_id) {
@@ -272,9 +267,8 @@ class ExpensesController extends Controller
         $data['details'] = $Expense->details;
 
         //get warehouses assigned to user
-        $warehouses = helpers::getWarehouses(auth()->user());
-
-        $Expenses_category = ExpenseCategory::where('deleted_at', '=', null)->get(['id', 'name']);
+        $warehouses = helpers::getWarehouses(auth()->user())->pluck('name','id');
+        $Expenses_category = ExpenseCategory::where('deleted_at', '=', null)->pluck('name','id');
 
         Inertia::share('titlePage', 'Modificar Gasto');
         return Inertia::render('Expense/Form_Expense', [
