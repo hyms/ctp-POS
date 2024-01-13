@@ -21,6 +21,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SalesReturnController;
 use App\Http\Controllers\SalesTypeController;
+use App\Http\Controllers\ScreenController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TransferController;
 use App\Http\Controllers\UnitsController;
@@ -351,6 +352,13 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
     Route::post('pos/create_pos', [PosController::class, 'CreatePOS']);
     Route::get('pos/get_products_pos', [PosController::class, 'GetProductsByParametre']);
     Route::get('pos/', [PosController::class, 'GetELementPos']);
+    //------------------------------------------------------------------\\
+    ////---------------------- Extra -----------------------------------\\
+    Route::post('screen/list', [ScreenController::class, 'ListSales']);
+    Route::get('screen/',  function (request $request) {
+        Inertia::share('titlePage', 'Prographics CTP');
+        return Inertia::render('Screen');
+    });
     //------------------------------------------------------------------\\
     Route::get('pdf', [\App\Http\Controllers\PDFController::class, 'printHtml']);
 

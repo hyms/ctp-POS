@@ -310,6 +310,12 @@ function loadPermissions() {
                     label: "Ver Tienda",
                     permission: "Pos_view",
                 },
+                {
+                    cols: "6",
+                    // label: labelsNew.pointofsales,
+                    label: "Ver Pantalla",
+                    permission: "screen_view",
+                },
             ],
         },
         {

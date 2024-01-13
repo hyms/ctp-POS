@@ -105,6 +105,7 @@ function submit() {
                                 :loading="processing"
                                 variant="flat"
                                 size="large"
+                                :disabled="processing"
                             >
                                 Ingresar
                                 <template v-slot:loader>
