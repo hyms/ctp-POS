@@ -1312,7 +1312,7 @@
 //       this.payment.provider_id = row.id;
 //       this.payment.provider_name = row.name;
 //       this.payment.due = row.due;
-//       this.payment.date = new Date().toISOString().slice(0, 10);
+//       this.payment.date = moment().format("YYYY-MM-DD");
 //       setTimeout(() => {
 //         this.$bvModal.show("modal_Pay_due");
 //       }, 500);
@@ -1437,7 +1437,7 @@
 //       this.payment_return.provider_id = row.id;
 //       this.payment_return.provider_name = row.name;
 //       this.payment_return.return_Due = row.return_Due;
-//       this.payment_return.date = new Date().toISOString().slice(0, 10);
+//       this.payment_return.date = moment().format("YYYY-MM-DD");
 //       setTimeout(() => {
 //         this.$bvModal.show("modal_Pay_return_due");
 //       }, 500);

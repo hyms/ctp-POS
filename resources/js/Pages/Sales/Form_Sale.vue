@@ -1,10 +1,11 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import {inject, onMounted, ref, watch} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router } from "@inertiajs/vue3";
 import { api, globals, helpers, rules } from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
 import SelectClient from "@/Components/select_client.vue";
+const moment = inject("moment");
 
 const props = defineProps({
     clients: Object,
@@ -41,7 +42,7 @@ const payment = ref({
 const sales = ref([]);
 const saleForm = ref({
     id: "",
-    date: new Date().toISOString().slice(0, 10),
+    date: moment().format("YYYY-MM-DD"),
     statut: "pending",
     notes: "",
     client_id: "",
@@ -615,7 +616,7 @@ function resetForm() {
     };
     saleForm.value = {
         id: "",
-        date: new Date().toISOString().slice(0, 10),
+        date: moment().format("YYYY-MM-DD"),
         statut: "completed",
         notes: "",
         client_id: "",

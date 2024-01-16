@@ -1,10 +1,10 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import {inject, onMounted, ref, watch} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router } from "@inertiajs/vue3";
 import { api, globals, helpers, labels, rules } from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
-
+const moment = inject("moment");
 const props = defineProps({
     details: Object,
     transfer: Object,
@@ -44,7 +44,7 @@ const transferForm = ref({
     to_warehouse: "",
     statut: "completed",
     notes: "",
-    date: new Date().toISOString().slice(0, 10),
+    date: moment().format("YYYY-MM-DD"),
     items: 0,
     tax_rate: 0,
     TaxNet: 0,
@@ -83,7 +83,7 @@ function resetForm() {
         id: "",
         notes: "",
         warehouse_id: "",
-        date: new Date().toISOString().slice(0, 10),
+        date: moment().format("YYYY-MM-DD"),
     };
     detailsForm.value = [];
     products.value = [];

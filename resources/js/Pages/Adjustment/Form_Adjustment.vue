@@ -1,9 +1,10 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import {inject, onMounted, ref, watch} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router } from "@inertiajs/vue3";
 import { api, helpers, labels, rules } from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
+const moment = inject("moment");
 
 const props = defineProps({
     warehouses: Object,
@@ -28,7 +29,7 @@ const adjustmentForm = ref({
     id: "",
     notes: "",
     warehouse_id: "",
-    date: new Date().toISOString().slice(0, 10),
+    date: moment().format("YYYY-MM-DD"),
 });
 
 const product = ref({
@@ -49,7 +50,7 @@ function resetForm() {
         id: "",
         notes: "",
         warehouse_id: "",
-        date: new Date().toISOString().slice(0, 10),
+        date: moment().format("YYYY-MM-DD"),
     };
     detailsForm.value = [];
     products.value = [];

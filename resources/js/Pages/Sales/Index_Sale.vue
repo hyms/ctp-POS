@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import {inject, onMounted, ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import { router } from "@inertiajs/vue3";
@@ -7,7 +7,7 @@ import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import { api, globals, helpers, labels, rules } from "@/helpers";
 import InvoiceDialog from "@/Components/dialogs/InvoiceDialog.vue";
-
+const moment = inject("moment");
 const props = defineProps({
     // filter_form: Object,
     errors: Object,
@@ -254,7 +254,7 @@ function New_Payment(saleItem) {
         reset_form_payment();
         EditPaymentMode.value = false;
         sale.value = saleItem;
-        payment.value.date = new Date().toISOString().slice(0, 10);
+        payment.value.date = moment().format("YYYY-MM-DD");
         Number_Order_Payment();
         payment.value.montant = saleItem.due;
         payment.value.Reglement = "cash";

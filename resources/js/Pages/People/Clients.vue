@@ -1,11 +1,11 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import {inject, onMounted, ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import { api, globals, helpers, labels, rules } from "@/helpers";
 import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
 import Snackbar from "@/Components/snackbar.vue";
-
+const moment = inject("moment");
 const currency = globals.currency();
 
 const props = defineProps({
@@ -287,7 +287,7 @@ function Pay_due(row) {
     payment.value.client_id = row.id;
     payment.value.client_name = row.name;
     payment.value.due = row.due;
-    payment.value.date = new Date().toISOString().slice(0, 10);
+    payment.value.date = moment().format("YYYY-MM-DD");
     dialogPayDue.value = true;
     dialogInvoice.value = false;
 }
@@ -368,7 +368,7 @@ function Submit_Pay_due() {
 // this.payment_return.client_id = row.id;
 // this.payment_return.client_name = row.name;
 // this.payment_return.return_Due = row.return_Due;
-// this.payment_return.date = new Date().toISOString().slice(0, 10);
+// this.payment_return.date = moment().format("YYYY-MM-DD");
 // setTimeout(() => {
 //     this.$bvModal.show("modal_Pay_return_due");
 // }, 500);
