@@ -43,7 +43,7 @@ const print_pos = (element_id) => {
 const print_pdf = (element_id, title) => {
     event.preventDefault();
     let divContents = document.getElementById(element_id).innerHTML;
-    let url = "/pdf?body=" + divContents;
+    let url = "/pdf?body=" + encodeURIComponent(divContents);
     let win = window.open(url, "_blank");
     win.focus();
 };

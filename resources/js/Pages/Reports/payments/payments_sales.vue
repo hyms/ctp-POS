@@ -39,6 +39,7 @@ const fields = ref([
     { title: "Cliente", key: "client_name" },
     { title: "Forma de Pago", key: "Reglement" },
     { title: "Monto", key: "montant" },
+    { title: "Notas", key: "notes" },
 ]);
 const jsonFields = ref({
     Fecha: "date",
@@ -47,6 +48,7 @@ const jsonFields = ref({
     Cliente: "client_name",
     "Forma de Pago": "Reglement",
     Monto: "montant",
+    Notas: "notes",
 });
 
 function sumCount(rowObj) {

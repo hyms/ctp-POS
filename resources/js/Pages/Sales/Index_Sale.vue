@@ -1,5 +1,5 @@
 <script setup>
-import {inject, onMounted, ref} from "vue";
+import { inject, onMounted, ref } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import { router } from "@inertiajs/vue3";
@@ -7,6 +7,7 @@ import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import { api, globals, helpers, labels, rules } from "@/helpers";
 import InvoiceDialog from "@/Components/dialogs/InvoiceDialog.vue";
+
 const moment = inject("moment");
 const props = defineProps({
     // filter_form: Object,
@@ -278,7 +279,7 @@ function Edit_Payment(payment_item) {
         payment_item.montant + payment_item.change
     ).toFixed(2);
     payment.value.notes = payment_item.notes;
-    console.log(payment_item);
+    // console.log(payment_item);
     due.value = parseFloat(sale_due.value) - payment_item.montant;
     dialogAddPayment.value = true;
 }
@@ -365,7 +366,7 @@ function Delete_Payment(item) {
 }
 
 function Remove_Payment() {
-    console.log(sale.value.id);
+    // console.log(sale.value.id);
 
     api.delete({
         url: "/payment_sale/" + sale.value.id,
@@ -385,6 +386,7 @@ function Get_Payments(id) {
     axios
         .get("/get_payments_by_sale/" + id)
         .then(({ data }) => {
+            // console.log(data);
             payments.value = data.payments;
             sale_due.value = data.due;
             dialogShowPayment.value = true;
@@ -495,6 +497,7 @@ onMounted(() => {
                                         <th>Codigo</th>
                                         <th>Monto</th>
                                         <th>Pagado en</th>
+                                        <th>Detalle</th>
                                         <th>Accion</th>
                                     </tr>
                                 </thead>
@@ -520,6 +523,9 @@ onMounted(() => {
                                                     payment.Reglement
                                                 )[0].title
                                             }}
+                                        </td>
+                                        <td>
+                                            {{ payment.notes }}
                                         </td>
                                         <td>
                                             <!--                    <v-btn-->

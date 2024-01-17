@@ -7,6 +7,7 @@ const props = defineProps({
     loading: { type: Boolean, default: false },
 });
 const emit = defineEmits(["update:modelValue"]);
+
 function updateValue(value) {
     emit("update:modelValue", value);
 }
@@ -78,7 +79,7 @@ function updateValue(value) {
                                         {{
                                             helpers.formatNumber(
                                                 detail_invoice.quantity,
-                                                2
+                                                0
                                             )
                                         }}
                                         {{ detail_invoice.unit_sale }} x
@@ -203,44 +204,19 @@ function updateValue(value) {
                         <tbody>
                             <tr>
                                 <td>
-                                    {{ invoice_pos.sale.notes }}
+                                    <div
+                                        style="text-wrap: pretty"
+                                        v-html="
+                                            invoice_pos.sale.notes.replace(
+                                                /(?:\r\n|\r|\n)/g,
+                                                '<br/>'
+                                            )
+                                        "
+                                    ></div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                    <!--          <v-table-->
-                    <!--              class="change mt-3"-->
-                    <!--              style=" font-size: 12px;"-->
-                    <!--              v-show="invoice_pos.sale.paid_amount > 0"-->
-                    <!--              density="compact"-->
-                    <!--              hover-->
-                    <!--          >-->
-                    <!--            <thead>-->
-                    <!--            <tr style="background: #eee; ">-->
-                    <!--              <th style="text-align: left;" colspan="1">Pagado en:</th>-->
-                    <!--              <th style="text-align: center;" colspan="2">Monto:</th>-->
-                    <!--              <th style="text-align: right;" colspan="1">Saldo:</th>-->
-                    <!--            </tr>-->
-                    <!--            </thead>-->
-                    <!--            <tbody>-->
-                    <!--            <tr v-for="payment_pos in invoice_pos.payments">-->
-                    <!--              <td style="text-align: left;" colspan="1">{{-->
-                    <!--                  helper.getReglamentPayment(payment_pos.Reglement)[0].title-->
-                    <!--                }}-->
-                    <!--              </td>-->
-                    <!--              <td-->
-                    <!--                  style="text-align: center;"-->
-                    <!--                  colspan="2"-->
-                    <!--              >{{ helper.formatNumber(payment_pos.montant, 2) }}-->
-                    <!--              </td>-->
-                    <!--              <td-->
-                    <!--                  style="text-align: right;"-->
-                    <!--                  colspan="1"-->
-                    <!--              >{{ helper.formatNumber(payment_pos.change, 2) }}-->
-                    <!--              </td>-->
-                    <!--            </tr>-->
-                    <!--            </tbody>-->
-                    <!--          </v-table>-->
                 </div>
             </v-card-text>
             <v-card-actions>

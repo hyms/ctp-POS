@@ -75,6 +75,7 @@ class PaymentSalesController extends Controller
                 'client_name' => $Payment['sale']?->client?->company_name,
                 'Reglement' => $Payment->Reglement,
                 'montant' => $Payment->montant,
+                'notes' => $Payment->notes,
                 // $item['montant'] = number_format($Payment->montant, 2, '.', ''),
             ]);
         }

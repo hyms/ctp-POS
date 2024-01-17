@@ -6,7 +6,10 @@ use App\Models\Adjustment;
 use App\Models\AdjustmentDetail;
 use App\Models\Client;
 use App\Models\Expense;
+use App\Models\PaymentPurchase;
+use App\Models\PaymentPurchaseReturns;
 use App\Models\PaymentSale;
+use App\Models\PaymentSaleReturns;
 use App\Models\Product;
 use App\Models\product_warehouse;
 use App\Models\ProductVariant;
@@ -1432,6 +1435,9 @@ class ReportController extends Controller
             return response()->json(['message' => "No tiene permisos"], 406);
         }
 
+        $role = Auth::user()->roles()->first();
+//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
+
         $data = collect();
 
         $item['sales'] = Sale::where('deleted_at', '=', null)->whereBetween('date', array($request->from, $request->to))
@@ -1440,43 +1446,43 @@ class ReportController extends Controller
                 DB::raw("count(*) as nmbr")
             )->first();
 
-//        $item['purchases'] = Purchase::where('deleted_at', '=', null)->whereBetween('date', array($request->from, $request->to))
-//            ->select(
-//                DB::raw('SUM(GrandTotal) AS sum'),
-//                DB::raw("count(*) as nmbr")
-//            )->first();
-//
-//        $item['returns_sales'] = SaleReturn::where('deleted_at', '=', null)->whereBetween('date', array($request->from, $request->to))
-//            ->select(
-//                DB::raw('SUM(GrandTotal) AS sum'),
-//                DB::raw("count(*) as nmbr")
-//            )->first();
-//
-//        $item['returns_purchases'] = PurchaseReturn::where('deleted_at', '=', null)->whereBetween('date', array($request->from, $request->to))
-//            ->select(
-//                DB::raw('SUM(GrandTotal) AS sum'),
-//                DB::raw("count(*) as nmbr")
-//            )->first();
+        $item['purchases'] = Purchase::where('deleted_at', '=', null)->whereBetween('date', array($request->from, $request->to))
+            ->select(
+                DB::raw('SUM(GrandTotal) AS sum'),
+                DB::raw("count(*) as nmbr")
+            )->first();
+
+        $item['returns_sales'] = SaleReturn::where('deleted_at', '=', null)->whereBetween('date', array($request->from, $request->to))
+            ->select(
+                DB::raw('SUM(GrandTotal) AS sum'),
+                DB::raw("count(*) as nmbr")
+            )->first();
+
+        $item['returns_purchases'] = PurchaseReturn::where('deleted_at', '=', null)->whereBetween('date', array($request->from, $request->to))
+            ->select(
+                DB::raw('SUM(GrandTotal) AS sum'),
+                DB::raw("count(*) as nmbr")
+            )->first();
 
         $item['paiement_sales'] = PaymentSale::whereBetween('date', array($request->from, $request->to))
             ->select(
                 DB::raw('SUM(montant) AS sum')
             )->first();
 
-//        $item['PaymentSaleReturns'] = PaymentSaleReturns::whereBetween('date', array($request->from, $request->to))
-//            ->select(
-//                DB::raw('SUM(montant) AS sum')
-//            )->first();
-//
-//        $item['PaymentPurchaseReturns'] = PaymentPurchaseReturns::whereBetween('date', array($request->from, $request->to))
-//            ->select(
-//                DB::raw('SUM(montant) AS sum')
-//            )->first();
-//
-//        $item['paiement_purchases'] = PaymentPurchase::whereBetween('date', array($request->from, $request->to))
-//            ->select(
-//                DB::raw('SUM(montant) AS sum')
-//            )->first();
+        $item['PaymentSaleReturns'] = PaymentSaleReturns::whereBetween('date', array($request->from, $request->to))
+            ->select(
+                DB::raw('SUM(montant) AS sum')
+            )->first();
+
+        $item['PaymentPurchaseReturns'] = PaymentPurchaseReturns::whereBetween('date', array($request->from, $request->to))
+            ->select(
+                DB::raw('SUM(montant) AS sum')
+            )->first();
+
+        $item['paiement_purchases'] = PaymentPurchase::whereBetween('date', array($request->from, $request->to))
+            ->select(
+                DB::raw('SUM(montant) AS sum')
+            )->first();
 
         $item['expenses'] = Expense::whereBetween('date', array($request->from, $request->to))
             ->where('deleted_at', '=', null)
@@ -1485,26 +1491,26 @@ class ReportController extends Controller
             )->first();
 
 
-//        $item['return_sales'] = SaleReturn::where('deleted_at', '=', null)
-//            ->whereBetween('date', array($request->from, $request->to))
-//            ->where(function ($query) {
-//                if (!helpers::checkPermission('record_view')) {
+        $item['return_sales'] = SaleReturn::where('deleted_at', '=', null)
+            ->whereBetween('date', array($request->from, $request->to))
+//            ->where(function ($query) use ($view_records) {
+//                if (!$view_records) {
 //                    return $query->where('user_id', '=', Auth::user()->id);
 //                }
 //            })
-//            ->get(DB::raw('SUM(GrandTotal)  As sum'))
-//            ->first()->sum;
+            ->get(DB::raw('SUM(GrandTotal)  As sum'))
+            ->first()->sum;
 
 
-//        $item['purchases_return'] = PurchaseReturn::where('deleted_at', '=', null)
-//            ->whereBetween('date', array($request->from, $request->to))
-////            ->where(function ($query) use ($view_records) {
-////                if (!$view_records) {
-////                    return $query->where('user_id', '=', Auth::user()->id);
-////                }
-////            })
-//            ->get(DB::raw('SUM(GrandTotal)  As sum'))
-//            ->first()->sum;
+        $item['purchases_return'] = PurchaseReturn::where('deleted_at', '=', null)
+            ->whereBetween('date', array($request->from, $request->to))
+//            ->where(function ($query) use ($view_records) {
+//                if (!$view_records) {
+//                    return $query->where('user_id', '=', Auth::user()->id);
+//                }
+//            })
+            ->get(DB::raw('SUM(GrandTotal)  As sum'))
+            ->first()->sum;
 
 
         //calcule COGS and average cost

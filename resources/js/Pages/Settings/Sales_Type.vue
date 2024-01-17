@@ -114,7 +114,7 @@ function reset_Form() {
 
 //---------------------- delete modal  ------------------------------\\
 function Delete_SalesType(item) {
-    console.log(item);
+    // console.log(item);
     reset_Form();
     sales_type.value = item;
     dialogDelete.value = true;

@@ -360,7 +360,7 @@ function verifiedForm() {
 //-------------------------------- Invoice POS ------------------------------\\
 function Invoice_POS(id) {
     dialogInvoice.value = false;
-    console.log(id);
+    // console.log(id);
     api.get({
         url: "/sales_print_invoice/" + id,
         loadingItem: loadingInvoice,

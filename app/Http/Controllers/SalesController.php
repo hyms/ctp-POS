@@ -624,7 +624,7 @@ class SalesController extends Controller
 
         $item['id'] = $sale->id;
         $item['Ref'] = $sale->Ref;
-        $item['date'] = Carbon::parse($sale->date)->format('d-m-Y');
+        $item['date'] = Carbon::parse($sale->date)->format('d-m-Y') . ' ' . Carbon::parse($sale->created_at)->format('H:i');
         $item['discount'] = number_format($sale->discount, 2, '.', '');
         $item['shipping'] = number_format($sale->shipping, 2, '.', '');
         $item['taxe'] = number_format($sale->TaxNet, 2, '.', '');
@@ -697,15 +697,7 @@ class SalesController extends Controller
     {
 
 //        $this->authorizeForUser($request->user('api'), 'view', PaymentSale::class);
-//        $role = Auth::user()->roles()->first();
-//        $view_records = Role::findOrFail($role->id)->inRole('record_view');
         $Sale = Sale::findOrFail($id);
-
-        // Check If User Has Permission view All Records
-//        if (!$view_records) {
-//            // Check If User->id === Sale->id
-//            $this->authorizeForUser($request->user('api'), 'check_record', $Sale);
-//        }
 
         $payments = PaymentSale::with('sale')
             ->where('sale_id', $id)
