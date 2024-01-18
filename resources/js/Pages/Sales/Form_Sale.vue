@@ -1,10 +1,11 @@
 <script setup>
-import {inject, onMounted, ref, watch} from "vue";
+import { inject, onMounted, ref, watch } from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import { router } from "@inertiajs/vue3";
 import { api, globals, helpers, rules } from "@/helpers";
 import Snackbar from "@/Components/snackbar.vue";
 import SelectClient from "@/Components/select_client.vue";
+
 const moment = inject("moment");
 
 const props = defineProps({
@@ -413,9 +414,10 @@ function Calcul_Total() {
     let grand_total = GrandTotal.value.toFixed(2);
     GrandTotal.value = parseFloat(grand_total);
 
+    payment.value.amount = 0;
     // if (payment.value.status == "paid") {
-    // payment.value.received_amount = helpers.formatNumber(GrandTotal.value, 2);
-    payment.value.amount = helpers.formatNumber(GrandTotal.value, 2);
+    //     // payment.value.received_amount = helpers.formatNumber(GrandTotal.value, 2);
+    //     payment.value.amount = helpers.formatNumber(GrandTotal.value, 2);
     // }
 }
 

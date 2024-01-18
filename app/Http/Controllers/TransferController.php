@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\product_warehouse;
 use App\Models\ProductVariant;
+use App\Models\Setting;
 use App\Models\Transfer;
 use App\Models\TransferDetail;
 use App\Models\Unit;
@@ -824,5 +825,72 @@ class TransferController extends Controller
         ]);
     }
 
+//-------------- Print Invoice transfer---------------\\
 
+    public function Print_Invoice_Transfer(Request $request, $id)
+    {
+        $helpers = new helpers();
+        $details = collect();
+
+        $transfer = Transfer::with(['details.product.unitSale','user','from_warehouse','to_warehouse'])
+            ->where('deleted_at', '=', null)
+            ->where(function ($query) {
+                if (!helpers::checkPermission('record_view')) {
+                    return $query->where('user_id', '=', Auth::user()->id);
+                }
+            })
+            ->findOrFail($id);
+
+        $item['id'] = $transfer->id;
+        $item['Ref'] = $transfer->Ref;
+        $item['date'] = Carbon::parse($transfer->date)->format('d-m-Y') . ' ' . Carbon::parse($transfer->created_at)->format('H:i');
+        $item['user_name'] = $transfer['user']->username;
+        $item['from_warehouse'] = $transfer['from_warehouse']->name;
+        $item['to_warehouse'] = $transfer['to_warehouse']->name;
+        $item['notes'] = $transfer['notes'];
+
+        foreach ($transfer['details'] as $detail) {
+
+            //check if detail has sale_unit_id Or Null
+            if ($detail->purchase_unit_id !== null) {
+                $unit = Unit::where('id', $detail->purchase_unit_id)->first();
+            } else {
+                $product_unit_id = Product::with('unitPurchase')
+                    ->where('id', $detail->product_id)
+                    ->first();
+                $unit = Unit::where('id', $product_unit_id['unitPurchase']->id)->first();
+            }
+
+            if ($detail->product_variant_id) {
+
+                $productsVariants = ProductVariant::where('product_id', $detail->product_id)
+                    ->where('id', $detail->product_variant_id)->first();
+
+                $data['code'] = $productsVariants->name . '-' . $detail['product']['code'];
+                $data['name'] = $productsVariants->name . '-' . $detail['product']['name'];
+
+            } else {
+                $data['code'] = $detail['product']['code'];
+                $data['name'] = $detail['product']['name'];
+            }
+
+
+            $data['quantity'] = number_format($detail->quantity, 2, '.', '');
+            $data['unit_sale'] = $unit->ShortName;
+
+            $data['is_imei'] = $detail['product']['is_imei'];
+            $data['imei_number'] = $detail->imei_number;
+
+            $details->add($data);
+        }
+
+        $settings = Setting::where('deleted_at', '=', null)->first();
+
+        return response()->json([
+            'setting' => $settings,
+            'transfer' => $item,
+            'details' => $details,
+        ]);
+
+    }
 }

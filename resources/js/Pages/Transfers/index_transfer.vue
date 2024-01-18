@@ -4,6 +4,7 @@ import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import { router } from "@inertiajs/vue3";
 import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
+import InvoiceTransferDialog from "@/Components/dialogs/InvoiceTransferDialog.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import { api, globals, helpers, labels } from "@/helpers";
 
@@ -47,16 +48,28 @@ const jsonFields = ref({
     Estado: "statut",
 });
 
-// //------ Reset Filter
-// function Reset_Filter() {
-//   this.search = "";
-//   this.Filter_date = "";
-//   this.Filter_status = "";
-//   this.Filter_Ref = "";
-//   this.Filter_From = "";
-//   this.Filter_To = "";
-//   this.Get_Transfers(this.serverParams.page);
-// },
+const invoice_pos = ref({
+    transfer: {
+        Ref: "",
+        client_name: "",
+        discount: "",
+        taxe: "",
+        tax_rate: "",
+        shipping: "",
+        GrandTotal: "",
+        paid_amount: "",
+    },
+    details: [],
+    setting: {
+        logo: "",
+        CompanyName: "",
+        CompanyAdress: "",
+        email: "",
+        CompanyPhone: "",
+    },
+});
+const dialogInvoice = ref(false);
+const loadingInvoice = ref(false);
 
 //----------------------------------- Get Details Transfer ------------------------------\\
 function showDetails(id) {
@@ -106,6 +119,23 @@ function Remove_Transfer(id) {
     });
 }
 
+function Invoice_POS(id) {
+    dialogInvoice.value = false;
+    api.get({
+        url: "/transfer_print_invoice/" + id,
+        loadingItem: loadingInvoice,
+        snackbar,
+        onSuccess: (data) => {
+            invoice_pos.value = data;
+            // payments_pos.value = data.payments;
+            // pos_settings.value = data.pos_settings;
+            dialogInvoice.value = true;
+            // if (response.data.pos_settings.is_printable) {
+            //   setTimeout(() => print_it(), 1000);
+            // }
+        },
+    });
+}
 function loadData() {
     api.get({
         url: "/transfers/list",
@@ -129,6 +159,11 @@ onMounted(() => {
             :text="snackbar.text"
             :color="snackbar.color"
         ></snackbar>
+        <invoice-transfer-dialog
+            v-model="dialogInvoice"
+            :invoice_pos="invoice_pos"
+            :loading="loadingInvoice"
+        ></invoice-transfer-dialog>
         <!-- Modal Remove Adjustment -->
         <delete-dialog
             :model="dialogDelete"
@@ -324,6 +359,16 @@ onMounted(() => {
                         </v-chip>
                     </template>
                     <template v-slot:item.actions="{ item }">
+                        <v-btn
+                            v-if="globals.userPermision(['transfer_view'])"
+                            class="ma-1"
+                            color="secundary"
+                            icon="fas fa-print"
+                            size="x-small"
+                            variant="outlined"
+                            @click="Invoice_POS(item.id)"
+                        >
+                        </v-btn>
                         <v-btn
                             v-if="globals.userPermision(['transfer_view'])"
                             class="ma-1"

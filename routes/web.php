@@ -259,6 +259,7 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
     Route::get('payment_return_purchase_pdf/{id}', [PaymentPurchaseReturnsController::class, 'payment_return']);
     Route::get('payment_sale_pdf/{id}', [PaymentSalesController::class, 'payment_sale']);
     Route::get('sales_print_invoice/{id}', [SalesController::class, 'Print_Invoice_POS']);
+    Route::get('transfer_print_invoice/{id}', [TransferController::class, 'Print_Invoice_Transfer']);
     //------------------------------------------------------------------\\
 
     //-------------------------- Reports ---------------------------
