@@ -37,7 +37,7 @@ class TransferController extends Controller
         $data = collect();
         //get warehouses assigned to user
         $warehouses = helpers::getWarehouses(auth()->user());
-
+        $filter = collect($request->get('filter'));
         // Check If User Has Permission View  All Records
         $transfers = Transfer::with('from_warehouse', 'to_warehouse')
             ->where('deleted_at', '=', null)
@@ -47,7 +47,20 @@ class TransferController extends Controller
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             });
-
+        if ($filter->count() > 0) {
+            if (!empty($filter->get('start_date')) && $filter->get('end_date')) {
+                $transfers = $transfers->whereBetween('date', [Carbon::parse($filter->get('start_date')), Carbon::parse($filter->get('end_date'))]);
+            }
+            if (!empty($filter->get('ref'))) {
+                $transfers = $transfers->where('Ref', 'like', "%{$filter->get('ref')}%");
+            }
+            if (!empty($filter->get('to_warehouse'))) {
+                $transfers = $transfers->where('warehouse_id', '=', $filter->get('warehouse'));
+            }
+            if (!empty($filter->get('from_warehouse'))) {
+                $transfers = $transfers->where('warehouse_id', '=', $filter->get('warehouse'));
+            }
+        }
         $transfers = $transfers->orderByDesc('updated_at')
             ->get();
 

@@ -42,28 +42,18 @@ class ExpensesController extends Controller
                 }
             });
         if ($filter->count() > 0) {
-            $filterData = false;
             if (!empty($filter->get('start_date')) && $filter->get('end_date')) {
                 $Expenses = $Expenses->whereBetween('date', [Carbon::parse($filter->get('start_date')), Carbon::parse($filter->get('end_date'))]);
-                $filterData = true;
             }
             if (!empty($filter->get('ref'))) {
                 $Expenses = $Expenses->where('Ref', 'like', "%{$filter->get('ref')}%");
-                $filterData = true;
             }
             if (!empty($filter->get('warehouse'))) {
                 $Expenses = $Expenses->where('warehouse_id', '=', $filter->get('warehouse'));
-                $filterData = true;
             }
             if (!empty($filter->get('category'))) {
                 $Expenses = $Expenses->where('expense_category_id', '=', $filter->get('category'));
-                $filterData = true;
             }
-            if (!$filterData) {
-                $Expenses = $Expenses->limit(1000);
-            }
-        } else {
-            $Expenses = $Expenses->limit(500);
         }
         $Expenses = $Expenses->orderByDesc('updated_at')->get();
         $data = collect();

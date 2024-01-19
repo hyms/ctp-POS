@@ -56,36 +56,24 @@ class SalesController extends Controller
             ->whereIn('warehouse_id', $warehouses->pluck('id'))
             ->orderBy('updated_at', 'desc');
         if ($filter->count() > 0) {
-            $filterData = false;
             if (!empty($filter->get('start_date')) && $filter->get('end_date')) {
                 $Sales = $Sales->whereBetween('date', [Carbon::parse($filter->get('start_date')), Carbon::parse($filter->get('end_date'))]);
-                $filterData = true;
             }
             if (!empty($filter->get('sale_ref'))) {
                 $Sales = $Sales->where('Ref', 'like', "%{$filter->get('sale_ref')}%");
-                $filterData = true;
             }
             if (!empty($filter->get('client'))) {
                 $Sales = $Sales->where('client_id', '=', $filter->get('client'));
-                $filterData = true;
             }
             if (!empty($filter->get('sale_type'))) {
                 $Sales = $Sales->where('sales_type_id', '=', $filter->get('sale_type'));
-                $filterData = true;
             }
             if (!empty($filter->get('statut'))) {
                 $Sales = $Sales->where('statut', '=', $filter->get('statut'));
-                $filterData = true;
             }
             if (!empty($filter->get('status_payment'))) {
                 $Sales = $Sales->where('payment_statut', '=', $filter->get('status_payment'));
-                $filterData = true;
             }
-            if (!$filterData) {
-                $Sales = $Sales->limit(1000);
-            }
-        } else {
-            $Sales = $Sales->limit(500);
         }
         $Sales = $Sales->get();
         $data = collect();
@@ -138,8 +126,6 @@ class SalesController extends Controller
         $customers = client::where('deleted_at', '=', null)->pluck('company_name','id');
 
         //get warehouses assigned to user
-
-
         $sales_types = SalesType::where('deleted_at', '=', null)->pluck('name','id');
 
         return response()->json([

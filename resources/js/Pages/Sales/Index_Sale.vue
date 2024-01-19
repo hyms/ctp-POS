@@ -100,8 +100,8 @@ const sale = ref({});
 
 const form = ref(null);
 const form_filter = ref({
-    start_date: "",
-    end_date: "",
+    start_date: moment().subtract(1, 'days').format('YYYY-MM-DD'),
+    end_date: moment().format('YYYY-MM-DD'),
     sale_ref: "",
     client: "",
     sale_type: "",

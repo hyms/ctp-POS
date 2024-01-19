@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import {inject, onMounted, ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import { router } from "@inertiajs/vue3";
@@ -10,7 +10,7 @@ import { api, globals, helpers, labels } from "@/helpers";
 
 const currency = globals.currency();
 const enableDays = globals.oldDay();
-
+const moment = inject("moment");
 const props = defineProps({
     errors: Object,
 });
@@ -68,6 +68,14 @@ const invoice_pos = ref({
         CompanyPhone: "",
     },
 });
+const form_filter = ref({
+    start_date: moment().subtract(1, 'days').format('YYYY-MM-DD'),
+    end_date: moment().format('YYYY-MM-DD'),
+    ref: "",
+    warehouse: "",
+    category: "",
+});
+const menu = ref(false);
 const dialogInvoice = ref(false);
 const loadingInvoice = ref(false);
 
@@ -139,6 +147,9 @@ function Invoice_POS(id) {
 function loadData() {
     api.get({
         url: "/transfers/list",
+        params: {
+            filter: form_filter.value,
+        },
         loadingItem: loading,
         snackbar,
         onSuccess: (data) => {
@@ -323,6 +334,86 @@ onMounted(() => {
             </v-col>
             <v-spacer></v-spacer>
             <v-col cols="auto" class="text-right">
+                <v-menu
+                    v-model="menu"
+                    :close-on-content-click="false"
+                    location="bottom"
+                >
+                    <template v-slot:activator="{ props }">
+                        <v-btn
+                            color="primary"
+                            variant="outlined"
+                            size="small"
+                            elevation="1"
+                            class="mr-2 my-1"
+                            v-bind="props"
+                            append-icon="fas fa-search"
+                        >
+                            Filtros
+                        </v-btn>
+                    </template>
+
+                    <v-card max-width="500">
+                        <v-form @submit.prevent="loadData()">
+                            <v-card-text>
+                                <v-row>
+                                    <v-col cols="12" sm="6">
+                                        <v-text-field
+                                            v-model="form_filter.start_date"
+                                            variant="outlined"
+                                            clearable
+                                            hide-details="auto"
+                                            type="date"
+                                            :label="labels.start_date"
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12" sm="6">
+                                        <v-text-field
+                                            v-model="form_filter.end_date"
+                                            variant="outlined"
+                                            clearable
+                                            hide-details="auto"
+                                            type="date"
+                                            :label="labels.end_date"
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12" sm="6">
+                                        <v-text-field
+                                            v-model="form_filter.sale_ref"
+                                            variant="outlined"
+                                            clearable
+                                            hide-details="auto"
+                                            type="text"
+                                            :label="labels.transfer.Ref"
+                                        ></v-text-field>
+                                    </v-col>
+
+                                </v-row>
+                            </v-card-text>
+                            <v-divider></v-divider>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn
+                                    variant="text"
+                                    size="small"
+                                    color="error"
+                                    @click="menu = false"
+                                >
+                                    Cancelar
+                                </v-btn>
+                                <v-btn
+                                    type="submit"
+                                    variant="tonal"
+                                    size="small"
+                                    color="primary"
+                                    :loading="loading"
+                                >
+                                    Buscar
+                                </v-btn>
+                            </v-card-actions>
+                        </v-form>
+                    </v-card>
+                </v-menu>
                 <ExportBtn
                     :data="transfers"
                     :fields="jsonFields"

@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import {inject, onMounted, ref} from "vue";
 import Layout from "@/Layouts/Authenticated.vue";
 import ExportBtn from "@/Components/buttons/ExportBtn.vue";
 import { router } from "@inertiajs/vue3";
@@ -7,6 +7,7 @@ import DeleteDialog from "@/Components/dialogs/DeleteDialog.vue";
 import Snackbar from "@/Components/snackbar.vue";
 import { api, globals, helpers, labels } from "@/helpers";
 
+const moment = inject("moment");
 const props = defineProps({
     filter_form: Object,
     errors: Object,
@@ -48,8 +49,8 @@ const expense = ref({
     id: "",
 });
 const form_filter = ref({
-    start_date: "",
-    end_date: "",
+    start_date: moment().subtract(1, 'days').format('YYYY-MM-DD'),
+    end_date: moment().format('YYYY-MM-DD'),
     ref: "",
     warehouse: "",
     category: "",

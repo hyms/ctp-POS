@@ -33,6 +33,7 @@ class AdjustmentController extends Controller
         }
 //get warehouses assigned to user
         $warehouses = $this->getWarehouses();
+        $filter = collect($request->get('filter'));
         // Check If User Has Permission View  All Records
         $Adjustments = Adjustment::with('warehouse')
             ->where('deleted_at', '=', null)
@@ -42,7 +43,14 @@ class AdjustmentController extends Controller
                     return $query->where('user_id', '=', Auth::user()->id);
                 }
             });
-
+        if ($filter->count() > 0) {
+            if (!empty($filter->get('start_date')) && $filter->get('end_date')) {
+                $Adjustments = $Adjustments->whereBetween('date', [Carbon::parse($filter->get('start_date')), Carbon::parse($filter->get('end_date'))]);
+            }
+            if (!empty($filter->get('ref'))) {
+                $Adjustments = $Adjustments->where('Ref', 'like', "%{$filter->get('sale_ref')}%");
+            }
+        }
         $Adjustments = $Adjustments->orderByDesc('updated_at')->get();
         $data = collect();
         foreach ($Adjustments as $Adjustment) {
