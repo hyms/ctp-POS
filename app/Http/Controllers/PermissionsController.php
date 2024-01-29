@@ -120,7 +120,7 @@ class PermissionsController extends Controller
             $permissions = $permissions->filter();
             $permissions = $permissions->map(function ($item, $key) {
                 return $key;
-            });
+            })->all();
             $role->syncPermissions($permissions);
 
         }, 10);

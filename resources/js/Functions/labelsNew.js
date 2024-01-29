@@ -674,7 +674,7 @@ export default {
     Cancelled: "Cancelado",
     Shipping_status: "Estado del envío",
     Users_Report: "Informe de usuarios",
-    stock_report: "Informe de existencias",
+    stock_report: "Informe de stock",
     Total_quotations: "Cotizaciones totales",
     Total_return_sales: "Ventas de devolución total",
     Total_return_purchases: "Compras de devolución total",

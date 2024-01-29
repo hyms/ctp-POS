@@ -386,15 +386,16 @@ function loadPermissions() {
                     label: labelsNew.SalesReport,
                     permission: "Reports_sales",
                 },
-                {
-                    cols: "12",
-                    label: labelsNew.ProfitandLoss,
-                    permission: "Reports_profit",
-                    // },{
-                    //     cols: "12",
-                    //     label: labelsNew.ProductQuantityAlerts,
-                    //     permission: "Reports_quantity_alerts",
-                },
+                // {
+                //     cols: "12",
+                //     label: labelsNew.ProfitandLoss,
+                //     permission: "Reports_profit",
+                // }
+                // ,{
+                //     cols: "12",
+                //     label: labelsNew.ProductQuantityAlerts,
+                //     permission: "Reports_quantity_alerts",
+                // },
                 {
                     cols: "12",
                     label: labelsNew.Warehouse_report,
@@ -425,11 +426,11 @@ function loadPermissions() {
                     label: labelsNew.product_report,
                     permission: "product_report",
                 },
-                {
-                    cols: "12",
-                    label: labelsNew.product_sales_report,
-                    permission: "product_sales_report",
-                },
+                // {
+                //     cols: "12",
+                //     label: labelsNew.product_sales_report,
+                //     permission: "product_sales_report",
+                // },
             ],
         },
         {

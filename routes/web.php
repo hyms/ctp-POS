@@ -232,8 +232,6 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
     //------------------------------- Settings ------------------------\\
     Route::prefix('settings')->group(function () {
         Route::get('/', [SettingsController::class, 'index']);
-        Route::get('/list', [SettingsController::class, 'getTable']);
-        Route::post('/', [SettingsController::class, 'store']);
         Route::put('/{id}', [SettingsController::class, 'update']);
         Route::delete('/{id}', [SettingsController::class, 'destroy']);
     });
@@ -301,7 +299,7 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
         Route::get("/warhouse_count_stock", [ReportController::class, "Warhouse_Count_Stock"]);
 //        Route::get("/report_today", [ReportController::class, "report_today"]);
         Route::get("/count_quantity_alert", [ReportController::class, "count_quantity_alert"]);
-        Route::get("/profit_and_loss", [ReportController::class, "ProfitAndLoss"]);
+//        Route::get("/profit_and_loss", [ReportController::class, "ProfitAndLoss"]);
         Route::get("/report_dashboard", [ReportController::class, "report_dashboard"]);
         Route::get("/top_products", [ReportController::class, "report_top_products"]);
         Route::get("/top_customers", [ReportController::class, "report_top_customers"]);

@@ -19,7 +19,7 @@
         "vue-html-to-paper": "^2.0.3",
         "vue-json-excel3": "^1.0.19",
         "vue3-tags-input": "^1.0.12",
-        "vuetify": "^3.4.10"
+        "vuetify": "^3.5.1"
     },
     "devDependencies": {
         "@fortawesome/fontawesome-svg-core": "^6.5.1",
@@ -43,10 +43,10 @@
         "postcss": "^8.4.6",
         "prettier": "^2.8.8",
         "resolve-url-loader": "^5.0.0",
-        "sass": "^1.62.0",
-        "sass-loader": "^13.3.2",
-        "vite": "^4.5.1",
-        "vue": "^3.4.13",
+        "sass": "^1.70.0",
+        "sass-loader": "^13.3.3",
+        "vite": "^4.5.2",
+        "vue": "^3.4.15",
         "vue-cli-plugin-vuetify": "~2.5.8",
         "vue-loader": "^17.4.2",
         "vue-template-compiler": "^2.7.14"

@@ -223,7 +223,7 @@ function loadMenu() {
                 activate: ["/report/client"],
             });
         }
-        //  if (globals.userPermision(["Reports_profit"])) {
+        // if (globals.userPermision(["Reports_profit"])) {
         //     subItems.push({
         //         label: "Perdidas y Ganancias",
         //         url: "/report/profit_and_loss",
@@ -241,7 +241,7 @@ function loadMenu() {
 
         if (globals.userPermision(["Warehouse_report"])) {
             subItems.push({
-                label: "Reporte de agencias",
+                label: "Reporte de almacenes",
                 url: "/report/warehouse_report",
                 activate: ["/report/warehouse_report"],
             });
@@ -271,6 +271,8 @@ function loadMenu() {
                 "/report/client",
                 "/report/stock",
                 "/report/top_products",
+                "/report/users_report",
+                "/report/warehouse_report",
             ],
             subItems: subItems.slice(),
         });
@@ -288,20 +290,20 @@ function loadMenu() {
         ])
     ) {
         subItems = [];
-        // if (globals.userPermision(["setting_system"])) {
-        //     subItems.push({
-        //         label: labelsNew.SystemSettings,
-        //         url: "/system_settings",
-        //         activate: ["/system_settings"],
-        //     });
-        // }
-        // if (globals.userPermision(["pos_settings"])) {
-        //     subItems.push({
-        //         label: labelsNew.pos_settings,
-        //         url: "/pos_settings",
-        //         activate: ["/pos_settings"],
-        //     });
-        // }
+        if (globals.userPermision(["setting_system"])) {
+            subItems.push({
+                label: labelsNew.SystemSettings,
+                url: "/get_Settings_data",
+                activate: ["/system_settings"],
+            });
+        }
+        if (globals.userPermision(["pos_settings"])) {
+            subItems.push({
+                label: labelsNew.pos_settings,
+                url: "/pos_settings",
+                activate: ["/pos_settings"],
+            });
+        }
         if (globals.userPermision(["permissions_view"])) {
             subItems.push({
                 label: labelsNew.GroupPermissions,
@@ -337,13 +339,13 @@ function loadMenu() {
                 activate: ["/users"],
             });
         }
-        // if (globals.userPermision(["backup"])) {
-        //     subItems.push({
-        //         label: labelsNew.Backup,
-        //         url: "/backup",
-        //         activate: ["/backup"],
-        //     });
-        // }
+        if (globals.userPermision(["backup"])) {
+            subItems.push({
+                label: labelsNew.Backup,
+                url: "/backup",
+                activate: ["/backup"],
+            });
+        }
 
         menuItems.value.push({
             label: labelsNew.Settings,
