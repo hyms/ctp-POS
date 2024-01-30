@@ -9,8 +9,8 @@ const reglaments = [
     { title: "Otros", value: "other" },
 ];
 const salesStatus = [
-    { title: "Completado", value: "completed", color: "primary" },
     { title: "Pendiente", value: "pending", color: "secondary" },
+    { title: "Completado", value: "completed", color: "primary" },
     // { title: "Entregado", value: "ordered", color: "info" },
     { title: "Entregado", value: "delivered", color: "info" },
 ];
@@ -116,6 +116,12 @@ const statutSale = (value = null) => {
     }
     return salesStatus.find((item) => item.value === value).title;
 };
+const statutSaleForm = (value = null) => {
+    if (value == null || value === "") {
+        return salesStatus;
+    }
+    return salesStatus.filter((item) => item.value !== value);
+};
 const statutSaleColor = (value) => {
     return salesStatus.find((item) => item.value === value).color;
 };
@@ -185,6 +191,7 @@ export default {
     statutTransfer,
     statutTransferColor,
     statutSale,
+    statutSaleForm,
     statutSaleColor,
     statusPayment,
     statusPaymentColor,

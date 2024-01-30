@@ -195,6 +195,7 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
         Route::delete('/{id}', [SalesController::class, 'destroy']);
         Route::get('/create', [SalesController::class, 'create']);
         Route::get('/edit/{id}', [SalesController::class, 'edit']);
+        Route::put('/statut/{id}', [SalesController::class, 'updateState']);
         Route::get('/detail/{id}', [SalesController::class, 'show']);
     });
     Route::get('convert_to_sale_data/{id}', [SalesController::class, 'Elemens_Change_To_Sale']);

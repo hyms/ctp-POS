@@ -970,6 +970,7 @@ onMounted(() => {
                                 hide-details="auto"
                                 :items="helpers.statutSale()"
                                 :label="saleLabel.statut"
+                                hide-selected
                             ></v-select>
                         </v-col>
 

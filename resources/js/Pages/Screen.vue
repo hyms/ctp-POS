@@ -16,12 +16,14 @@ function getData() {
         loadingItem: loading,
         snackbar,
         onSuccess: (data) => {
+            // console.log(data);
             items.value = data.sales;
         },
     });
 }
 onMounted(() => {
     getData();
+    setInterval(getData, 30000);
 });
 </script>
 <template>
@@ -32,7 +34,7 @@ onMounted(() => {
             :color="snackbar.color"
         ></snackbar>
         <div class="auth-wrapper">
-            <v-card>
+            <v-card :loading="loading">
                 <v-toolbar color="secondary">
                     <v-toolbar-title
                         class="text-h3 font-weight-bold text-center"
@@ -42,7 +44,7 @@ onMounted(() => {
                 <v-card-text>
                     <v-data-iterator :items="items" items-per-page="42">
                         <template v-slot:default="{ items }">
-                            <v-row>
+                            <v-slide-y-transition group tag="div" class="v-row">
                                 <template v-for="(item, i) in items" :key="i">
                                     <v-col cols="12" lg="2" md="3">
                                         <v-card color="secondary">
@@ -62,7 +64,7 @@ onMounted(() => {
                                         </v-card>
                                     </v-col>
                                 </template>
-                            </v-row>
+                            </v-slide-y-transition>
                         </template>
                     </v-data-iterator>
                 </v-card-text>

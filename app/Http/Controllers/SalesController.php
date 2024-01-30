@@ -22,6 +22,7 @@ use App\utils\helpers;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -315,7 +316,7 @@ class SalesController extends Controller
                     }
 
                     if ($value['sale_unit_id'] !== null) {
-                        $this->save_product_warehouse($current_Sale, $value, $old_unit);
+                        $this->add_stock_product($current_Sale, $value, $old_unit);
                         // Delete Detail
                         if ($new_sale_details->doesntContain('id', '=', $value->id)) {
                             $SaleDetail = SaleDetail::findOrFail($value->id);
@@ -330,16 +331,8 @@ class SalesController extends Controller
                     if ($item['sale_unit_id'] !== 0) {
                         $unit_prod = Unit::where('id', $item['sale_unit_id'])->first();
 
-                        if ($request['statut'] == "completed") {
-                            $product_warehouse = $this->getProduct_warehouse($item, $request);
-                            if ($product_warehouse) {
-                                if ($unit_prod->operator == '/') {
-                                    $product_warehouse->qty -= $prod_detail['quantity'] / $unit_prod->operator_value;
-                                } else {
-                                    $product_warehouse->qty -= $prod_detail['quantity'] * $unit_prod->operator_value;
-                                }
-                                $product_warehouse->save();
-                            }
+                        if ($request['statut'] == "completed" || $request['statut'] == "delivered") {
+                            $this->sub_stock_product($item, $request, $unit_prod, $prod_detail['quantity']);
                         }
 
                         $orderDetails['sale_id'] = $id;
@@ -394,6 +387,41 @@ class SalesController extends Controller
 
         return response()->json(['success' => true]);
     }
+//------------- UPDATE SALE -----------
+
+    public function updateState(Request $request, $id)
+    {
+        if (!helpers::checkPermission('Sales_edit')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
+
+        request()->validate([
+            'statut' => 'required',
+        ]);
+
+        DB::transaction(function () use ($request, $id) {
+            $current_Sale = Sale::findOrFail($id);
+            if (SaleReturn::where('sale_id', $id)->where('deleted_at', '=', null)->exists()) {
+                return response()->json(['success' => false, 'Return exist for the Transaction' => false], 403);
+            } else {
+                $sale_details = SaleDetail::where('sale_id', $id)->get();
+                foreach ($sale_details as $key => $item) {
+                    if ($item['sale_unit_id'] !== null) {
+                        $unit_prod = Unit::where('id', $item['sale_unit_id'])->first();
+                        $this->add_stock_product($current_Sale, $item, $unit_prod);
+                        if ($request['statut'] == "completed" || $request['statut'] == "delivered") {
+                            $this->sub_stock_product($item, $current_Sale, $unit_prod, $item['quantity']);
+                        }
+                    }
+                }
+                $current_Sale->update([
+                    'statut' => $request['statut'],
+                ]);
+            }
+        }, 10);
+
+        return response()->json(['success' => true]);
+    }
 
     public function getProduct_warehouse(mixed $value, $current_Sale): mixed
     {
@@ -421,8 +449,6 @@ class SalesController extends Controller
         }
 
         DB::transaction(function () use ($id, $request) {
-//            $role = Auth::user()->roles()->first();
-//            $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $current_Sale = Sale::findOrFail($id);
             $old_sale_details = SaleDetail::where('sale_id', $id)->get();
             //$shipment_data = Shipment::where('sale_id', $id)->first();
@@ -448,7 +474,7 @@ class SalesController extends Controller
                         $old_unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
                     }
 
-                    $this->save_product_warehouse($current_Sale, $value, $old_unit);
+                    $this->add_stock_product($current_Sale, $value, $old_unit);
 
                 }
 
@@ -1290,9 +1316,9 @@ class SalesController extends Controller
      * @param $old_unit
      * @return void
      */
-    public function save_product_warehouse($current_Sale, mixed $value, $old_unit): void
+    public function add_stock_product($current_Sale, mixed $value, $old_unit): void
     {
-        if ($current_Sale->statut == "completed") {
+        if ($current_Sale->statut == "completed" || $current_Sale->statut == "delivered") {
             $product_warehouse = $this->getProduct_warehouse($value, $current_Sale);
 
             if ($product_warehouse) {
@@ -1303,6 +1329,26 @@ class SalesController extends Controller
                 }
                 $product_warehouse->save();
             }
+        }
+    }
+
+    /**
+     * @param Collection $item
+     * @param $request
+     * @param Unit $unit_prod
+     * @param $quantity
+     * @return void
+     */
+    public function sub_stock_product(Collection $item, $request, Unit $unit_prod, $quantity): void
+    {
+        $product_warehouse = $this->getProduct_warehouse($item, $request);
+        if ($product_warehouse) {
+            if ($unit_prod->operator == '/') {
+                $product_warehouse->qty -= $quantity / $unit_prod->operator_value;
+            } else {
+                $product_warehouse->qty -= $quantity * $unit_prod->operator_value;
+            }
+            $product_warehouse->save();
         }
     }
 

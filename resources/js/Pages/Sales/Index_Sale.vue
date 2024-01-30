@@ -28,6 +28,7 @@ const snackbar = ref({
     text: "",
 });
 const dialogDelete = ref(false);
+const dialogStatutSale = ref(false);
 const dialogInvoice = ref(false);
 const dialogAddPayment = ref(false);
 const dialogShowPayment = ref(false);
@@ -100,8 +101,8 @@ const sale = ref({});
 
 const form = ref(null);
 const form_filter = ref({
-    start_date: moment().subtract(1, 'days').format('YYYY-MM-DD'),
-    end_date: moment().format('YYYY-MM-DD'),
+    start_date: moment().subtract(1, "days").format("YYYY-MM-DD"),
+    end_date: moment().format("YYYY-MM-DD"),
     sale_ref: "",
     client: "",
     sale_type: "",
@@ -433,6 +434,46 @@ function Remove_Sale(id, sale_has_return) {
     }
 }
 
+function Show_Statut_Sale(item) {
+    sale.value = item;
+    dialogStatutSale.value = true;
+}
+function Show_Statut_Text(item) {
+    switch (item.statut) {
+        case "pending":
+            return "Completar Trabajo";
+        case "completed":
+            return "Trabajo Entregado";
+        default:
+            return "";
+    }
+}
+function Update_Statut_Sale() {
+    let statut = "";
+    switch (sale.value.statut) {
+        case "pending":
+            statut = "completed";
+            break;
+        case "completed":
+            statut = "delivered";
+            break;
+    }
+
+    api.put({
+        url: "/sales/statut/" + sale.value.id,
+        params: {
+            statut,
+        },
+        loadingItem: loading,
+        snackbar,
+        onSuccess: () => {
+            snackbar.value.text = "Actualizacion exitosa";
+            loadData();
+            dialogStatutSale.value = false;
+        },
+    });
+}
+
 function loadData() {
     api.get({
         url: "/sales/list",
@@ -472,6 +513,10 @@ onMounted(() => {
         <delete-dialog
             v-model="dialogDeletePayment"
             :on-save="Remove_Payment"
+        ></delete-dialog>
+        <delete-dialog
+            v-model="dialogStatutSale"
+            :on-save="Update_Statut_Sale"
         ></delete-dialog>
         <!-- Modal Show Payments-->
         <v-dialog v-model="dialogShowPayment" width="800">
@@ -1013,6 +1058,18 @@ onMounted(() => {
                             >
                                 <v-list-item-title>
                                     Eliminar
+                                </v-list-item-title>
+                            </v-list-item>
+                            <v-list-item
+                                v-if="
+                                    globals.userPermision(['Sales_edit']) &&
+                                    item.statut != 'delivered'
+                                "
+                                @click="Show_Statut_Sale(item)"
+                                prepend-icon="fas fa-cogs"
+                            >
+                                <v-list-item-title>
+                                    {{ Show_Statut_Text(item) }}
                                 </v-list-item-title>
                             </v-list-item>
                         </v-list>
