@@ -339,13 +339,13 @@ function loadMenu() {
                 activate: ["/users"],
             });
         }
-        if (globals.userPermision(["backup"])) {
-            subItems.push({
-                label: labelsNew.Backup,
-                url: "/backup",
-                activate: ["/backup"],
-            });
-        }
+        // if (globals.userPermision(["backup"])) {
+        //     subItems.push({
+        //         label: labelsNew.Backup,
+        //         url: "/backup",
+        //         activate: ["/backup"],
+        //     });
+        // }
 
         menuItems.value.push({
             label: labelsNew.Settings,

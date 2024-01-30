@@ -12,6 +12,7 @@ const salesStatus = [
     { title: "Completado", value: "completed", color: "primary" },
     { title: "Pendiente", value: "pending", color: "secondary" },
     // { title: "Entregado", value: "ordered", color: "info" },
+    { title: "Entregado", value: "delivered", color: "info" },
 ];
 const paymentStatus = [
     { title: "Pagado", value: "paid", color: "success" },

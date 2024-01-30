@@ -451,16 +451,16 @@ function loadPermissions() {
                     label: labelsNew.sales_type,
                     permission: "sales_type",
                 },
-                {
-                    cols: "12",
-                    label: labelsNew.pos_settings,
-                    permission: "pos_settings",
-                },
-                {
-                    cols: "12",
-                    label: labelsNew.Backup,
-                    permission: "backup",
-                },
+                // {
+                //     cols: "12",
+                //     label: labelsNew.pos_settings,
+                //     permission: "pos_settings",
+                // },
+                // {
+                //     cols: "12",
+                //     label: labelsNew.Backup,
+                //     permission: "backup",
+                // },
             ],
         },
     ];

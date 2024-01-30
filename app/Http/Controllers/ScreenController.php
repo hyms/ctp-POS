@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\product_warehouse;
-use App\Models\ProductVariant;
+use App\Models\Sale;
+use App\utils\helpers;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ScreenController extends Controller
@@ -13,102 +14,34 @@ class ScreenController extends Controller
 
     public function ListSales(request $request)
     {
-//        $this->authorizeForUser($request->user('api'), 'Sales_pos', Sale::class);
-        // How many items do you want to display.
-//        $perPage = 8;
-//        $pageStart = \Request::get('page', 1);
-        // Start displaying items from this number;
-//        $offSet = ($pageStart * $perPage) - $perPage;
-        $data = collect();
-
-        $product_warehouse_data = product_warehouse::where('warehouse_id', $request->warehouse_id)
-            ->with('product', 'product.unitSale')
+        if (!helpers::checkPermission('screen_view')) {
+            return response()->json(['message' => "No tiene permisos"], 406);
+        }
+        $warehouses = helpers::getWarehouses(auth()->user());
+        $Sales = Sale::with('facture', 'client', 'warehouse', 'user', 'userpos', 'sales_type')
             ->where('deleted_at', '=', null)
-            ->where(function ($query) use ($request) {
-                return $query->whereHas('product', function ($q) use ($request) {
-                    $q->where('not_selling', '=', 0);
-                })
-                    ->where(function ($query) use ($request) {
-                        if ($request->stock == '1') {
-                            return $query->where('qty', '>', 0);
-                        }
-                    });
-            })
-
-            // Filter
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('category_id'), function ($query) use ($request) {
-                    return $query->whereHas('product', function ($q) use ($request) {
-                        $q->where('category_id', '=', $request->category_id);
-                    });
-                });
-            })
-//            ->where(function ($query) use ($request) {
-//                return $query->when($request->filled('brand_id'), function ($query) use ($request) {
-//                    return $query->whereHas('product', function ($q) use ($request) {
-//                        $q->where('brand_id', '=', $request->brand_id);
-//                    });
-//                });
-//            });
-        ;
-//        $totalRows = $product_warehouse_data->count();
-
-        $product_warehouse_data = $product_warehouse_data
-//            ->offset($offSet)
-//            ->limit(8)
-            ->get();
-
-        foreach ($product_warehouse_data as $product_warehouse) {
-            if ($product_warehouse->product_variant_id) {
-                $productsVariants = ProductVariant::where('product_id', $product_warehouse->product_id)
-                    ->where('id', $product_warehouse->product_variant_id)
-                    ->where('deleted_at', null)
-                    ->first();
-
-                $item['product_variant_id'] = $product_warehouse->product_variant_id;
-                $item['Variant'] = $productsVariants->name;
-                $item['code'] = $productsVariants->name . '-' . $product_warehouse['product']->code;
-
-            } else if ($product_warehouse->product_variant_id === null) {
-                $item['product_variant_id'] = null;
-                $item['Variant'] = null;
-                $item['code'] = $product_warehouse['product']->code;
-            }
-            $item['id'] = $product_warehouse->product_id;
-            $item['barcode'] = $product_warehouse['product']->code;
-            $item['name'] = $product_warehouse['product']->name;
-//            $firstimage = explode(',', $product_warehouse['product']->image);
-//            $item['image'] = $firstimage[0];
-
-            if ($product_warehouse['product']['unitSale']->operator == '/') {
-                $item['qte_sale'] = $product_warehouse->qty * $product_warehouse['product']['unitSale']->operator_value;
-                $price = $product_warehouse['product']->price / $product_warehouse['product']['unitSale']->operator_value;
-
-            } else {
-                $item['qte_sale'] = $product_warehouse->qty / $product_warehouse['product']['unitSale']->operator_value;
-                $price = $product_warehouse['product']->price * $product_warehouse['product']['unitSale']->operator_value;
-
-            }
-            $item['unitSale'] = $product_warehouse['product']['unitSale']->ShortName;
-            $item['qte'] = $product_warehouse->qty;
-
-            $item['Net_price'] = $price;
-            if ($product_warehouse['product']->TaxNet !== 0.0) {
-
-                //Exclusive
-                if ($product_warehouse['product']->tax_method == '1') {
-                    $tax_price = $price * $product_warehouse['product']->TaxNet / 100;
-
-                    $item['Net_price'] = $price + $tax_price;
-                }
-            }
-
+            ->whereIn('warehouse_id', $warehouses->pluck('id'))
+            ->orderBy('updated_at', 'desc');
+        $Sales = $Sales->whereBetween('date', [Carbon::now()->subMonth()->format('Y-m-d'), Carbon::now()->format('Y-m-d')]);
+        $Sales = $Sales->whereIn('statut', ['completed']);
+        $Sales = $Sales->limit(100);
+        $Sales = $Sales->get();
+        $data = collect();
+        foreach ($Sales as $Sale) {
+            $item['id'] = $Sale['id'];
+            $item['date'] = $Sale['date'];
+            $item['Ref'] = $Sale['Ref'];
+            $item['statut'] = $Sale['statut'];
+            $item['warehouse_name'] = $Sale->warehouse?->name;
+            $item['client_id'] = $Sale->client?->id;
+            $item['client_name'] = $Sale->client?->company_name;
+            $item['updated_at'] = Carbon::parse($Sale->updated_at)->format('Y-m-d');
             $data->add($item);
         }
 
         return response()->json([
-            'products' => $data,
-//            'totalRows' => $totalRows,
+            'sales' => $data,
+            'warehouses' => $warehouses,
         ]);
     }
 

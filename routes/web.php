@@ -353,11 +353,11 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
     Route::get('pos/', [PosController::class, 'GetELementPos']);
     //------------------------------------------------------------------\\
     ////---------------------- Extra -----------------------------------\\
-    Route::post('screen/list', [ScreenController::class, 'ListSales']);
     Route::get('screen/',  function (request $request) {
         Inertia::share('titlePage', 'Prographics CTP');
         return Inertia::render('Screen');
     });
+    Route::get('screen/list', [ScreenController::class, 'ListSales']);
     //------------------------------------------------------------------\\
     Route::get('pdf', [\App\Http\Controllers\PDFController::class, 'printHtml']);
 
