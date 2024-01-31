@@ -87,7 +87,13 @@ class ReportController extends Controller
         $data = collect();
 
         $clients = Client::where('deleted_at', '=', null);
-
+        $filter = collect($request->get('filter'));
+        if (empty($filter->get('start_date'))) {
+            $filter['start_date'] = Carbon::now()->startOfDay()->format('Y-m-d');
+        }
+        if (empty($filter->get('end_date'))) {
+            $filter['end_date'] = Carbon::parse($filter['start_date'])->endOfDay()->format('Y-m-d');
+        }
         $clients = $clients->orderByDesc('id')
             ->get();
 
@@ -95,16 +101,19 @@ class ReportController extends Controller
             $item['total_sales'] = DB::table('sales')
                 ->where('deleted_at', '=', null)
                 ->where('client_id', $client->id)
+                ->whereBetween('date', [$filter->get('start_date'), $filter->get('end_date')])
                 ->count();
 
             $item['total_amount'] = DB::table('sales')
                 ->where('deleted_at', '=', null)
                 ->where('client_id', $client->id)
+                ->whereBetween('date', [$filter->get('start_date'), $filter->get('end_date')])
                 ->sum('GrandTotal');
 
             $item['total_paid'] = DB::table('sales')
                 ->where('sales.deleted_at', '=', null)
                 ->where('sales.client_id', $client->id)
+                ->whereBetween('date', [$filter->get('start_date'), $filter->get('end_date')])
                 ->sum('paid_amount');
 
             $item['due'] = $item['total_amount'] - $item['total_paid'];
@@ -112,11 +121,13 @@ class ReportController extends Controller
             $item['total_amount_return'] = DB::table('sale_returns')
                 ->where('deleted_at', '=', null)
                 ->where('client_id', $client->id)
+                ->whereBetween('date', [$filter->get('start_date'), $filter->get('end_date')])
                 ->sum('GrandTotal');
 
             $item['total_paid_return'] = DB::table('sale_returns')
                 ->where('sale_returns.deleted_at', '=', null)
                 ->where('sale_returns.client_id', $client->id)
+                ->whereBetween('date', [$filter->get('start_date'), $filter->get('end_date')])
                 ->sum('paid_amount');
 
             $item['return_Due'] = $item['total_amount_return'] - $item['total_paid_return'];
@@ -129,10 +140,6 @@ class ReportController extends Controller
             $data->add($item);
         }
 
-//        Inertia::share('titlePage', 'Reporte de Clientes');
-//        return Inertia::render('Reports/customers_report', [
-//            'report' => $data,
-//        ]);
         return response()->json(['report' => $data]);
     }
 
@@ -1982,9 +1989,9 @@ class ReportController extends Controller
 
         $data = $sales->map(function ($sale) {
             return [
-                'username' => $sale['user']->username,
-                'client_name' => $sale['client']->name,
-                'warehouse_name' => $sale['warehouse']->name,
+                'username' => $sale['user']?->username,
+                'client_name' => $sale['client']?->company_name,
+                'warehouse_name' => $sale['warehouse']?->name,
                 'date' => $sale->date,
                 'Ref' => $sale->Ref,
                 'sale_id' => $sale->id,

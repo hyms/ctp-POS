@@ -13,7 +13,10 @@ const report = ref([]);
 const loading = ref(false);
 const menu = ref(false);
 const search = ref("");
-// const clients = ref([]);
+const form = ref({
+    start_date: moment().subtract(1, "months").format("YYYY-MM-DD"),
+    end_date: moment().format("YYYY-MM-DD"),
+});
 const snackbar = ref({
     view: false,
     color: "",
@@ -76,6 +79,7 @@ function sumCount4(rowObj) {
 function Get_Client_Report(page) {
     api.get({
         url: "/report/client/list",
+        params: { filter: form.value },
         loadingItem: loading,
         snackbar,
         onSuccess: (data) => {
@@ -83,6 +87,7 @@ function Get_Client_Report(page) {
         },
     });
 }
+
 onMounted(() => {
     Get_Client_Report();
 });
@@ -107,6 +112,75 @@ onMounted(() => {
             </v-col>
             <v-spacer></v-spacer>
             <v-col cols="auto" class="text-right">
+                <v-menu
+                    v-model="menu"
+                    :close-on-content-click="false"
+                    location="bottom"
+                >
+                    <template v-slot:activator="{ props }">
+                        <v-btn
+                            color="primary"
+                            variant="outlined"
+                            size="small"
+                            elevation="1"
+                            class="mr-2 my-1"
+                            v-bind="props"
+                            append-icon="fas fa-search"
+                        >
+                            {{ labels.filters }}
+                        </v-btn>
+                    </template>
+
+                    <v-card max-width="500">
+                        <v-form @submit.prevent="Get_Client_Report">
+                            <v-card-text>
+                                <v-row>
+                                    <v-col cols="12" sm="6">
+                                        <v-text-field
+                                            v-model="form.start_date"
+                                            variant="outlined"
+                                            clearable
+                                            hide-details="auto"
+                                            type="date"
+                                            :label="labels.start_date"
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12" sm="6">
+                                        <v-text-field
+                                            v-model="form.end_date"
+                                            variant="outlined"
+                                            clearable
+                                            hide-details="auto"
+                                            type="date"
+                                            :label="labels.end_date"
+                                        ></v-text-field>
+                                    </v-col>
+                                </v-row>
+                            </v-card-text>
+                            <v-divider></v-divider>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn
+                                    variant="text"
+                                    size="small"
+                                    color="error"
+                                    @click="menu = false"
+                                >
+                                    {{ labels.cancel }}
+                                </v-btn>
+                                <v-btn
+                                    type="submit"
+                                    variant="tonal"
+                                    size="small"
+                                    color="primary"
+                                    @click="Get_Sales"
+                                >
+                                    {{ labels.search }}
+                                </v-btn>
+                            </v-card-actions>
+                        </v-form>
+                    </v-card>
+                </v-menu>
                 <ExportBtn
                     :data="report"
                     :fields="jsonFields"
