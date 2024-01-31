@@ -33,52 +33,39 @@ onMounted(() => {
             v-model="snackbar.view"
             :color="snackbar.color"
         ></snackbar>
-        <div class="auth-wrapper">
-            <v-card :loading="loading">
-                <v-toolbar color="secondary">
-                    <v-toolbar-title
-                        class="text-h3 font-weight-bold text-center"
-                        >Trabajos Finalizados</v-toolbar-title
-                    >
-                </v-toolbar>
-                <v-card-text>
-                    <v-data-iterator :items="items" items-per-page="42">
-                        <template v-slot:default="{ items }">
-                            <v-slide-y-transition group tag="div" class="v-row">
-                                <template v-for="(item, i) in items" :key="i">
-                                    <v-col cols="12" lg="2" md="3">
-                                        <v-card color="secondary">
-                                            <v-card-text>
-                                                <div
-                                                    class="text-h1 font-weight-regular"
-                                                >
-                                                    {{ item.raw.Ref }}
-                                                </div>
-                                                <v-divider />
-                                                <div
-                                                    class="text-h4 font-weight-regular"
-                                                >
-                                                    {{ item.raw.client_name }}
-                                                </div>
-                                            </v-card-text>
-                                        </v-card>
-                                    </v-col>
-                                </template>
-                            </v-slide-y-transition>
-                        </template>
-                    </v-data-iterator>
-                </v-card-text>
-            </v-card>
-        </div>
+        <v-card :loading="loading">
+            <v-toolbar color="secondary">
+                <v-toolbar-title class="text-h3 font-weight-bold text-center"
+                    >Trabajos Finalizados</v-toolbar-title
+                >
+            </v-toolbar>
+            <v-card-text>
+                <v-data-iterator :items="items" items-per-page="42">
+                    <template v-slot:default="{ items }">
+                        <v-slide-y-transition group tag="div" class="v-row">
+                            <template v-for="(item, i) in items" :key="i">
+                                <v-col cols="12" lg="2" md="3">
+                                    <v-card color="secondary">
+                                        <v-card-text>
+                                            <div
+                                                class="text-h1 font-weight-regular"
+                                            >
+                                                {{ item.raw.Ref }}
+                                            </div>
+                                            <v-divider />
+                                            <div
+                                                class="text-h4 font-weight-regular"
+                                            >
+                                                {{ item.raw.client_name }}
+                                            </div>
+                                        </v-card-text>
+                                    </v-card>
+                                </v-col>
+                            </template>
+                        </v-slide-y-transition>
+                    </template>
+                </v-data-iterator>
+            </v-card-text>
+        </v-card>
     </Layout>
 </template>
-
-<style lang="scss">
-//.auth-wrapper {
-//    display: flex;
-//    min-height: calc(var(--vh, 1vh) * 100);
-//    width: 100%;
-//    flex-basis: 100%;
-//    align-items: center;
-//}
-</style>
