@@ -19,7 +19,7 @@
         "vue-html-to-paper": "^2.0.3",
         "vue-json-excel3": "^1.0.19",
         "vue3-tags-input": "^1.0.12",
-        "vuetify": "^3.5.1"
+        "vuetify": "^3.5.2"
     },
     "devDependencies": {
         "@fortawesome/fontawesome-svg-core": "^6.5.1",

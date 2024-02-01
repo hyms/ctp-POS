@@ -190,7 +190,7 @@ function loadMenu() {
         subItems = [];
         if (globals.userPermision(["Reports_payments_Sales"])) {
             subItems.push({
-                label: "Reporte de Pagos Ventas",
+                label: "Reporte de Pagos recibidos",
                 url: "/payment_sale",
                 activate: ["/payment_sale"],
             });
@@ -204,7 +204,7 @@ function loadMenu() {
         // }
         if (globals.userPermision(["Reports_sales"])) {
             subItems.push({
-                label: "Reporte de ventas",
+                label: "Reporte de Ordenes",
                 url: "/report/sales",
                 activate: ["/report/sales"],
             });

@@ -36,6 +36,7 @@ const fields = ref([
     { title: "Fecha", key: "date" },
     { title: "Codigo", key: "Ref" },
     { title: "Codigo Venta", key: "Ref_Sale" },
+    { title: "Detalle Venta", key: "details" },
     { title: "Cliente", key: "client_name" },
     { title: "Forma de Pago", key: "Reglement" },
     { title: "Monto", key: "montant" },
@@ -45,6 +46,7 @@ const jsonFields = ref({
     Fecha: "date",
     Codigo: "Ref",
     "Codigo Venta": "Ref_Sale",
+    "Detalle Venta": "details",
     Cliente: "client_name",
     "Forma de Pago": "Reglement",
     Monto: "montant",
@@ -238,6 +240,9 @@ onMounted(() => {
             >
                 <template v-slot:item.Reglement="{ item }">
                     {{ helpers.getReglamentPayment(item.Reglement)[0]?.title }}
+                </template>
+                <template v-slot:item.details="{ item }">
+                    <span v-html="item.details"></span>
                 </template>
                 <template v-slot:tfoot>
                     <tr>

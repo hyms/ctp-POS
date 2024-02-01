@@ -45,7 +45,7 @@ class PaymentSalesController extends Controller
         }
 
         // Check If User Has Permission View  All Records
-        $Payments = PaymentSale::with('sale', 'sale.client')
+        $Payments = PaymentSale::with('sale.details.product', 'sale.client')
             ->where('deleted_at', '=', null)
             ->where(function ($query) {
                 if (!helpers::checkPermission('record_view')) {
@@ -66,19 +66,23 @@ class PaymentSalesController extends Controller
 
         $Payments = $Payments->orderByDesc('date')
             ->get();
-
-        foreach ($Payments as $Payment) {
-            $data->add([
-                'date' => $Payment->date,
-                'Ref' => $Payment->Ref,
-                'Ref_Sale' => $Payment['sale']?->Ref,
-                'client_name' => $Payment['sale']?->client?->company_name,
-                'Reglement' => $Payment->Reglement,
-                'montant' => $Payment->montant,
-                'notes' => $Payment->notes,
+        $data = $Payments->map(function ($item){
+            $details = "";
+            foreach ($item['sale']['details'] as $key => $detail) {
+                $details .= (($key>0)?" <br /> ":"")." {$detail->quantity} ({$detail['product']['name']}) {$detail->total} ".helpers::Get_Currency_code_static();
+            }
+            return [
+                'date' => $item->date,
+                'Ref' => $item->Ref,
+                'Ref_Sale' => $item['sale']?->Ref,
+                'client_name' => $item['sale']?->client?->company_name,
+                'Reglement' => $item->Reglement,
+                'montant' => $item->montant,
+                'notes' => $item->notes,
+                'details' => $details,
                 // $item['montant'] = number_format($Payment->montant, 2, '.', ''),
-            ]);
-        }
+            ];
+        });
 
         $clients = Client::where('deleted_at', '=', null)->pluck('company_name', 'id');
 //        $sales = Sale::whereIn('id', $Payments->pluck('sale_id'))->pluck('Ref', 'id');

@@ -102,6 +102,11 @@ class helpers
 //        }
         return $code;
     }
+public static function Get_Currency_code_static()
+    {
+        $code = 'Bs';
+        return $code;
+    }
 
     public static function to_select_vuetify(Collection $data)
     {

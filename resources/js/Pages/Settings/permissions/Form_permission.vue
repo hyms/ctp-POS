@@ -341,6 +341,11 @@ function loadPermissions() {
                     label: labelsNew.Del,
                     permission: "payment_sales_delete",
                 },
+                {
+                    cols: "6",
+                    label: "Imprimir precio en Orden",
+                    permission: "invoice_price",
+                },
             ],
         },
         {

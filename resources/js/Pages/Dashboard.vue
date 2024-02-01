@@ -406,7 +406,7 @@ onMounted(() => {
                 </v-card>
             </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="globals.userPermision(['dashboard'])">
             <!-- Stock Alert -->
             <v-col cols="12" md="8">
                 <v-card :loading="loading">
@@ -443,7 +443,7 @@ onMounted(() => {
                 </v-card>
             </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="globals.userPermision(['dashboard'])">
             <!-- Stock Alert -->
             <v-col cols="12" md="8">
                 <v-card :loading="loading">

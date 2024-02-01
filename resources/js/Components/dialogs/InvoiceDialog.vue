@@ -1,5 +1,5 @@
 <script setup>
-import { helpers, labels } from "@/helpers";
+import { globals, helpers, labels } from "@/helpers";
 
 const props = defineProps({
     modelValue: Boolean,
@@ -69,47 +69,80 @@ function updateValue(value) {
                     </div>
                     <v-table hover>
                         <tbody>
-                            <tr v-for="detail_invoice in invoice_pos.details">
-                                <td colspan="3">
-                                    <span class="font-weight-bold total">{{
-                                        detail_invoice.name
-                                    }}</span>
-                                    <br />
-                                    <span>
-                                        {{
-                                            helpers.formatNumber(
-                                                detail_invoice.quantity,
-                                                0
-                                            )
-                                        }}
-                                        {{ detail_invoice.unit_sale }} x
-                                        {{
-                                            helpers.formatNumber(
-                                                detail_invoice.total /
+                            <template
+                                v-for="detail_invoice in invoice_pos.details"
+                            >
+                                <tr
+                                    v-if="
+                                        globals.userPermision(['invoice_price'])
+                                    "
+                                >
+                                    <td colspan="3">
+                                        <span class="font-weight-bold total">{{
+                                            detail_invoice.name
+                                        }}</span>
+                                        <br />
+                                        <span>
+                                            {{
+                                                helpers.formatNumber(
                                                     detail_invoice.quantity,
+                                                    0
+                                                )
+                                            }}
+                                            {{ detail_invoice.unit_sale }} x
+                                            {{
+                                                helpers.formatNumber(
+                                                    detail_invoice.total /
+                                                        detail_invoice.quantity,
+                                                    2
+                                                )
+                                            }}
+                                        </span>
+                                    </td>
+                                    <td
+                                        style="
+                                            text-align: right;
+                                            vertical-align: bottom;
+                                        "
+                                    >
+                                        {{
+                                            helpers.formatNumber(
+                                                detail_invoice.total,
                                                 2
                                             )
                                         }}
-                                    </span>
-                                </td>
-                                <td
-                                    style="
-                                        text-align: right;
-                                        vertical-align: bottom;
-                                    "
-                                >
-                                    {{
-                                        helpers.formatNumber(
-                                            detail_invoice.total,
-                                            2
-                                        )
-                                    }}
-                                </td>
-                            </tr>
-
+                                    </td>
+                                </tr>
+                                <tr v-else>
+                                    <td colspan="3">
+                                        <span class="font-weight-bold total">{{
+                                            detail_invoice.name
+                                        }}</span>
+                                    </td>
+                                    <td
+                                        style="
+                                            text-align: right;
+                                            vertical-align: bottom;
+                                        "
+                                    >
+                                        <span>
+                                            {{
+                                                helpers.formatNumber(
+                                                    detail_invoice.quantity,
+                                                    0
+                                                )
+                                            }}
+                                        </span>
+                                        {{ detail_invoice.unit_sale }}
+                                    </td>
+                                </tr>
+                            </template>
                             <tr
                                 style="margin-top: 10px"
-                                v-if="invoice_pos.pos_settings.show_discount"
+                                v-if="
+                                    invoice_pos.pos_settings.show_discount &&
+                                    globals.userPermision(['invoice_price'])
+                                "
                             >
                                 <td colspan="3" class="total">Impuesto</td>
                                 <td style="text-align: right" class="total">
@@ -145,7 +178,10 @@ function updateValue(value) {
                                 </td>
                             </tr>
 
-                            <tr style="margin-top: 10px">
+                            <tr
+                                style="margin-top: 10px"
+                                v-if="globals.userPermision(['invoice_price'])"
+                            >
                                 <td colspan="3" class="total">Total</td>
                                 <td style="text-align: right" class="total">
                                     {{ invoice_pos.symbol }}
@@ -161,7 +197,8 @@ function updateValue(value) {
                             <tr
                                 v-if="
                                     invoice_pos.sale.paid_amount <
-                                    invoice_pos.sale.GrandTotal
+                                        invoice_pos.sale.GrandTotal &&
+                                    globals.userPermision(['invoice_price'])
                                 "
                             >
                                 <td colspan="3" class="total">Pagado</td>
@@ -179,7 +216,8 @@ function updateValue(value) {
                             <tr
                                 v-if="
                                     invoice_pos.sale.paid_amount <
-                                    invoice_pos.sale.GrandTotal
+                                        invoice_pos.sale.GrandTotal &&
+                                    globals.userPermision(['invoice_price'])
                                 "
                             >
                                 <td colspan="3" class="total">Deuda</td>
@@ -195,7 +233,7 @@ function updateValue(value) {
                             </tr>
                         </tbody>
                     </v-table>
-                    <table class="change mt-2" style="font-size: 12px">
+                    <v-table class="change mt-2" style="font-size: 12px">
                         <thead>
                             <tr class="total">
                                 <th>Notas</th>
@@ -216,7 +254,7 @@ function updateValue(value) {
                                 </td>
                             </tr>
                         </tbody>
-                    </table>
+                    </v-table>
                 </div>
             </v-card-text>
             <v-card-actions>

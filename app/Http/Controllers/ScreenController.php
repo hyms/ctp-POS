@@ -18,29 +18,40 @@ class ScreenController extends Controller
             return response()->json(['message' => "No tiene permisos"], 406);
         }
         $warehouses = helpers::getWarehouses(auth()->user());
-        $Sales = Sale::with('facture', 'client', 'warehouse', 'user', 'userpos', 'sales_type')
+        $Sales = Sale::with('facture', 'client', 'warehouse', 'user', 'userpos', 'sales_type','details.product.unitSale')
             ->where('deleted_at', '=', null)
             ->whereIn('warehouse_id', $warehouses->pluck('id'))
             ->orderBy('updated_at', 'desc');
         $Sales = $Sales->whereBetween('date', [Carbon::now()->subMonth()->format('Y-m-d'), Carbon::now()->format('Y-m-d')]);
-        $Sales = $Sales->whereIn('statut', ['completed']);
-        $Sales = $Sales->limit(100);
-        $Sales = $Sales->get();
-        $data = collect();
-        foreach ($Sales as $Sale) {
-            $item['id'] = $Sale['id'];
-            $item['date'] = $Sale['date'];
-            $item['Ref'] = $Sale['Ref'];
-            $item['statut'] = $Sale['statut'];
-            $item['warehouse_name'] = $Sale->warehouse?->name;
-            $item['client_id'] = $Sale->client?->id;
-            $item['client_name'] = $Sale->client?->company_name;
-            $item['updated_at'] = Carbon::parse($Sale->updated_at)->format('Y-m-d');
-            $data->add($item);
-        }
+        $Sales = $Sales->limit(200);
+        $Sales = $Sales->whereIn('statut', ['pending', 'completed'])->get();
+        $data = $Sales->map(function ($item, $key) {
+            $details = "";
+            foreach ($item->details as $detail) {
+                $details .= " | {$detail->quantity}({$detail['product']['name']})";
+            }
+            return [
+                'id' => $item['id'],
+                'date' => $item['date'],
+                'Ref' => $item['Ref'],
+                'statut' => $item['statut'],
+                'warehouse_name' => $item->warehouse?->name,
+                'client_id' => $item->client?->id,
+                'client_name' => $item->client?->company_name,
+                'detail' => $details,
+                'updated_at' => Carbon::parse($item->updated_at)->format('Y-m-d'),
+            ];
+        });
+        $data1 = $data->filter(function ($item) {
+            return $item['statut'] == 'completed';
+        });
+        $data2 = $data->filter(function ($item) {
+            return $item['statut'] == 'pending';
+        });
 
         return response()->json([
-            'sales' => $data,
+            'sales' => $data1->values(),
+            'sales_p' => $data2->values(),
             'warehouses' => $warehouses,
         ]);
     }
