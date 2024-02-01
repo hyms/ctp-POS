@@ -1,34 +1,41 @@
 <script setup>
-import {labels} from "@/helpers";
 const props = defineProps({
     onSave: Function,
     modelValue: Boolean,
+    text: {
+        type: String,
+        default: "Estas seguro?",
+    },
 });
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(["update:modelValue"]);
 function updateValue(value) {
-    emit('update:modelValue', value)
+    emit("update:modelValue", value);
 }
 </script>
 <template>
     <!-- Modal Remove Product -->
-    <v-dialog :model-value="modelValue"  max-width="300" @update:modelValue="updateValue">
+    <v-dialog
+        :model-value="modelValue"
+        max-width="300"
+        @update:modelValue="updateValue"
+    >
         <v-card color="surface">
             <v-card-text class="text-h5 text-center">
-            Estas seguro?
+                {{ props.text }}
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
                     small
-                     variant="tonal"
+                    variant="tonal"
                     color="primary"
                     class="ma-1"
                     @click="onSave"
                     min-width="100"
                     >Si
                 </v-btn>
-                 <v-btn
-                 small
+                <v-btn
+                    small
                     variant="elevated"
                     color="error"
                     class="ma-1"

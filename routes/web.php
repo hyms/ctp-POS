@@ -355,8 +355,10 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'auth.session']], functio
     //------------------------------------------------------------------\\
     ////---------------------- Extra -----------------------------------\\
     Route::get('screen/',  function (request $request) {
-        Inertia::share('titlePage', 'Prographics CTP');
         return Inertia::render('Screen');
+    });
+    Route::get('screen_pending/',  function (request $request) {
+        return Inertia::render('Screen_pendings');
     });
     Route::get('screen/list', [ScreenController::class, 'ListSales']);
     //------------------------------------------------------------------\\

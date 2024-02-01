@@ -22,7 +22,6 @@ use App\utils\helpers;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -1333,13 +1332,13 @@ class SalesController extends Controller
     }
 
     /**
-     * @param Collection $item
+     * @param $item
      * @param $request
      * @param Unit $unit_prod
      * @param $quantity
      * @return void
      */
-    public function sub_stock_product(Collection $item, $request, Unit $unit_prod, $quantity): void
+    public function sub_stock_product($item, $request, Unit $unit_prod, $quantity): void
     {
         $product_warehouse = $this->getProduct_warehouse($item, $request);
         if ($product_warehouse) {

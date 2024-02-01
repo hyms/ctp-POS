@@ -312,9 +312,13 @@ function loadPermissions() {
                 },
                 {
                     cols: "6",
-                    // label: labelsNew.pointofsales,
                     label: "Ver Pantalla",
                     permission: "screen_view",
+                },
+                {
+                    cols: "6",
+                    label: "Ver Pantalla de Pendientes",
+                    permission: "screen_view_pendings",
                 },
             ],
         },

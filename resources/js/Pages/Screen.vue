@@ -25,7 +25,7 @@ function getData() {
 }
 onMounted(() => {
     getData();
-    // setInterval(getData, 30000);
+    setInterval(getData, 30000);
 });
 </script>
 <template>
@@ -70,8 +70,9 @@ onMounted(() => {
                                                     <div
                                                         class="text-h4 font-weight-regular"
                                                     >
-                                                        Orden: {{ item.raw.Ref
-                                                        }}<br />
+                                                        Orden:
+                                                        {{ item.raw.Ref }}
+                                                        <br />
                                                         Trabajo
                                                         {{ item.raw.detail }}
                                                     </div>
@@ -119,8 +120,9 @@ onMounted(() => {
                                                     <div
                                                         class="text-h4 font-weight-regular"
                                                     >
-                                                        Orden: {{ item.raw.Ref
-                                                        }}<br />
+                                                        Orden:
+                                                        {{ item.raw.Ref }}
+                                                        <br />
                                                         Trabajo
                                                         {{ item.raw.detail }}
                                                     </div>
