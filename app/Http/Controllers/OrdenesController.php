@@ -12,6 +12,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
@@ -115,27 +116,29 @@ class OrdenesController extends Controller
                     'errors' => $validator->errors()
                 ]);
             }
-            //armar orden
-            $orden = array();
-            $id = null;
-            if (!isset($request['id'])) {
-                $orden['sucursal'] = Auth::user()['sucursal'];
-                $orden['estado'] = 1;
-            } else {
-                $id = $request['id'];
-            }
-            $orden['userDiseñador'] = Auth::id();
-            $orden['tipoOrden'] = $request['tipo'];
-            $orden['responsable'] = $request['responsable'];
-            $orden['telefono'] = $request['telefono'];
-            $orden['observaciones'] = $request['observaciones'] ??"";
-            $orden['cliente'] = $request['cliente'] ?? Cliente::newCliente($request['responsable'], $request['telefono'], Auth::user()['sucursal']);
-            //armar detalleOrden
-            $detalle = $this->setDetalle($request['productos']);
-            $orden['montoVenta'] = $detalle->sum('total');
-            $id = OrdenesTrabajo::newOrden($orden, $detalle->all(), $id);
+            DB::transaction(function () {
+                //armar orden
+                $orden = array();
+                $id = null;
+                if (!isset($request['id'])) {
+                    $orden['sucursal'] = Auth::user()['sucursal'];
+                    $orden['estado'] = 1;
+                } else {
+                    $id = $request['id'];
+                }
+                $orden['userDiseñador'] = Auth::id();
+                $orden['tipoOrden'] = $request['tipo'];
+                $orden['responsable'] = $request['responsable'];
+                $orden['telefono'] = $request['telefono'];
+                $orden['observaciones'] = $request['observaciones'] ?? "";
+                $orden['cliente'] = $request['cliente'] ?? Cliente::newCliente($request['responsable'], $request['telefono'], Auth::user()['sucursal']);
+                //armar detalleOrden
+                $detalle = $this->setDetalle($request['productos']);
+                $orden['montoVenta'] = $detalle->sum('total');
+                $id = OrdenesTrabajo::newOrden($orden, $detalle->all(), $id);
 //            OrdenesTrabajo::notifyNewOrden($id);
-            return response()->json(["status" => 0, 'path' => 'ordenes', 'id' => $id]);
+                return response()->json(["status" => 0, 'path' => 'ordenes', 'id' => $id]);
+            });
         } catch (Exception $error) {
             Log::error($error->getMessage());
             return response()->json(["status" => -1,

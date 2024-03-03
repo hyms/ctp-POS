@@ -66,7 +66,7 @@ class OrdenesTrabajo extends Model
         if ($reposicion) {
             $orden['tipoOrden'] = "0";
         }
-        $orden['updated_at'] = Carbon::now();
+        $orden['updated_at'] = $orden['updated_at']??Carbon::now();
         if (isset($id)) {
             $ordenes
                 ->where('id', $id)
@@ -91,12 +91,12 @@ class OrdenesTrabajo extends Model
                 }
                 $orden['correlativo'] = $correlativo;
                 $orden['codigoServicio'] = $tipo->codigo . '-' . $correlativo;
-                $orden['created_at'] = Carbon::now();
+                $orden['created_at'] = $orden['created_at']??Carbon::now();
                 return DB::table(self::$tables)->insertGetId($orden);
             });
         }
         if (!empty($id)) {
-            DetallesOrden::newOrdenDetalle($productos, $id);
+            DetallesOrden::newOrdenDetalle($productos, $id,$orden['created_at'],$orden['updated_at']);
         }
         return $id;
     }
@@ -124,7 +124,7 @@ class OrdenesTrabajo extends Model
     public static function venta(array $orden)
     {
         $ordenes = DB::table(self::$tables);
-        $orden['updated_at'] = Carbon::now();
+        $orden['updated_at'] = $orden['updated_at']??Carbon::now();
         $realized = $ordenes
             ->where('id', $orden['id'])
             ->update($orden);
@@ -135,6 +135,8 @@ class OrdenesTrabajo extends Model
                 'sucursal' => $item->sucursal,
                 'montoVenta' => $item->montoVenta,
                 'ordenTrabajo' => $item->id,
+                'created_at'=>$orden['updated_at'],
+                'updated_at'=>$orden['updated_at']
             ]);
             return $orden['id'];
         }

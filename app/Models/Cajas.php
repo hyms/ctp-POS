@@ -62,8 +62,8 @@ class Cajas extends Model
                     'observaciones' => "venta de insumos",
                     'ordenTrabajo' => !empty($request['ordenTrabajo']) ? $request['ordenTrabajo'] : "",
                     'user' => Auth::id(),
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
+                    'created_at' => $request['created_at']??Carbon::now(),
+                    'updated_at' => $request['updated_at']??Carbon::now()
                 ]);
         }
         return $caja;

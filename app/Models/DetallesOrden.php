@@ -26,8 +26,8 @@ class DetallesOrden extends Model
                 'cantidad' => $item['cantidad'],
                 'costo' => $item['costo'],
                 'total' => $item['total'],
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
+                'created_at' => $item['created_at'] ?? Carbon::now(),
+                'updated_at' => $item['updated_at'] ?? Carbon::now(),
                 'ordenTrabajo' => $ordenTrabajo
             ]);
 
@@ -72,6 +72,8 @@ class DetallesOrden extends Model
                     'producto' => $item->producto,
                     'cantidad' => $item->cantidad,
                     'detalleOrden' => $item->id,
+                    'created_at' => $item->created_at,
+                    'updated_at' => $item->updated_at,
                 ], true, $reposicion);
             }
         }
@@ -81,7 +83,7 @@ class DetallesOrden extends Model
     {
         $total = 0;
         foreach ($detalleOrden as $item) {
-            $totalParcial = round($item['costo'],2) * $item['cantidad'];
+            $totalParcial = round($item['costo'], 2) * $item['cantidad'];
             DB::table(self::$tables)
                 ->where('ordenTrabajo', $idOrden)
                 ->where('stock', $item['stock'])
@@ -91,6 +93,6 @@ class DetallesOrden extends Model
                 ]);
             $total += ($totalParcial);
         }
-        return round($total,2);
+        return round($total, 2);
     }
 }

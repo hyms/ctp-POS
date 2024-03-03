@@ -38,6 +38,7 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/migrate',[\App\Http\Controllers\DashboardController::class, 'migrate'])->middleware(['auth', 'verified'])->name('migrate');
 
 require __DIR__.'/auth.php';
 

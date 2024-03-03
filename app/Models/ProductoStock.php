@@ -125,8 +125,8 @@ class ProductoStock extends Model
                 'observaciones' => (($reposicion) ? "reposicion de insumos" : "venta de insumos"),
                 'detalleOrden' => !empty($request['detalleOrden']) ? $request['detalleOrden'] : "",
                 'user' => Auth::id(),
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
+                'created_at' => $request['created_at']??Carbon::now(),
+                'updated_at' => $request['updated_at']??Carbon::now()
             ]);
         }
         return $stock;
